@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model weights and exported ONNX files
+models/
+
+# Job description data (may be large or not ours to publish)
+data/
+
+# macOS
+.DS_Store
