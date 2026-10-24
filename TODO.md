@@ -66,6 +66,11 @@ Python 3.12.12 and 3.14.8, both built with `--enable-shared`.
 
 ### Steps
 
+The maintainer was emailed the draft below on 2026-10-24, with word
+that the issue would follow in about a week. Steps 1 to 5 wait until
+2026-10-31. If he fixes it first, or asks for no issue, skip them: the
+task is then done when a fixed release reaches CPAN.
+
 1. Search the issues again, open and closed, in case someone has
    reported it since.
 2. Reproduce it yourself from a fresh clone of upstream, without and
@@ -87,7 +92,8 @@ Python 3.12.12 and 3.14.8, both built with `--enable-shared`.
 5. Follow up on any questions. If the maintainer asks for a pull
    request, make one then.
 
-**Done when** the issue is filed. When a fixed release reaches CPAN,
+**Done when** the issue is filed, or the maintainer has fixed it or
+asked for no issue. When a fixed release reaches CPAN,
 reinstall Inline::Python with plain `cpanm Inline::Python` (see below),
 and remove this task.
 
