@@ -32,6 +32,13 @@ has the steps).
   data, synonym rules in the format Elasticsearch and Solr use, read
   with a `grammar` word list. `cmd/sections` measures how well they
   cover the ads, and lists the headings they miss.
+- Boilerplate. `internal/boilerplate` finds text that ads repeat
+  whatever the job, word for word in ads for different jobs, counting
+  similar titles as one job so that a job posted in many places isn't
+  taken for boilerplate. Repeated text mostly in the sections that
+  describe the job is a template for it instead, unless it's so
+  widespread that it says nothing about any job. `cmd/boilerplate`
+  measures how much of each kind of section is boilerplate.
 - Go does most of the work. Python stays for what needs its
   machine-learning tools: evaluating models, exporting them to ONNX,
   and notebooks.

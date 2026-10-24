@@ -142,8 +142,9 @@ type Section struct {
 	// Heading is the heading that started it, as written; empty for the
 	// summary before the first heading.
 	Heading string `json:"heading,omitempty"`
-	// Parts are what follows: text, list items and fields.
-	Parts []headings.Part `json:"parts"`
+	// Parts are what follows: text, list items and fields. A heading
+	// followed at once by another has none.
+	Parts []headings.Part `json:"parts,omitempty"`
 }
 
 // Divide divides an ad's parts into sections. Parts before the first
