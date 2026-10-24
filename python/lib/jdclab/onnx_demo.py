@@ -49,4 +49,7 @@ def save_model(path: Path) -> None:
 
 def similarities(session: ort.InferenceSession, rows) -> np.ndarray:
     """Run the model on rows, all the same length; return the score for each pair."""
-    return session.run(None, {"vectors": np.asarray(rows, dtype=np.float32)})[0]
+    # ONNX Runtime's type hints don't promise an array back, so make it one.
+    return np.asarray(
+        session.run(None, {"vectors": np.asarray(rows, dtype=np.float32)})[0]
+    )

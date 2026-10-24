@@ -80,8 +80,8 @@ then download the version `go.mod` asks for.
 Watch for other tools that rebuild the `PATH` at every prompt or change
 of folder, such as `mise activate`. Their hooks can run after direnv's
 and undo it, moving the lab's folders behind the system's. Then, in the
-lab, `perl` turns out to be macOS's own, or `python3`, `pytest` and
-`ruff` Homebrew's, while the lab's are still there further down. This
+lab, `perl` turns out to be macOS's own, or `python3`, `pytest`,
+`ruff` and `ty` Homebrew's, while the lab's are still there further down. This
 lists the hooks in the order they run; direnv's, `_direnv_hook`, should
 be the last that changes the `PATH`:
 
@@ -122,7 +122,7 @@ prints its source.
 
 `.python-version` names the Python, and pyenv picks it up in the lab's
 folder. `requirements.txt` pins every package, including indirect ones,
-for that version, the lab's tools (pytest, ruff) included.
+for that version, the lab's tools (pytest, ruff, ty) included.
 
 Build Python with `--enable-shared`, which pyenv doesn't do by default.
 Only the optional Perl side needs it, because Inline::Python links

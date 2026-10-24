@@ -124,6 +124,7 @@ tqdm==4.70.1
 traitlets==5.16.1
 transformers==5.20.2
 truststore==0.10.5
+ty==0.0.91
 typer==0.27.3
 typing_extensions==4.16.0
 tzdata==2026.5

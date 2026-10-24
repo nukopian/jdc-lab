@@ -15,6 +15,9 @@ has the steps).
 - Job ads in, as JSON Lines. `python/bin/xml_to_jsonl.py` converts a
   MySQL `--xml` export of job ads into one JSON object per ad, with the
   lab's own field names, for every language to read.
+- Type checking. ty, pinned in the venv, checks the Python code's
+  annotations, and `test-all.sh` fails on a type error as on a failing
+  test.
 
 ## v0.1.0 (2026-10-24)
 

@@ -58,16 +58,28 @@ saves, so it makes the model first if it's missing.
 
 ## Python
 
-Tests use [pytest](https://docs.pytest.org), and
+Tests use [pytest](https://docs.pytest.org),
 [ruff](https://docs.astral.sh/ruff/) checks and formats the code,
-notebooks included. Both are in the venv, so their versions are pinned
-in `requirements.txt` like everything else:
+notebooks included, and [ty](https://docs.astral.sh/ty/) checks the
+type annotations. All three are in the venv, so their versions are
+pinned in `requirements.txt` like everything else:
 
 ```
 pytest python
 ruff check python
 ruff format python
+ty check --project python
 ```
+
+Annotate every function in `python/lib` in full: its arguments and what
+it returns. Programs and tests use annotations where they help, and
+notebooks needn't. ty reads its settings, the venv and `python/lib`,
+from `pyproject.toml`. Unlike ruff, it looks for that file only from the
+folder it's run in, hence `--project python` from the root; without it,
+ty can't find the lab's packages. ty is young (version 0.0.x), and its
+rules change between releases, so keep it pinned, and expect new
+findings when upgrading it. `test-all.sh` runs it after pytest, and a
+type error fails the run as a failing test does.
 
 pytest finds the lab's packages in `python/lib` by itself, so tests
 also run where direnv doesn't, such as inside an editor. ruff knows
@@ -76,9 +88,9 @@ also run where direnv doesn't, such as inside an editor. ruff knows
 any new package of the lab's there too.
 
 `ruff format` rewrites files in place; `ruff format --check python`
-only reports. ruff may also be installed system-wide, as on a Mac with
-Homebrew, but the venv's copy is the one whose version is pinned, and
-the one `.envrc` puts first.
+only reports. ruff and ty may also be installed system-wide, as on a
+Mac with Homebrew, but the venv's copies are the ones whose versions are
+pinned, and the ones `.envrc` puts first.
 
 After installing or upgrading a package, refresh the pins and commit
 them with the change that needed them. `--exclude-editable` keeps out

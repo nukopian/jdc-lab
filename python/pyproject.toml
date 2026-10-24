@@ -19,3 +19,9 @@ extend-select = ["I", "UP", "B"]
 [tool.ruff.lint.isort]
 # The lab's own packages, in lib/: imported after third-party ones.
 known-first-party = ["jdclab"]
+
+[tool.ty.environment]
+# The venv, at the lab's root, and the lab's packages in lib/, so ty finds
+# both without direnv or flags.
+python = "../.venv"
+extra-paths = ["lib"]

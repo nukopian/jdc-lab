@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs the lab's tests in every language that's set up here: Python's with
-# pytest, Go's with go test, and Perl's with yath. A language that isn't set
+# pytest, then ty's type check, Go's with go test, and Perl's with yath. A language that isn't set
 # up is skipped, with a note saying so; any suite that fails fails the run.
 # Run it from anywhere in the lab, with direnv on (see docs/SETUP.md):
 #
@@ -35,7 +35,13 @@ note() {
 
 echo "== Python"
 if [ -x .venv/bin/pytest ]; then
-	if .venv/bin/pytest python; then note Python pass; else note Python FAIL; fi
+	# Type errors fail the run as test failures do. ty needs --project to
+	# find its settings in python/pyproject.toml from the root.
+	if .venv/bin/pytest python && .venv/bin/ty check --project python; then
+		note Python pass
+	else
+		note Python FAIL
+	fi
 else
 	note Python "skipped: no .venv"
 fi
