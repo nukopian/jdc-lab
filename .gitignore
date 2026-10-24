@@ -1,5 +1,4 @@
-# Config
-.envrc
+# Values that are yours alone, read by .envrc
 .env
 
 # Working notes: they carry context that isn't for publishing
@@ -25,6 +24,9 @@ __pycache__/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Inline's build cache, made wherever a Perl script using Inline runs
+_Inline/
 
 # Model weights and exported ONNX files
 models/

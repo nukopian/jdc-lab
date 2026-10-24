@@ -41,14 +41,16 @@ It's early days.
 
 ## Layout
 
-Python is used for experiments and for exporting models to ONNX, and
-Go for running them.
+Python is used for experiments and for exporting models to ONNX, Go
+for running them, and Perl for text work, calling Python where it
+helps.
 
 | Path | What's there |
 |------|--------------|
 | `notebooks/` | Jupyter notebooks for exploration |
 | `scripts/` | Python programs that produce models and datasets |
 | `cmd/`, `internal/` | Go programs and packages |
+| `perl/` | Perl programs |
 | `data/`, `models/` | Job descriptions, models and ONNX exports, kept out of git |
 
 Job descriptions and model files stay out of the repository. gitleaks
@@ -57,5 +59,5 @@ scanning and push protection are on as well.
 
 ## Running it
 
-The lab needs Python 3.12, Go 1.26 and ONNX Runtime.
+The lab needs Python 3.12, Go 1.26, Perl 5.36 and ONNX Runtime.
 [HOWTO.md](HOWTO.md) sets everything up from nothing, step by step.

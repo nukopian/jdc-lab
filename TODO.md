@@ -99,22 +99,10 @@ and remove this task.
 
 ### Until it's fixed
 
-Inline::Python in `perl-5.36.3@jdc-lab` was built from 0.58 with the
-fix applied, against the lab venv's Python. From the lab's folder, with
-that perlbrew library in use:
-
-```
-INLINE_PYTHON_EXECUTABLE="$PWD/.venv/bin/python3" cpanm --look Inline::Python
-```
-
-That opens a shell in the unpacked source, which inherits the setting.
-Apply the one-line fix to `Makefile.PL` there, run `cpanm -v .`, and
-exit the shell.
-
-It links pyenv's `libpython3.12.dylib`, so moving the lab to another
-Python means rebuilding it. Perl starts Python from its base install,
-not the venv: to import the venv's packages, set
-`PYTHONPATH=.venv/lib/python3.12/site-packages`.
+[HOWTO.md](HOWTO.md#inlinepython) installs Inline::Python 0.58 with
+the fix applied. When a fixed release is out, replace those steps there
+with plain `cpanm Inline::Python`, run in the lab's folder so that it
+installs into the lab's library.
 
 ### Draft issue
 

@@ -14,13 +14,16 @@ step changes, the change and the guide go in the same commit.
 | Homebrew | any | installing the rest | [brew.sh](https://brew.sh) |
 | git, gh | any recent | the repository; gh for GitHub | `brew install gh` |
 | pyenv | any recent | the Python version | `brew install pyenv` |
-| Python | 3.12.12 | experiments, ONNX export | `pyenv install 3.12.12` |
+| Python | 3.12.12 | experiments, ONNX export | see [Python](#python) |
 | gvm | any recent | Go versions, side by side | see [Go](#go) |
 | Go | 1.26.10 or newer | running models | `gvm install go1.26.10 -B` |
 | ONNX Runtime | 1.31.0 | running ONNX models from Go | `brew install onnxruntime` |
+| perlbrew | any recent | Perl versions and module libraries | see [Perl](#perl) |
+| Perl | 5.36.3 | text work, calling Python | `perlbrew install perl-5.36.3` |
+| Inline::Python | 0.58, patched | calling Python from Perl | see [Perl](#perl) |
 | gitleaks | 8.30.1 | scanning history for secrets | `brew install gitleaks` |
 | pandoc, Prince | any recent | PDFs of the documents | `brew install pandoc` and `brew install --cask prince` |
-| direnv | any recent | optional: activates the venv on `cd` | `brew install direnv` |
+| direnv | any recent | sets up the environment on `cd` | `brew install direnv` |
 
 ## Get the code
 
@@ -45,20 +48,24 @@ git clone git@github.com:nukopian/scalar.git
 folder. `requirements.txt` pins every package, including indirect ones,
 for that version.
 
+Build Python with `--enable-shared`, which pyenv doesn't do by default.
+Inline::Python links against Python's shared library, so the Perl side
+needs it.
+
 ```
 cd jdc-lab
-pyenv install --skip-existing "$(cat .python-version)"
+PYTHON_CONFIGURE_OPTS=--enable-shared pyenv install --skip-existing "$(cat .python-version)"
 "$(pyenv prefix)/bin/python" -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/pip check
 ```
 
-To activate the venv on entering the folder, create `.envrc` (it's
-git-ignored) and allow it:
+If that Python was already installed, check how it was built: this
+prints `1` for a shared build. Otherwise, reinstall it with `--force`
+added to `pyenv install`, and rebuild the venv.
 
 ```
-echo 'source .venv/bin/activate' > .envrc
-direnv allow
+"$(pyenv prefix)/bin/python" -c 'import sysconfig; print(sysconfig.get_config_var("Py_ENABLE_SHARED"))'
 ```
 
 After installing or upgrading a package, refresh the pins with
@@ -147,6 +154,95 @@ go work init . ../grammar ../scalar
 `go env GOWORK` shows whether a workspace is in use. Set `GOWORK=off` to
 build against the published versions, as anyone else cloning the lab
 would.
+
+## Perl
+
+Perl is for text work, and through Inline::Python it can call the lab's
+Python, ONNX Runtime included.
+
+### perlbrew
+
+[perlbrew](https://perlbrew.pl) keeps Perl versions apart from the
+system's, and gives each project its own library of modules. Install
+it, then load it in every new shell by adding the line it prints to
+`~/.zshrc`. It's usually this one:
+
+```
+curl -L https://install.perlbrew.pl | bash
+echo 'source ~/perl5/perlbrew/etc/bashrc' >> ~/.zshrc
+source ~/perl5/perlbrew/etc/bashrc
+```
+
+Then install the lab's Perl, cpanm, and the lab's library. Building
+Perl takes a while: adding `--notest` to `perlbrew install` skips Perl's
+own test suite to save time.
+
+```
+perlbrew install perl-5.36.3
+perlbrew install-cpanm
+perlbrew lib create perl-5.36.3@jdc-lab
+```
+
+The lab's `.envrc` switches to `perl-5.36.3@jdc-lab` on entering the
+folder (see [direnv](#direnv)), so modules installed with `cpanm` there
+go into the lab's library.
+
+### Inline::Python
+
+Inline::Python 0.58 doesn't link Python's library on macOS unless
+Python is Apple's own, so it fails all its tests and won't install.
+Until a fixed release is out ([TODO.md](TODO.md) has the details), install
+it with a one-line fix applied. In the lab's folder, with direnv on:
+
+```
+lab=$PWD
+cd "$(mktemp -d)"
+curl -sSL https://cpan.metacpan.org/authors/id/N/NI/NINE/Inline-Python-0.58.tar.gz | tar -xz
+cd Inline-Python-0.58
+perl -pi -e 's/\(\?:\\\.\\Q\$Config\{dlext\}\\E\|/(?:\\.\\Q\$Config{so}\\E|\\.\\Q\$Config{dlext}\\E|/' Makefile.PL
+grep -c 'Config{so}' Makefile.PL
+INLINE_PYTHON_EXECUTABLE="$lab/.venv/bin/python3" cpanm -v .
+cd "$lab"
+```
+
+`grep` prints `1` when the fix is in. `INLINE_PYTHON_EXECUTABLE` builds
+it against the venv's Python, without asking which one to use. The
+build links that Python's shared library, so after changing the lab's
+Python, install Inline::Python again.
+
+To check it works, run the demo. It builds a small ONNX model in Python,
+runs it with ONNX Runtime, and passes Perl arrays in and out:
+
+```
+perl perl/onnx-demo.pl
+```
+
+It prints the ONNX Runtime and Perl versions, then a table of how alike
+three vectors are, with `1.000` along the diagonal.
+
+## direnv
+
+The lab's [`.envrc`](.envrc) sets up its environment whenever you
+enter the folder: it activates the venv, switches to
+`perl-5.36.3@jdc-lab`, sets `PYTHONPATH` so that Inline::Python sees the
+venv's packages, and reads `.env` if there is one. It skips Python or
+Perl, with a note, when their setup isn't there yet.
+
+Hook direnv into the shell once, by adding this line to `~/.zshrc`:
+
+```
+eval "$(direnv hook zsh)"
+```
+
+direnv only runs an `.envrc` you've allowed. Allow the lab's after
+cloning, and again whenever it changes:
+
+```
+direnv allow
+```
+
+Values that are yours alone, such as tokens, go in `.env`. It's
+git-ignored, and holds lines of the form `NAME=value`.
 
 ## Data
 
