@@ -33,6 +33,9 @@ go.work.sum
 .venv/
 __pycache__/
 *.pyc
+# ruff's and pytest's caches (each also holds its own .gitignore)
+.ruff_cache/
+.pytest_cache/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -53,6 +56,12 @@ MYMETA.*
 cover_db/
 nytprof/
 nytprof.out*
+# Perl::Tidy's output files, backups and logs, when not writing to the
+# screen or in place without a backup
+*.tdy
+*.bak
+*.ERR
+*.LOG
 
 # Model weights and exported ONNX files
 models/
