@@ -12,9 +12,12 @@ has the steps).
 
 ## Unreleased
 
-- Job ads in, as JSON Lines. `python/bin/xml_to_jsonl.py` converts a
-  MySQL `--xml` export of job ads into one JSON object per ad, with the
-  lab's own field names, for every language to read.
+- Job ads in, as JSON Lines. `cmd/xml-to-jsonl` converts a MySQL
+  `--xml` export of job ads into one JSON object per ad, with the lab's
+  own field names, for every language to read.
+- Go does most of the work. Python stays for what needs its
+  machine-learning tools: evaluating models, exporting them to ONNX,
+  and notebooks.
 - Type checking. ty, pinned in the venv, checks the Python code's
   annotations, and `test-all.sh` fails on a type error as on a failing
   test.

@@ -41,8 +41,9 @@ It's early days.
 
 ## Layout
 
-Python is used for experiments and for exporting models to ONNX, and
-Go for running them. Perl is optional: a handy tool for working through
+Go does most of the work. Python is used where its machine-learning
+tools are needed: evaluating models, exporting them to ONNX, and
+notebooks. Perl is optional: a handy tool for working through
 text along the way, able to call the lab's Python. Nothing in the lab
 depends on it.
 
