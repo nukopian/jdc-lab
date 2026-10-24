@@ -1,0 +1,12 @@
+# Perl::Critic's profile for the lab's Perl, the same as DBIx-Squirrel's.
+# Severity 3 ("harsh") and up, from the core policies, with the policy
+# name in each message.
+severity = 3
+verbose  = 8
+theme    = core
+
+# Excluded: magic numbers and unused variables are noise more than help
+# here, complexity is judged in review, and every module starts
+# `use v5.36`, which ProhibitVersionStrings would reject. Perl::Critic
+# keeps only the last `exclude` line, so they all go on one.
+exclude  = ValuesAndExpressions::ProhibitMagicNumbers Variables::ProhibitUnusedVariables Subroutines::ProhibitExcessComplexity ValuesAndExpressions::ProhibitVersionStrings

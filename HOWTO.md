@@ -325,6 +325,29 @@ perl perl/bin/onnx-demo.pl
 It prints the ONNX Runtime and Perl versions, then the same table as
 the Python and Go demos.
 
+### Style
+
+Perl::Tidy formats the Perl, with [`.perltidyrc`](.perltidyrc), and
+Perl::Critic reviews it, with [`.perlcriticrc`](.perlcriticrc):
+severity 3 and up, from the core policies. The profile's comments say
+why each excluded policy is excluded. Both profiles are the same as
+DBIx-Squirrel's, so the Perl reads the same in both. From the lab's
+folder:
+
+```
+perlcritic perl
+for f in $(git ls-files 'perl/*.pl' 'perl/*.pm' 'perl/*.t'); do perltidy "$f" | diff -u "$f" -; done
+```
+
+The loop prints what Perl::Tidy would change in each file, and nothing
+for a file that's already tidy. `.perltidyrc` sends its output to the
+screen, for editors, so to tidy a file in place, without leaving a
+backup:
+
+```
+perltidy -nst -b -bext='/' perl/bin/onnx-demo.pl
+```
+
 ### The cpanfile
 
 [`cpanfile`](cpanfile), at the root beside `requirements.txt` and
@@ -336,7 +359,8 @@ cpanm --installdeps --with-develop .
 ```
 
 That installs the test toolchain (Test2::V0 and its plugins) and the
-tools for working on the code (`yath` and `scan-perl-prereqs`) too.
+tools for working on the code (`yath`, `perlcritic`, `perltidy` and
+`scan-perl-prereqs`) too.
 Leave out `--with-develop` to skip the tools. Modules already installed
 at the listed version or newer are left alone.
 
@@ -355,8 +379,10 @@ To keep it tidy:
 - **Phases:** modules only the tests use go in an
   `on test => sub { ... }` block, and tools for working on the code,
   such as Perl::Critic, in `on develop => sub { ... }`.
-- **Order:** alphabetical within each block. Comment a module only when
-  it needs something unusual, as Inline::Python does.
+- **Order and comments:** alphabetical within each block. Each tool in
+  the `develop` block gets a comment naming the command it provides;
+  other modules get one only when they need something unusual, as
+  Inline::Python does.
 - **When:** change the cpanfile in the same commit as the code that
   starts or stops using a module.
 

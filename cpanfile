@@ -22,8 +22,14 @@ on test => sub {
 };
 
 on develop => sub {
+    # perlcritic, which reviews the code against .perlcriticrc.
+    requires 'Perl::Critic', '1.156';
+
     # scan-perl-prereqs, for checking this file against the code.
     requires 'Perl::PrereqScanner', '1.100';
+
+    # perltidy, which formats the code with .perltidyrc.
+    requires 'Perl::Tidy', '20260826';
 
     # yath, which runs the tests, rather than prove.
     requires 'Test2::Harness', '1.000180';
