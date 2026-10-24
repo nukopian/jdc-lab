@@ -303,13 +303,18 @@ lab=$PWD
 cd "$(mktemp -d)"
 curl -sSL https://cpan.metacpan.org/authors/id/N/NI/NINE/Inline-Python-0.58.tar.gz | tar -xz
 cd Inline-Python-0.58
-perl -pi -e 's/\(\?:\\\.\\Q\$Config\{dlext\}\\E\|/(?:\\.\\Q\$Config{so}\\E|\\.\\Q\$Config{dlext}\\E|/' Makefile.PL
+old='(?:\.\Q$Config{dlext}\E|' \
+new='(?:\.\Q$Config{so}\E|\.\Q$Config{dlext}\E|' \
+perl -pi -e 's/\Q$ENV{old}\E/$ENV{new}/' Makefile.PL
 grep -c 'Config{so}' Makefile.PL
 INLINE_PYTHON_EXECUTABLE="$lab/.venv/bin/python3" cpanm -v .
 cd "$lab"
 ```
 
-`grep` prints `1` when the fix is in. `INLINE_PYTHON_EXECUTABLE` builds
+The fix is the `perl` command, with the text before and after as `old`
+and `new`: in single quotes the shell leaves them alone, and `\Q...\E`
+makes Perl match the old text literally, so nothing in them needs
+escaping. `grep` prints `1` when the fix is in. `INLINE_PYTHON_EXECUTABLE` builds
 it against the venv's Python, without asking which one to use. The
 build links that Python's shared library, so after changing the lab's
 Python, install Inline::Python again.
