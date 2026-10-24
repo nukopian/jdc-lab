@@ -62,7 +62,7 @@ def main():
     print(f"ONNX Runtime {ort.__version__}, called from Python {python}")
     print(f"Model saved to {MODEL_PATH.relative_to(LAB)}\n")
     print(f"{'':18}" + "".join(f"{name:>18}" for name in NAMES))
-    for name, row in zip(NAMES, scores):
+    for name, row in zip(NAMES, scores, strict=True):
         print(f"{name:18}" + "".join(f"{score:18.3f}" for score in row))
 
 
