@@ -15,3 +15,7 @@ target-version = "py312"
 # The defaults (pyflakes and the pycodestyle errors), plus import order
 # (I), newer syntax where the target allows it (UP) and likely bugs (B).
 extend-select = ["I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+# The lab's own packages, in lib/: imported after third-party ones.
+known-first-party = ["jdclab"]
