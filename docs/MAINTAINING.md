@@ -181,17 +181,22 @@ Things learnt the hard way, kept here so they needn't be learnt again.
   with C or C++ code can build cleanly, then segfault. Rebuilding it
   with the `SDKROOT` and `MACOSX_DEPLOYMENT_TARGET` prefix from
   [SETUP.md](SETUP.md#if-perl-wont-build-on-macos) is the first thing
-  to try, though it isn't sure to help.
-- **Compiler::Lexer 0.23 crashes** with Apple clang 21 whenever it's
-  created in verbose mode, even on `use strict;`, and rebuilding it
-  against the older SDK didn't help. So App::scan_prereqs_cpanfile and
+  to try, then the older Xcode through `DEVELOPER_DIR` described there.
+  Neither is sure to help: some modules are simply buggy, as below.
+- **Compiler::Lexer 0.23 crashes** whenever it's created in verbose
+  mode, even on `use strict;`. It isn't the compiler: it crashes the
+  same built with Xcode 26.3's clang 17 as with Xcode 27.1's clang 21.
+  The module hasn't changed since 2020, and its issues list many open
+  segfaults. So App::scan_prereqs_cpanfile and
   Perl::PrereqScanner::Lite, which use it, fail their tests and won't
   install. Perl::PrereqScanner is pure Perl, built on PPI, and works.
 - **Net::SSLeay doesn't build against OpenSSL 4**, which is Homebrew's
-  `openssl` now. A module that needs it, such as IO::Socket::SSL, has
-  to be built against `openssl@3`:
-  `OPENSSL_PREFIX=/opt/homebrew/opt/openssl@3 cpanm IO::Socket::SSL`.
-  cpanm itself fetches from CPAN over plain HTTP, so it isn't affected.
+  `openssl` now. Build it against `openssl@3` instead, before anything
+  that needs it, such as IO::Socket::SSL:
+  `OPENSSL_PREFIX=/opt/homebrew/opt/openssl@3 cpanm Net::SSLeay`.
+  Net::SSLeay 1.96 builds, passes its tests and makes TLS connections
+  that way. cpanm itself fetches from CPAN over plain HTTP, so it isn't
+  affected.
 - **Test2 under `yath` warns without UUID.** Its UUID support prefers
   the UUID module, and falls back to slower ones with a warning. UUID
   is in the cpanfile's `develop` block for that reason; it builds and
@@ -212,8 +217,24 @@ Things learnt the hard way, kept here so they needn't be learnt again.
 ## ONNX Runtime
 
 Python's `onnxruntime` and Homebrew's library must stay on the same
-version. When one moves, move the other, then run the three demos
-([SETUP.md](SETUP.md#check-it-works)): their tables must still match.
+version. `requirements.txt` pins Python's, and `brew pin` holds
+Homebrew's, so neither moves by accident. To move both, unpin and
+upgrade Homebrew's, install the same version in the venv, refreeze,
+and pin again:
+
+```
+brew unpin onnxruntime && brew upgrade onnxruntime
+.venv/bin/pip install "onnxruntime==$(brew list --versions onnxruntime | awk '{print $2}')"
+.venv/bin/pip check
+.venv/bin/pip freeze --exclude-editable > requirements.txt
+brew pin onnxruntime
+```
+
+Then run the three demos ([SETUP.md](SETUP.md#check-it-works)): their
+tables must still match. Homebrew keeps only the newest version of a
+formula, so the pin is what keeps it on the lab's version; going back
+once it has moved is awkward. If another formula needs a newer
+`onnxruntime`, Homebrew says so, and that's the time to move both.
 
 ## Before committing
 

@@ -143,10 +143,14 @@ Two copies, one for each language:
 
 ```
 brew install onnxruntime
+brew pin onnxruntime
 ```
 
 Keep them on the same version, so that a model gives the same answers
-from both languages. To compare them:
+from both languages. `requirements.txt` pins Python's; `brew pin` holds
+Homebrew's, so `brew upgrade` leaves it alone until both are moved
+together ([MAINTAINING.md](MAINTAINING.md#onnx-runtime) has how).
+`brew list --pinned` shows what's held. To compare the two:
 
 ```
 .venv/bin/python -c 'import onnxruntime; print(onnxruntime.__version__)'
@@ -249,6 +253,24 @@ no underscore: clang ignores `SDK_ROOT` and keeps its default SDK.
 Modules installed with `cpanm` afterwards, Inline::Python included,
 build without either variable. Check whether this is still needed after
 the next Xcode update.
+
+The other way round it is an older Xcode, kept beside the current one
+and used only for the build. Xcode 26.3 is the last with clang 17
+(26.4 onwards have clang 21). Download it from
+[Apple's developer site](https://developer.apple.com/download/all/),
+signed in with your Apple ID, expand it, and rename it
+`Xcode-26.3.app` in `/Applications`, so your current `Xcode.app` stays.
+`DEVELOPER_DIR` points one command at it, and nothing else changes:
+
+```
+DEVELOPER_DIR=/Applications/Xcode-26.3.app/Contents/Developer perlbrew install perl-5.36.3 --notest
+```
+
+Built this way, Perl passes its own test suite apart from
+`porting/libperl.t`, a check of the build's symbol table that likely
+trips over this toolchain's `nm`, so `--notest` is still needed for
+perlbrew to finish. It needs about 12 GB of disk; the `SDKROOT` way
+needs nothing extra.
 
 ### Inline::Python
 
