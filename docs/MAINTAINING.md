@@ -282,41 +282,14 @@ formula, so the pin is what keeps it on the lab's version; going back
 once it has moved is awkward. If another formula needs a newer
 `onnxruntime`, Homebrew says so, and that's the time to move both.
 
-## Heading phrases
+## Improving the pipeline
 
-Which section of an ad a heading starts is data:
-[`internal/sections/headings.txt`](../internal/sections/headings.txt)
-holds synonym rules in the format Elasticsearch and Solr use, each the
-section's name first, then the phrases that mean it. A phrase is found
-anywhere in a heading, in any case, and in the plural too. Where a
-heading has phrases of two sections, the section whose rule comes first
-in the file wins, so moving a rule changes which wins. A heading with no
-phrase is a details heading if it's a field's label ("Working Hours"),
-and otherwise starts an unmapped section, so the text under it shows up
-as unmapped rather than being counted as part of the section before.
-
-To improve them, measure, change, and measure again:
-
-```
-go run ./cmd/sections data/ingestion/ads.jsonl data/sections
-```
-
-It prints how many headings are of a known kind, and each section's
-share of the ads and of their text; unmapped's share is how much is left
-to map. It writes tables to `data/sections/`: `unmapped.tsv`, headings
-of no known kind, most used first, with the characters of text under
-each, which is the list to work down (sort it by that column to find the
-biggest); `disagree.tsv`, headings whose
-phrases point to more than one section, and which won; and `named.tsv`,
-plain lines taken for headings because they're exactly a section's
-name. Keep a change if more headings start the right section and none
-start the wrong one, and add a heading it settles to `TestOf`. A word
-that's common in other headings, such as "role", is better added as part
-of a longer phrase.
-
-Field labels, such as "Salary" and "Hours", are a list in
-`internal/headings`, not here: a line with one is a field, not a
-heading.
+[PIPELINE.md](PIPELINE.md#improving-it) has how: the loop of measure,
+look, change and measure again, the questions each stage's tables
+answer, with commands, and what to change for each finding. In short,
+headings' phrases are in `internal/sections/headings.txt`, field labels
+in `internal/headings`, and each change keeps a test case and updates
+PIPELINE.md's figures.
 
 ## Before committing
 

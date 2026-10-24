@@ -50,6 +50,9 @@ go run ./cmd/sections       data/ingestion/ads.jsonl data/sections
 go run ./cmd/boilerplate    data/ingestion/ads.jsonl data/boilerplate
 ```
 
+`cmd/heading-uses` is for looking at one heading across the ads, when
+improving the stages (see [Improving it](#improving-it)).
+
 After the first, only the stage being worked on needs running.
 `go install ./cmd/...` puts the programs in `bin/`, on the lab's `PATH`,
 so they can be run by name. Ads whose HTML is the same as an earlier
@@ -205,10 +208,9 @@ you".
 
 `cmd/sections` writes each ad's sections to `ads.jsonl`, and three tables
 to work from: `unmapped.tsv` (headings of no known kind, with the text
-under each), `disagree.tsv` (headings whose phrases point to two kinds),
-and `named.tsv` (plain lines taken by name).
-[MAINTAINING.md](MAINTAINING.md#heading-phrases) has how to improve the
-phrases with them.
+under each), `disagree.tsv` (headings whose phrases point to two kinds,
+and the kind that won), and `named.tsv` (plain lines taken by name).
+[Improving it](#improving-it) has how to use them.
 
 ## 5. Boilerplate: what ads repeat whatever the job
 
@@ -246,6 +248,149 @@ any: as with a common word in a search index.
 
 `cmd/boilerplate` writes `repeated.tsv`: every repeated text, with its
 groups, ads, characters, the kinds of section it's in, and its verdict.
+
+## Improving it
+
+Each program leaves tables in `data/` that say where its stage falls
+short. Improving the pipeline is a loop over them:
+
+1. **Measure:** run the stage's program, and keep its output as the
+   before (see [Before and after](#before-and-after)).
+2. **Pick** the biggest gap: the table row with the most ads or text.
+3. **Look** at it in the ads, in context, before deciding anything.
+4. **Change one thing:** a phrase, a label, a rule, a threshold.
+5. **Measure again,** and keep the change only if it helped and broke
+   nothing.
+6. **Pin it:** add a test case for what it settled, and update the
+   figures in [What it measured](#what-it-measured).
+
+### Questions, and where to look
+
+All from the lab's folder, after running the programs (see
+[Running it](#running-it)). Each command runs as it stands.
+
+**Which headings are worth working on?** The unmapped headings with the
+most text under them:
+
+```
+sort -t$'\t' -k2,2nr data/sections/unmapped.tsv | head -20
+```
+
+**What is this heading, really?** `cmd/heading-uses` shows every ad that
+uses a heading: how it's spelt, what section comes before it, and the
+first lines under it. Give it the heading's key (the third column of
+`unmapped.tsv`), or the heading as written; this takes the biggest
+from the table:
+
+```
+top=$(sort -t$'\t' -k2,2nr data/sections/unmapped.tsv | head -1 | cut -f3)
+go run ./cmd/heading-uses data/ingestion/ads.jsonl "$top"
+```
+
+or one by name:
+
+```
+go run ./cmd/heading-uses data/ingestion/ads.jsonl "please note"
+```
+
+**Did a heading go to the wrong kind?** `disagree.tsv` lists headings
+whose phrases point to more than one kind, with the kind that won:
+
+```
+head -20 data/sections/disagree.tsv
+```
+
+**Is a plain line being taken for a heading?** `named.tsv` lists the
+lines without cues that started a section because they're exactly a
+phrase:
+
+```
+head -20 data/sections/named.tsv
+```
+
+**Is something taken for a heading that isn't one?** Headings with
+figures in are often times, steps or references:
+
+```
+awk -F'\t' 'NR > 1 && $2 ~ /[0-9]/' data/headings/headings.tsv | head -20
+```
+
+**Is a field label missing?** Short unmapped headings ending in a colon
+are candidates; `fields.tsv` has the labels already known, by use:
+
+```
+awk -F'\t' 'NR > 1 && $4 ~ /:$/ && split($3, w, " ") <= 2' data/sections/unmapped.tsv | head -20
+head -20 data/headings/fields.tsv
+```
+
+**Why did an ad come out as it did?** Take its id (here the first from
+`heading-uses`), then see its blocks, and its HTML, to tell a block
+split wrongly from a heading judged wrongly:
+
+```
+id=$(go run ./cmd/heading-uses data/ingestion/ads.jsonl "please note" | awk '$1 ~ /^[0-9]+$/ {print $1; exit}')
+jq -c --arg id "$id" 'select(.id == $id) | .blocks[]' data/blocks/ads.jsonl | head -20
+jq -r --arg id "$id" 'select(.id == $id) | .html' data/ingestion/ads.jsonl | head -c 3000
+```
+
+**Is a boilerplate verdict wrong?** Templates under three or more title
+groups are worth a look, as footers filed under requirements end up
+there:
+
+```
+awk -F'\t' '$5 == "template" && $1 >= 3' data/boilerplate/repeated.tsv | cut -f1-4,6 | head -20
+```
+
+**Is boilerplate hiding in near-duplicates?** Texts that share their
+opening but aren't word for word the same are variants of one text.
+Compare how many openings and how many whole texts recur in five ads or
+more; the difference is the near-duplicates:
+
+```
+jq -r '.sections[].parts[]? | select(.role == "text") | .text' data/sections/ads.jsonl |
+  awk 'NF >= 8' | cut -c1-50 | sort | uniq -c | sort -rn | awk '$1 >= 5' | head -20
+```
+
+### What to change
+
+| What you found | What to change | Where |
+|---|---|---|
+| A heading whose words mean a kind | Add the phrase to that kind's rule; add the heading to `TestOf` | `internal/sections/headings.txt` |
+| The wrong kind won | Move the winning kind's rule below the right one's, or make the phrase longer | `headings.txt` |
+| A plain line wrongly taken by name | Make the phrase longer, or drop it | `headings.txt` |
+| A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
+| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `money`); add a case to `TestRead` | `internal/headings/headings.go` |
+| A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
+| A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
+| An advertiser's name as a heading | Nothing: it stays unmapped, and its text is found as boilerplate | |
+| A heading that introduces mixed things | Nothing: unmapped is its right place | |
+
+"Please note" is an example of the last: `heading-uses` shows it before
+notices about applications, about sites and travel, and about working
+hours, so no one kind fits it.
+
+### Before and after
+
+Keep the tables and summary from before a change, in a folder of their
+own (anything under `data/` is git-ignored):
+
+```
+mkdir -p data/before
+go run ./cmd/sections data/ingestion/ads.jsonl data/sections > data/before/summary.txt
+cp data/sections/*.tsv data/before/
+```
+
+Make the change, then compare. The first shows how the summary moved;
+the second lists the headings now mapped (lines starting `<`) and any
+newly unmapped (`>`, which should be none):
+
+```
+go run ./cmd/sections data/ingestion/ads.jsonl data/sections | diff data/before/summary.txt -
+diff <(cut -f3 data/before/unmapped.tsv | sort) <(cut -f3 data/sections/unmapped.tsv | sort)
+```
+
+The same works for the other stages' programs and tables. Then run
+the tests (`test-all.sh`), and delete `data/before` when done.
 
 ## What it measured
 

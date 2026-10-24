@@ -41,7 +41,9 @@ has the steps).
   measures how much of each kind of section is boilerplate.
 - How it works, written down. `docs/PIPELINE.md` describes the flow
   from export to boilerplate: each stage, how to run it, what it
-  decides and why, what it measured, and what it doesn't do yet.
+  decides and why, what it measured, and what it doesn't do yet, and
+  how to improve each stage from the tables it writes. `cmd/heading-uses`
+  shows how the ads use any one heading.
 - Go does most of the work. Python stays for what needs its
   machine-learning tools: evaluating models, exporting them to ONNX,
   and notebooks.

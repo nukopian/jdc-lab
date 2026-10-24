@@ -9,8 +9,9 @@
 //   - unmapped.tsv: headings of no known kind, by how many ads use
 //     them, most first, with the characters of text under them: the list
 //     to work down when adding phrases;
-//   - disagree.tsv: headings whose phrases point to more than one kind, and
-//     the kind that won;
+//   - disagree.tsv: headings whose phrases point to more than one kind:
+//     the kind that won, and all of them, in the order they come in the
+//     heading;
 //   - named.tsv: lines of text, with no cue to be headings, that started a
 //     section by being exactly a section's name.
 //
@@ -188,7 +189,7 @@ func (t tally) tables(dir string) error {
 	})
 	var unmapped, disagree strings.Builder
 	unmapped.WriteString("ads\tchars\tkey\theading\n")
-	disagree.WriteString("ads\tkinds\theading\n")
+	disagree.WriteString("ads\twon\tkinds\theading\n")
 	for _, k := range keys {
 		h := t.headings[k]
 		if _, ok := sections.Of(k); !ok {
@@ -199,7 +200,8 @@ func (t tally) tables(dir string) error {
 			for i, kind := range h.kinds {
 				names[i] = string(kind)
 			}
-			fmt.Fprintf(&disagree, "%d\t%s\t%s\n", len(h.ads), strings.Join(names, " > "), h.text)
+			won, _ := sections.Of(k)
+			fmt.Fprintf(&disagree, "%d\t%s\t%s\t%s\n", len(h.ads), won, strings.Join(names, ","), h.text)
 		}
 	}
 	var named strings.Builder
