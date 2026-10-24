@@ -20,6 +20,10 @@ has the steps).
   written, with cues from the markup, such as text that is all bold.
   Ads in plain text are laid out by their newlines. Deciding which
   blocks are headings is left to the next step.
+- Headings and fields found. `internal/headings` gives each block a
+  role: a heading, a field such as "Salary: £30,000", a repeat of the
+  ad's title or location, or text. `cmd/heading-counts` counts how many
+  ads use each heading and field label.
 - Go does most of the work. Python stays for what needs its
   machine-learning tools: evaluating models, exporting them to ONNX,
   and notebooks.
