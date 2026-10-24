@@ -1,3 +1,7 @@
+# Config
+.envrc
+.env
+
 # Python
 .venv/
 __pycache__/
