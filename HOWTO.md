@@ -18,9 +18,9 @@ step changes, the change and the guide go in the same commit.
 | gvm | any recent | Go versions, side by side | see [Go](#go) |
 | Go | 1.26.10 or newer | running models | `gvm install go1.26.10 -B` |
 | ONNX Runtime | 1.31.0 | running ONNX models from Go | `brew install onnxruntime` |
-| perlbrew | any recent | Perl versions and module libraries | see [Perl](#perl) |
-| Perl | 5.36.3 | text work, calling Python | `perlbrew install perl-5.36.3` |
-| Inline::Python | 0.58, patched | calling Python from Perl | see [Perl](#perl) |
+| perlbrew | any recent | optional: Perl versions and module libraries | see [Perl](#perl) |
+| Perl | 5.36.3 | optional: working through text | see [Perl](#perl) |
+| Inline::Python | 0.58, patched | optional: calling Python from Perl | see [Perl](#perl) |
 | gitleaks | 8.30.1 | scanning history for secrets | `brew install gitleaks` |
 | pandoc, Prince | any recent | PDFs of the documents | `brew install pandoc` and `brew install --cask prince` |
 | direnv | any recent | sets up the environment on `cd` | `brew install direnv` |
@@ -49,8 +49,9 @@ folder. `requirements.txt` pins every package, including indirect ones,
 for that version.
 
 Build Python with `--enable-shared`, which pyenv doesn't do by default.
-Inline::Python links against Python's shared library, so the Perl side
-needs it.
+Only the optional Perl side needs it, because Inline::Python links
+against Python's shared library. It does no harm otherwise, and saves
+rebuilding Python if you want Perl later.
 
 ```
 cd jdc-lab
@@ -157,8 +158,10 @@ would.
 
 ## Perl
 
-Perl is for text work, and through Inline::Python it can call the lab's
-Python, ONNX Runtime included.
+Perl is optional, and nothing else in the lab depends on it: skip this
+section unless you want it. It's a handy tool for working through text
+along the way, and through Inline::Python it can call the lab's Python,
+ONNX Runtime included.
 
 ### perlbrew
 
