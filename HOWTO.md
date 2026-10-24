@@ -242,7 +242,14 @@ direnv allow
 ```
 
 Values that are yours alone, such as tokens, go in `.env`. It's
-git-ignored, and holds lines of the form `NAME=value`.
+git-ignored, and holds lines of the form `NAME=value`. direnv reads it
+as data, without running it as shell code, and watches it: creating or
+editing `.env` reloads the environment at the next prompt, with no
+`direnv allow` needed.
+
+`.envrc` is bash, with direnv's standard library loaded first.
+`log_status` and `dotenv_if_exists` come from there. `man direnv-stdlib`
+documents the library, and `direnv stdlib` prints its source.
 
 ## Data
 
