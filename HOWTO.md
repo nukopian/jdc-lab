@@ -15,7 +15,8 @@ step changes, the change and the guide go in the same commit.
 | git, gh | any recent | the repository; gh for GitHub | `brew install gh` |
 | pyenv | any recent | the Python version | `brew install pyenv` |
 | Python | 3.12.12 | experiments, ONNX export | `pyenv install 3.12.12` |
-| Go | 1.26.10 or newer | running models | [go.dev/dl](https://go.dev/dl/) or a version manager |
+| gvm | any recent | Go versions, side by side | see [Go](#go) |
+| Go | 1.26.10 or newer | running models | `gvm install go1.26.10 -B` |
 | ONNX Runtime | 1.31.0 | running ONNX models from Go | `brew install onnxruntime` |
 | gitleaks | 8.30.1 | scanning history for secrets | `brew install gitleaks` |
 | pandoc, Prince | any recent | PDFs of the documents | `brew install pandoc` and `brew install --cask prince` |
@@ -91,6 +92,45 @@ Exporting a model to ONNX needs `onnx` and `onnxscript`, which are in
 `requirements.txt`.
 
 ## Go
+
+### gvm
+
+[gvm](https://github.com/moovweb/gvm) keeps several Go versions side by
+side and switches between them, for the whole machine or for one
+shell. That makes it easy to try the lab on another Go, or to build
+grammar and scalar on the oldest Go they support. It needs the Xcode
+Command Line Tools, which provide git, make, gcc and bison:
+
+```
+xcode-select --install
+```
+
+Install gvm with its installer script. It clones gvm into `~/.gvm` and
+adds a line to `~/.zshrc` (or `~/.bashrc`) that loads gvm in each new
+shell. Then load it into the current shell:
+
+```
+zsh < <(curl -sSL https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+source ~/.gvm/scripts/gvm
+```
+
+Install the lab's Go and make it the default. `-B` installs Go's
+published binary. Without `-B`, gvm builds Go from source, which needs
+an older Go to build it.
+
+```
+gvm install go1.26.10 -B
+gvm use go1.26.10 --default
+go version
+```
+
+`gvm list` shows the installed versions. `gvm use go1.25.14` switches
+the current shell only, and a new shell starts on the default again.
+To move to a newer Go, install it and make it the default the same
+way. The `go` line in `go.mod` is the oldest Go the lab accepts, so it
+only changes when the lab needs something newer.
+
+### The module
 
 The lab is one Go module, `github.com/nukopian/jdc-lab`, at the root of
 the repository. Programs go in `cmd/`, and the packages they share in
