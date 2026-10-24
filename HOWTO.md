@@ -223,10 +223,19 @@ three vectors are, with `1.000` along the diagonal.
 ## direnv
 
 The lab's [`.envrc`](.envrc) sets up its environment whenever you
-enter the folder: it activates the venv, switches to
-`perl-5.36.3@jdc-lab`, sets `PYTHONPATH` so that Inline::Python sees the
-venv's packages, and reads `.env` if there is one. It skips Python or
-Perl, with a note, when their setup isn't there yet.
+enter the folder:
+
+- **Python:** it activates the venv.
+- **Perl:** it switches to `perl-5.36.3@jdc-lab`, and sets `PYTHONPATH`
+  so that Inline::Python sees the venv's packages.
+- **Go:** it puts gvm's Go at the version in `go.mod` first on the
+  `PATH`, whatever `gvm use` says elsewhere. Raising the version in
+  `go.mod` moves the lab with it, once gvm has that version installed.
+- **`.env`:** it reads it, if there is one.
+
+It skips any of the three languages, with a note, when its setup isn't
+there yet. Without gvm, the lab uses whichever `go` is on the `PATH`.
+Any Go from 1.21 on will then download the version `go.mod` asks for.
 
 Hook direnv into the shell once, by adding this line to `~/.zshrc`:
 
