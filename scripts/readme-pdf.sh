@@ -31,7 +31,7 @@ build() {
 }
 
 if [ $# -eq 0 ]; then
-	for doc in README.md; do
+	for doc in README.md HOWTO.md; do
 		build "$root/$doc" "$root/${doc%.md}.pdf"
 	done
 else

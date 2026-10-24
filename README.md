@@ -57,12 +57,5 @@ scanning and push protection are on as well.
 
 ## Running it
 
-Python 3.12 (see `.python-version`):
-
-```
-python -m venv .venv
-.venv/bin/pip install -r requirements.txt
-```
-
-Go 1.26, and ONNX Runtime's shared library for the Go side. On macOS,
-that is `brew install onnxruntime`.
+The lab needs Python 3.12, Go 1.26 and ONNX Runtime.
+[HOWTO.md](HOWTO.md) sets everything up from nothing, step by step.
