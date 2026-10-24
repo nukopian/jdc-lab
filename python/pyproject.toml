@@ -1,0 +1,16 @@
+# Settings for the lab's Python tools. The lab's own packages, when they
+# come, will live in lib/ and be described here too (see HOWTO.md).
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Tests import the lab's packages from lib/ without needing PYTHONPATH,
+# so they also run where direnv doesn't, such as inside an editor.
+pythonpath = ["lib"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+# The defaults (pyflakes and the pycodestyle errors), plus import order
+# (I), newer syntax where the target allows it (UP) and likely bugs (B).
+extend-select = ["I", "UP", "B"]

@@ -52,7 +52,7 @@ apart:
 | Path | What's there |
 |------|--------------|
 | `python/bin/`, `python/lib/` | Python programs, and the lab's Python packages |
-| `python/notebooks/` | Jupyter notebooks for exploration |
+| `python/notebooks/`, `python/tests/` | Jupyter notebooks for exploration, and tests |
 | `cmd/`, `internal/` | Go programs and packages |
 | `perl/bin/`, `perl/lib/`, `perl/t/` | Optional Perl programs, the lab's Perl modules, and their tests |
 | `scripts/` | Scripts for the repository itself, such as building the PDFs |

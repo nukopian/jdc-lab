@@ -69,14 +69,45 @@ added to `pyenv install`, and rebuild the venv.
 "$(pyenv prefix)/bin/python" -c 'import sysconfig; print(sysconfig.get_config_var("Py_ENABLE_SHARED"))'
 ```
 
-After installing or upgrading a package, refresh the pins with
-`.venv/bin/pip freeze > requirements.txt` and commit them.
+After installing or upgrading a package, refresh the pins and commit
+them. `--exclude-editable` keeps out the lab's own packages, once
+they're installed into the venv, whose lines would hold a local path:
+
+```
+.venv/bin/pip freeze --exclude-editable > requirements.txt
+```
+
+`requirements.txt` pins everything in the venv, the tools below
+included, so it doubles as a record of the lab's Python setup.
 
 The lab's Python lives in `python/`: programs in `python/bin`, the lab's
-own packages in `python/lib`, and notebooks in `python/notebooks`. The
-lab's `.envrc` puts `python/lib` on `PYTHONPATH` (see [direnv](#direnv)),
-so programs and notebooks can import those packages without installing
-them.
+own packages in `python/lib`, notebooks in `python/notebooks`, and tests
+in `python/tests`. The lab's `.envrc` puts `python/lib` on `PYTHONPATH`
+(see [direnv](#direnv)), so programs and notebooks can import those
+packages without installing them. Settings for the tools below are in
+`python/pyproject.toml`.
+
+### Tests and style
+
+Tests use [pytest](https://docs.pytest.org), and
+[ruff](https://docs.astral.sh/ruff/) checks and formats the code,
+notebooks included. Both are in the venv, so their versions are pinned
+like everything else. From the lab's folder:
+
+```
+pytest python
+ruff check python
+ruff format python
+```
+
+pytest finds the lab's packages in `python/lib` by itself, so tests
+also run where direnv doesn't, such as inside an editor. Until the
+first test arrives, pytest reports "no tests ran" and exits with code
+5; that's expected.
+
+`ruff format` rewrites files in place; `ruff format --check python`
+only reports. ruff may also be installed system-wide, as on a Mac with
+Homebrew, but the venv's copy is the one whose version is pinned.
 
 ### Models
 
