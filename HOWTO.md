@@ -198,8 +198,10 @@ section unless you want it. It's a handy tool for working through text
 along the way, and through Inline::Python it can call the lab's Python,
 ONNX Runtime included.
 
-The lab's Perl lives in `perl/`: programs in `perl/bin`, and the lab's
-own modules in `perl/lib`, which the lab's `.envrc` puts on `PERL5LIB`.
+The lab's Perl lives in `perl/`: programs in `perl/bin`, the lab's own
+modules in `perl/lib`, which the lab's `.envrc` puts on `PERL5LIB`, and
+their tests in `perl/t`. Run the tests from the lab's folder with
+`prove -r perl/t`.
 
 ### perlbrew
 
