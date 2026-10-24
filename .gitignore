@@ -2,6 +2,9 @@
 .envrc
 .env
 
+# VSCode
+.vscode/
+
 # Python
 .venv/
 __pycache__/
