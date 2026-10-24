@@ -12,7 +12,9 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Job ads in, as JSON Lines. `python/bin/xml_to_jsonl.py` converts a
+  MySQL `--xml` export of job ads into one JSON object per ad, with the
+  lab's own field names, for every language to read.
 
 ## v0.1.0 (2026-10-24)
 
