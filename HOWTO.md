@@ -286,6 +286,47 @@ perl perl/bin/onnx-demo.pl
 It prints the ONNX Runtime and Perl versions, then the same table as
 the Python and Go demos.
 
+### The cpanfile
+
+[`cpanfile`](cpanfile), at the root beside `requirements.txt` and
+`go.mod`, lists the CPAN modules the lab's Perl uses. Install them,
+after Inline::Python above, from the lab's folder:
+
+```
+cpanm --installdeps .
+```
+
+Modules already installed at the listed version or newer are left
+alone.
+
+To keep it tidy:
+
+- **What goes in:** every CPAN module that code in `perl/bin`,
+  `perl/lib` or `perl/t` loads directly, with `use` or `require`, and
+  nothing else. Leave out modules that come with Perl (`corelist Name`
+  says whether one does), and other modules' own dependencies, which
+  cpanm finds for itself.
+- **Versions:** give each module the version it was tested with, as its
+  minimum. `perl -MName -e 'print $Name::VERSION'` shows the installed
+  one.
+- **Phases:** modules only the tests use go in an
+  `on test => sub { ... }` block, and tools for working on the code,
+  such as Perl::Critic, in `on develop => sub { ... }`.
+- **Order:** alphabetical within each block. Comment a module only when
+  it needs something unusual, as Inline::Python does.
+- **When:** change the cpanfile in the same commit as the code that
+  starts or stops using a module.
+
+To check it, list what the code loads and compare that with the
+cpanfile, then run `cpanm --installdeps .` again:
+
+```
+rg -n '^\s*(use|require)\s' perl/
+```
+
+One line can load two modules: `use Inline Python => …` loads Inline,
+which then loads Inline::Python, so both are listed.
+
 ## direnv
 
 The lab's [`.envrc`](.envrc) sets up its environment whenever you
