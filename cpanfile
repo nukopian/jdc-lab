@@ -1,4 +1,6 @@
-# The CPAN modules the lab's Perl uses, for `cpanm --installdeps .`.
+# The CPAN modules the lab's Perl uses, for
+# `cpanm --installdeps --with-develop .` (leave out --with-develop to
+# skip the tools in the develop block).
 # Perl is optional in the lab. HOWTO.md, under Perl, says how to keep
 # this file tidy: every module that perl/bin, perl/lib or perl/t uses
 # directly, at the version it was tested with, and nothing else.
@@ -10,3 +12,23 @@ requires 'Inline', '0.87';
 # 0.58 needs a one-line fix on macOS (upstream issue #44). Install it as
 # HOWTO.md describes first; cpanm then finds it already there.
 requires 'Inline::Python', '0.58';
+
+# The lab's test toolchain, Test2 rather than Test::More, listed ahead of
+# the first test in perl/t. Test2::V0 comes with Test-Simple.
+on test => sub {
+    requires 'Test2::Plugin::NoWarnings', '0.10';
+    requires 'Test2::Tools::Explain', '0.02';
+    requires 'Test2::V0', '1.302226';
+};
+
+on develop => sub {
+    # scan-perl-prereqs, for checking this file against the code.
+    requires 'Perl::PrereqScanner', '1.100';
+
+    # yath, which runs the tests, rather than prove.
+    requires 'Test2::Harness', '1.000180';
+
+    # Test2's UUID support, which yath uses, warns unless it finds UUID,
+    # its preferred backend.
+    requires 'UUID', '0.40';
+};

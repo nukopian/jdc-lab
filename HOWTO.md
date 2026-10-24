@@ -200,8 +200,16 @@ ONNX Runtime included.
 
 The lab's Perl lives in `perl/`: programs in `perl/bin`, the lab's own
 modules in `perl/lib`, which the lab's `.envrc` puts on `PERL5LIB`, and
-their tests in `perl/t`. Run the tests from the lab's folder with
-`prove -r perl/t`.
+their tests in `perl/t`. Tests use Test2 (`use Test2::V0;`) rather than
+Test::More, and run with `yath` rather than `prove`, from the lab's
+folder:
+
+```
+yath test perl/t
+```
+
+Until the first test arrives, `yath` stops with "No tests were seen!"
+and exits with an error; that's expected.
 
 ### perlbrew
 
@@ -293,11 +301,13 @@ the Python and Go demos.
 after Inline::Python above, from the lab's folder:
 
 ```
-cpanm --installdeps .
+cpanm --installdeps --with-develop .
 ```
 
-Modules already installed at the listed version or newer are left
-alone.
+That installs the test toolchain (Test2::V0 and its plugins) and the
+tools for working on the code (`yath` and `scan-perl-prereqs`) too.
+Leave out `--with-develop` to skip the tools. Modules already installed
+at the listed version or newer are left alone.
 
 To keep it tidy:
 
@@ -305,7 +315,9 @@ To keep it tidy:
   `perl/lib` or `perl/t` loads directly, with `use` or `require`, and
   nothing else. Leave out modules that come with Perl (`corelist Name`
   says whether one does), and other modules' own dependencies, which
-  cpanm finds for itself.
+  cpanm finds for itself. The one exception is the test toolchain,
+  listed ahead of the first test so that it's in place when one
+  arrives.
 - **Versions:** give each module the version it was tested with, as its
   minimum. `perl -MName -e 'print $Name::VERSION'` shows the installed
   one.
@@ -317,15 +329,60 @@ To keep it tidy:
 - **When:** change the cpanfile in the same commit as the code that
   starts or stops using a module.
 
-To check it, list what the code loads and compare that with the
-cpanfile, then run `cpanm --installdeps .` again:
+To check it, list the CPAN modules the code loads, compare that with
+the cpanfile, then run `cpanm --installdeps --with-develop .` again.
+`scan-perl-prereqs`, from Perl::PrereqScanner (in the cpanfile's
+`develop` block), reads the code properly, leaving out modules that
+ship with Perl:
 
 ```
-rg -n '^\s*(use|require)\s' perl/
+scan-perl-prereqs perl/
 ```
 
 One line can load two modules: `use Inline Python => …` loads Inline,
-which then loads Inline::Python, so both are listed.
+which then loads Inline::Python. The scanner lists only Inline, so
+Inline::Python is in the cpanfile by hand.
+
+### Notes for later
+
+Things learnt the hard way, kept here so they needn't be learnt again.
+
+- **Inline::Python must stay patched** until a release fixes issue #44.
+  On a fresh library, install it as above before
+  `cpanm --installdeps --with-develop .`, which would otherwise fetch the unpatched
+  0.58 and fail. `cpanm --reinstall Inline::Python` breaks it the same
+  way.
+- **Compiled modules may crash on macOS** since Xcode 27.1: a module
+  with C or C++ code can build cleanly, then segfault. Rebuilding it
+  with the `SDKROOT` and `MACOSX_DEPLOYMENT_TARGET` prefix from
+  [If Perl won't build on macOS](#if-perl-wont-build-on-macos) is the
+  first thing to try, though it isn't sure to help.
+- **Compiler::Lexer 0.23 crashes** with Apple clang 21 whenever it's
+  created in verbose mode, even on `use strict;`, and rebuilding it
+  against the older SDK didn't help. So App::scan_prereqs_cpanfile and
+  Perl::PrereqScanner::Lite, which use it, fail their tests and won't
+  install. Perl::PrereqScanner is pure Perl, built on PPI, and works.
+- **Net::SSLeay doesn't build against OpenSSL 4**, which is Homebrew's
+  `openssl` now. A module that needs it, such as IO::Socket::SSL, has
+  to be built against `openssl@3`:
+  `OPENSSL_PREFIX=/opt/homebrew/opt/openssl@3 cpanm IO::Socket::SSL`.
+  cpanm itself fetches from CPAN over plain HTTP, so it isn't affected.
+- **Test2 under `yath` warns without UUID.** Its UUID support prefers
+  the UUID module, and falls back to slower ones with a warning. UUID
+  is in the cpanfile's `develop` block for that reason; it builds and
+  passes its tests here, so `--notest` isn't needed.
+- **`cpanm --test-only` still installs dependencies.** It leaves out
+  only the module being tested, and installs whatever is needed to
+  test it.
+- **`cpanm --uninstall` removes only the modules named,** not what they
+  brought in. To undo an install, save the library's list first, and
+  compare afterwards:
+
+  ```
+  perlbrew list-modules > /tmp/before.txt
+  cpanm Some::Module
+  perlbrew list-modules | diff /tmp/before.txt -
+  ```
 
 ## direnv
 
