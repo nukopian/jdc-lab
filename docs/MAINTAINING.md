@@ -32,9 +32,26 @@ entry at the root.
 Python and Go meet only through `models/` and `data/`: Python writes,
 Go reads, and neither calls the other.
 
-`python/lib`, `perl/lib`, `perl/t`, `python/tests` and `internal/` are
-committed while empty, each holding only a `.gitkeep`. Delete a folder's
-`.gitkeep` in the commit that adds its first real file.
+A program stays thin: the work it does goes in its language's library
+folder, where the tests can reach it. The ONNX demo shows the pattern in
+all three: `jdclab.onnx_demo`, `internal/onnxdemo` and
+`JDCLab::OnnxDemo` hold the model and its use, their tests check the
+same scores to within a millionth, and the three demo programs only
+print the table.
+
+## Running all the tests
+
+`scripts/test-all.sh` runs every language's tests that can run here, and
+skips, with a note, any language that isn't set up. It's on the `PATH`
+in the lab, so from any folder in it:
+
+```
+test-all.sh
+```
+
+It ends with a line per language (pass, FAIL, or why it skipped), and
+fails if any suite fails. The Go tests run the model the Python demo
+saves, so it makes the model first if it's missing.
 
 ## Python
 
@@ -50,9 +67,10 @@ ruff format python
 ```
 
 pytest finds the lab's packages in `python/lib` by itself, so tests
-also run where direnv doesn't, such as inside an editor. Until the
-first test arrives, pytest reports "no tests ran" and exits with code
-5; that's expected.
+also run where direnv doesn't, such as inside an editor. ruff knows
+`jdclab` is the lab's own package (`known-first-party` in
+`pyproject.toml`), so it sorts its imports after third-party ones; add
+any new package of the lab's there too.
 
 `ruff format` rewrites files in place; `ruff format --check python`
 only reports. ruff may also be installed system-wide, as on a Mac with
@@ -79,7 +97,10 @@ gofmt -l .
 ```
 
 `gofmt -l` lists any file that isn't formatted; `gofmt -w .` formats
-them. To build the programs, install them: `.envrc` points `GOBIN` at
+them. A test that needs something the machine lacks, such as ONNX
+Runtime's library or the model the Python demo saves, skips with a note
+saying what to do, rather than failing; `go test -v ./...` shows the
+notes. To build the programs, install them: `.envrc` points `GOBIN` at
 the git-ignored `bin/` and puts it on the `PATH`, so they then run by
 name from anywhere in the lab:
 
@@ -116,19 +137,24 @@ both.
 
 ```
 yath test perl/t
-perlcritic perl
+perlcritic perl/lib perl/bin
 for f in $(git ls-files 'perl/*.pl' 'perl/*.pm' 'perl/*.t'); do perltidy "$f" | diff -u "$f" -; done
 ```
 
-Until the first test arrives, `yath` stops with "No tests were seen!"
-and exits with an error; that's expected. The loop prints what
-Perl::Tidy would change in each file, and nothing for a file that's
-already tidy. `.perltidyrc` sends its output to the screen, for
-editors, so to tidy a file in place, without leaving a backup:
+The tests skip, rather than fail, where Inline::Python isn't installed,
+as Perl is optional. Perl::Critic reviews the modules and programs, not
+the tests: its module rules (a `package` line, ending in `1;`) don't fit
+a test script. The loop prints what Perl::Tidy would change in each
+file, and nothing for a file that's already tidy. `.perltidyrc` sends
+its output to the screen, for editors, so to tidy a file in place,
+without leaving a backup:
 
 ```
 perltidy -nst -b -bext='/' perl/bin/onnx-demo.pl
 ```
+
+Its trailing-comma rules can need a second pass to settle: run the loop
+again afterwards, and tidy again if it still prints a change.
 
 ### The cpanfile
 
@@ -230,8 +256,9 @@ brew unpin onnxruntime && brew upgrade onnxruntime
 brew pin onnxruntime
 ```
 
-Then run the three demos ([SETUP.md](SETUP.md#check-it-works)): their
-tables must still match. Homebrew keeps only the newest version of a
+Then run `test-all.sh`: the tests in each language check the model's
+scores against the same numbers, so they show at once if the two copies
+have drifted apart. Homebrew keeps only the newest version of a
 formula, so the pin is what keeps it on the lab's version; going back
 once it has moved is awkward. If another formula needs a newer
 `onnxruntime`, Homebrew says so, and that's the time to move both.

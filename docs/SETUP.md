@@ -329,6 +329,15 @@ along the diagonal. If the tables differ, the copies of ONNX Runtime
 have drifted apart. The Go demo looks for the library in Homebrew's
 place, unless `ONNXRUNTIME_LIB` names another.
 
+Then run every language's tests at once. Each checks the same scores,
+and a language that isn't set up is skipped with a note:
+
+```
+test-all.sh
+```
+
+It ends with a line per language, and `pass` for each one set up.
+
 ## Data
 
 Job descriptions are not in the repository, and never go into it. Put

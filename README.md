@@ -51,13 +51,13 @@ apart. Everything in the repository, folder by folder:
 
 | Path | What's there |
 |------|--------------|
-| `python/bin/`, `python/lib/` | Python programs, and the lab's Python packages |
+| `python/bin/`, `python/lib/` | Python programs, and the lab's Python package, `jdclab` |
 | `python/notebooks/`, `python/tests/` | Jupyter notebooks for exploration, and tests |
 | `python/pyproject.toml` | Settings for pytest and ruff |
 | `cmd/`, `internal/` | Go programs and packages |
 | `perl/bin/`, `perl/lib/`, `perl/t/` | Optional Perl programs, the lab's Perl modules, and their tests |
 | `docs/` | [SETUP.md](docs/SETUP.md) and [MAINTAINING.md](docs/MAINTAINING.md), and the PDFs' style sheet |
-| `scripts/` | Scripts for the repository itself, such as building the PDFs |
+| `scripts/` | Scripts for the repository itself: running every language's tests, and building the PDFs |
 | `.github/workflows/` | The secret scan that runs on every push |
 
 And file by file, at the root:
