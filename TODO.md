@@ -66,10 +66,10 @@ Python 3.12.12 and 3.14.8, both built with `--enable-shared`.
 
 ### Steps
 
-The maintainer was emailed the draft below on 2026-10-24, with word
-that the issue would follow in about a week. Steps 1 to 5 wait until
-2026-10-31. If he fixes it first, or asks for no issue, skip them: the
-task is then done when a fixed release reaches CPAN.
+Emails with the draft to the current and original maintainers both
+bounced on 2026-10-24, so the issue is the way to reach them, and
+there's no reason to wait before filing it. It's also where others
+hitting the bug will find it, so the draft ends with a workaround.
 
 1. Search the issues again, open and closed, in case someone has
    reported it since.
@@ -92,8 +92,7 @@ task is then done when a fixed release reaches CPAN.
 5. Follow up on any questions. If the maintainer asks for a pull
    request, make one then.
 
-**Done when** the issue is filed, or the maintainer has fixed it or
-asked for no issue. When a fixed release reaches CPAN,
+**Done when** the issue is filed. When a fixed release reaches CPAN,
 reinstall Inline::Python with plain `cpanm Inline::Python` (see below),
 and remove this task.
 
@@ -141,3 +140,19 @@ installs into the lab's library.
 > Environment: macOS 26.7.1 arm64, Apple clang 21.0.0, Perl 5.36.3
 > (perlbrew, `darwin-thread-multi-2level`), Inline::Python 0.58 and
 > `master` at 2b2e476.
+>
+> **Workaround,** for anyone hitting this before a fix is released.
+> Your Python must have been built with `--enable-shared` (pyenv:
+> `PYTHON_CONFIGURE_OPTS=--enable-shared pyenv install …`). With
+> `python3` on your `PATH` being the Python you want to embed:
+>
+> ```
+> curl -sSL https://cpan.metacpan.org/authors/id/N/NI/NINE/Inline-Python-0.58.tar.gz | tar -xz
+> cd Inline-Python-0.58
+> perl -pi -e 's/\(\?:\\\.\\Q\$Config\{dlext\}\\E\|/(?:\\.\\Q\$Config{so}\\E|\\.\\Q\$Config{dlext}\\E|/' Makefile.PL
+> INLINE_PYTHON_EXECUTABLE="$(python3 -c 'import sys; print(sys.executable)')" cpanm .
+> ```
+>
+> The `perl -pi` line applies the change above. `INLINE_PYTHON_EXECUTABLE`
+> picks the Python without `Makefile.PL` asking which to use, and
+> works with pyenv's shims and with venvs.
