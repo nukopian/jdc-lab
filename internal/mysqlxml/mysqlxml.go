@@ -4,7 +4,7 @@
 // The export is a <resultset> of <row>s, each holding a <field name="..."> per
 // column, with NULL written as xsi:nil="true". XML is awkward to work with, so
 // the lab converts it once to JSON Lines: one ad per line, as a JSON object
-// with the lab's own field names (see Ad), which jq, Go and Python all read
+// with the lab's own field names (see ads.Ad), which jq, Go and Python all read
 // without help.
 //
 // The conversion keeps every row and every value as it was: duplicates, HTML
@@ -19,6 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/nukopian/jdc-lab/internal/ads"
 )
 
 // A Row is one row of the export: each column's value, or nil for NULL.
@@ -73,20 +75,10 @@ func (r *Reader) Read() (Row, error) {
 	}
 }
 
-// An Ad is the lab's record of one job ad. Location and LocationCanonical
-// are nil where the export has NULL; the rest can't be.
-type Ad struct {
-	ID                string  `json:"id"`
-	Title             string  `json:"title"`
-	Location          *string `json:"location"`
-	LocationCanonical *string `json:"location_canonical"`
-	HTML              string  `json:"html"`
-}
-
 // Ad renames the row's columns to the lab's names, dropping the rest. A
 // missing column is an error, not a silent nil: it means the export isn't
 // the one this was written for.
-func (row Row) Ad() (Ad, error) {
+func (row Row) Ad() (ads.Ad, error) {
 	var err error
 	column := func(name string, nullable bool) *string {
 		v, ok := row[name]
@@ -104,7 +96,7 @@ func (row Row) Ad() (Ad, error) {
 		}
 		return ""
 	}
-	ad := Ad{
+	ad := ads.Ad{
 		ID:                text("ref"),
 		Title:             text("jobtitle"),
 		Location:          column("location", true),

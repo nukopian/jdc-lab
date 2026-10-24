@@ -1,0 +1,408 @@
+// Package blocks splits a job ad's HTML into blocks: the paragraphs, lines
+// and lists a reader sees, in order, each with its text as written.
+//
+// It records evidence and decides nothing. Whether a block is a heading, a
+// field such as "Salary: £30,000", or plain text is for later steps, which
+// look at its text and its Cues: what the markup said that the text alone
+// doesn't, such as that all of it was bold. Keeping the two apart means the
+// decisions can be measured and changed without touching the HTML.
+package blocks
+
+import (
+	"strings"
+	"unicode"
+
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
+)
+
+// A Kind is what sort of block a Block is.
+type Kind int
+
+const (
+	// Paragraph is a block of text on its own: a <p>, a heading tag, a
+	// <div>, or text outside any of them.
+	Paragraph Kind = iota
+	// Line is one of several lines a <br> split a block into.
+	Line
+	// List is consecutive list items, from <ul>, <ol> or bare <li>s.
+	List
+)
+
+var kindNames = [...]string{Paragraph: "paragraph", Line: "line", List: "list"}
+
+// String returns the kind's name, as JSON writes it: "paragraph".
+func (k Kind) String() string {
+	if k < 0 || int(k) >= len(kindNames) {
+		return "unknown"
+	}
+	return kindNames[k]
+}
+
+// MarshalText writes the kind as its name, so JSON shows "line", not 1.
+func (k Kind) MarshalText() ([]byte, error) {
+	return []byte(k.String()), nil
+}
+
+// Cues are what the markup says about a piece of text that the text alone
+// doesn't.
+type Cues struct {
+	// Heading is true for text in an <h1> to <h6>.
+	Heading bool `json:"heading,omitempty"`
+	// Bold is true when all the text is in <strong> or <b>.
+	Bold bool `json:"bold,omitempty"`
+	// BoldLead is the bold text it starts with, when not all of it is
+	// bold: "Salary:" in "<strong>Salary:</strong> £30,000".
+	BoldLead string `json:"bold_lead,omitempty"`
+}
+
+// An Item is a piece of text with its cues: a list item, or the text of a
+// Paragraph or Line.
+type Item struct {
+	Text string `json:"text"`
+	Cues Cues   `json:"cues,omitzero"`
+}
+
+// A Block is one block of an ad. A Paragraph or Line has Text and Cues; a
+// List has Items instead.
+type Block struct {
+	Kind  Kind   `json:"kind"`
+	Text  string `json:"text,omitempty"`
+	Cues  Cues   `json:"cues,omitzero"`
+	Items []Item `json:"items,omitempty"`
+}
+
+// Split returns the blocks of src, an HTML fragment, in order. Text is kept
+// as written, with HTML's entities decoded and its runs of white space
+// collapsed to one, as a browser shows them. Blocks with nothing visible,
+// such as <p>&nbsp;</p>, are dropped. Broken HTML is read as far as it
+// makes sense; nothing makes Split fail.
+//
+// Some ads are plain text, with no tags that lay out blocks: at most
+// inline ones such as <b>. Their newlines are all the layout they have, so
+// there a newline ends a Line and a blank line ends a block. A wall of text
+// with no newlines stays one Paragraph: splitting it is for later steps.
+func Split(src string) []Block {
+	b := builder{plain: !laidOut(src)}
+	z := html.NewTokenizer(strings.NewReader(src))
+	for {
+		switch z.Next() {
+		case html.ErrorToken: // the end of src: the tokenizer stops at nothing else
+			b.finish()
+			return b.blocks
+		case html.TextToken:
+			b.text(string(z.Text()))
+		case html.StartTagToken, html.SelfClosingTagToken:
+			name, _ := z.TagName()
+			b.start(atom.Lookup(name))
+		case html.EndTagToken:
+			name, _ := z.TagName()
+			b.end(atom.Lookup(name))
+		}
+	}
+}
+
+// builder turns the tokenizer's stream of tags and text into blocks. Its zero
+// value is ready to use.
+type builder struct {
+	blocks []Block
+
+	piece   piece  // the text being gathered
+	lines   []Item // pieces of the current block that <br>s have ended
+	items   []Item // the list being gathered
+	bold    int    // how many <strong> or <b> we're inside
+	skip    int    // how many <script> or <style> we're inside
+	heading int    // how many <h1> to <h6> we're inside
+	list    int    // how many <ul> or <ol> we're inside
+	inItem  bool   // inside an <li>
+
+	plain    bool // src is plain text, laid out by its newlines
+	newlines int  // newlines since the last visible text, in plain text
+}
+
+func (b *builder) text(s string) {
+	if b.skip > 0 {
+		return
+	}
+	if !b.plain {
+		b.piece.write(s, b.bold > 0)
+		return
+	}
+	// In plain text, newlines end lines and blocks, but only once more
+	// visible text comes: spaces and further newlines in between change
+	// nothing, and trailing ones end nothing.
+	s = strings.ReplaceAll(strings.ReplaceAll(s, "\r\n", "\n"), "\r", "\n")
+	start := 0
+	for i, r := range s {
+		switch {
+		case r == '\n':
+			b.piece.write(s[start:i], b.bold > 0)
+			start = i + 1
+			b.newlines++
+		case b.newlines > 0 && visible(string(r)):
+			b.piece.write(s[start:i], b.bold > 0)
+			start = i
+			if b.newlines > 1 {
+				b.endBlock()
+			} else {
+				b.endLine()
+			}
+			b.newlines = 0
+		}
+	}
+	b.piece.write(s[start:], b.bold > 0)
+}
+
+func (b *builder) start(tag atom.Atom) {
+	switch {
+	case tag == atom.Script || tag == atom.Style:
+		b.skip++
+	case tag == atom.Strong || tag == atom.B:
+		b.bold++
+	case tag == atom.Br:
+		if b.inItem || b.heading > 0 {
+			b.piece.write(" ", false) // an item or heading stays one piece
+		} else {
+			b.endLine()
+		}
+	case isHeading(tag):
+		b.endBlock()
+		b.heading++
+	case tag == atom.Li:
+		switch {
+		case b.inItem || b.list > 0:
+			b.endItem() // the item before, if its </li> was left out
+		default:
+			b.endBlock() // the text before a bare <li>
+		}
+		b.inItem = true
+	case tag == atom.Ul || tag == atom.Ol:
+		if b.inItem {
+			b.endItem() // the outer item's own text, before its sublist
+		} else if b.list == 0 {
+			b.endBlock()
+		}
+		b.list++
+	case breaks(tag):
+		b.boundary()
+	}
+}
+
+func (b *builder) end(tag atom.Atom) {
+	switch {
+	case tag == atom.Script || tag == atom.Style:
+		b.skip = max(b.skip-1, 0)
+	case tag == atom.Strong || tag == atom.B:
+		b.bold = max(b.bold-1, 0)
+	case isHeading(tag):
+		if b.heading > 0 && !b.inItem {
+			it, ok := b.piece.take()
+			if ok {
+				it.Cues.Heading = true
+				b.add(Block{Kind: Paragraph, Text: it.Text, Cues: it.Cues})
+			}
+		}
+		b.heading = max(b.heading-1, 0)
+	case tag == atom.Li:
+		b.endItem()
+	case tag == atom.Ul || tag == atom.Ol:
+		b.endItem()
+		b.list = max(b.list-1, 0)
+		if b.list == 0 {
+			b.endList()
+		}
+	case breaks(tag):
+		b.boundary()
+	}
+}
+
+// boundary handles a tag that ends a block, such as <p> or </div>. Inside a
+// list item it's only a space, so "<li><p>Drive</p></li>" stays one item.
+func (b *builder) boundary() {
+	if b.inItem {
+		b.piece.write(" ", false)
+	} else {
+		b.endBlock()
+	}
+}
+
+// endLine ends the current piece at a <br>, keeping it as one of the
+// block's lines.
+func (b *builder) endLine() {
+	if it, ok := b.piece.take(); ok {
+		b.lines = append(b.lines, it)
+	}
+}
+
+// endBlock ends the current block: one Paragraph, or a Line for each piece
+// if <br>s split it.
+func (b *builder) endBlock() {
+	b.endLine()
+	if len(b.lines) == 0 {
+		return
+	}
+	kind := Paragraph
+	if len(b.lines) > 1 {
+		kind = Line
+	}
+	for _, it := range b.lines {
+		b.add(Block{Kind: kind, Text: it.Text, Cues: it.Cues})
+	}
+	b.lines = b.lines[:0]
+}
+
+// endItem ends the current list item, if there's one with any text.
+func (b *builder) endItem() {
+	if it, ok := b.piece.take(); ok {
+		b.items = append(b.items, it)
+	}
+	b.inItem = false
+}
+
+// endList adds the list gathered so far, if any, as a block.
+func (b *builder) endList() {
+	if len(b.items) > 0 {
+		b.blocks = append(b.blocks, Block{Kind: List, Items: b.items})
+		b.items = nil
+	}
+}
+
+// add adds a block, after any list of bare <li>s that came before it.
+func (b *builder) add(block Block) {
+	if b.list == 0 {
+		b.endList()
+	}
+	b.blocks = append(b.blocks, block)
+}
+
+// finish ends whatever is open at the end of the HTML.
+func (b *builder) finish() {
+	if b.inItem || b.list > 0 {
+		b.endItem()
+	}
+	b.endBlock()
+	b.endList()
+}
+
+// laidOut reports whether src has any tag that lays out blocks, as HTML
+// does, rather than leaving that to its newlines, as plain text does.
+func laidOut(src string) bool {
+	z := html.NewTokenizer(strings.NewReader(src))
+	for {
+		switch z.Next() {
+		case html.ErrorToken:
+			return false
+		case html.StartTagToken, html.SelfClosingTagToken, html.EndTagToken:
+			name, _ := z.TagName()
+			tag := atom.Lookup(name)
+			if breaks(tag) || isHeading(tag) || tag == atom.Br || tag == atom.Li ||
+				tag == atom.Ul || tag == atom.Ol {
+				return true
+			}
+		}
+	}
+}
+
+func isHeading(tag atom.Atom) bool {
+	switch tag {
+	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		return true
+	}
+	return false
+}
+
+// breaks reports whether tag starts or ends a block, as a browser lays it
+// out. Lists, list items, headings and <br> are handled on their own.
+func breaks(tag atom.Atom) bool {
+	switch tag {
+	case atom.P, atom.Div, atom.Section, atom.Article, atom.Header, atom.Footer,
+		atom.Blockquote, atom.Pre, atom.Table, atom.Tr, atom.Td, atom.Th,
+		atom.Dl, atom.Dt, atom.Dd, atom.Hr:
+		return true
+	}
+	return false
+}
+
+// piece gathers the text of one Item, noting which of it was bold. Its zero
+// value is ready to use.
+type piece struct {
+	text     strings.Builder
+	lead     strings.Builder // the bold text at the start
+	leadDone bool            // plain text has ended the lead
+	bold     bool            // some visible text was bold
+	plain    bool            // some visible text wasn't
+}
+
+// write adds s, which was in bold or not.
+func (p *piece) write(s string, bold bool) {
+	seen := visible(s)
+	switch {
+	case seen && bold:
+		p.bold = true
+	case seen:
+		p.plain = true
+	}
+	if !p.leadDone {
+		if seen && !bold {
+			p.leadDone = true
+		} else {
+			collapse(&p.lead, s)
+		}
+	}
+	collapse(&p.text, s)
+}
+
+// take returns what's been gathered as an Item, and whether it has anything
+// visible, and starts afresh.
+func (p *piece) take() (Item, bool) {
+	text := strings.TrimFunc(p.text.String(), unicode.IsSpace)
+	it := Item{Text: text}
+	it.Cues.Bold = p.bold && !p.plain
+	if p.bold && p.plain && p.leadDone {
+		it.Cues.BoldLead = strings.TrimFunc(p.lead.String(), unicode.IsSpace)
+	}
+	ok := visible(text)
+	*p = piece{}
+	return it, ok
+}
+
+// collapse appends s to w with each run of HTML white space (space, tab,
+// newline, carriage return, form feed) made one space, as a browser shows
+// it, and none at the start. Other spaces, such as the no-break space, are
+// kept as they are.
+func collapse(w *strings.Builder, s string) {
+	for _, r := range s {
+		if !isHTMLSpace(r) {
+			w.WriteRune(r)
+			continue
+		}
+		if t := w.String(); t != "" && t[len(t)-1] != ' ' {
+			w.WriteByte(' ')
+		}
+	}
+}
+
+func isHTMLSpace(r rune) bool {
+	return r == ' ' || r == '\t' || r == '\n' || r == '\r' || r == '\f'
+}
+
+// visible reports whether s has anything a reader would see: not only
+// spaces of any kind, and invisible characters such as the zero-width space.
+func visible(s string) bool {
+	for _, r := range s {
+		if !unicode.IsSpace(r) && !invisible(r) {
+			return true
+		}
+	}
+	return false
+}
+
+func invisible(r rune) bool {
+	switch r {
+	case '\u00ad', // soft hyphen
+		'\u200b', '\u200c', '\u200d', // zero-width space, non-joiner, joiner
+		'\u2060', '\ufeff': // word joiner, byte order mark
+		return true
+	}
+	return false
+}

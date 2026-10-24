@@ -15,6 +15,11 @@ has the steps).
 - Job ads in, as JSON Lines. `cmd/xml-to-jsonl` converts a MySQL
   `--xml` export of job ads into one JSON object per ad, with the lab's
   own field names, for every language to read.
+- Job ads split into blocks. `cmd/blocks` splits each ad's HTML into
+  the paragraphs, lines and lists a reader sees, keeping their text as
+  written, with cues from the markup, such as text that is all bold.
+  Ads in plain text are laid out by their newlines. Deciding which
+  blocks are headings is left to the next step.
 - Go does most of the work. Python stays for what needs its
   machine-learning tools: evaluating models, exporting them to ONNX,
   and notebooks.

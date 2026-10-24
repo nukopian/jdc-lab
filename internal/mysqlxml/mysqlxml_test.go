@@ -7,6 +7,8 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/nukopian/jdc-lab/internal/ads"
 )
 
 // export is two ads as MySQL's --xml writes them: HTML escaped as entities,
@@ -151,7 +153,7 @@ func TestConvert(t *testing.T) {
 	rows := readAll(t, export)
 	i := 0
 	for ; lines.Scan(); i++ {
-		var got Ad
+		var got ads.Ad
 		if err := json.Unmarshal(lines.Bytes(), &got); err != nil {
 			t.Fatalf("line %d: %v", i+1, err)
 		}
