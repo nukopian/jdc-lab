@@ -19,6 +19,18 @@ type Ad struct {
 	HTML              string  `json:"html"`
 }
 
+// Locations returns the ad's locations that it has: Location, then
+// LocationCanonical.
+func (a Ad) Locations() []string {
+	var ls []string
+	for _, l := range []*string{a.Location, a.LocationCanonical} {
+		if l != nil {
+			ls = append(ls, *l)
+		}
+	}
+	return ls
+}
+
 // All reads ads from r, one JSON object per line, for a range loop. It stops
 // at the end of r, or after yielding the first error.
 func All(r io.Reader) iter.Seq2[Ad, error] {

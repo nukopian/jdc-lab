@@ -24,6 +24,12 @@ has the steps).
   role: a heading, a field such as "Salary: £30,000", a repeat of the
   ad's title or location, or text. `cmd/heading-counts` counts how many
   ads use each heading and field label.
+- Sections. `internal/sections` divides an ad into its summary,
+  responsibilities, requirements, desirable, benefits, company, apply
+  and legal sections, by the phrases in its headings. The phrases are
+  data, synonym rules in the format Elasticsearch and Solr use, read
+  with a `grammar` word list. `cmd/sections` measures how well they
+  cover the ads, and lists the headings they miss.
 - Go does most of the work. Python stays for what needs its
   machine-learning tools: evaluating models, exporting them to ONNX,
   and notebooks.

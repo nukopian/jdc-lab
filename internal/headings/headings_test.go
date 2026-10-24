@@ -98,6 +98,27 @@ func TestRead(t *testing.T) {
 			[]string{`heading "Location:" key="location"`},
 		},
 		{
+			"a label as a heading, its value on the next line",
+			`<p><strong>Working Hours</strong></p><p>Monday to Friday, 9am to 5pm</p><p><b>Location</b> Leeds</p>`,
+			[]string{
+				`field "Working Hours Monday to Friday, 9am to 5pm" key="working hours" value="Monday to Friday, 9am to 5pm"`,
+				`field "Location Leeds" key="location" value="Leeds"`,
+			},
+		},
+		{
+			"a label as a heading, followed by a paragraph",
+			`<p><b>Location:</b></p><p>Our office is in the centre of Leeds, a short walk from the station, with parking on site for all staff.</p>`,
+			[]string{
+				`heading "Location:" key="location"`,
+				`text "Our office is in the centre of Leeds, a short walk from the station, with parking on site for all staff."`,
+			},
+		},
+		{
+			"a bar for a colon",
+			`<p>Salary | £30,000</p>`,
+			[]string{`field "Salary | £30,000" key="salary" value="£30,000"`},
+		},
+		{
 			"a bold heading run into its text",
 			`<p><strong>Key Responsibilities:</strong> You will lead the team.</p>`,
 			[]string{`heading "Key Responsibilities:" key="key responsibilities"`, `text "You will lead the team."`},

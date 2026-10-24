@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"slices"
 	"strings"
 	"testing"
 )
@@ -25,6 +26,23 @@ func TestAll(t *testing.T) {
 	}
 	if second.Location != nil || *second.LocationCanonical != "" || second.HTML != "<p>Drive.</p>" {
 		t.Errorf("second: got %+v", second)
+	}
+}
+
+func TestLocations(t *testing.T) {
+	leeds, empty := "Leeds", ""
+	tests := []struct {
+		ad   Ad
+		want []string
+	}{
+		{Ad{Location: &leeds, LocationCanonical: &leeds}, []string{"Leeds", "Leeds"}},
+		{Ad{LocationCanonical: &empty}, []string{""}},
+		{Ad{}, nil},
+	}
+	for _, tt := range tests {
+		if got := tt.ad.Locations(); !slices.Equal(got, tt.want) {
+			t.Errorf("Locations() = %q, want %q", got, tt.want)
+		}
 	}
 }
 

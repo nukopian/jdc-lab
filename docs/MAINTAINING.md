@@ -282,6 +282,36 @@ formula, so the pin is what keeps it on the lab's version; going back
 once it has moved is awkward. If another formula needs a newer
 `onnxruntime`, Homebrew says so, and that's the time to move both.
 
+## Heading phrases
+
+Which section of an ad a heading starts is data:
+[`internal/sections/headings.txt`](../internal/sections/headings.txt)
+holds synonym rules in the format Elasticsearch and Solr use, each the
+section's name first, then the phrases that mean it. A phrase is found
+anywhere in a heading, in any case, and in the plural too. Where a
+heading has phrases of two sections, the section whose rule comes first
+in the file wins, so moving a rule changes which wins.
+
+To improve them, measure, change, and measure again:
+
+```
+go run ./cmd/sections data/ingestion/ads.jsonl data/sections
+```
+
+It prints how many headings start a section, and writes tables to
+`data/sections/`: `unmapped.tsv`, headings that start none, most used
+first, which is the list to work down; `disagree.tsv`, headings whose
+phrases point to more than one section, and which won; and `named.tsv`,
+plain lines taken for headings because they're exactly a section's
+name. Keep a change if more headings start the right section and none
+start the wrong one, and add a heading it settles to `TestOf`. A word
+that's common in other headings, such as "role", is better added as part
+of a longer phrase.
+
+Field labels, such as "Salary" and "Hours", are a list in
+`internal/headings`, not here: a line with one is a field, not a
+heading.
+
 ## Before committing
 
 - **Notebooks:** clear their outputs. They carry local paths, and job

@@ -157,13 +157,7 @@ func tally(source string) (heads, fields counter, s summary, err error) {
 		seen[ad.HTML] = true
 		s.ads++
 
-		var locations []string
-		for _, l := range []*string{ad.Location, ad.LocationCanonical} {
-			if l != nil {
-				locations = append(locations, *l)
-			}
-		}
-		parts := headings.Read(blocks.Split(ad.HTML), ad.Title, locations...)
+		parts := headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...)
 		for _, p := range parts {
 			s.roles[p.Role]++
 		}

@@ -73,11 +73,16 @@ var fieldLabels = map[string]bool{}
 func init() {
 	for _, label := range []string{
 		"salary", "pay", "rate", "rate of pay", "pay rate", "hourly rate", "wage", "wages",
+		"salary range", "remuneration", "ir35",
 		"location", "work location", "job location", "based", "base", "area",
-		"hours", "working hours", "hours of work", "working pattern", "shift", "shifts",
-		"contract", "contract type", "job type", "employment type", "type",
-		"start date", "closing date", "duration", "term",
-		"job title", "position", "role", "reference", "ref", "job reference",
+		"hours", "working hours", "hours of work", "hours per week", "working pattern",
+		"work pattern", "shift", "shifts", "shift pattern", "working days", "days", "schedule",
+		"contract", "contract type", "job type", "employment type", "employment", "type",
+		"contract length", "length of contract", "duration", "term",
+		"start", "start date", "starting", "closing date", "deadline", "interview date",
+		"job title", "job role", "position", "role", "reference", "ref", "job reference",
+		"sector", "industry", "department", "employer", "client", "consultant",
+		"contact", "email", "keywords",
 	} {
 		fieldLabels[label] = true
 	}
@@ -104,7 +109,30 @@ func Read(bs []blocks.Block, title string, locations ...string) []Part {
 		}
 		parts = append(parts, block(b.Text, b.Cues, repeats)...)
 	}
-	return parts
+	return joinFields(parts)
+}
+
+// MaxValueWords is the most words a field's value on a line of its own
+// has. A longer line after a label is a paragraph about it, not its value.
+const MaxValueWords = 15
+
+// joinFields joins a field's label, written as a heading, and its value on
+// the next line, as in "<b>Hours:</b><br>40 per week", into one Field.
+func joinFields(parts []Part) []Part {
+	var out []Part
+	for i := 0; i < len(parts); i++ {
+		p := parts[i]
+		if p.Role == Heading && fieldLabels[p.Key] && i+1 < len(parts) {
+			next := parts[i+1]
+			if next.Role == Text && !next.Item && len(strings.Fields(next.Text)) <= MaxValueWords {
+				out = append(out, Part{Role: Field, Text: p.Text + " " + next.Text, Key: p.Key, Value: next.Text})
+				i++
+				continue
+			}
+		}
+		out = append(out, p)
+	}
+	return out
 }
 
 // block reads a Paragraph or a Line.
@@ -138,8 +166,9 @@ func item(text string) Part {
 	return Part{Role: Text, Text: text}
 }
 
-// labelled finds "Label: value", the label up to the first colon.
-var labelled = regexp.MustCompile(`^([^:]{1,40}):\s*(\S.*)$`)
+// labelled finds "Label: value" or "Label | value", the label up to the
+// first colon or bar.
+var labelled = regexp.MustCompile(`^([^:|]{1,40})[:|]\s*(\S.*)$`)
 
 // field reads text as a field, if its label is one of fieldLabels and it
 // has a value.
