@@ -27,10 +27,14 @@ entry at the root.
   PDFs, never for any language's code.
 - **`models/`** and **`data/`** are git-ignored. ONNX exports go into
   `models/`, rebuilt by the programs in `python/bin`, never copied; job
-  descriptions go into `data/`. They arrive as a MySQL `--xml` export,
-  which `go run ./cmd/xml-to-jsonl` converts once to JSON Lines, one ad
-  per line (`id`, `title`, `location`, `location_canonical`, `html`):
-  the lab's code reads that, not the XML.
+  descriptions go into `data/ingestion/`. They arrive there as a MySQL
+  `--xml` export, `extract.xml`, which is never edited, only replaced.
+  `go run ./cmd/xml-to-jsonl` converts it once to `ads.jsonl` beside it,
+  JSON Lines with one ad per line (`id`, `title`, `location`,
+  `location_canonical`, `html`): the lab's code reads that, not the
+  XML. Everything else in `data/` is derived from `data/ingestion/`,
+  each step in a folder of its own, so any of it can be deleted and
+  rebuilt.
 
 Python and Go meet only through `models/` and `data/`: each reads what
 the other writes there, and neither calls the other.
