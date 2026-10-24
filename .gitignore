@@ -5,6 +5,9 @@
 # VSCode
 .vscode/
 
+# Go binaries
+bin/
+
 # Python
 .venv/
 __pycache__/
