@@ -8,6 +8,10 @@
 # Go binaries
 bin/
 
+# Go workspace: local working copies of ../grammar and ../scalar
+go.work
+go.work.sum
+
 # Python
 .venv/
 __pycache__/
