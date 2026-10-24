@@ -358,19 +358,31 @@ Unreleased as work lands, then, to release:
    git push origin vX.Y.Z
    ```
 
-4. Publish the GitHub release from the tag, titled `vX.Y.Z: title`,
-   with the rest of the entry as its notes:
+4. Build PIPELINE.md's PDF from the tagged commit, and publish the
+   GitHub release from the tag, titled `vX.Y.Z: title`, with the rest of
+   the entry as its notes and the PDF attached. `git describe` prints
+   the tag only if the checkout is at it, and `git status` must show
+   nothing, so the PDF is the tag's text:
 
    ```
-   gh release create vX.Y.Z --verify-tag --title "vX.Y.Z: title" --notes-file notes.txt
+   git describe --exact-match --tags
+   git status --short
+   scripts/readme-pdf.sh docs/PIPELINE.md
+   gh release create vX.Y.Z --verify-tag --title "vX.Y.Z: title" \
+     --notes-file notes.txt docs/PIPELINE.pdf
    ```
+
+   The release is the one place a PDF is published: a snapshot of how
+   the pipeline worked at that version. The repository keeps only the
+   Markdown, which GitHub shows as it is now.
 
 A tag is never moved or deleted once pushed: a fix is a new release.
 
 ## Documents
 
 `scripts/readme-pdf.sh` builds a PDF of each document, beside it, for
-reading offline. The PDFs are git-ignored.
+reading offline. The PDFs are git-ignored; PIPELINE.md's is also
+attached to each release (see [Releases](#releases)).
 
 ```
 readme-pdf.sh
