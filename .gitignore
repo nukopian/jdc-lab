@@ -10,10 +10,21 @@ CLAUDE.md
 # VSCode
 .vscode/
 
-# Go binaries
+# Go
+# Binaries: built into bin/, or beside the code by a bare `go build`
 bin/
-
-# Go workspace: local working copies of ../grammar and ../scalar
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# Test binaries (go test -c), coverage profiles, pprof profiles, and
+# VS Code's debugger builds
+*.test
+*.out
+*.prof
+__debug_bin*
+# Workspace: local working copies of ../grammar and ../scalar
 go.work
 go.work.sum
 
@@ -25,8 +36,22 @@ __pycache__/
 # Jupyter
 .ipynb_checkpoints/
 
-# Inline's build cache, made wherever a Perl script using Inline runs
+# Perl
+# Inline's build cache, made wherever a script using Inline runs
 _Inline/
+# Modules installed by Carton, beside a cpanfile
+local/
+# Building a module: left by Makefile.PL or Build.PL and make
+blib/
+_build/
+pm_to_blib
+MYMETA.*
+*.o
+*.bs
+# Devel::Cover and Devel::NYTProf output
+cover_db/
+nytprof/
+nytprof.out*
 
 # Model weights and exported ONNX files
 models/
