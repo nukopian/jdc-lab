@@ -25,8 +25,10 @@ has the steps).
   ad's title or location, or text. `cmd/heading-counts` counts how many
   ads use each heading and field label.
 - Sections. `internal/sections` divides an ad into its summary,
-  responsibilities, requirements, desirable, benefits, company, apply
-  and legal sections, by the phrases in its headings. The phrases are
+  responsibilities, requirements, desirable, benefits, company, apply,
+  legal and details sections, by the phrases in its headings. A heading
+  of no known kind starts an unmapped section, so what's left to map
+  shows. The phrases are
   data, synonym rules in the format Elasticsearch and Solr use, read
   with a `grammar` word list. `cmd/sections` measures how well they
   cover the ads, and lists the headings they miss.

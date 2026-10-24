@@ -164,6 +164,14 @@ func TestRead(t *testing.T) {
 	}
 }
 
+func TestIsLabel(t *testing.T) {
+	for key, want := range map[string]bool{"salary": true, "working hours": true, "the role": false, "Salary": false} {
+		if got := IsLabel(key); got != want {
+			t.Errorf("IsLabel(%q) = %t, want %t", key, got, want)
+		}
+	}
+}
+
 func TestRoleString(t *testing.T) {
 	for r, want := range map[Role]string{Text: "text", Heading: "heading", Field: "field", Repeat: "repeat", 9: "unknown"} {
 		if got := r.String(); got != want {

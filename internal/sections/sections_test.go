@@ -48,6 +48,15 @@ func TestOf(t *testing.T) {
 		{"You will have:", Requirements},
 		{"You'll be someone who:", Requirements},
 		{"JOB PURPOSE:", Summary},
+		// Details: its phrases, then any field's label.
+		{"Job Details", Details},
+		{"Location & travel", Details},
+		{"Salary |", Details},
+		{"Salary & Benefits", Benefits},
+		{"Working Days", Details},
+		{"Tasks", Responsibilities},
+		{"Candidates will also require:", Requirements},
+		{"What's in it for me?", Benefits},
 		{"Software Development", ""},
 		{"Your impact", ""},
 	}
@@ -80,14 +89,14 @@ func TestNamed(t *testing.T) {
 	}
 }
 
-// TestRules checks headings.txt: every kind has phrases, and no phrase
-// means two kinds.
+// TestRules checks headings.txt: every kind but Unmapped has phrases, and
+// no phrase means two kinds.
 func TestRules(t *testing.T) {
 	if amb := phrases.Ambiguous(); len(amb) > 0 {
 		t.Errorf("phrases with more than one kind: %v", amb)
 	}
 	for _, k := range Kinds {
-		if _, ok := Named(string(k)); !ok {
+		if _, ok := Named(string(k)); !ok && k != Unmapped {
 			t.Errorf("kind %q has no rule", k)
 		}
 	}
@@ -109,7 +118,8 @@ func TestDivide(t *testing.T) {
 	}
 	want := []string{
 		`summary "": text(We're a friendly team.)`,
-		`responsibilities "Key Responsibilities": text(Drive) heading(Software Development) text(Some Go.) field(Salary: £30,000)`,
+		`responsibilities "Key Responsibilities": text(Drive)`,
+		`unmapped "Software Development": text(Some Go.) field(Salary: £30,000)`,
 		`benefits "Benefits": text(Pension)`,
 	}
 	if !slices.Equal(got, want) {

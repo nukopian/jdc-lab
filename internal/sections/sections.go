@@ -22,7 +22,10 @@ import (
 type Kind string
 
 // The kinds of section. Summary is what comes before the first heading, as
-// well as what headings such as "The role" start.
+// well as what headings such as "The role" start. Details holds the job's
+// terms, such as its hours and contract, under headings like "Job details"
+// or a field's label. Unmapped is what a heading of no known kind starts:
+// its share of the text is how much is left to find phrases for.
 const (
 	Summary          Kind = "summary"
 	Responsibilities Kind = "responsibilities"
@@ -32,10 +35,12 @@ const (
 	Company          Kind = "company"
 	Apply            Kind = "apply"
 	Legal            Kind = "legal"
+	Details          Kind = "details"
+	Unmapped         Kind = "unmapped"
 )
 
 // Kinds are all the kinds, in the order ads tend to have them.
-var Kinds = []Kind{Summary, Responsibilities, Requirements, Desirable, Benefits, Company, Apply, Legal}
+var Kinds = []Kind{Summary, Responsibilities, Requirements, Desirable, Benefits, Company, Apply, Legal, Details, Unmapped}
 
 //go:embed headings.txt
 var rules string
@@ -78,7 +83,7 @@ func init() {
 		}
 	}
 	for _, k := range Kinds {
-		if _, ok := rank[k]; !ok {
+		if _, ok := rank[k]; !ok && k != Unmapped {
 			panic(fmt.Sprintf("sections: headings.txt has no rule for %q", k))
 		}
 	}
@@ -87,8 +92,9 @@ func init() {
 // Of returns the kind of section a heading starts, given its key (see
 // headings.Key), and whether it's known. Of the kinds its phrases point
 // to, the one whose rule comes first in headings.txt wins. With none, a
-// heading starting "about" is company ("About TeacherActive") and one
-// starting "why" benefits ("Why Tradewind?").
+// heading starting "about" is company ("About TeacherActive"), one
+// starting "why" benefits ("Why Tradewind?"), and a field's label details
+// ("Working Hours").
 func Of(key string) (Kind, bool) {
 	if kinds := All(key); len(kinds) > 0 {
 		return slices.MinFunc(kinds, func(a, b Kind) int { return rank[a] - rank[b] }), true
@@ -98,6 +104,9 @@ func Of(key string) (Kind, bool) {
 		return Company, true
 	case "why":
 		return Benefits, true
+	}
+	if headings.IsLabel(key) {
+		return Details, true
 	}
 	return "", false
 }
@@ -133,15 +142,14 @@ type Section struct {
 	// Heading is the heading that started it, as written; empty for the
 	// summary before the first heading.
 	Heading string `json:"heading,omitempty"`
-	// Parts are what follows: text, list items and fields, and headings
-	// that start no section of their own, such as "Software Development"
-	// among the requirements.
+	// Parts are what follows: text, list items and fields.
 	Parts []headings.Part `json:"parts"`
 }
 
 // Divide divides an ad's parts into sections. Parts before the first
-// heading are the summary. A heading of no known kind stays among the
-// parts of the section it's in, as a sub-heading; a line of text that is
+// heading are the summary. A heading of no known kind starts an Unmapped
+// section, even a sub-heading such as "Software Development" among the
+// requirements, so that what's left to map shows; a line of text that is
 // exactly a section's name, with no cue, starts that section.
 func Divide(parts []headings.Part) []Section {
 	sections := []Section{{Kind: Summary}}
@@ -163,7 +171,10 @@ func Divide(parts []headings.Part) []Section {
 func starts(p headings.Part) (Kind, bool) {
 	switch {
 	case p.Role == headings.Heading:
-		return Of(p.Key)
+		if kind, ok := Of(p.Key); ok {
+			return kind, true
+		}
+		return Unmapped, true
 	case p.Role == headings.Text && !p.Item:
 		return Named(headings.Key(p.Text))
 	}

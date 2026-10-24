@@ -166,6 +166,12 @@ func item(text string) Part {
 	return Part{Role: Text, Text: text}
 }
 
+// IsLabel reports whether key (see Key) is a field's label, such as
+// "salary" or "working hours".
+func IsLabel(key string) bool {
+	return fieldLabels[key]
+}
+
 // labelled finds "Label: value" or "Label | value", the label up to the
 // first colon or bar.
 var labelled = regexp.MustCompile(`^([^:|]{1,40})[:|]\s*(\S.*)$`)

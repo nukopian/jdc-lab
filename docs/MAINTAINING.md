@@ -290,7 +290,10 @@ holds synonym rules in the format Elasticsearch and Solr use, each the
 section's name first, then the phrases that mean it. A phrase is found
 anywhere in a heading, in any case, and in the plural too. Where a
 heading has phrases of two sections, the section whose rule comes first
-in the file wins, so moving a rule changes which wins.
+in the file wins, so moving a rule changes which wins. A heading with no
+phrase is a details heading if it's a field's label ("Working Hours"),
+and otherwise starts an unmapped section, so the text under it shows up
+as unmapped rather than being counted as part of the section before.
 
 To improve them, measure, change, and measure again:
 
@@ -298,9 +301,12 @@ To improve them, measure, change, and measure again:
 go run ./cmd/sections data/ingestion/ads.jsonl data/sections
 ```
 
-It prints how many headings start a section, and writes tables to
-`data/sections/`: `unmapped.tsv`, headings that start none, most used
-first, which is the list to work down; `disagree.tsv`, headings whose
+It prints how many headings are of a known kind, and each section's
+share of the ads and of their text; unmapped's share is how much is left
+to map. It writes tables to `data/sections/`: `unmapped.tsv`, headings
+of no known kind, most used first, with the characters of text under
+each, which is the list to work down (sort it by that column to find the
+biggest); `disagree.tsv`, headings whose
 phrases point to more than one section, and which won; and `named.tsv`,
 plain lines taken for headings because they're exactly a section's
 name. Keep a change if more headings start the right section and none

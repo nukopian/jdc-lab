@@ -11,12 +11,18 @@
 # rule comes first here wins, so the order of the rules matters: "Desirable
 # skills" is desirable, not requirements, and "What our client offers" is
 # benefits, not company.
+#
+# A heading with none of these phrases is a details heading if it's a
+# field's label ("Working Hours", followed by a list), as internal/headings
+# knows them, and otherwise starts an unmapped section: the headings to
+# find phrases for.
 
 desirable, desirables, nice to have, nice to haves, ideally, bonus points,
 	advantageous, would be a plus, would be an advantage, preferred, beneficial
 
 benefits, benefit, perk, offer, offering, what's on offer, on offer,
-	what we offer, in return, what's in it for you, what you'll get,
+	what we offer, in return, what's in it for you, what's in it for me,
+	what you'll get,
 	what you get, reward, rewards, package, why join us, why join,
 	why work for us, why work with us, why choose us, why apply,
 	training, training and development, salary & benefits,
@@ -37,13 +43,13 @@ requirements, requirement, what we're looking for, what we are looking for,
 	you'll bring, you will bring, you should have, you will have, you'll have,
 	person specification, to be successful, what it takes, profile, who you are,
 	candidate requirements, knowledge, competencies, attributes,
-	someone who, anyone who
+	someone who, anyone who, require, required, you should be
 
 responsibilities, responsibility, duty, main duties, key duties,
 	what you'll be doing, what you will be doing, what you'll do, what you will do,
 	what will you be doing, what you will be responsible for, you will be responsible,
 	your role, role responsibilities, day to day, day in the life, your day,
-	accountabilities, accountability, key tasks, your week,
+	accountabilities, accountability, key tasks, task, your week,
 	in this role you will, your role will include, your role will involve,
 	you will, you'll
 
@@ -58,6 +64,11 @@ apply, how to apply, apply now, apply today, apply, application, applications,
 	interested, next steps, what's next, what happens next, get in touch,
 	contact, contact us, what you need to do now, for more information,
 	ready to apply, interview, interviews
+
+details, job details, role details, position details, contract details,
+	vacancy details, key details, the details, job information, key information,
+	location, hours, working hours, shift pattern, working pattern, salary, pay,
+	contract, duration
 
 summary, the role, about the role, the opportunity, about the opportunity,
 	overview, role overview, job overview, summary, job summary, role summary,

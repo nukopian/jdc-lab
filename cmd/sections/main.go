@@ -6,8 +6,9 @@
 // It writes, into OUTDIR:
 //
 //   - ads.jsonl: each ad's sections, one ad per line;
-//   - unmapped.tsv: headings that start no section, by how many ads use
-//     them, most first: the list to work down when adding phrases;
+//   - unmapped.tsv: headings of no known kind, by how many ads use
+//     them, most first, with the characters of text under them: the list
+//     to work down when adding phrases;
 //   - disagree.tsv: headings whose phrases point to more than one kind, and
 //     the kind that won;
 //   - named.tsv: lines of text, with no cue to be headings, that started a
@@ -50,6 +51,7 @@ type heading struct {
 	ads   map[string]bool // the ads using it
 	text  string          // how it's first written
 	kinds []sections.Kind // what its phrases point to
+	chars int             // characters of text in the sections it starts
 }
 
 // tally is what's counted over all the ads.
@@ -161,6 +163,9 @@ func (t *tally) add(id string, parts []headings.Part, ss []sections.Section) {
 			if p.Role == headings.Text {
 				t.kindChars[s.Kind] += len(p.Text)
 				t.chars += len(p.Text)
+				if h := t.headings[headings.Key(s.Heading)]; h != nil && s.Kind == sections.Unmapped {
+					h.chars += len(p.Text)
+				}
 			}
 		}
 	}
@@ -182,12 +187,12 @@ func (t tally) tables(dir string) error {
 		return cmp.Or(cmp.Compare(len(t.headings[b].ads), len(t.headings[a].ads)), cmp.Compare(a, b))
 	})
 	var unmapped, disagree strings.Builder
-	unmapped.WriteString("ads\tkey\theading\n")
+	unmapped.WriteString("ads\tchars\tkey\theading\n")
 	disagree.WriteString("ads\tkinds\theading\n")
 	for _, k := range keys {
 		h := t.headings[k]
 		if _, ok := sections.Of(k); !ok {
-			fmt.Fprintf(&unmapped, "%d\t%s\t%s\n", len(h.ads), k, h.text)
+			fmt.Fprintf(&unmapped, "%d\t%d\t%s\t%s\n", len(h.ads), h.chars, k, h.text)
 		}
 		if len(h.kinds) > 1 {
 			names := make([]string, len(h.kinds))
@@ -219,7 +224,7 @@ func (t tally) tables(dir string) error {
 
 func (t tally) print(dir string) {
 	fmt.Printf("%d ads (%d duplicates left out); written to %s\n\n", t.ads, t.duplicates, dir)
-	fmt.Printf("headings that start a section:   %d of %d uses (%.0f%%)\n", t.mapped, t.uses, pct(t.mapped, t.uses))
+	fmt.Printf("headings of a known kind:        %d of %d uses (%.0f%%)\n", t.mapped, t.uses, pct(t.mapped, t.uses))
 	named := 0
 	for _, n := range t.named {
 		named += n
