@@ -10,6 +10,19 @@ set -u
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root" || exit 2
 
+# Put the lab's own tools first, as .envrc means them to be, in case a
+# shell hook (mise's, for one) has moved them behind the system's since.
+if [ -n "${PERLBREW_ROOT:-}" ] && [ -n "${PERLBREW_PERL:-}" ]; then
+	PATH=$PERLBREW_ROOT/perls/$PERLBREW_PERL/bin:$PATH
+	if [ -n "${PERLBREW_LIB:-}" ]; then
+		PATH=${PERLBREW_HOME:-$HOME/.perlbrew}/libs/$PERLBREW_PERL@$PERLBREW_LIB/bin:$PATH
+	fi
+fi
+if [ -d .venv/bin ]; then
+	PATH=$root/.venv/bin:$PATH
+fi
+export PATH
+
 failed=
 summary=
 
