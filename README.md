@@ -47,23 +47,40 @@ text along the way, able to call the lab's Python. Nothing in the lab
 depends on it.
 
 Each language has its own place, with programs and reusable code kept
-apart:
+apart. Everything in the repository, folder by folder:
 
 | Path | What's there |
 |------|--------------|
 | `python/bin/`, `python/lib/` | Python programs, and the lab's Python packages |
 | `python/notebooks/`, `python/tests/` | Jupyter notebooks for exploration, and tests |
+| `python/pyproject.toml` | Settings for pytest and ruff |
 | `cmd/`, `internal/` | Go programs and packages |
 | `perl/bin/`, `perl/lib/`, `perl/t/` | Optional Perl programs, the lab's Perl modules, and their tests |
+| `docs/` | [SETUP.md](docs/SETUP.md) and [MAINTAINING.md](docs/MAINTAINING.md), and the PDFs' style sheet |
 | `scripts/` | Scripts for the repository itself, such as building the PDFs |
-| `data/`, `models/` | Job descriptions, models and ONNX exports, kept out of git |
+| `.github/workflows/` | The secret scan that runs on every push |
 
-Job descriptions and model files stay out of the repository. gitleaks
-scans the whole history for secrets on every push, and GitHub's secret
+And file by file, at the root:
+
+| File | What it's for |
+|------|---------------|
+| `requirements.txt` | Python packages, every one pinned |
+| `.python-version` | The Python version, for pyenv |
+| `go.mod`, `go.sum` | The Go module and its dependencies |
+| `cpanfile` | Perl modules, with the tools for working on the code |
+| `.perltidyrc`, `.perlcriticrc` | Perl::Tidy's and Perl::Critic's profiles |
+| `.envrc` | Sets up Python, Perl and Go on entering the folder, with direnv |
+| `.gitignore` | What stays out of git, by language |
+
+Kept out of git: `data/` (job descriptions), `models/` (models and ONNX
+exports), `bin/` (Go programs once built), and `.venv/`. gitleaks scans
+the whole history for secrets on every push, and GitHub's secret
 scanning and push protection are on as well.
 
 ## Running it
 
 The lab needs Python 3.12, Go 1.26 and ONNX Runtime, and optionally
-Perl 5.36.
-[HOWTO.md](HOWTO.md) sets everything up from nothing, step by step.
+Perl 5.36. [SETUP.md](docs/SETUP.md) sets everything up from nothing,
+step by step, and [MAINTAINING.md](docs/MAINTAINING.md) covers working
+on the lab: tests, style, dependencies and the checks before
+committing.

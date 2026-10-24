@@ -8,7 +8,7 @@
 # scores come back as one. python/bin/onnx_demo.py and cmd/onnx-demo do the
 # same from Python and Go, and all three print the same table.
 #
-# From the lab's folder, with direnv on (see HOWTO.md):
+# From the lab's folder, with direnv on (see docs/SETUP.md):
 #
 #   perl perl/bin/onnx-demo.pl
 use v5.36;
