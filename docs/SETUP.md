@@ -77,6 +77,23 @@ there yet, so it's safe to allow before the steps below. Without gvm,
 the lab uses whichever `go` is on the `PATH`. Any Go from 1.21 on will
 then download the version `go.mod` asks for.
 
+Watch for other tools that rebuild the `PATH` at every prompt or change
+of folder, such as `mise activate`. Their hooks can run after direnv's
+and undo it, moving the lab's folders behind the system's. Then, in the
+lab, `perl` turns out to be macOS's own, or `python3`, `pytest` and
+`ruff` Homebrew's, while the lab's are still there further down. This
+lists the hooks in the order they run; direnv's, `_direnv_hook`, should
+be the last that changes the `PATH`:
+
+```
+echo $chpwd_functions $precmd_functions
+```
+
+Either don't load such a tool, or use a mode that leaves the `PATH`
+alone, such as mise's shims (`mise activate zsh --shims`).
+`test-all.sh` puts the lab's tools first for itself, so it isn't fooled
+either way.
+
 Hook direnv into the shell once, by adding this line to `~/.zshrc`:
 
 ```
