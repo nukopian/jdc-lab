@@ -5,7 +5,8 @@
 # takes a batch of vectors and returns how alike each pair is (cosine
 # similarity), as the lab does when comparing a heading's embedding with
 # each section type's. The vectors go in as a Perl array of arrays and the
-# scores come back as one.
+# scores come back as one. scripts/onnx_demo.py and cmd/onnx-demo do the
+# same from Python and Go, and all three print the same table.
 #
 # From the lab's folder, with direnv on (see HOWTO.md):
 #

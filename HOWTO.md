@@ -99,6 +99,20 @@ brew list --versions onnxruntime
 Exporting a model to ONNX needs `onnx` and `onnxscript`, which are in
 `requirements.txt`.
 
+To check both work, run the demos, Python's first: it builds a small
+model that scores how alike some vectors are, saves it to
+`models/onnx-demo.onnx`, and runs it. The Go demo runs the same file.
+
+```
+python scripts/onnx_demo.py
+go run ./cmd/onnx-demo
+```
+
+Each prints the ONNX Runtime version, then the same table, with `1.000`
+along the diagonal. If the tables differ, the two copies of ONNX Runtime
+have drifted apart. The Go demo looks for the library in Homebrew's
+place, unless `ONNXRUNTIME_LIB` names another.
+
 ## Go
 
 ### gvm
@@ -235,15 +249,16 @@ it against the venv's Python, without asking which one to use. The
 build links that Python's shared library, so after changing the lab's
 Python, install Inline::Python again.
 
-To check it works, run the demo. It builds a small ONNX model in Python,
+To check it works, run the Perl version of the
+[ONNX Runtime](#onnx-runtime) demo. It builds the same model in Python,
 runs it with ONNX Runtime, and passes Perl arrays in and out:
 
 ```
 perl perl/onnx-demo.pl
 ```
 
-It prints the ONNX Runtime and Perl versions, then a table of how alike
-three vectors are, with `1.000` along the diagonal.
+It prints the ONNX Runtime and Perl versions, then the same table as
+the Python and Go demos.
 
 ## direnv
 
