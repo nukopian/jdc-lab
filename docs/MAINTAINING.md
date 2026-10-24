@@ -325,8 +325,10 @@ heading.
 - **Style and tests:** the checks above, for each language touched.
 - **Docs:** a change to tools, versions, dependencies or setup updates
   [SETUP.md](SETUP.md) in the same commit, and a change to how the lab
-  is worked on updates this file. Rebuild the PDFs and read the pages
-  that changed.
+  is worked on updates this file. A change to a stage of the pipeline,
+  what it decides, its thresholds or its programs, updates
+  [PIPELINE.md](PIPELINE.md) in the same commit, with its figures if
+  they moved. Rebuild the PDFs and read the pages that changed.
 - **Messages:** commits follow
   [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
   `fix:`, `docs:`, `chore:`, `build(deps):` and so on), and are signed.

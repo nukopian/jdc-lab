@@ -57,7 +57,7 @@ apart. Everything in the repository, folder by folder:
 | `python/pyproject.toml` | Settings for pytest and ruff |
 | `cmd/`, `internal/` | Go programs and packages |
 | `perl/bin/`, `perl/lib/`, `perl/t/` | Optional Perl programs, the lab's Perl modules, and their tests |
-| `docs/` | [SETUP.md](docs/SETUP.md) and [MAINTAINING.md](docs/MAINTAINING.md), and the PDFs' style sheet |
+| `docs/` | [PIPELINE.md](docs/PIPELINE.md), [SETUP.md](docs/SETUP.md) and [MAINTAINING.md](docs/MAINTAINING.md), and the PDFs' style sheet |
 | `scripts/` | Scripts for the repository itself: running every language's tests, and building the PDFs |
 | `.github/workflows/` | The secret scan that runs on every push |
 
@@ -85,4 +85,6 @@ The lab needs Python 3.12, Go 1.26 and ONNX Runtime, and optionally
 Perl 5.36. [SETUP.md](docs/SETUP.md) sets everything up from nothing,
 step by step, and [MAINTAINING.md](docs/MAINTAINING.md) covers working
 on the lab: tests, style, dependencies and the checks before
-committing.
+committing. [PIPELINE.md](docs/PIPELINE.md) describes how the lab
+turns a job ad into blocks, headings, sections and boilerplate, what
+each stage decides, and what it has measured so far.

@@ -1,10 +1,10 @@
 // Command blocks splits each job ad into blocks (see internal/blocks), writes
-// them as JSON Lines, one ad per line, and prints a summary: how many blocks
-// of each kind, and how many carry each cue.
+// them to OUTDIR/ads.jsonl, one ad per line, and prints a summary: how many
+// blocks of each kind, and how many carry each cue.
 //
 // From the lab's folder:
 //
-//	go run ./cmd/blocks data/ingestion/ads.jsonl data/blocks/ads.jsonl
+//	go run ./cmd/blocks data/ingestion/ads.jsonl data/blocks
 //
 // or, once installed with `go install ./cmd/...`, just blocks.
 package main
@@ -38,9 +38,9 @@ type tally struct {
 func main() {
 	log.SetFlags(0)
 	if len(os.Args) != 3 {
-		log.Fatal("usage: blocks ADS.jsonl OUT.jsonl")
+		log.Fatal("usage: blocks ADS.jsonl OUTDIR")
 	}
-	source, target := os.Args[1], os.Args[2]
+	source, target := os.Args[1], filepath.Join(os.Args[2], "ads.jsonl")
 	t, err := run(source, target)
 	if err != nil {
 		os.Remove(target) // half an output is worse than none
