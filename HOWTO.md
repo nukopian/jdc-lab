@@ -187,6 +187,26 @@ The lab's `.envrc` switches to `perl-5.36.3@jdc-lab` on entering the
 folder (see [direnv](#direnv)), so modules installed with `cpanm` there
 go into the lab's library.
 
+#### If Perl won't build on macOS
+
+Since Xcode 27.1 (Apple clang 21, building against the macOS 27.0 SDK),
+`perlbrew install` fails on macOS 26.7 for every Perl version. The build
+stops at "Failed to build miniperl", because miniperl crashes with a
+segmentation fault, whether or not `--notest` is given. Building
+against an older SDK works. The Command Line Tools keep several, and
+`xcode-select --install` installs them:
+
+```
+ls /Library/Developer/CommandLineTools/SDKs/
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk MACOSX_DEPLOYMENT_TARGET=26.0 perlbrew install perl-5.36.3 --notest
+```
+
+Use the newest SDK older than the one that fails: `xcrun --show-sdk-version`
+shows which one the compiler is using. The variable is `SDKROOT`, with
+no underscore: clang ignores `SDK_ROOT` and keeps its default SDK. Modules installed with `cpanm`
+afterwards, Inline::Python included, build without either variable.
+Check whether this is still needed after the next Xcode update.
+
 ### Inline::Python
 
 Inline::Python 0.58 doesn't link Python's library on macOS unless
