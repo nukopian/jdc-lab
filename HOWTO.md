@@ -161,10 +161,23 @@ only changes when the lab needs something newer.
 ### The module
 
 The lab is one Go module, `github.com/nukopian/jdc-lab`, at the root of
-the repository, where Go's tools expect it. Programs go in `cmd/`, one
-folder each, and the packages they share in `internal/`. A plain
-`go build` there leaves binaries beside the code; `go build -o bin/`
-puts them in the git-ignored `bin/` at the root instead.
+the repository, where Go's tools expect it. The root itself holds no Go
+code, only `go.mod` and `go.sum`. Programs go in `cmd/`, one folder
+each, and the packages they share in `internal/`, each with its tests
+and examples beside it.
+
+To build the programs, install them. The lab's `.envrc` points `GOBIN`
+at the git-ignored `bin/` and puts it on the `PATH`, so they then run
+by name from anywhere in the lab:
+
+```
+go install ./cmd/...
+onnx-demo
+```
+
+`go run ./cmd/onnx-demo` builds and runs a program without keeping it.
+Avoid a bare `go build` inside `cmd/<tool>/`: it leaves the binary
+beside the code. `.gitignore` hides it, but it's clutter.
 
 `go.mod` requires the published versions of grammar and scalar. To use
 your sibling clones instead, without publishing a release, create a
@@ -284,6 +297,11 @@ enter the folder:
 - **Go:** it puts gvm's Go at the version in `go.mod` first on the
   `PATH`, whatever `gvm use` says elsewhere. Raising the version in
   `go.mod` moves the lab with it, once gvm has that version installed.
+  It also points `GOBIN` at `bin/`, for `go install`.
+- **`bin/` and `scripts/`:** it puts both on the `PATH`, ahead of the
+  system's folders, so the lab's programs and the repository's scripts
+  run by name. `bin/` is added even before the first `go install`
+  creates it, so it needs no reload afterwards.
 - **`.env`:** it reads it, if there is one.
 
 It skips any of the three languages, with a note, when its setup isn't

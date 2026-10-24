@@ -5,24 +5,27 @@
 // similarity). This program runs it on the same vectors as the Python and
 // Perl demos, and should print the same table.
 //
-// From the lab's folder, after running the Python demo:
+// After running the Python demo, from anywhere in the lab:
 //
 //	go run ./cmd/onnx-demo
+//
+// or, once installed with `go install ./cmd/...`, just onnx-demo. It finds
+// the lab by looking upwards from the current folder for go.mod.
 //
 // ONNX Runtime's shared library is loaded from $ONNXRUNTIME_LIB, or else
 // from Homebrew's /opt/homebrew/lib/libonnxruntime.dylib.
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	ort "github.com/yalue/onnxruntime_go"
 )
-
-const modelPath = "models/onnx-demo.onnx"
 
 var (
 	names   = []string{"responsibilities", "duties", "benefits"}
@@ -42,11 +45,16 @@ func main() {
 	}
 	defer ort.DestroyEnvironment()
 
-	if _, err := os.Stat(modelPath); err != nil {
+	lab, err := labRoot()
+	if err != nil {
+		log.Fatal(err)
+	}
+	model := filepath.Join(lab, "models", "onnx-demo.onnx")
+	if _, err := os.Stat(model); err != nil {
 		log.Fatalf("%v: run python python/bin/onnx_demo.py first", err)
 	}
 
-	scores, err := similarities(vectors)
+	scores, err := similarities(model, vectors)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,9 +74,28 @@ func main() {
 	}
 }
 
-// similarities runs the model on rows, which must all be the same length,
-// and returns the score for each pair.
-func similarities(rows [][]float32) ([][]float32, error) {
+// labRoot returns the lab's folder: the nearest one at or above the
+// current folder that holds go.mod.
+func labRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", errors.New("not in the lab: no go.mod here or above")
+		}
+		dir = parent
+	}
+}
+
+// similarities runs the model file on rows, which must all be the same
+// length, and returns the score for each pair.
+func similarities(model string, rows [][]float32) ([][]float32, error) {
 	n, dim := int64(len(rows)), int64(len(rows[0]))
 	flat := make([]float32, 0, n*dim)
 	for _, row := range rows {
@@ -86,7 +113,7 @@ func similarities(rows [][]float32) ([][]float32, error) {
 	}
 	defer output.Destroy()
 
-	session, err := ort.NewAdvancedSession(modelPath,
+	session, err := ort.NewAdvancedSession(model,
 		[]string{"vectors"}, []string{"scores"},
 		[]ort.Value{input}, []ort.Value{output}, nil)
 	if err != nil {
