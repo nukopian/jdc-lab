@@ -61,5 +61,6 @@ printf "ONNX Runtime %s, called from Perl %vd\n\n", runtime_version(), $^V;
 my $scores = similarities(\@vectors);
 printf "%-18s%s\n", '', join '', map { sprintf '%18s', $_ } @names;
 for my $i (keys @names) {
-	printf "%-18s%s\n", $names[$i], join '', map { sprintf '%18.3f', $_ } $scores->[$i]->@*;
+    printf "%-18s%s\n", $names[$i], join '',
+        map { sprintf '%18.3f', $_ } $scores->[$i]->@*;
 }
