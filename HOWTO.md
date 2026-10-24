@@ -190,9 +190,11 @@ go into the lab's library.
 ### Inline::Python
 
 Inline::Python 0.58 doesn't link Python's library on macOS unless
-Python is Apple's own, so it fails all its tests and won't install.
-Until a fixed release is out ([TODO.md](TODO.md) has the details), install
-it with a one-line fix applied. In the lab's folder, with direnv on:
+Python is Apple's own, so it fails all its tests and won't install
+([issue #44](https://github.com/niner/inline-python-pm/issues/44) has
+the cause and the fix). Until a fixed release is out, install it with
+that one-line fix applied. When one is, replace these steps with plain
+`cpanm Inline::Python`. In the lab's folder, with direnv on:
 
 ```
 lab=$PWD
