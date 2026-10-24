@@ -283,6 +283,33 @@ once it has moved is awkward. If another formula needs a newer
   gitleaks git --redact .
   ```
 
+## Releases
+
+A release is a signed, annotated tag on `main`, with a GitHub release to
+match. Its notes live in [CHANGELOG.md](../CHANGELOG.md): add to
+Unreleased as work lands, then, to release:
+
+1. Turn Unreleased into the release's entry, `## vX.Y.Z (date)`, with a
+   one-line title first, and start a fresh Unreleased above it. Commit.
+2. Check the commit you'll tag: `test-all.sh` passes, and
+   `gitleaks git --redact .` finds nothing.
+3. Tag it, with the entry (title line first) as the tag's message, and
+   push the tag:
+
+   ```
+   git tag -s vX.Y.Z -F entry.txt
+   git push origin vX.Y.Z
+   ```
+
+4. Publish the GitHub release from the tag, titled `vX.Y.Z: title`,
+   with the rest of the entry as its notes:
+
+   ```
+   gh release create vX.Y.Z --verify-tag --title "vX.Y.Z: title" --notes-file notes.txt
+   ```
+
+A tag is never moved or deleted once pushed: a fix is a new release.
+
 ## Documents
 
 `scripts/readme-pdf.sh` builds a PDF of each document, beside it, for

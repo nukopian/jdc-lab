@@ -71,6 +71,7 @@ And file by file, at the root:
 | `.perltidyrc`, `.perlcriticrc` | Perl::Tidy's and Perl::Critic's profiles |
 | `.envrc` | Sets up Python, Perl and Go on entering the folder, with direnv |
 | `.gitignore` | What stays out of git, by language |
+| `CHANGELOG.md` | What changed in each release |
 
 Kept out of git: `data/` (job descriptions), `models/` (models and ONNX
 exports), `bin/` (Go programs once built), and `.venv/`. gitleaks scans
