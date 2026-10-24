@@ -72,12 +72,18 @@ added to `pyenv install`, and rebuild the venv.
 After installing or upgrading a package, refresh the pins with
 `.venv/bin/pip freeze > requirements.txt` and commit them.
 
+The lab's Python lives in `python/`: programs in `python/bin`, the lab's
+own packages in `python/lib`, and notebooks in `python/notebooks`. The
+lab's `.envrc` puts `python/lib` on `PYTHONPATH` (see [direnv](#direnv)),
+so programs and notebooks can import those packages without installing
+them.
+
 ### Models
 
 The embedding models come from Hugging Face. They're downloaded on
 first use into Hugging Face's cache (`~/.cache/huggingface`), not into
 the lab. ONNX exports go into `models/`, which is git-ignored, so they
-are rebuilt from the scripts, not copied.
+are rebuilt by the programs in `python/bin`, not copied.
 
 ## ONNX Runtime
 
@@ -104,7 +110,7 @@ model that scores how alike some vectors are, saves it to
 `models/onnx-demo.onnx`, and runs it. The Go demo runs the same file.
 
 ```
-python scripts/onnx_demo.py
+python python/bin/onnx_demo.py
 go run ./cmd/onnx-demo
 ```
 
@@ -155,8 +161,10 @@ only changes when the lab needs something newer.
 ### The module
 
 The lab is one Go module, `github.com/nukopian/jdc-lab`, at the root of
-the repository. Programs go in `cmd/`, and the packages they share in
-`internal/`.
+the repository, where Go's tools expect it. Programs go in `cmd/`, one
+folder each, and the packages they share in `internal/`. A plain
+`go build` there leaves binaries beside the code; `go build -o bin/`
+puts them in the git-ignored `bin/` at the root instead.
 
 `go.mod` requires the published versions of grammar and scalar. To use
 your sibling clones instead, without publishing a release, create a
@@ -176,6 +184,9 @@ Perl is optional, and nothing else in the lab depends on it: skip this
 section unless you want it. It's a handy tool for working through text
 along the way, and through Inline::Python it can call the lab's Python,
 ONNX Runtime included.
+
+The lab's Perl lives in `perl/`: programs in `perl/bin`, and the lab's
+own modules in `perl/lib`, which the lab's `.envrc` puts on `PERL5LIB`.
 
 ### perlbrew
 
@@ -254,7 +265,7 @@ To check it works, run the Perl version of the
 runs it with ONNX Runtime, and passes Perl arrays in and out:
 
 ```
-perl perl/onnx-demo.pl
+perl perl/bin/onnx-demo.pl
 ```
 
 It prints the ONNX Runtime and Perl versions, then the same table as
@@ -265,9 +276,11 @@ the Python and Go demos.
 The lab's [`.envrc`](.envrc) sets up its environment whenever you
 enter the folder:
 
-- **Python:** it activates the venv.
-- **Perl:** it switches to `perl-5.36.3@jdc-lab`, and sets `PYTHONPATH`
-  so that Inline::Python sees the venv's packages.
+- **Python:** it activates the venv, and puts `python/lib` on
+  `PYTHONPATH`.
+- **Perl:** it switches to `perl-5.36.3@jdc-lab`, puts `perl/lib` ahead
+  of that library on `PERL5LIB`, and adds the venv's packages to
+  `PYTHONPATH`, after `python/lib`, so that Inline::Python sees them.
 - **Go:** it puts gvm's Go at the version in `go.mod` first on the
   `PATH`, whatever `gvm use` says elsewhere. Raising the version in
   `go.mod` moves the lab with it, once gvm has that version installed.
@@ -297,7 +310,8 @@ editing `.env` reloads the environment at the next prompt, with no
 `direnv allow` needed.
 
 `.envrc` is bash, with direnv's standard library loaded first.
-`log_status` and `dotenv_if_exists` come from there. `man direnv-stdlib`
+`log_status`, `path_add`, `PATH_add` and `dotenv_if_exists` come from
+there. `man direnv-stdlib`
 documents the library, and `direnv stdlib` prints its source.
 
 ## Data

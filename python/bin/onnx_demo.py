@@ -4,12 +4,12 @@ The model takes a batch of vectors and returns how alike each pair is
 (cosine similarity), as the lab does when comparing a heading's embedding
 with each section type's. It's built here, so the demo needs no download,
 and saved to models/onnx-demo.onnx for the Go demo (cmd/onnx-demo) to run
-too: the two should print the same table. perl/onnx-demo.pl does the same
+too: the two should print the same table. perl/bin/onnx-demo.pl does the same
 from Perl.
 
 From the lab's folder, with the venv active:
 
-    python scripts/onnx_demo.py
+    python python/bin/onnx_demo.py
 """
 
 import sys
@@ -20,7 +20,9 @@ import onnx
 import onnxruntime as ort
 from onnx import TensorProto, helper
 
-MODEL_PATH = Path("models/onnx-demo.onnx")
+# The lab's folder, two levels up from python/bin, wherever this is run from.
+LAB = Path(__file__).resolve().parents[2]
+MODEL_PATH = LAB / "models" / "onnx-demo.onnx"
 
 NAMES = ["responsibilities", "duties", "benefits"]
 VECTORS = [[0.9, 0.1, 0.0], [0.8, 0.3, 0.1], [0.1, 0.2, 0.9]]
@@ -58,7 +60,7 @@ def main():
 
     python = ".".join(str(n) for n in sys.version_info[:3])
     print(f"ONNX Runtime {ort.__version__}, called from Python {python}")
-    print(f"Model saved to {MODEL_PATH}\n")
+    print(f"Model saved to {MODEL_PATH.relative_to(LAB)}\n")
     print(f"{'':18}" + "".join(f"{name:>18}" for name in NAMES))
     for name, row in zip(NAMES, scores):
         print(f"{name:18}" + "".join(f"{score:18.3f}" for score in row))

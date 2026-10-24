@@ -1,6 +1,6 @@
 // Command onnx-demo runs a small ONNX model from Go, with ONNX Runtime.
 //
-// The model, saved to models/onnx-demo.onnx by scripts/onnx_demo.py, takes
+// The model, saved to models/onnx-demo.onnx by python/bin/onnx_demo.py, takes
 // a batch of vectors and returns how alike each pair is (cosine
 // similarity). This program runs it on the same vectors as the Python and
 // Perl demos, and should print the same table.
@@ -43,7 +43,7 @@ func main() {
 	defer ort.DestroyEnvironment()
 
 	if _, err := os.Stat(modelPath); err != nil {
-		log.Fatalf("%v: run python scripts/onnx_demo.py first", err)
+		log.Fatalf("%v: run python python/bin/onnx_demo.py first", err)
 	}
 
 	scores, err := similarities(vectors)

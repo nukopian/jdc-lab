@@ -46,12 +46,16 @@ Go for running them. Perl is optional: a handy tool for working through
 text along the way, able to call the lab's Python. Nothing in the lab
 depends on it.
 
+Each language has its own place, with programs and reusable code kept
+apart:
+
 | Path | What's there |
 |------|--------------|
-| `notebooks/` | Jupyter notebooks for exploration |
-| `scripts/` | Python programs that produce models and datasets |
+| `python/bin/`, `python/lib/` | Python programs, and the lab's Python packages |
+| `python/notebooks/` | Jupyter notebooks for exploration |
 | `cmd/`, `internal/` | Go programs and packages |
-| `perl/` | Optional Perl tools and demos |
+| `perl/bin/`, `perl/lib/` | Optional Perl programs, and the lab's Perl modules |
+| `scripts/` | Scripts for the repository itself, such as building the PDFs |
 | `data/`, `models/` | Job descriptions, models and ONNX exports, kept out of git |
 
 Job descriptions and model files stay out of the repository. gitleaks

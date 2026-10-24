@@ -11,8 +11,9 @@ CLAUDE.md
 .vscode/
 
 # Go
-# Binaries: built into bin/, or beside the code by a bare `go build`
-bin/
+# Binaries: built into bin/ at the root (not python/bin or perl/bin, which
+# hold programs), or beside the code by a bare `go build`
+/bin/
 *.exe
 *.exe~
 *.dll
