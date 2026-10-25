@@ -62,7 +62,9 @@ print the table.
 - [ROADMAP.md](../ROADMAP.md) holds what the lab means to do: features
   and outcomes, in Now, Next and Later, each saying which of the lab's
   questions it serves. It's public, on both branches, and in every
-  release. An item in Now has a plan written to be picked up cold; one
+  release. Now holds three items at most, so the roadmap stays a queue
+  to pull from, not a list pushing work; an item in Now has a plan
+  written to be picked up cold; one
   leaves when it ships, in the commit that adds it to the CHANGELOG.
   Each of the pipeline's [Known gaps](PIPELINE.md#known-gaps) links to
   its item.

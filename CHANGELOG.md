@@ -12,7 +12,8 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- The roadmap's Now holds three items at most, so it stays a queue to
+  pull from.
 
 ## v0.3.1 (2026-10-25)
 
