@@ -66,8 +66,9 @@ nytprof.out*
 # Model weights and exported ONNX files
 models/
 
-# Job description data (may be large or not ours to publish)
-data/
+# Job description data (may be large or not ours to publish): a folder,
+# or a link to a private data store, so no trailing slash
+/data
 
 # macOS
 .DS_Store

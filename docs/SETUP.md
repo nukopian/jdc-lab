@@ -371,4 +371,9 @@ lab reads, named the same way. Each such file is a sample:
 go run ./cmd/xml-to-jsonl data/ingestion/extract-20261024.xml data/ingestion/ads-20261024.jsonl
 ```
 
+`data` can instead be a link to a private data store kept elsewhere,
+with its exports in `ingestion/`, for those with access to one:
+`ln -s /path/to/store data`. Git ignores the link as it does the
+folder.
+
 [PIPELINE.md](PIPELINE.md#running-it) has what to run after that.
