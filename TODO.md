@@ -175,27 +175,6 @@ a name of its own so the first stays.
 **Done when** both samples' figures are in PIPELINE.md, and any rule
 that fitted only the first has been changed.
 
-## Try grammar's develop, and greenlight its release
-
-**From:** grammar's session, 2026-10-25 (grammar d688a7eda7d24c0d3962cd12e47d474c3b489ea7)
-**Waiting on:** nothing
-
-**What:** with `go.work` joining `../grammar` on its `develop`, make the
-changes in the two tasks below, for `ToAll` and `Canonicals`, run the
-tests, and tell Iain whether grammar can be released. Leave the changes
-uncommitted until the release, as `go.mod` can't ask for it yet.
-
-**Why:** both came from friction the lab found, so the lab says whether
-they fix it before grammar releases them. The release also brings two
-changes to every match: the undef for no match is locked, so reading it
-stays undef, and reading a match creates nothing (scalar v0.5.7's
-`Autovivify(false)`), as in Raku.
-
-**What's known:** grammar's session tried both: `TestAll`, `ExampleAll`
-and the full suite pass, and `rank` is the same for every kind.
-
-**Done when** Iain has the lab's answer.
-
 ## Use grammar's Canonicals to rank the kinds
 
 **From:** grammar's session, 2026-10-25 (grammar d688a7eda7d24c0d3962cd12e47d474c3b489ea7)
