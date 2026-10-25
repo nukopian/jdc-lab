@@ -214,6 +214,11 @@ anywhere in a heading's key, as whole words, in any case, and in the
 plural ("duty" finds "Main Duties"). So adding a synonym means adding a
 phrase to the file, not changing code.
 
+**"Why" first.** A heading starting "why" is benefits, whatever phrases
+are in it: it's a pitch to the reader, as in "Why join us?", and also
+"Why you'll love this role" or "Why should you apply?", whose phrases
+would otherwise make them responsibilities or apply.
+
 **Choosing between kinds.** Where a heading has phrases of two kinds, the
 kind whose rule comes first in the file wins. The file's order is the
 ranking: desirable, benefits, legal, requirements, responsibilities,
@@ -221,8 +226,7 @@ company, apply, details, summary. So "Desirable skills" is desirable, not
 requirements, and "What our client offers" benefits, not company.
 
 **With no phrase**, a heading starting "about" is company ("About" and a
-company's name), one starting "why" is benefits, and one that's a field's
-label is details. Any other starts an `unmapped` section: so the text
+company's name), and one that's a field's label is details. Any other starts an `unmapped` section: so the text
 under it counts as unmapped, rather than hiding in the section before,
 and unmapped's share of the text measures what's left to map.
 
@@ -424,9 +428,10 @@ go run ./cmd/pipeline compare before after
 
 For each sample, and all of them together, `compare` shows the summary
 lines whose figures moved, `-` before and `+` after, and the headings the
-change mapped and those it unmapped, with the most text first. Newly
-unmapped headings should be none, and newly mapped ones should all be
-right: a phrase can match more than was meant, as "the business" would
+change mapped and those it unmapped, with the most text first. A sample
+in only one of the runs, such as a new export's, is named, with nothing
+to compare: run `before` again to include it. Newly unmapped headings
+should be none, and newly mapped ones should all be right: a phrase can match more than was meant, as "the business" would
 take "The business has a strong presence across:" to be company. Any
 other table can be compared by hand, as in:
 
@@ -469,7 +474,7 @@ section but the summary, 5% and 4%.
 | desirable | 2% | 2% | 2% | 3% | 4% | 4% |
 | benefits | 12% | 12% | 12% | 32% | 27% | 31% |
 | company | 5% | 2% | 3% | 45% | 28% | 40% |
-| apply | 3% | 3% | 3% | 36% | 40% | 42% |
+| apply | 3% | 3% | 3% | 36% | 41% | 42% |
 | legal | 1% | 1% | 1% | 77% | 69% | 74% |
 | details | 2% | 2% | 2% | 9% | 15% | 14% |
 | unmapped | 14% | 16% | 15% | 17% | 25% | 24% |
@@ -497,6 +502,7 @@ they're taken for headings (see [Known gaps](#known-gaps)).
 | Text kept, keys normalised | Grammars later need the text as written (`£`, `–`); matching needs one form. |
 | Phrases as data, canonical first | Synonyms are edited, not coded, in the format search engines use. |
 | Rule order as ranking | Which kind wins is data too, changed by moving a line. |
+| "Why" headings are benefits | They pitch the job to the reader, whatever words follow "why". |
 | Unmapped and details sections | So what's left to map shows, and the job's terms are kept together for grammars. |
 | "The role" is summary | What follows is usually an overview; to revisit with more evidence. |
 | Title groups for advertisers | The ads don't say who placed them; different jobs is what makes text boilerplate. |

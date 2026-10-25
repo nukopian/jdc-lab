@@ -81,20 +81,22 @@ func init() {
 }
 
 // Of returns the kind of section a heading starts, given its key (see
-// headings.Key), and whether it's known. Of the kinds its phrases point
-// to, the one whose rule comes first in headings.txt wins. With none, a
-// heading starting "about" is company ("About Brightway Recruitment"), one
-// starting "why" benefits ("Why Brightway?"), and a field's label details
-// ("Working Hours").
+// headings.Key), and whether it's known. A heading starting "why" is
+// benefits, whatever phrases are in it: it's a pitch to the reader ("Why
+// Brightway?", "Why you'll love this role"). Otherwise, of the kinds its
+// phrases point to, the one whose rule comes first in headings.txt wins.
+// With none, a heading starting "about" is company ("About Brightway
+// Recruitment"), and a field's label details ("Working Hours").
 func Of(key string) (Kind, bool) {
+	first, _, _ := strings.Cut(key, " ")
+	if first == "why" {
+		return Benefits, true
+	}
 	if kinds := All(key); len(kinds) > 0 {
 		return slices.MinFunc(kinds, func(a, b Kind) int { return rank[a] - rank[b] }), true
 	}
-	switch first, _, _ := strings.Cut(key, " "); first {
-	case "about":
+	if first == "about" {
 		return Company, true
-	case "why":
-		return Benefits, true
 	}
 	if headings.IsLabel(key) {
 		return Details, true

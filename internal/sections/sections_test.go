@@ -31,6 +31,11 @@ func TestOf(t *testing.T) {
 		{"About Us", Company},
 		{"About Brightway Recruitment", Company},
 		{"Why Brightway?", Benefits},
+		// A heading starting "why" is a pitch, whatever phrases are in it.
+		{"Why You'll Love This Role:", Benefits},
+		{"Why Choose Day-to-Day Supply?", Benefits},
+		{"Why Should You Apply?", Benefits},
+		{"Why consider the role?", Benefits},
 		{"How to Apply", Apply},
 		{"Interested?", Apply},
 		{"Equal Opportunities Statement", Legal},

@@ -34,6 +34,22 @@ has the steps).
   Go checks and tests (gofmt, vet, the race detector, govulncheck) as
   well as the secret scan. docs/MAINTAINING.md has the branches and the
   release steps.
+- The README says why the lab is public: it's for learning as much as
+  research, so its code, method and findings are open, while the job
+  ads it reads, which aren't ours to publish, and the detailed results
+  drawn from them are kept privately. `data` can be a link to such a
+  private store. Where it stands now describes the pipeline and its
+  figures, and is kept current with every change.
+- A wash-up before the release. It found and fixed
+  `cmd/pipeline compare` stopping at the first sample in only one of
+  the two runs, which the first new export would have hit, so no sample
+  after it was compared, and skipping without a word any sample gone
+  from the second run; and 15 of 717 headings starting "why" filed by a
+  phrase inside them, such as "Why you'll love this role" as
+  responsibilities and "Why should you apply?" as apply, when they're
+  benefits. Only the second sample's figures moved, and only apply's
+  boilerplate, from 40% to 41%. Smaller: `cmd/heading-counts` ended a
+  summary line with spaces.
 
 ## v0.2.0 (2026-10-25)
 

@@ -30,6 +30,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
@@ -63,7 +64,7 @@ func main() {
 	case len(os.Args) == 3 && os.Args[1] == "run":
 		err = run(os.Args[2])
 	case len(os.Args) == 4 && os.Args[1] == "compare":
-		err = compare(os.Stdout, os.Args[2], os.Args[3])
+		err = compare(os.Stdout, runsDir, os.Args[2], os.Args[3])
 	default:
 		log.Fatal("usage: pipeline run RUN | pipeline compare BEFORE AFTER")
 	}
@@ -115,10 +116,10 @@ func run(name string) error {
 
 // stage runs each stage on one sample, into dir.
 func stage(s runs.Sample, dir string) error {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
 	for _, st := range stages {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			return err
-		}
 		summary, err := os.Create(filepath.Join(dir, st.dir+".txt"))
 		if err != nil {
 			return err
@@ -163,43 +164,80 @@ func combine(samples []runs.Sample, path string) (runs.Sample, error) {
 	return runs.Sample{Name: "all", Path: path}, out.Close()
 }
 
-// compare writes to w how each sample moved from run before to run after.
-func compare(w io.Writer, before, after string) error {
-	entries, err := os.ReadDir(filepath.Join(runsDir, after))
+// compare writes to w how each sample moved from run before to run after,
+// both in dir. A sample in only one of them, such as a new export's, is
+// named, with nothing to compare.
+func compare(w io.Writer, dir, before, after string) error {
+	was, err := sampleDirs(filepath.Join(dir, before))
 	if err != nil {
 		return err
 	}
-	for _, e := range entries {
-		if !e.IsDir() {
+	now, err := sampleDirs(filepath.Join(dir, after))
+	if err != nil {
+		return err
+	}
+	for _, name := range now {
+		if !slices.Contains(was, name) {
+			fmt.Fprintf(w, "== %s: new in %s, not in %s\n\n", name, after, before)
 			continue
 		}
-		fmt.Fprintf(w, "== %s\n", e.Name())
-		was, now := filepath.Join(runsDir, before, e.Name()), filepath.Join(runsDir, after, e.Name())
-		for _, st := range stages {
-			// A summary names the folder it wrote to, which differs
-			// between runs by the run's name alone.
-			a, errA := os.ReadFile(filepath.Join(was, st.dir+".txt"))
-			b, errB := os.ReadFile(filepath.Join(now, st.dir+".txt"))
-			if errA != nil || errB != nil {
-				fmt.Fprintf(w, "%s: not in both runs\n", st.program)
-				continue
-			}
-			changes := runs.Changed(strings.ReplaceAll(string(a), was, "…"), strings.ReplaceAll(string(b), now, "…"))
-			if len(changes) == 0 {
-				fmt.Fprintf(w, "%s: unchanged\n", st.program)
-				continue
-			}
-			fmt.Fprintf(w, "%s:\n", st.program)
-			for _, c := range changes {
-				fmt.Fprintf(w, "  - %s\n  + %s\n", c.Before, c.After)
-			}
-		}
-		if err := moved(w, was, now); err != nil {
+		fmt.Fprintf(w, "== %s\n", name)
+		if err := compareSample(w, filepath.Join(dir, before, name), filepath.Join(dir, after, name)); err != nil {
 			return err
 		}
 		fmt.Fprintln(w)
 	}
+	for _, name := range was {
+		if !slices.Contains(now, name) {
+			fmt.Fprintf(w, "== %s: in %s, gone from %s\n\n", name, before, after)
+		}
+	}
 	return nil
+}
+
+// sampleDirs returns the names of a run's samples: its folders.
+func sampleDirs(run string) ([]string, error) {
+	entries, err := os.ReadDir(run)
+	if err != nil {
+		return nil, err
+	}
+	var names []string
+	for _, e := range entries {
+		if e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	return names, nil
+}
+
+// compareSample writes how one sample moved between its folders in two
+// runs.
+func compareSample(w io.Writer, was, now string) error {
+	for _, st := range stages {
+		// A summary names the folder it wrote to, which differs
+		// between runs by the run's name alone.
+		a, errA := os.ReadFile(filepath.Join(was, st.dir+".txt"))
+		b, errB := os.ReadFile(filepath.Join(now, st.dir+".txt"))
+		if errA != nil || errB != nil {
+			fmt.Fprintf(w, "%s: not in both runs\n", st.program)
+			continue
+		}
+		changes := runs.Changed(strings.ReplaceAll(string(a), was, "…"), strings.ReplaceAll(string(b), now, "…"))
+		if len(changes) == 0 {
+			fmt.Fprintf(w, "%s: unchanged\n", st.program)
+			continue
+		}
+		fmt.Fprintf(w, "%s:\n", st.program)
+		for _, c := range changes {
+			if c.Before != "" {
+				fmt.Fprintf(w, "  - %s\n", c.Before)
+			}
+			if c.After != "" {
+				fmt.Fprintf(w, "  + %s\n", c.After)
+			}
+		}
+	}
+	return moved(w, was, now)
 }
 
 // moved writes the headings newly mapped and unmapped between two runs of
