@@ -26,7 +26,7 @@ func ExampleAll() {
 	// 2 Nurse
 }
 
-// File reads a file of ads, such as data/ingestion/ads.jsonl, and closes it
+// File reads a file of ads, such as data/ingestion/ads-20261024.jsonl, and closes it
 // at the end.
 func ExampleFile() {
 	path := filepath.Join(os.TempDir(), "jdc-lab-example-ads.jsonl")

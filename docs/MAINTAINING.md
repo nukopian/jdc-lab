@@ -27,12 +27,14 @@ entry at the root.
   PDFs, never for any language's code.
 - **`models/`** and **`data/`** are git-ignored. ONNX exports go into
   `models/`, rebuilt by the programs in `python/bin`, never copied; job
-  descriptions go into `data/ingestion/`. They arrive there as a MySQL
-  `--xml` export, `extract.xml`, which is never edited, only replaced.
-  `go run ./cmd/xml-to-jsonl` converts it once to `ads.jsonl` beside it,
-  JSON Lines with one ad per line (`id`, `title`, `location`,
+  descriptions go into `data/ingestion/`. Each arrives there as a MySQL
+  `--xml` export, named by its date (`extract-20261025.xml`), which is
+  never edited. `go run ./cmd/xml-to-jsonl` converts it once to a
+  sample of the same date beside it (`ads-20261025.jsonl`), JSON Lines
+  with one ad per line (`id`, `title`, `location`,
   `location_canonical`, `html`): the lab's code reads that, not the
-  XML. Everything else in `data/` is derived from `data/ingestion/`,
+  XML. Samples are kept apart, so a rule tuned on one can be checked on
+  the others; `cmd/pipeline` runs them all into `data/runs/`. Everything else in `data/` is derived from `data/ingestion/`,
   each step in a folder of its own, so any of it can be deleted and
   rebuilt.
 

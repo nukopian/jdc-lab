@@ -1,5 +1,5 @@
-// Package ads is the lab's record of a job ad, as data/ingestion/ads.jsonl
-// holds it: one JSON object per line.
+// Package ads is the lab's record of a job ad, as each sample in
+// data/ingestion holds it: one JSON object per line.
 package ads
 
 import (

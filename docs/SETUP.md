@@ -363,11 +363,12 @@ It ends with a line per language, and `pass` for each one set up.
 ## Data
 
 Job descriptions are not in the repository, and never go into it. Put
-the export in `data/ingestion/`, which, like all of `data/`, is
-git-ignored, and convert it to the JSON Lines the lab reads:
+each export in `data/ingestion/`, which, like all of `data/`, is
+git-ignored, named by its date, and convert it to the JSON Lines the
+lab reads, named the same way. Each such file is a sample:
 
 ```
-go run ./cmd/xml-to-jsonl data/ingestion/extract.xml data/ingestion/ads.jsonl
+go run ./cmd/xml-to-jsonl data/ingestion/extract-20261024.xml data/ingestion/ads-20261024.jsonl
 ```
 
 [PIPELINE.md](PIPELINE.md#running-it) has what to run after that.

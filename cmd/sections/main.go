@@ -19,7 +19,7 @@
 //
 // From the lab's folder:
 //
-//	go run ./cmd/sections data/ingestion/ads.jsonl data/sections
+//	go run ./cmd/sections data/ingestion/ads-20261024.jsonl data/sections
 //
 // or, once installed with `go install ./cmd/...`, just sections.
 package main

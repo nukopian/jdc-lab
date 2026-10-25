@@ -7,7 +7,7 @@
 // data/sections list it, or as written: either way it's matched by key,
 // so "Please Note:" finds "please note". From the lab's folder:
 //
-//	go run ./cmd/heading-uses data/ingestion/ads.jsonl "please note"
+//	go run ./cmd/heading-uses data/ingestion/ads-20261024.jsonl "please note"
 //
 // or, once installed with `go install ./cmd/...`, just heading-uses.
 package main

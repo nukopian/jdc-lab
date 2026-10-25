@@ -10,7 +10,7 @@
 //
 // From the lab's folder:
 //
-//	go run ./cmd/boilerplate data/ingestion/ads.jsonl data/boilerplate
+//	go run ./cmd/boilerplate data/ingestion/ads-20261024.jsonl data/boilerplate
 //
 // or, once installed with `go install ./cmd/...`, just boilerplate.
 package main

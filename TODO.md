@@ -57,7 +57,7 @@ requirements. Under five title groups, they're then counted as
 templates for the job, and kept for embedding.
 
 **What's known:** the largest templates in
-`data/boilerplate/repeated.tsv` are almost all such footers. Text under
+`data/runs/RUN/ads-20261024/boilerplate/repeated.tsv` are almost all such footers. Text under
 five groups or more is already boilerplate wherever it is.
 
 **Steps:**
@@ -125,7 +125,7 @@ are listed by a command in PIPELINE.md's Improving it.
 **Steps:** in `internal/headings`, refuse text whose key is mostly
 times (digits with am or pm, or hh:mm); add cases to `TestRead`.
 
-**Done when** no time range is in `data/headings/headings.tsv`, and no
+**Done when** no time range is in `data/runs/RUN/all/headings/headings.tsv`, and no
 other heading was lost (compare the table before and after).
 
 ## Find headings written as plain lines
@@ -145,7 +145,7 @@ followed by a list are the likeliest headings.
 
 **Steps:** in `internal/headings`, consider a short plain line that's
 followed by a list, and contains a kind's phrase, as a heading; check
-`data/sections/named.tsv` and the unmapped table before and after.
+`data/runs/RUN/all/sections/named.tsv` and the unmapped table before and after.
 
 **Done when** more headings are found with none wrongly (check the new
 ones by eye), and tests cover it.
@@ -155,22 +155,35 @@ ones by eye), and tests cover it.
 **From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
 **Waiting on:** nothing
 
-**What:** run every stage on a second sample of ads, from a different
-slice than the first, and compare the figures.
+**What:** work down the second sample's unmapped table, and change any
+rule that fitted only the first.
 
-**Why:** every rule, phrase and threshold was tuned on one sample,
-which leans towards education jobs. Rules that only fit it would show
-as figures that fall on another.
+**Why:** every rule, phrase and threshold was tuned on the first
+sample, which leans towards education jobs. The second leans towards
+vehicle jobs.
 
-**What's known:** the first sample's figures are in PIPELINE.md's What
-it measured. The second needs a new export, into `data/ingestion/` under
-a name of its own so the first stays.
+**What's known:** both samples are in `data/ingestion/`, and their
+figures in PIPELINE.md's What it measured. The rules mostly hold. Where
+they don't: heading uses of a known kind fall from 76% to 73%, unmapped
+text rises from 14% to 16%, and a quarter of that is boilerplate. The
+biggest unmapped heading is "and" (39 ads, 82,000 characters), with
+"OR" beside it: one advertiser's template puts them alone in bold
+between requirements (Known gaps: lone conjunctions). Then phrases
+that look like kinds: "who thrives here", "what to expect", "the
+business", "what is in it for you", "vacancy type", "working
+arrangement", "important notice". "The business" also maps "The
+business has a strong presence across:", so check each in context.
 
 **Steps:**
 
-1. Convert the second export with `cmd/xml-to-jsonl`.
-2. Run each stage on it, and compare its summaries with the first's.
-3. Work down its unmapped table as for the first.
+1. `go run ./cmd/pipeline run before`.
+2. Stop a lone conjunction passing as a heading, in
+   `internal/headings`, with a case in `TestRead`.
+3. Work down `data/runs/before/ads-20261025/sections/unmapped.tsv` as
+   PIPELINE.md's Improving it says, comparing each change on every
+   sample.
 
-**Done when** both samples' figures are in PIPELINE.md, and any rule
-that fitted only the first has been changed.
+**Done when** the second sample's known headings are at least the
+first's 76%, neither sample's figures got worse, the lone conjunctions
+gap is out of PIPELINE.md, and its figures are updated.
+

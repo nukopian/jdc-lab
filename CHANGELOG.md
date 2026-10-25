@@ -17,6 +17,14 @@ has the steps).
   than reading `headings.txt` a second time with its own idea of the
   format, and `All` takes its kinds with `ToAll`, no longer reaching
   into scalar. Its sections are the same as before.
+- Samples and runs. Each export is a sample of its own,
+  `data/ingestion/ads-DATE.jsonl`, named by its date. `cmd/pipeline run
+  NAME` runs every stage on every sample, and on all of them together,
+  into `data/runs/NAME/`; `cmd/pipeline compare BEFORE AFTER` shows how
+  each sample's figures moved, and which headings a change mapped or
+  unmapped. docs/PIPELINE.md's way of improving the pipeline uses them,
+  and its figures are for both samples: a second, of 5,000 ads leaning
+  towards vehicle jobs, joins the first.
 
 ## v0.2.0 (2026-10-25)
 

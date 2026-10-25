@@ -14,25 +14,32 @@ change to a stage changes this document in the same commit
 ## The flow
 
 ```
-data/ingestion/extract.xml        the export, as received
+data/ingestion/extract-DATE.xml   an export, as received
         │  cmd/xml-to-jsonl        internal/mysqlxml
         ▼
-data/ingestion/ads.jsonl          one ad per line: id, title, location, html
+data/ingestion/ads-DATE.jsonl     a sample: one ad per line: id, title, location, html
         │
         │  internal/blocks         HTML → blocks, with cues      (cmd/blocks)
         │  internal/headings       blocks → parts, with roles    (cmd/heading-counts)
         │  internal/sections       parts → sections, by kind     (cmd/sections)
         │  internal/boilerplate    sections → boilerplate        (cmd/boilerplate)
         ▼
-data/blocks/  data/headings/  data/sections/  data/boilerplate/
+data/runs/RUN/SAMPLE/  blocks/  headings/  sections/  boilerplate/
 ```
 
 Each stage is a package in `internal/`, with tests and examples beside
 it, and each has a program in `cmd/` that runs it over every ad, writes
-what it found to its folder in `data/`, and prints a summary. The
-programs don't read each other's output: each reads `ads.jsonl` and runs
-the stages before its own, which are fast. So any folder in `data/`
-except `ingestion/` can be deleted and rebuilt.
+what it found to a folder, and prints a summary. The programs don't
+read each other's output: each reads a sample and runs the stages before
+its own, which are fast. So any folder in `data/` except `ingestion/`
+can be deleted and rebuilt.
+
+A **sample** is one export's ads, converted: a `.jsonl` file in
+`data/ingestion/`, named by the export's date. Samples are kept apart,
+not merged, so that a rule tuned on one can be checked on another.
+`cmd/pipeline` runs every stage on every sample, and on all of them
+together as the sample `all`, and keeps each **run** under a name of its
+own in `data/runs/`.
 
 Every stage only adds to what the one before it found, and never changes
 the ad's text. Text is kept as written, and only a separate **key** (see
@@ -40,23 +47,40 @@ the ad's text. Text is kept as written, and only a separate **key** (see
 
 ## Running it
 
-From the lab's folder, in this order the first time:
+From the lab's folder. Convert each new export into a sample, named by
+its date:
 
 ```
-go run ./cmd/xml-to-jsonl data/ingestion/extract.xml data/ingestion/ads.jsonl
-go run ./cmd/blocks         data/ingestion/ads.jsonl data/blocks
-go run ./cmd/heading-counts data/ingestion/ads.jsonl data/headings
-go run ./cmd/sections       data/ingestion/ads.jsonl data/sections
-go run ./cmd/boilerplate    data/ingestion/ads.jsonl data/boilerplate
+go run ./cmd/xml-to-jsonl data/ingestion/extract-20261025.xml data/ingestion/ads-20261025.jsonl
 ```
 
-`cmd/heading-uses` is for looking at one heading across the ads, when
-improving the stages (see [Improving it](#improving-it)).
+Then run every stage on every sample, as a run called `now`:
 
-After the first, only the stage being worked on needs running.
+```
+go run ./cmd/pipeline run now
+```
+
+It takes a few seconds, and prints where each sample's output went:
+`data/runs/now/ads-20261025/sections/` holds the sections stage's tables
+for that sample, and `data/runs/now/ads-20261025/sections.txt` its
+summary. A run of the same name is replaced, and
+`data/runs/now/all/` has the samples together.
+
+Each stage's program can also be run alone, on one sample, into any
+folder:
+
+```
+go run ./cmd/blocks         data/ingestion/ads-20261025.jsonl data/blocks
+go run ./cmd/heading-counts data/ingestion/ads-20261025.jsonl data/headings
+go run ./cmd/sections       data/ingestion/ads-20261025.jsonl data/sections
+go run ./cmd/boilerplate    data/ingestion/ads-20261025.jsonl data/boilerplate
+```
+
+`cmd/heading-uses` is for looking at one heading across a sample's ads,
+when improving the stages (see [Improving it](#improving-it)).
 `go install ./cmd/...` puts the programs in `bin/`, on the lab's `PATH`,
 so they can be run by name. Ads whose HTML is the same as an earlier
-one's are counted once by the last three.
+one's are counted once by every stage after blocks.
 
 ## 1. Ingestion: the export to JSON Lines
 
@@ -255,26 +279,39 @@ groups, ads, characters, the kinds of section it's in, and its verdict.
 Each program leaves tables in `data/` that say where its stage falls
 short. Improving the pipeline is a loop over them:
 
-1. **Measure:** run the stage's program, and keep its output as the
-   before (see [Before and after](#before-and-after)).
+1. **Measure:** `go run ./cmd/pipeline run before`, every stage on
+   every sample (see [Before and after](#before-and-after)).
 2. **Pick** the biggest gap: the table row with the most ads or text.
+   Work on one sample, and check the others as you go.
 3. **Look** at it in the ads, in context, before deciding anything.
 4. **Change one thing:** a phrase, a label, a rule, a threshold.
-5. **Measure again,** and keep the change only if it helped and broke
-   nothing.
+5. **Measure again,** as the run `after`, and compare. Keep the change
+   only if it helped and broke nothing, on every sample: one that helps
+   one sample and harms another fits that sample, not job ads.
 6. **Pin it:** add a test case for what it settled, and update the
    figures in [What it measured](#what-it-measured).
 
 ### Questions, and where to look
 
-All from the lab's folder, after running the programs (see
-[Running it](#running-it)). Each command runs as it stands.
+All from the lab's folder, after a run (see
+[Running it](#running-it)). The commands look at one sample of the
+run `before`, which these names choose; set them first, to the sample
+and run you want, and each command then runs as it stands:
+
+```
+sample=ads-20261025
+r=data/runs/before/$sample
+ads=data/ingestion/$sample.jsonl
+```
+
+For the samples together, `sample=all`, and their ads are in the run:
+`ads=$r/ads.jsonl`.
 
 **Which headings are worth working on?** The unmapped headings with the
 most text under them:
 
 ```
-sort -t$'\t' -k2,2nr data/sections/unmapped.tsv | head -20
+sort -t$'\t' -k2,2nr $r/sections/unmapped.tsv | head -20
 ```
 
 **What is this heading, really?** `cmd/heading-uses` shows every ad that
@@ -284,21 +321,21 @@ first lines under it. Give it the heading's key (the third column of
 from the table:
 
 ```
-top=$(sort -t$'\t' -k2,2nr data/sections/unmapped.tsv | head -1 | cut -f3)
-go run ./cmd/heading-uses data/ingestion/ads.jsonl "$top"
+top=$(sort -t$'\t' -k2,2nr $r/sections/unmapped.tsv | head -1 | cut -f3)
+go run ./cmd/heading-uses "$ads" "$top"
 ```
 
 or one by name:
 
 ```
-go run ./cmd/heading-uses data/ingestion/ads.jsonl "please note"
+go run ./cmd/heading-uses "$ads" "please note"
 ```
 
 **Did a heading go to the wrong kind?** `disagree.tsv` lists headings
 whose phrases point to more than one kind, with the kind that won:
 
 ```
-head -20 data/sections/disagree.tsv
+head -20 $r/sections/disagree.tsv
 ```
 
 **Is a plain line being taken for a heading?** `named.tsv` lists the
@@ -306,22 +343,22 @@ lines without cues that started a section because they're exactly a
 phrase:
 
 ```
-head -20 data/sections/named.tsv
+head -20 $r/sections/named.tsv
 ```
 
 **Is something taken for a heading that isn't one?** Headings with
 figures in are often times, steps or references:
 
 ```
-awk -F'\t' 'NR > 1 && $2 ~ /[0-9]/' data/headings/headings.tsv | head -20
+awk -F'\t' 'NR > 1 && $2 ~ /[0-9]/' $r/headings/headings.tsv | head -20
 ```
 
 **Is a field label missing?** Short unmapped headings ending in a colon
 are candidates; `fields.tsv` has the labels already known, by use:
 
 ```
-awk -F'\t' 'NR > 1 && $4 ~ /:$/ && split($3, w, " ") <= 2' data/sections/unmapped.tsv | head -20
-head -20 data/headings/fields.tsv
+awk -F'\t' 'NR > 1 && $4 ~ /:$/ && split($3, w, " ") <= 2' $r/sections/unmapped.tsv | head -20
+head -20 $r/headings/fields.tsv
 ```
 
 **Why did an ad come out as it did?** Take its id (here the first from
@@ -329,9 +366,9 @@ head -20 data/headings/fields.tsv
 split wrongly from a heading judged wrongly:
 
 ```
-id=$(go run ./cmd/heading-uses data/ingestion/ads.jsonl "please note" | awk '$1 ~ /^[0-9]+$/ {print $1; exit}')
-jq -c --arg id "$id" 'select(.id == $id) | .blocks[]' data/blocks/ads.jsonl | head -20
-jq -r --arg id "$id" 'select(.id == $id) | .html' data/ingestion/ads.jsonl | head -c 3000
+id=$(go run ./cmd/heading-uses "$ads" "please note" | awk '$1 ~ /^[0-9]+$/ {print $1; exit}')
+jq -c --arg id "$id" 'select(.id == $id) | .blocks[]' $r/blocks/ads.jsonl | head -20
+jq -r --arg id "$id" 'select(.id == $id) | .html' "$ads" | head -c 3000
 ```
 
 **Is a boilerplate verdict wrong?** Templates under three or more title
@@ -339,7 +376,7 @@ groups are worth a look, as footers filed under requirements end up
 there:
 
 ```
-awk -F'\t' '$5 == "template" && $1 >= 3' data/boilerplate/repeated.tsv | cut -f1-4,6 | head -20
+awk -F'\t' '$5 == "template" && $1 >= 3' $r/boilerplate/repeated.tsv | cut -f1-4,6 | head -20
 ```
 
 **Is boilerplate hiding in near-duplicates?** Texts that share their
@@ -348,7 +385,7 @@ Compare how many openings and how many whole texts recur in five ads or
 more; the difference is the near-duplicates:
 
 ```
-jq -r '.sections[].parts[]? | select(.role == "text") | .text' data/sections/ads.jsonl |
+jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.jsonl |
   awk 'NF >= 8' | cut -c1-50 | sort | uniq -c | sort -rn | awk '$1 >= 5' | head -20
 ```
 
@@ -372,55 +409,83 @@ hours, so no one kind fits it.
 
 ### Before and after
 
-Keep the tables and summary from before a change, in a folder of their
-own (anything under `data/` is git-ignored):
+Keep a run from before a change:
 
 ```
-mkdir -p data/before
-go run ./cmd/sections data/ingestion/ads.jsonl data/sections > data/before/summary.txt
-cp data/sections/*.tsv data/before/
+go run ./cmd/pipeline run before
 ```
 
-Make the change, then compare. The first shows how the summary moved;
-the second lists the headings now mapped (lines starting `<`) and any
-newly unmapped (`>`, which should be none):
+Make the change, run again under another name, and compare:
 
 ```
-go run ./cmd/sections data/ingestion/ads.jsonl data/sections | diff data/before/summary.txt -
-diff <(cut -f3 data/before/unmapped.tsv | sort) <(cut -f3 data/sections/unmapped.tsv | sort)
+go run ./cmd/pipeline run after
+go run ./cmd/pipeline compare before after
 ```
 
-The same works for the other stages' programs and tables. Then run
-the tests (`test-all.sh`), and delete `data/before` when done.
+For each sample, and all of them together, `compare` shows the summary
+lines whose figures moved, `-` before and `+` after, and the headings the
+change mapped and those it unmapped, with the most text first. Newly
+unmapped headings should be none, and newly mapped ones should all be
+right: a phrase can match more than was meant, as "the business" would
+take "The business has a strong presence across:" to be company. Any
+other table can be compared by hand, as in:
+
+```
+diff data/runs/before/all/boilerplate/repeated.tsv data/runs/after/all/boilerplate/repeated.tsv | head -20
+```
+
+Then run the tests (`test-all.sh`). For the next change, `after` can
+become the new `before`: `go run ./cmd/pipeline run before` again.
 
 ## What it measured
 
-On the sample of 1,890 distinct ads (2,000 less 110 duplicates), on
-2026-10-25. Rerun the programs for current figures.
+On two samples, measured on 2026-10-25 with
+`go run ./cmd/pipeline run now`, which gives current figures:
 
-**Headings.** 89% of ads have at least one heading. 76% of heading uses
-are of a known kind, and 51% of ads have every heading known. 5% of ads
-have no section but the summary.
+| Sample | Ads | Distinct | Leans towards |
+|---|---:|---:|---|
+| `ads-20261024` | 2,000 | 1,890 | education: teaching, support staff |
+| `ads-20261025` | 5,000 | 4,296 | vehicles: mobile technicians, mechanics |
+| `all` | 7,000 | 6,167 | both; 19 ads' text is in both samples |
+
+The rules were tuned on the first, and mostly hold on the second: how
+the text divides into sections moves by two points at most, except for
+company. How much of each section is boilerplate moves more, as each
+slice has advertisers of its own.
+
+**Headings.** 89% of ads have at least one heading, in both samples.
+Headings of a known kind are 76% of heading uses in the first, 73% in
+the second; ads with every heading known, 51% and 49%; ads with no
+section but the summary, 5% and 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
 
-| Section | Of the text | Of it, boilerplate |
-|---|---:|---:|
-| summary | 28% | 6% |
-| responsibilities | 16% | 0% |
-| requirements | 19% | 7% |
-| desirable | 2% | 3% |
-| benefits | 12% | 32% |
-| company | 5% | 45% |
-| apply | 3% | 36% |
-| legal | 1% | 77% |
-| details | 2% | 9% |
-| unmapped | 14% | 17% |
+| Section | Of the text | | | Of it, boilerplate | | |
+|---|---:|---:|---:|---:|---:|---:|
+| | **1024** | **1025** | **all** | **1024** | **1025** | **all** |
+| summary | 28% | 28% | 28% | 6% | 7% | 7% |
+| responsibilities | 16% | 16% | 16% | 0% | 1% | 1% |
+| requirements | 19% | 19% | 19% | 7% | 7% | 9% |
+| desirable | 2% | 2% | 2% | 3% | 4% | 4% |
+| benefits | 12% | 12% | 12% | 32% | 27% | 31% |
+| company | 5% | 2% | 3% | 45% | 28% | 40% |
+| apply | 3% | 3% | 3% | 36% | 40% | 42% |
+| legal | 1% | 1% | 1% | 77% | 69% | 74% |
+| details | 2% | 2% | 2% | 9% | 15% | 14% |
+| unmapped | 14% | 16% | 15% | 17% | 25% | 24% |
 
-13.2% of all the text is boilerplate, and 2.1% template for the job. So
-boilerplate, with the company, apply and legal text that isn't, is
-roughly 15–20% of an ad that probably needn't be embedded. That's a
-first answer to whether retrieval can improve while embedding less.
+Boilerplate is 13.2% of the text in the first sample, 13.3% in the
+second, and 14.5% in both together, as more ads show more of what's
+repeated; template for the job is 2.1%, 2.6% and 2.3%. So boilerplate,
+with the company, apply and legal text that isn't, is roughly 15–20% of
+an ad that probably needn't be embedded. That's a first answer to
+whether retrieval can improve while embedding less.
+
+What the second sample showed: its employers say less about themselves
+under a heading of their own (company 2% of the text, not 5%), and more
+of its unmapped text is boilerplate (25%, not 17%): one advertiser's
+template puts "OR" and "and" alone on a line between requirements, and
+they're taken for headings (see [Known gaps](#known-gaps)).
 
 ## Decisions, and why
 
@@ -449,7 +514,7 @@ each, and a gap leaves this table when its task is done.
 | Footers under few title groups | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
 | Plain lines without cues | Only exact phrases are taken as headings | More evidence from the following text |
 | Shift times as headings | "2:00pm–10:00pm" in bold passes as a heading | A rule for times |
-| One sample | Every rule was tuned on one slice of ads, weighted to education | Check against a second sample |
+| Lone conjunctions as headings | "OR" or "and" alone in bold, between list items, is taken for a heading, and what follows it for an unmapped section | A heading needs a word that isn't a conjunction |
 
 ## Words used here
 
@@ -463,6 +528,8 @@ each, and a gap leaves this table when its task is done.
 | section | a heading and what follows it, up to the next |
 | kind | what a section is: summary, requirements and the rest |
 | phrase | a synonym in `headings.txt` |
+| sample | one export's ads, as a `.jsonl` file in `data/ingestion/`; `all` is every sample together |
+| run | every stage on every sample, kept in `data/runs/` under a name |
 | title group | titles similar enough to be the same job |
 | boilerplate | text repeated across different jobs, not about the job |
 | template | text repeated across related jobs that does describe the job |

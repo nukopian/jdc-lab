@@ -9,7 +9,7 @@
 //
 // From the lab's folder:
 //
-//	go run ./cmd/heading-counts data/ingestion/ads.jsonl data/headings
+//	go run ./cmd/heading-counts data/ingestion/ads-20261024.jsonl data/headings
 //
 // or, once installed with `go install ./cmd/...`, just heading-counts.
 package main

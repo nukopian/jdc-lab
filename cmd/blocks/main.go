@@ -4,7 +4,7 @@
 //
 // From the lab's folder:
 //
-//	go run ./cmd/blocks data/ingestion/ads.jsonl data/blocks
+//	go run ./cmd/blocks data/ingestion/ads-20261024.jsonl data/blocks
 //
 // or, once installed with `go install ./cmd/...`, just blocks.
 package main

@@ -5,7 +5,7 @@
 //
 // From the lab's folder:
 //
-//	go run ./cmd/xml-to-jsonl data/ingestion/extract.xml data/ingestion/ads.jsonl
+//	go run ./cmd/xml-to-jsonl data/ingestion/extract-20261024.xml data/ingestion/ads-20261024.jsonl
 //
 // or, once installed with `go install ./cmd/...`, just xml-to-jsonl.
 package main
