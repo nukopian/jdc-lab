@@ -19,6 +19,11 @@ has the steps).
   plans for the pipeline's known gaps move into it word for word, and
   PIPELINE.md's Known gaps link to them. TODO.md stays for the next
   session's tasks, which come first, and never reaches `main`.
+- A wash-up before the release, of documents alone, as no code changed.
+  The roadmap's opening called every item "next", Later's ideas
+  included, and gave readers a rule meant for whoever maintains it;
+  it's rewritten, and every relative link and anchor in the documents
+  was checked after so many headings moved.
 
 ## v0.3.0 (2026-10-25)
 

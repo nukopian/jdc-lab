@@ -99,7 +99,7 @@ And file by file, at the root:
 | `.envrc` | Sets up Python, Perl and Go on entering the folder, with direnv |
 | `.gitignore` | What stays out of git, by language |
 | `CHANGELOG.md` | What changed in each release |
-| `ROADMAP.md` | What the lab means to do next, and why |
+| `ROADMAP.md` | What the lab means to do, and why |
 
 Kept out of git: `data/` (job descriptions), `models/` (models and ONNX
 exports), `bin/` (Go programs once built), and `.venv/`. gitleaks scans

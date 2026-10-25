@@ -1,11 +1,11 @@
 # Roadmap
 
-What the lab means to do next, and why. It's the future to go with the
-[CHANGELOG](CHANGELOG.md), which is the past, and the README's
-[Where it stands](README.md#where-it-stands), which is the present.
+What the lab means to do, and why. The [CHANGELOG](CHANGELOG.md) says
+what it has done, and the README's
+[Where it stands](README.md#where-it-stands) where it is now.
 
-Items are features and outcomes: what the lab should be able to do, or
-find out. Each says which of the lab's questions it serves:
+Each item is something the lab should be able to do, or find out, and
+names the part of the lab's question it serves:
 
 - **structure:** finding an ad's parts, its headings, sections and
   boilerplate;
@@ -15,16 +15,17 @@ find out. Each says which of the lab's questions it serves:
 - **search:** whether any of it makes search better, for less;
 - **deployment:** running it all from Go.
 
-They're in three groups. **Now** is what's being worked on, each with a
-plan written to be picked up cold: where it came from, what it waits on,
-what, why, what's known, the steps, and how to tell it's done. **Next**
-is decided but not started, and **Later** is ideas worth keeping. Within
-each, the most useful comes first.
+Items come in three groups, the most useful first in each:
 
-An item leaves when it ships, in the commit that puts it in the
-CHANGELOG. Figures in the plans are from the first sample,
-`ads-20261024` (1,890 distinct ads), unless a plan says otherwise, and
-their commands run from the lab's folder, with `RUN` a run's name (see
+- **Now:** being worked on, each with a plan detailed enough to pick up
+  cold;
+- **Next:** decided, but not started;
+- **Later:** ideas worth keeping.
+
+When an item ships, it moves from here to the CHANGELOG. Unless a plan
+says otherwise, its figures are from the first sample, `ads-20261024`
+(1,890 distinct ads), and its commands run from the lab's folder, with
+`RUN` standing for a run's name (see
 [Before and after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
