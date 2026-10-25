@@ -12,6 +12,17 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.3.1 (2026-10-25)
+
+A roadmap
+
+The lab's plans are now public, in a roadmap beside the CHANGELOG and
+the README. It changes how the lab is worked on, which would usually
+make this v0.4.0, but it adds and moves documents and changes no code,
+so it's a patch release.
+
 - A roadmap. ROADMAP.md says what the lab means to do, and why, in Now,
   Next and Later, each item naming the question it serves: structure,
   metadata, taxonomies, embeddings, search or deployment. It's the
