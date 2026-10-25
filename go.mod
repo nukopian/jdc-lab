@@ -3,7 +3,7 @@ module github.com/nukopian/jdc-lab
 go 1.26.10
 
 require (
-	github.com/nukopian/grammar v0.2.0
+	github.com/nukopian/grammar v0.2.1
 	github.com/yalue/onnxruntime_go v1.38.0
 	golang.org/x/net v0.61.0
 )

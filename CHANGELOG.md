@@ -14,6 +14,9 @@ has the steps).
 
 - The roadmap's Now holds three items at most, so it stays a queue to
   pull from.
+- grammar v0.2.1, which changes only its documentation. It still asks
+  for scalar v0.5.7, so jdc-lab stays on that; scalar v0.5.8 is
+  documentation only too. The pipeline's output is unchanged.
 
 ## v0.3.1 (2026-10-25)
 
