@@ -168,11 +168,11 @@ func tally(source string) (heads, fields counter, s summary, err error) {
 func (s summary) print(heads, fields counter, dir string) {
 	slices.Sort(s.perAd)
 	fmt.Printf("%d ads (%d duplicates left out); tables written to %s\n\n", s.ads, s.duplicates, dir)
-	fmt.Printf("parts:    ")
+	var counts []string
 	for _, r := range []headings.Role{headings.Text, headings.Heading, headings.Field, headings.Repeat} {
-		fmt.Printf("%s %d   ", r, s.roles[r])
+		counts = append(counts, fmt.Sprintf("%s %d", r, s.roles[r]))
 	}
-	fmt.Printf("\n\n")
+	fmt.Printf("parts:    %s\n\n", strings.Join(counts, "   "))
 	fmt.Printf("ads with no heading:     %d (%.0f%%)\n", s.none, pct(s.none, s.ads))
 	median := 0
 	if len(s.perAd) > 0 {
