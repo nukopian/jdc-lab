@@ -295,8 +295,12 @@ PIPELINE.md's figures.
 
 - **TODO.md:** `git pull --ff-only` and re-read it. Sessions working on
   grammar and scalar add tasks to it, and a commit that completes one
-  removes it. Each task opens with **From** (where it came from) and
-  **Waiting on** (what it needs first, or nothing).
+  removes it. Each task opens with **From** (the session that added it,
+  the date, and the commit that prompted it, or the last commit and
+  "work uncommitted") and **Waiting on** (what it needs first, or
+  nothing). A task added to grammar's or scalar's TODO.md is committed
+  and pushed there at once, after the same pull, so TODO.md only ever
+  changes through commits.
 - **Notebooks:** clear their outputs. They carry local paths, and job
   description text once data is in use.
 - **Style and tests:** the checks above, for each language touched.
@@ -349,6 +353,10 @@ Unreleased as work lands, then, to release:
    ```
    gh release create vX.Y.Z --verify-tag --title "vX.Y.Z: title" --notes-file notes.txt
    ```
+
+5. Look in grammar's and scalar's TODO.md, on `develop`, for tasks
+   waiting on this release, and say which can now be done. Nothing
+   else tells their sessions it has landed.
 
 A tag is never moved or deleted once pushed: a fix is a new release.
 
