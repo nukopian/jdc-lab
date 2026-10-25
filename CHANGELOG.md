@@ -6,8 +6,8 @@ entry is also its signed tag's message. Versions follow
 before v1, a release that changes how the lab is set up or worked on
 bumps the minor version.
 
-Work collects under Unreleased on `main`, and becomes a release's entry
-when it's tagged ([docs/MAINTAINING.md](docs/MAINTAINING.md#releases)
+Work collects under Unreleased on `develop`, and becomes a release's
+entry when it's tagged ([docs/MAINTAINING.md](docs/MAINTAINING.md#releases)
 has the steps).
 
 ## Unreleased
@@ -25,6 +25,13 @@ has the steps).
   unmapped. docs/PIPELINE.md's way of improving the pipeline uses them,
   and its figures are for both samples: a second, of 5,000 ads leaning
   towards vehicle jobs, joins the first.
+- Branches and releases, as in grammar and scalar. Work happens on
+  `develop`, where CI runs on every push, and `main` is the latest
+  release, moved only by a fast-forward at a release, and protected.
+  `TODO.md` lives on `develop` and never reaches `main`. CI now runs the
+  Go checks and tests (gofmt, vet, the race detector, govulncheck) as
+  well as the secret scan. docs/MAINTAINING.md has the branches and the
+  release steps.
 
 ## v0.2.0 (2026-10-25)
 

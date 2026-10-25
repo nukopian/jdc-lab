@@ -1,6 +1,8 @@
 # TODO
 
-Planned work, most useful first. Most tasks come from a known gap in
+Planned work, most useful first. It lives on `develop` and never reaches
+`main`: before a release, each task is done or moved to a GitHub issue,
+and the file deleted with the last. Most tasks come from a known gap in
 [docs/PIPELINE.md](docs/PIPELINE.md#known-gaps); when one is done, take
 it out of here and its row out of the gaps table, in the same commit,
 and update PIPELINE.md's figures. Others come from another repository's

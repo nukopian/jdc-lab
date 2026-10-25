@@ -59,7 +59,7 @@ apart. Everything in the repository, folder by folder:
 | `perl/bin/`, `perl/lib/`, `perl/t/` | Optional Perl programs, the lab's Perl modules, and their tests |
 | `docs/` | [PIPELINE.md](docs/PIPELINE.md), [SETUP.md](docs/SETUP.md) and [MAINTAINING.md](docs/MAINTAINING.md), and the PDFs' style sheet |
 | `scripts/` | Scripts for the repository itself: running every language's tests, and building the PDFs |
-| `.github/workflows/` | The secret scan that runs on every push |
+| `.github/workflows/` | CI on every push: the Go checks and tests, and the secret scan |
 
 And file by file, at the root:
 

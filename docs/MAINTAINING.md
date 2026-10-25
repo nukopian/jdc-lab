@@ -34,9 +34,9 @@ entry at the root.
   with one ad per line (`id`, `title`, `location`,
   `location_canonical`, `html`): the lab's code reads that, not the
   XML. Samples are kept apart, so a rule tuned on one can be checked on
-  the others; `cmd/pipeline` runs them all into `data/runs/`. Everything else in `data/` is derived from `data/ingestion/`,
-  each step in a folder of its own, so any of it can be deleted and
-  rebuilt.
+  the others; `cmd/pipeline` runs them all into `data/runs/`.
+  Everything else in `data/` is derived from `data/ingestion/`, each
+  step in a folder of its own, so any of it can be deleted and rebuilt.
 
 Python and Go meet only through `models/` and `data/`: each reads what
 the other writes there, and neither calls the other.
@@ -47,6 +47,39 @@ all three: `jdclab.onnx_demo`, `internal/onnxdemo` and
 `JDCLab::OnnxDemo` hold the model and its use, their tests check the
 same scores to within a millionth, and the three demo programs only
 print the table.
+
+## Branches
+
+- `develop` is where work happens. Every commit goes there, and CI runs
+  on every push to it.
+- `main` is the latest release, and nothing else. It moves only when a
+  release is made, by a fast-forward to `develop`, and the release's tag
+  is on it. Visitors to GitHub see `main`, so its README and docs
+  describe the lab as released. Releases come often, at the close of
+  each run of work, so `main` is never far behind.
+- There are no feature branches, for now: changes are made one at a
+  time.
+- `TODO.md`, when there is one, lists work planned for a later session.
+  It's committed on `develop` and gone before a release, so it never
+  reaches `main`: each task is done, or moved to a GitHub issue, before
+  the release (see [Before committing](#before-committing) and
+  [Releases](#releases)).
+
+`main` is protected on GitHub. Pushes to it need signed commits, a linear
+history (no merge commits) and CI passing on every job, and it can't be
+force-pushed or deleted. This holds for admins too. To see the settings:
+
+```
+gh api repos/nukopian/jdc-lab/branches/main/protection --jq '{signatures: .required_signatures.enabled, linear: .required_linear_history.enabled, checks: .required_status_checks.contexts, force_push: .allow_force_pushes.enabled, admins: .enforce_admins.enabled}'
+```
+
+For a fresh clone, or a checkout still on `main`, switch to `develop`:
+
+```
+git fetch origin
+git switch develop
+git pull --ff-only
+```
 
 ## Running all the tests
 
@@ -295,14 +328,14 @@ PIPELINE.md's figures.
 
 ## Before committing
 
-- **TODO.md:** `git pull --ff-only` and re-read it. Sessions working on
-  grammar and scalar add tasks to it, and a commit that completes one
+- **TODO.md:** on `develop`, `git pull --ff-only` and re-read it.
+  Sessions working on grammar and scalar add tasks to it, and a commit that completes one
   removes it. Each task opens with **From** (the session that added it,
   the date, and the commit that prompted it, or the last commit and
   "work uncommitted") and **Waiting on** (what it needs first, or
-  nothing). A task added to grammar's or scalar's TODO.md is committed
-  and pushed there at once, after the same pull, so TODO.md only ever
-  changes through commits.
+  nothing). A task added to grammar's or scalar's TODO.md, also on
+  their `develop`, is committed and pushed there at once, after the same
+  pull, so TODO.md only ever changes through commits.
 - **Notebooks:** clear their outputs. They carry local paths, and job
   description text once data is in use.
 - **Style and tests:** the checks above, for each language touched.
@@ -315,6 +348,10 @@ PIPELINE.md's figures.
 - **Messages:** commits follow
   [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
   `fix:`, `docs:`, `chore:`, `build(deps):` and so on), and are signed.
+- **CI:** every push to `develop` runs the Go checks (gofmt, vet, the
+  tests with the race detector, govulncheck) and gitleaks over the whole
+  history. The ONNX demo's tests skip there, with no ONNX Runtime;
+  `test-all.sh` runs them, and the Python and Perl tests, here.
 - **Secrets:** gitleaks scans the whole history for secrets on every
   push to GitHub. Run it by hand before a tag, and after any history
   rewrite, before pushing:
@@ -326,39 +363,98 @@ PIPELINE.md's figures.
 ## Releases
 
 A release is a signed, annotated tag on `main`, with a GitHub release to
-match. Its notes live in [CHANGELOG.md](../CHANGELOG.md): add to
-Unreleased as work lands, then, to release:
+match. Before v1, a release that changes how the lab is set up or worked
+on bumps the minor version (v0.2.0 to v0.3.0), and anything else the
+patch (v0.2.0 to v0.2.1). Its notes live in
+[CHANGELOG.md](../CHANGELOG.md): add to Unreleased as work lands, then
+release from `develop` in these steps. Claude asks before tagging.
 
-0. Wash up: review everything since the last tag together, code, tests,
-   docs and data files such as `headings.txt`, for inconsistency,
-   inefficiency, errors and slop, and fix what's found. Save each
-   stage's output on the ads first: afterwards it must be the same,
-   unless a fix means to change it, and then say how. Reproduce each
+0. **Wash up:** review everything since the last tag together, code,
+   tests, docs and data files such as `headings.txt`, for
+   inconsistency, inefficiency, errors and slop, and fix what's found.
+   Save a run first (`go run ./cmd/pipeline run before`): afterwards
+   `go run ./cmd/pipeline compare before after` must show no change,
+   unless a fix means to make one, and then say how. Reproduce each
    finding before fixing it, with a failing test where code is wrong,
    and note the worst in the release's entry. A wash-up is also worth
    doing whenever a run of work comes to a natural close.
-1. Turn Unreleased into the release's entry, `## vX.Y.Z (date)`, with a
-   one-line title first, and start a fresh Unreleased above it. Commit.
-2. Check the commit you'll tag: `test-all.sh` passes, and
-   `gitleaks git --redact .` finds nothing.
-3. Tag it, with the entry (title line first) as the tag's message, and
-   push the tag:
+
+1. **Check `develop`:** CI is green on its last commit, there's no
+   `TODO.md`, the tests pass against the grammar `go.mod` asks for, and
+   the history has no secrets.
 
    ```
-   git tag -s vX.Y.Z -F entry.txt
-   git push origin vX.Y.Z
+   git switch develop
+   git pull --ff-only
+   gh run list --branch develop --limit 2
+   if [ -e TODO.md ]; then cat TODO.md; else echo "no TODO.md"; fi
+   grep nukopian/grammar go.mod
+   GOWORK=off go test ./...
+   test-all.sh
+   gitleaks git --redact --no-banner .
    ```
 
-4. Publish the GitHub release from the tag, titled `vX.Y.Z: title`,
-   with the rest of the entry as its notes:
+   If `TODO.md` is there, its tasks come first: do them, or move each to
+   a GitHub issue, and delete the file before going on. `go.mod` names a
+   grammar tag, such as `v0.2.0`, never a pseudo-version or a `replace`
+   pointing at `../grammar`.
+
+2. **Turn Unreleased into the release** in CHANGELOG.md: rename the
+   heading to the version and date, as in `## v0.3.0 (2026-10-26)`,
+   start the entry with a one-line title (it becomes the tag's title),
+   and add an Unreleased above it, saying `Nothing yet.` Commit
+   (`docs: v0.3.0's entry in the CHANGELOG`), push, and wait for CI.
+
+3. **Write the tag message from the entry,** and read it. The entry is
+   also the GitHub release's notes, and the tag message is the same with
+   the version in front. Set the version on the first line:
 
    ```
-   gh release create vX.Y.Z --verify-tag --title "vX.Y.Z: title" --notes-file notes.txt
+   v=v0.3.0
+   awk -v h="## $v (" 'index($0, h) == 1 {on = 1; next} /^## / {on = 0} on' CHANGELOG.md | sed '/./,$!d' > "$TMPDIR/notes-$v.txt"
+   sed "1s/^/$v: /" "$TMPDIR/notes-$v.txt" > "$TMPDIR/tag-$v.txt"
+   cat "$TMPDIR/tag-$v.txt"
    ```
 
-5. Look in grammar's and scalar's TODO.md, on `develop`, for tasks
-   waiting on this release, and say which can now be done. Nothing
-   else tells their sessions it has landed.
+4. **Move `main` and tag it.** First check that every check run on the
+   commit has completed successfully: `main`'s protection refuses the
+   push until they have, and `gh run watch` can report a run as passed
+   while a job is still in progress.
+
+   ```
+   gh api "repos/nukopian/jdc-lab/commits/$(git rev-parse develop)/check-runs" --jq '.check_runs[] | "\(.name) \(.status) \(.conclusion)"'
+   ```
+
+   Every line ends `completed success`. Then the merge, which is a
+   fast-forward, so `main` gets exactly the commits CI tested on
+   `develop`, with their signatures. Set the version on the first line:
+
+   ```
+   v=v0.3.0
+   git switch main
+   git pull --ff-only
+   git merge --ff-only develop
+   git tag -s "$v" -F "$TMPDIR/tag-$v.txt"
+   git push origin main "$v"
+   gh release create "$v" --verify-tag --title "$(git tag -l --format='%(contents:subject)' "$v")" --notes-file "$TMPDIR/notes-$v.txt"
+   git switch develop
+   ```
+
+   If the merge says it can't fast-forward, `main` has a commit
+   `develop` doesn't. Stop and find out why; don't make a merge commit.
+   `--verify-tag` refuses to make a tag of its own if the push didn't
+   happen.
+
+5. **Tell the waiting tasks.** Look in grammar's and scalar's `TODO.md`,
+   on their `develop`, for tasks waiting on this release, and say which
+   can now be done. Nothing else tells their sessions it has landed:
+
+   ```
+   for repo in grammar scalar; do
+     git -C ../$repo fetch -q
+     git -C ../$repo show origin/develop:TODO.md 2>/dev/null | grep -n -B3 '^\*\*Waiting on:\*\*.*jdc-lab' | sed "s|^|$repo: |"
+   done
+   ```
 
 A tag is never moved or deleted once pushed: a fix is a new release.
 

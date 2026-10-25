@@ -32,6 +32,10 @@ git clone git@github.com:nukopian/jdc-lab.git
 cd jdc-lab
 ```
 
+That checks out `main`, the latest release. Work happens on `develop`:
+to work on the lab, `git switch develop` (see
+[MAINTAINING.md](MAINTAINING.md#branches)).
+
 The Go side can use two sibling projects,
 [grammar](https://github.com/nukopian/grammar) and
 [scalar](https://github.com/nukopian/scalar). Clone them beside the lab

@@ -1,0 +1,41 @@
+name: test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  GOTOOLCHAIN: local # test the Go go.mod asks for, not a newer one it fetches
+
+jobs:
+  # The Go code: format, vet, tests with the race detector, and known
+  # vulnerabilities. The ONNX demo's tests skip here, with no ONNX Runtime
+  # or exported model; test-all.sh runs them, and the Python and Perl
+  # tests, locally.
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - run: go version
+
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then echo "$unformatted"; exit 1; fi
+
+      - run: go vet ./...
+
+      - run: go test -race ./...
+
+      # Known vulnerabilities in what the lab calls, in its dependencies
+      # or the standard library.
+      - name: govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
