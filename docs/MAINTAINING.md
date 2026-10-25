@@ -344,7 +344,10 @@ PIPELINE.md's figures.
   is worked on updates this file. A change to a stage of the pipeline,
   what it decides, its thresholds or its programs, updates
   [PIPELINE.md](PIPELINE.md) in the same commit, with its figures if
-  they moved. Rebuild the PDFs and read the pages that changed.
+  they moved. A change to what the lab can do, what it has measured or
+  what comes next updates the README's
+  [Where it stands](../README.md#where-it-stands) too, so that it's never
+  behind. Rebuild the PDFs and read the pages that changed.
 - **Messages:** commits follow
   [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
   `fix:`, `docs:`, `chore:`, `build(deps):` and so on), and are signed.
@@ -376,7 +379,9 @@ release from `develop` in these steps. Claude asks before tagging.
    `go run ./cmd/pipeline compare before after` must show no change,
    unless a fix means to make one, and then say how. Reproduce each
    finding before fixing it, with a failing test where code is wrong,
-   and note the worst in the release's entry. A wash-up is also worth
+   and note the worst in the release's entry. Check the README's Where
+   it stands against the work since the last tag, as it's what
+   visitors to `main` read first. A wash-up is also worth
    doing whenever a run of work comes to a natural close.
 
 1. **Check `develop`:** CI is green on its last commit, there's no
