@@ -12,7 +12,13 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- A roadmap. ROADMAP.md says what the lab means to do, and why, in Now,
+  Next and Later, each item naming the question it serves: structure,
+  metadata, taxonomies, embeddings, search or deployment. It's the
+  future to go with the CHANGELOG's past and the README's present. The
+  plans for the pipeline's known gaps move into it word for word, and
+  PIPELINE.md's Known gaps link to them. TODO.md stays for the next
+  session's tasks, which come first, and never reaches `main`.
 
 ## v0.3.0 (2026-10-25)
 

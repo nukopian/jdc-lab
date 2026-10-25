@@ -59,14 +59,19 @@ print the table.
   each run of work, so `main` is never far behind.
 - There are no feature branches, for now: changes are made one at a
   time.
-- Plans for the pipeline's known gaps live in PIPELINE.md's
-  [Known gaps](PIPELINE.md#known-gaps), one for each gap, where readers
-  of the pipeline find them, and go when the gap is closed.
-- `TODO.md`, when there is one, lists other work planned for a later
-  session, such as tasks from grammar's and scalar's sessions. It's
+- [ROADMAP.md](../ROADMAP.md) holds what the lab means to do: features
+  and outcomes, in Now, Next and Later, each saying which of the lab's
+  questions it serves. It's public, on both branches, and in every
+  release. An item in Now has a plan written to be picked up cold; one
+  leaves when it ships, in the commit that adds it to the CHANGELOG.
+  Each of the pipeline's [Known gaps](PIPELINE.md#known-gaps) links to
+  its item.
+- `TODO.md`, when there is one, lists tasks for the next session: the
+  concrete steps of an item being worked on, or tasks from grammar's
+  and scalar's sessions. Its tasks come before the roadmap's items. It's
   committed on `develop` and gone before a release, so it never reaches
-  `main`: each task is done, or, if it's a gap in the pipeline, moved
-  word for word into PIPELINE.md's plans (see
+  `main`: each task is done, or, if it's a feature rather than a step,
+  moved word for word into the roadmap (see
   [Before committing](#before-committing) and [Releases](#releases)).
 
 `main` is protected on GitHub. Pushes to it need signed commits, a linear
@@ -351,7 +356,8 @@ PIPELINE.md's figures.
   they moved. A change to what the lab can do, what it has measured or
   what comes next updates the README's
   [Where it stands](../README.md#where-it-stands) too, so that it's never
-  behind. Rebuild the PDFs and read the pages that changed.
+  behind, and a change that ships, starts or drops a feature updates
+  [ROADMAP.md](../ROADMAP.md). Rebuild the PDFs and read the pages that changed.
 - **Messages:** commits follow
   [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
   `fix:`, `docs:`, `chore:`, `build(deps):` and so on), and are signed.
@@ -385,7 +391,8 @@ release from `develop` in these steps. Claude asks before tagging.
    finding before fixing it, with a failing test where code is wrong,
    and note the worst in the release's entry. Check the README's Where
    it stands against the work since the last tag, as it's what
-   visitors to `main` read first. A wash-up is also worth
+   visitors to `main` read first, and ROADMAP.md: what shipped is out of
+   it, and Now is what's really being worked on. A wash-up is also worth
    doing whenever a run of work comes to a natural close.
 
 1. **Check `develop`:** CI is green on its last commit, there's no
@@ -403,11 +410,10 @@ release from `develop` in these steps. Claude asks before tagging.
    gitleaks git --redact --no-banner .
    ```
 
-   If `TODO.md` is there, its tasks come first: do them, or move a gap
-   in the pipeline word for word into PIPELINE.md's plans, with a row
-   in Known gaps linking to it, and delete the file before going on. `go.mod` names a
-   grammar tag, such as `v0.2.0`, never a pseudo-version or a `replace`
-   pointing at `../grammar`.
+   If `TODO.md` is there, its tasks come first: do them, or move a
+   feature word for word into ROADMAP.md, and delete the file before
+   going on. `go.mod` names a grammar tag, such as `v0.2.0`, never a
+   pseudo-version or a `replace` pointing at `../grammar`.
 
 2. **Turn Unreleased into the release** in CHANGELOG.md: rename the
    heading to the version and date, as in `## v0.3.0 (2026-10-26)`,

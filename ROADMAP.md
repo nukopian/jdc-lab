@@ -1,0 +1,271 @@
+# Roadmap
+
+What the lab means to do next, and why. It's the future to go with the
+[CHANGELOG](CHANGELOG.md), which is the past, and the README's
+[Where it stands](README.md#where-it-stands), which is the present.
+
+Items are features and outcomes: what the lab should be able to do, or
+find out. Each says which of the lab's questions it serves:
+
+- **structure:** finding an ad's parts, its headings, sections and
+  boilerplate;
+- **metadata:** facts with a definite value, such as salary and hours;
+- **taxonomies:** links to skills and occupations;
+- **embeddings:** which models, for which parts;
+- **search:** whether any of it makes search better, for less;
+- **deployment:** running it all from Go.
+
+They're in three groups. **Now** is what's being worked on, each with a
+plan written to be picked up cold: where it came from, what it waits on,
+what, why, what's known, the steps, and how to tell it's done. **Next**
+is decided but not started, and **Later** is ideas worth keeping. Within
+each, the most useful comes first.
+
+An item leaves when it ships, in the commit that puts it in the
+CHANGELOG. Figures in the plans are from the first sample,
+`ads-20261024` (1,890 distinct ads), unless a plan says otherwise, and
+their commands run from the lab's folder, with `RUN` a run's name (see
+[Before and after](docs/PIPELINE.md#before-and-after)).
+
+## Now
+
+### Check the rules on a second sample
+
+**Serves:** structure
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
+**What:** work down the second sample's unmapped table, and change any
+rule that fitted only the first.
+
+**Why:** every rule, phrase and threshold was tuned on the first
+sample, which leans towards education jobs. The second leans towards
+vehicle jobs.
+
+**What's known:** both samples are in `data/ingestion/`, and their
+figures in PIPELINE.md's What it measured. The rules mostly hold. Where
+they don't: heading uses of a known kind fall from 76% to 73%, unmapped
+text rises from 14% to 16%, and a quarter of that is boilerplate. The
+biggest unmapped heading is "and" (39 ads, 82,000 characters), with
+"OR" beside it: one advertiser's template puts them alone in bold
+between requirements (Known gaps: lone conjunctions). Then phrases
+that look like kinds: "who thrives here", "what to expect", "the
+business", "what is in it for you", "vacancy type", "working
+arrangement", "important notice". "The business" also maps "The
+business has a strong presence across:", so check each in context.
+
+**Steps:**
+
+1. `go run ./cmd/pipeline run before`.
+2. Stop a lone conjunction passing as a heading, in
+   `internal/headings`, with a case in `TestRead`.
+3. Work down `data/runs/before/ads-20261025/sections/unmapped.tsv` as
+   PIPELINE.md's Improving it says, comparing each change on every
+   sample.
+
+**Done when** the second sample's known headings are at least the
+first's 76%, neither sample's figures got worse, the lone conjunctions
+gap is out of PIPELINE.md, and its figures are updated.
+
+### Stop shift times passing as headings
+
+**Serves:** structure
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
+**What:** don't take a bold time range, such as "2:00pm–10:00pm", for a
+heading.
+
+**Why:** it starts a section of no known kind, splitting the section
+it's in.
+
+**What's known:** `headingShaped` refuses money and runs of three
+digits or more, but a time has only pairs. The headings with figures in
+are listed by a command in PIPELINE.md's Improving it.
+
+**Steps:** in `internal/headings`, refuse text whose key is mostly
+times (digits with am or pm, or hh:mm); add cases to `TestRead`.
+
+**Done when** no time range is in `data/runs/RUN/all/headings/headings.tsv`, and no
+other heading was lost (compare the table before and after).
+
+## Next
+
+### Find near-duplicate boilerplate
+
+**Serves:** structure, embeddings: what isn't found as boilerplate gets embedded
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
+**What:** find boilerplate that's the same standard text with a few
+words changed, which `internal/boilerplate` misses because it matches
+word for word.
+
+**Why:** most of it is likely in summaries, which are 28% of the text
+but measured only 6% boilerplate. It's probably the largest amount of
+boilerplate still hidden, and what isn't found gets embedded.
+
+**What's known:** texts of eight words or more whose first 50
+characters recur in five ads or more number 178, against 155 whole
+texts: about 23 groups of variants. The commonest change is likely the
+ad's own title or place written into the standard text ("we're
+recruiting a … in …").
+
+**Steps:**
+
+1. Cheapest first: before keying a text, replace the words of the ad's
+   own title and locations in it with one placeholder, so that
+   templated text keys the same in every ad. Measure what that finds.
+2. If that leaves much, compare texts by shingles (overlapping runs of
+   five words) and their overlap, or MinHash for speed, grouping texts
+   above a threshold; tune it on the variant groups above.
+3. Keep the title-groups rule: variants count as one text across
+   different jobs.
+
+**Done when** boilerplate's share of summaries and of the whole has been
+remeasured, a sample of the newly found texts has been checked by eye
+to be standard text and not job text, tests cover the matching, and
+PIPELINE.md describes it.
+
+### Catch footers filed under requirements
+
+**Serves:** structure, embeddings
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
+**What:** treat repeated text that comes after an ad's job content, at
+its end, as boilerplate, even when it's repeated under only two to four
+title groups.
+
+**Why:** footers (an agency's notices, equal opportunities statements)
+often have no heading, so they're filed under the last one, usually
+requirements. Under five title groups, they're then counted as
+templates for the job, and kept for embedding.
+
+**What's known:** the largest templates in
+`data/runs/RUN/ads-20261024/boilerplate/repeated.tsv` are almost all such footers. Text under
+five groups or more is already boilerplate wherever it is.
+
+**Steps:**
+
+1. Record where each text comes in its ad: whether it's in the run of
+   repeated texts that ends the ad.
+2. Count a repeated text found mostly in such end runs as boilerplate,
+   whatever its section.
+3. Check the templates under three or more groups (the command in
+   PIPELINE.md's Improving it) before and after.
+
+**Done when** those footers are boilerplate, no line that describes a
+job has become boilerplate (check the newly flipped texts by eye), a
+test covers it, and PIPELINE.md's figures are updated.
+
+### Split walls of text into sentences
+
+**Serves:** structure
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
+**What:** split long paragraphs into sentences, and find the headings
+and bullets run into them.
+
+**Why:** some ads are a single wall of text, with headings run into the
+prose ("… every day. What you'll be doing You'll be …") and bullets
+flattened into capitalised phrases with no stops. Blocks keeps a wall as
+one paragraph, so nothing in it is found as a heading, and boilerplate
+sentences inside it aren't found either.
+
+**What's known:** 80 ads have a paragraph over 1,500 characters. A
+heading run into text follows the end of a sentence and comes before a
+capital letter. Flattened bullets are harder: capitalised phrases with
+no full stop between them.
+
+**Steps:**
+
+1. Agree the names first: a package for sentences, and what its pieces
+   are called.
+2. Split paragraphs into sentences with rules (stops, question marks,
+   and the capital that follows), keeping each sentence's text as
+   written.
+3. Find headings inside walls: a known heading phrase (from
+   `headings.txt`) between a sentence's end and a capital letter.
+4. Let boilerplate match sentences as well as blocks.
+
+**Done when** the walls are measured before and after (headings found in
+them, boilerplate found in them), tests cover the splitting with
+made-up text in the shapes seen, and PIPELINE.md has the new stage.
+
+### Find headings written as plain lines
+
+**Serves:** structure
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
+**What:** take more plain lines, with no bold and no colon, as headings
+when what follows shows they are.
+
+**Why:** a plain line starts a section only if it's exactly a kind's
+phrase, so "Your role in the team" written plainly before a list is
+missed.
+
+**What's known:** 952 plain lines start a section by name. Short lines
+followed by a list are the likeliest headings.
+
+**Steps:** in `internal/headings`, consider a short plain line that's
+followed by a list, and contains a kind's phrase, as a heading; check
+`data/runs/RUN/all/sections/named.tsv` and the unmapped table before and after.
+
+**Done when** more headings are found with none wrongly (check the new
+ones by eye), and tests cover it.
+
+## Later
+
+### Facts from the details
+
+**Serves:** metadata
+
+Grammars ([grammar](https://github.com/nukopian/grammar)) for the facts
+in an ad's details sections and fields: salary and its period, hours,
+working pattern, contract type and location, as metadata with definite
+values, so that search can filter on them and they needn't be embedded.
+
+### Skills and occupations as taxonomy links
+
+**Serves:** taxonomies
+
+Link the skills in requirements, and the job itself, to taxonomies of
+skills and occupations, so that search can match on what a job needs
+rather than on how its ad words it.
+
+### A fair test of embedding models
+
+**Serves:** embeddings
+
+Rerun the first comparison of `BAAI/bge-base-en-v1.5` and
+`intfloat/e5-small-v2` fairly: with the `query: ` and `passage: `
+prefixes E5 is trained with, on many headings and sections rather than
+one, and with other small local models beside them. Separation between
+kinds matters more than the scores themselves.
+
+### Does it make search better?
+
+**Serves:** search
+
+Measure retrieval, not only structure: a set of queries with the ads
+that should answer them, and a comparison of one embedding per ad with
+embeddings of its chosen sections, with and without metadata to filter
+on, and against a managed embedding service. This is what answers the
+lab's question.
+
+### Embeddings from Go
+
+**Serves:** deployment
+
+Run the chosen model from Go with ONNX Runtime over the sections worth
+embedding, as the ONNX demo does for its toy model, so that nothing in
+the pipeline needs a Python service.

@@ -31,7 +31,7 @@ build() {
 }
 
 if [ $# -eq 0 ]; then
-	for doc in README.md CHANGELOG.md docs/PIPELINE.md docs/SETUP.md docs/MAINTAINING.md; do
+	for doc in README.md CHANGELOG.md ROADMAP.md docs/PIPELINE.md docs/SETUP.md docs/MAINTAINING.md; do
 		build "$root/$doc" "$root/${doc%.md}.pdf"
 	done
 else

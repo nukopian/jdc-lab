@@ -54,9 +54,10 @@ embeddings, and a large language model only where those fall short.
   is boilerplate, or company, application and legal text, that
   probably needn't be embedded: a first answer to whether search can
   improve while embedding less.
-- **Next:** recognising more headings, the gaps in PIPELINE.md's Known
-  gaps, then grammars for the facts in the details sections, such as
-  salary and hours.
+- **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
+  and why: now, recognising more headings; then the rest of the
+  pipeline's known gaps, grammars for the facts in the details sections,
+  and a fair test of embeddings.
 - **Embeddings** have had a first look: two small local models,
   `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`, compared at
   matching section headings to section types. BGE separated the types
@@ -98,6 +99,7 @@ And file by file, at the root:
 | `.envrc` | Sets up Python, Perl and Go on entering the folder, with direnv |
 | `.gitignore` | What stays out of git, by language |
 | `CHANGELOG.md` | What changed in each release |
+| `ROADMAP.md` | What the lab means to do next, and why |
 
 Kept out of git: `data/` (job descriptions), `models/` (models and ONNX
 exports), `bin/` (Go programs once built), and `.venv/`. gitleaks scans
