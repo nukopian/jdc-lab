@@ -293,6 +293,10 @@ PIPELINE.md's figures.
 
 ## Before committing
 
+- **TODO.md:** `git pull --ff-only` and re-read it. Sessions working on
+  grammar and scalar add tasks to it, and a commit that completes one
+  removes it. Each task opens with **From** (where it came from) and
+  **Waiting on** (what it needs first, or nothing).
 - **Notebooks:** clear their outputs. They carry local paths, and job
   description text once data is in use.
 - **Style and tests:** the checks above, for each language touched.

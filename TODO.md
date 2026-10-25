@@ -1,12 +1,16 @@
 # TODO
 
-Planned work, most useful first. Each task comes from a known gap in
+Planned work, most useful first. Most tasks come from a known gap in
 [docs/PIPELINE.md](docs/PIPELINE.md#known-gaps); when one is done, take
 it out of here and its row out of the gaps table, in the same commit,
-and update PIPELINE.md's figures. Figures below are from the v0.2.0
+and update PIPELINE.md's figures. Others come from another repository's
+session, as their From line says. Figures below are from the v0.2.0
 sample of 1,890 distinct ads.
 
 ## Find near-duplicate boilerplate
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
 
 **What:** find boilerplate that's the same standard text with a few
 words changed, which `internal/boilerplate` misses because it matches
@@ -40,6 +44,9 @@ PIPELINE.md describes it.
 
 ## Catch footers filed under requirements
 
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
 **What:** treat repeated text that comes after an ad's job content, at
 its end, as boilerplate, even when it's repeated under only two to four
 title groups.
@@ -67,6 +74,9 @@ job has become boilerplate (check the newly flipped texts by eye), a
 test covers it, and PIPELINE.md's figures are updated.
 
 ## Split walls of text into sentences
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
 
 **What:** split long paragraphs into sentences, and find the headings
 and bullets run into them.
@@ -99,6 +109,9 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
 
 ## Stop shift times passing as headings
 
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
 **What:** don't take a bold time range, such as "2:00pm–10:00pm", for a
 heading.
 
@@ -116,6 +129,9 @@ times (digits with am or pm, or hh:mm); add cases to `TestRead`.
 other heading was lost (compare the table before and after).
 
 ## Find headings written as plain lines
+
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
 
 **What:** take more plain lines, with no bold and no colon, as headings
 when what follows shows they are.
@@ -136,6 +152,9 @@ ones by eye), and tests cover it.
 
 ## Check the rules on a second sample
 
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**Waiting on:** nothing
+
 **What:** run every stage on a second sample of ads, from a different
 slice than the first, and compare the figures.
 
@@ -155,3 +174,27 @@ a name of its own so the first stays.
 
 **Done when** both samples' figures are in PIPELINE.md, and any rule
 that fitted only the first has been changed.
+
+## Use grammar's ToAll in sections.All
+
+**From:** grammar's session, 2026-10-25 (grammar 569c9a2c9f8095d91c8a9d644ff5d428963402d8)
+**Waiting on:** a grammar release with ToAll
+
+**What:** in `internal/sections`, have `All` take the kinds from
+`grammar.ToAll[Kind](finder.FindAll(key))` rather than ranging over
+`FindAll(key).Items()` and reading `m.At("made").String()` from each.
+
+**Why:** it was the one place the lab's code reached into scalar, only
+to get strings back out of a list of matches. grammar added `ToAll`,
+`To` for `FindAll`, for it.
+
+**What's known:** tried against grammar's `develop` through `go.work`:
+`TestAll`, `ExampleAll` and the full suite pass unchanged. `ToAll`'s
+error can be ignored here: a phrase list's canonical values are always
+strings.
+
+**Steps:** raise grammar in `go.mod` to the release, change `All`, and
+check with `GOWORK=off`, so the tests use the release, not `../grammar`.
+
+**Done when** `All` uses `ToAll`, and its tests and example pass
+unchanged with `GOWORK=off`.
