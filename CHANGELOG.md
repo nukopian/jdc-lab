@@ -12,6 +12,17 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.2.0 (2026-10-25)
+
+From job ads to sections and boilerplate
+
+The first work on real job ads: a pipeline, in Go, that splits each ad
+into blocks, finds its headings and fields, divides it into sections,
+and finds the boilerplate ads repeat whatever the job, all measured on
+a sample of ads and described in docs/PIPELINE.md.
+
 - Job ads in, as JSON Lines. `cmd/xml-to-jsonl` converts a MySQL
   `--xml` export of job ads into one JSON object per ad, with the lab's
   own field names, for every language to read.
