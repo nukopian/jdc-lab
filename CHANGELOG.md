@@ -12,6 +12,18 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.3.0 (2026-10-25)
+
+Samples, runs, and releases from develop
+
+The pipeline's figures now come from two samples of ads, and a tool
+runs every stage on them and shows what a change moved, so the
+pipeline can be improved without losing ground on either. The lab now
+works as grammar and scalar do, with work on `develop` and releases on
+`main`.
+
 - grammar v0.2.0 (and scalar v0.5.7 with it). `internal/sections`
   takes each kind's rank from the phrase list's `Canonicals`, rather
   than reading `headings.txt` a second time with its own idea of the
