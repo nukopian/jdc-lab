@@ -175,6 +175,52 @@ a name of its own so the first stays.
 **Done when** both samples' figures are in PIPELINE.md, and any rule
 that fitted only the first has been changed.
 
+## Try grammar's develop, and greenlight its release
+
+**From:** grammar's session, 2026-10-25 (grammar d688a7eda7d24c0d3962cd12e47d474c3b489ea7)
+**Waiting on:** nothing
+
+**What:** with `go.work` joining `../grammar` on its `develop`, make the
+changes in the two tasks below, for `ToAll` and `Canonicals`, run the
+tests, and tell Iain whether grammar can be released. Leave the changes
+uncommitted until the release, as `go.mod` can't ask for it yet.
+
+**Why:** both came from friction the lab found, so the lab says whether
+they fix it before grammar releases them. The release also brings two
+changes to every match: the undef for no match is locked, so reading it
+stays undef, and reading a match creates nothing (scalar v0.5.7's
+`Autovivify(false)`), as in Raku.
+
+**What's known:** grammar's session tried both: `TestAll`, `ExampleAll`
+and the full suite pass, and `rank` is the same for every kind.
+
+**Done when** Iain has the lab's answer.
+
+## Use grammar's Canonicals to rank the kinds
+
+**From:** grammar's session, 2026-10-25 (grammar d688a7eda7d24c0d3962cd12e47d474c3b489ea7)
+**Waiting on:** a grammar release with Canonicals
+
+**What:** in `internal/sections`' `init`, take each kind's rank from its
+place in `phrases.Canonicals()`, and check each is a kind in the same
+loop, rather than walking `Phrases()` and `Canonical` for the check and
+reading `headings.txt` a second time, line by line, for the rank.
+
+**Why:** the second reading copies `AddRules`' idea of the format, and
+already differs from it: a rule written `a, b => desirable` would rank
+`a`. grammar added `Canonicals`, the values in the order first added,
+for it. It was a friction point; Iain asked that the lab be told.
+
+**What's known:** tried against grammar's `develop` through `go.work`:
+the two loops become one, `rank` is the same for all nine kinds, and the
+full suite passes. `strings` may then be unused in `sections.go`.
+
+**Steps:** raise grammar in `go.mod` to the release, change `init`, and
+check with `GOWORK=off`.
+
+**Done when** `init` ranks by `Canonicals`, `headings.txt` is read once,
+and the tests pass unchanged with `GOWORK=off`.
+
 ## Use grammar's ToAll in sections.All
 
 **From:** grammar's session, 2026-10-25 (grammar 569c9a2c9f8095d91c8a9d644ff5d428963402d8)
