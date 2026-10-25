@@ -10,6 +10,20 @@ to stand for everything in the advert at once: the role, the
 requirements, the salary, the benefits, the company blurb and the legal
 boilerplate.
 
+## Why it's public
+
+This is a learning lab as much as a research one. I'm using it to learn
+Go, to get hands-on with embedding models and ONNX, and to work out how
+search over text like this should be built, in the open, where anyone
+can follow along and reuse what's useful.
+
+So its code, its method and its findings are public; its data isn't.
+The job ads it reads were written by the employers who placed them, and
+aren't ours to publish, so the ads, and the detailed results drawn from
+them, are kept privately. What's here is the code to run, how it works
+([docs/PIPELINE.md](docs/PIPELINE.md)), and figures summed over many
+ads, never an ad itself.
+
 ## The idea
 
 Not all of a job description deserves an embedding. The lab tests a
@@ -28,18 +42,27 @@ embeddings, and a large language model only where those fall short.
 
 ## Where it stands
 
-It's early days.
-
-- A first comparison of two small local embedding models,
-  `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`, at matching
-  section headings such as "Responsibilities" to section types. BGE
-  separated the types more clearly, but the test was too small to
-  settle anything, and it has to be rerun fairly for E5.
-- ONNX Runtime works from both Python and Go, so a model chosen in
-  Python can also run from Go.
-- The next step is a sample of real job descriptions, to count which
-  section headings occur and how many map to a section type by rule
-  alone.
+- **A pipeline, by rules alone.** It splits each ad into the blocks a
+  reader sees, finds its headings and fields, divides it into sections
+  (summary, responsibilities, requirements, benefits and the rest), and
+  finds the boilerplate that ads repeat whatever the job.
+  [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works, what
+  it measured, and how to improve it.
+- **Measured on two samples** of 2,000 and 5,000 ads, from different
+  kinds of job. 89% of ads have headings, and about three in four
+  heading uses are recognised by rule, on both. Roughly 15–20% of an ad
+  is boilerplate, or company, application and legal text, that
+  probably needn't be embedded: a first answer to whether search can
+  improve while embedding less.
+- **Next:** recognising more headings, the gaps in PIPELINE.md's Known
+  gaps, then grammars for the facts in the details sections, such as
+  salary and hours.
+- **Embeddings** have had a first look: two small local models,
+  `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`, compared at
+  matching section headings to section types. BGE separated the types
+  more clearly, but the test was too small to settle anything, and it
+  has to be rerun fairly for E5. ONNX Runtime works from both Python and
+  Go, so a model chosen in Python can also run from Go.
 
 ## Layout
 
