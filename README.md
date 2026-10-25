@@ -1,5 +1,7 @@
 # JDC Lab
 
+**Exploring better representations of job descriptions for search**
+
 A lab for one question: how can search over job descriptions get
 better, while spending less on embeddings?
 
