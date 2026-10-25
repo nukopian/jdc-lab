@@ -62,28 +62,17 @@ func init() {
 	if err := phrases.AddRules(rules); err != nil {
 		panic(fmt.Sprintf("sections: headings.txt: %v", err))
 	}
-	// Each rule's first phrase must be a kind: a misspelt one would
-	// otherwise be a ninth kind of section, quietly.
-	for _, p := range phrases.Phrases() {
-		for _, k := range phrases.Canonical(p) {
-			if !slices.Contains(Kinds, Kind(k)) {
-				panic(fmt.Sprintf("sections: headings.txt: %q is no kind of section", k))
-			}
+	// Each rule's kind must be one of Kinds: a misspelt one would
+	// otherwise be a ninth kind of section, quietly. Its rank is where its
+	// first rule comes.
+	for i, k := range phrases.Canonicals() {
+		if !slices.Contains(Kinds, Kind(k)) {
+			panic(fmt.Sprintf("sections: headings.txt: %q is no kind of section", k))
 		}
+		rank[Kind(k)] = i
 	}
 	finder = grammar.MustCompile(`grammar Heading { token TOP { @sections } }`, phrases)
 
-	// A rule starts at the beginning of a line, and carries on in indented
-	// ones; its first phrase is its kind.
-	for line := range strings.Lines(rules) {
-		if line == "" || strings.ContainsRune(" \t\n#", rune(line[0])) {
-			continue
-		}
-		kind, _, _ := strings.Cut(line, ",")
-		if _, ok := rank[Kind(kind)]; !ok {
-			rank[Kind(kind)] = len(rank)
-		}
-	}
 	for _, k := range Kinds {
 		if _, ok := rank[k]; !ok && k != Unmapped {
 			panic(fmt.Sprintf("sections: headings.txt has no rule for %q", k))
@@ -117,9 +106,12 @@ func Of(key string) (Kind, bool) {
 // they come in it, each once: more than one means the heading's words
 // disagree, and Of chose between them.
 func All(key string) []Kind {
+	// A phrase list's canonical values are always strings, so ToAll can't
+	// fail here.
+	made, _ := grammar.ToAll[Kind](finder.FindAll(key))
 	var kinds []Kind
-	for _, m := range finder.FindAll(key).Items() {
-		if k := Kind(m.At("made").String()); !slices.Contains(kinds, k) {
+	for _, k := range made {
+		if !slices.Contains(kinds, k) {
 			kinds = append(kinds, k)
 		}
 	}

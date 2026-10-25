@@ -12,7 +12,11 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.2.0 (and scalar v0.5.7 with it). `internal/sections`
+  takes each kind's rank from the phrase list's `Canonicals`, rather
+  than reading `headings.txt` a second time with its own idea of the
+  format, and `All` takes its kinds with `ToAll`, no longer reaching
+  into scalar. Its sections are the same as before.
 
 ## v0.2.0 (2026-10-25)
 
