@@ -63,11 +63,10 @@ print the table.
   and outcomes, in Now, Next and Later, each saying which of the lab's
   questions it serves. It's public, on both branches, and in every
   release. Now holds three items at most, so the roadmap stays a queue
-  to pull from, not a list pushing work; an item in Now has a plan
-  written to be picked up cold; one
-  leaves when it ships, in the commit that adds it to the CHANGELOG.
-  Each of the pipeline's [Known gaps](PIPELINE.md#known-gaps) links to
-  its item.
+  to pull from, not a list pushing work. Each item in Now has a plan
+  written to be picked up cold, and an item leaves when it ships, in
+  the commit that adds it to the CHANGELOG. Each of the pipeline's
+  [Known gaps](PIPELINE.md#known-gaps) links to its item.
 - `TODO.md`, when there is one, lists tasks for the next session: the
   concrete steps of an item being worked on, or tasks from grammar's
   and scalar's sessions. Its tasks come before the roadmap's items. It's

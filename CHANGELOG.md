@@ -12,11 +12,22 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.3.2 (2026-10-25)
+
+Now holds three at most
+
+The roadmap's Now is capped, as grammar's and scalar's now are, and the
+lab follows grammar's documentation-only patch release.
+
 - The roadmap's Now holds three items at most, so it stays a queue to
   pull from.
 - grammar v0.2.1, which changes only its documentation. It still asks
   for scalar v0.5.7, so jdc-lab stays on that; scalar v0.5.8 is
   documentation only too. The pipeline's output is unchanged.
+- A wash-up before the release found only a sentence in
+  docs/MAINTAINING.md left broken mid-line by an edit; it's mended.
 
 ## v0.3.1 (2026-10-25)
 
