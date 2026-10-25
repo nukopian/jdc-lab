@@ -51,12 +51,6 @@ func main() {
 
 func run(source, target string) (t tally, err error) {
 	t.kinds = map[blocks.Kind]int{}
-	in, err := os.Open(source)
-	if err != nil {
-		return t, err
-	}
-	defer in.Close()
-
 	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
 		return t, err
 	}
@@ -73,9 +67,9 @@ func run(source, target string) (t tally, err error) {
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(false)
 
-	for ad, err := range ads.All(in) {
+	for ad, err := range ads.File(source) {
 		if err != nil {
-			return t, fmt.Errorf("%s: ad %d: %w", source, t.ads+1, err)
+			return t, err
 		}
 		bs := blocks.Split(ad.HTML)
 		t.add(bs)

@@ -166,7 +166,11 @@ func (b *builder) start(tag atom.Atom) {
 			b.endLine()
 		}
 	case isHeading(tag):
-		b.endBlock()
+		if b.inItem {
+			b.piece.write(" ", false) // a heading in an item stays in the item
+		} else {
+			b.endBlock()
+		}
 		b.heading++
 	case tag == atom.Li:
 		switch {
@@ -195,19 +199,26 @@ func (b *builder) end(tag atom.Atom) {
 	case tag == atom.Strong || tag == atom.B:
 		b.bold = max(b.bold-1, 0)
 	case isHeading(tag):
-		if b.heading > 0 && !b.inItem {
-			it, ok := b.piece.take()
-			if ok {
+		switch {
+		case b.inItem:
+			b.piece.write(" ", false)
+		case b.heading > 0:
+			if it, ok := b.piece.take(); ok {
 				it.Cues.Heading = true
 				b.add(Block{Kind: Paragraph, Text: it.Text, Cues: it.Cues})
 			}
 		}
 		b.heading = max(b.heading-1, 0)
 	case tag == atom.Li:
-		b.endItem()
+		if b.inItem || b.list > 0 { // else a stray </li>, which ends nothing
+			b.endItem()
+		}
 	case tag == atom.Ul || tag == atom.Ol:
+		if b.list == 0 {
+			break // a stray </ul>, which ends nothing
+		}
 		b.endItem()
-		b.list = max(b.list-1, 0)
+		b.list--
 		if b.list == 0 {
 			b.endList()
 		}

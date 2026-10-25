@@ -22,6 +22,8 @@ func TestSimilar(t *testing.T) {
 		{"crane operator", "forklift driver", false},
 		{"teaching assistant", "cover supervisor", false},
 		{"sen teacher", "teacher", true},
+		{"", "teacher", false}, // a title with no words is like no other
+		{"", "", true},
 	}
 	for _, tt := range tests {
 		if got := similar(tt.a, tt.b); got != tt.want {

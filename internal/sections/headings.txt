@@ -60,7 +60,7 @@ company, about us, about the company, about the client, about our client,
 	company overview, company profile, our story, our values, our mission,
 	our culture, who are we, about the employer, the employer
 
-apply, how to apply, apply now, apply today, apply, application, applications,
+apply, how to apply, apply now, apply today, application, applications,
 	interested, next steps, what's next, what happens next, get in touch,
 	contact, contact us, what you need to do now, for more information,
 	ready to apply, interview, interviews
@@ -71,7 +71,7 @@ details, job details, role details, position details, contract details,
 	contract, duration
 
 summary, the role, about the role, the opportunity, about the opportunity,
-	overview, role overview, job overview, summary, job summary, role summary,
+	overview, role overview, job overview, job summary, role summary,
 	your new role, the job, about the job, the position, about the position,
 	job description, description, introduction, role purpose, purpose of the role,
 	job purpose

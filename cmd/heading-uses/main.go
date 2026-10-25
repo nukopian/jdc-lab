@@ -51,21 +51,15 @@ func main() {
 // find returns each ad's first use of a heading whose key is key. Ads whose
 // HTML is the same as an earlier one's are left out.
 func find(source, key string) ([]use, error) {
-	in, err := os.Open(source)
-	if err != nil {
-		return nil, err
-	}
-	defer in.Close()
 	var uses []use
-	seen := map[string]bool{}
-	for ad, err := range ads.All(in) {
+	var d ads.Distinct
+	for ad, err := range ads.File(source) {
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", source, err)
+			return nil, err
 		}
-		if seen[ad.HTML] {
+		if !d.First(ad) {
 			continue
 		}
-		seen[ad.HTML] = true
 		ss := sections.Divide(headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...))
 		for i, s := range ss {
 			if s.Heading == "" || headings.Key(s.Heading) != key {

@@ -1,6 +1,6 @@
-# Settings for the lab's Python tools. The lab's own packages, when
-# they come, will live in lib/ and be described here too (see
-# docs/MAINTAINING.md).
+# Settings for the lab's Python tools: pytest, ruff and ty. The lab's
+# own package, jdclab, lives in lib/, and will be described here too
+# once it's installed into the venv (see docs/MAINTAINING.md).
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

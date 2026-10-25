@@ -1,6 +1,10 @@
 package ads
 
 import (
+	"errors"
+	"io/fs"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -43,6 +47,53 @@ func TestLocations(t *testing.T) {
 		if got := tt.ad.Locations(); !slices.Equal(got, tt.want) {
 			t.Errorf("Locations() = %q, want %q", got, tt.want)
 		}
+	}
+}
+
+func TestAllSaysWhichAd(t *testing.T) {
+	const lines = `{"id":"1"}
+{"id":
+`
+	for _, err := range All(strings.NewReader(lines)) {
+		if err != nil && !strings.HasPrefix(err.Error(), "ad 2: ") {
+			t.Errorf("got %q, want it to start with \"ad 2: \"", err)
+		}
+	}
+}
+
+func TestFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "ads.jsonl")
+	if err := os.WriteFile(path, []byte(`{"id":"1"}`+"\n"+`{"id":`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var ids []string
+	var errs []error
+	for ad, err := range File(path) {
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		ids = append(ids, ad.ID)
+	}
+	if len(ids) != 1 || len(errs) != 1 || !strings.HasPrefix(errs[0].Error(), path+": ad 2: ") {
+		t.Errorf("got ids %v and errors %v", ids, errs)
+	}
+	for _, err := range File(filepath.Join(t.TempDir(), "none.jsonl")) {
+		if !errors.Is(err, fs.ErrNotExist) {
+			t.Errorf("a missing file: got %v", err)
+		}
+	}
+}
+
+func TestDistinct(t *testing.T) {
+	var d Distinct // the zero value is ready to use
+	got := []bool{
+		d.First(Ad{ID: "1", HTML: "<p>A</p>"}),
+		d.First(Ad{ID: "2", HTML: "<p>B</p>"}),
+		d.First(Ad{ID: "3", HTML: "<p>A</p>"}),
+	}
+	if !slices.Equal(got, []bool{true, true, false}) || d.Duplicates != 1 {
+		t.Errorf("got %v and %d duplicates; want [true true false] and 1", got, d.Duplicates)
 	}
 }
 

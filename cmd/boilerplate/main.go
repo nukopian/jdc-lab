@@ -32,11 +32,6 @@ import (
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
 
-// ad is what's kept of each ad between the two passes.
-type ad struct {
-	sections []sections.Section
-}
-
 // repeat is what's known of one repeated text.
 type repeat struct {
 	text        string
@@ -65,23 +60,17 @@ func main() {
 	t.print(len(all), dups, dir)
 }
 
-// read divides every ad into sections, and indexes their text.
-func read(source string) (all []ad, ix boilerplate.Index, dups int, err error) {
-	in, err := os.Open(source)
-	if err != nil {
-		return nil, ix, 0, err
-	}
-	defer in.Close()
-	seen := map[string]bool{}
-	for a, err := range ads.All(in) {
+// read divides every ad into sections, and indexes their text. It keeps
+// each ad's sections for the second pass.
+func read(source string) (all [][]sections.Section, ix boilerplate.Index, dups int, err error) {
+	var d ads.Distinct
+	for a, err := range ads.File(source) {
 		if err != nil {
-			return nil, ix, 0, fmt.Errorf("%s: %w", source, err)
+			return nil, ix, 0, err
 		}
-		if seen[a.HTML] {
-			dups++
+		if !d.First(a) {
 			continue
 		}
-		seen[a.HTML] = true
 		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
 		for _, s := range ss {
 			var texts []string
@@ -92,9 +81,9 @@ func read(source string) (all []ad, ix boilerplate.Index, dups int, err error) {
 			}
 			ix.Add(a.Title, s.Kind, texts...)
 		}
-		all = append(all, ad{sections: ss})
+		all = append(all, ss)
 	}
-	return all, ix, dups, nil
+	return all, ix, d.Duplicates, nil
 }
 
 // tally is what's measured.
@@ -105,12 +94,12 @@ type tally struct {
 	repeats                           map[string]*repeat
 }
 
-func measure(all []ad, ix *boilerplate.Index) tally {
+func measure(all [][]sections.Section, ix *boilerplate.Index) tally {
 	t := tally{kindChars: map[sections.Kind]int{}, kindBoiler: map[sections.Kind]int{}, repeats: map[string]*repeat{}}
 	for _, a := range all {
 		chars, boiler := 0, 0
 		seen := map[string]bool{}
-		for _, s := range a.sections {
+		for _, s := range a {
 			for _, p := range s.Parts {
 				if p.Role != headings.Text {
 					continue

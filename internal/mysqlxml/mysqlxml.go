@@ -111,7 +111,7 @@ func (row Row) Ad() (ads.Ad, error) {
 func Convert(r io.Reader, w io.Writer) (int, error) {
 	buf := bufio.NewWriter(w)
 	enc := json.NewEncoder(buf)
-	// The HTML stays readable: <p>, not <p>.
+	// The HTML stays readable: <p>, not \u003cp\u003e.
 	enc.SetEscapeHTML(false)
 	rows := NewReader(r)
 	count := 0

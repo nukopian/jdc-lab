@@ -29,8 +29,8 @@ func TestOf(t *testing.T) {
 		{"The opportunity", Summary},
 		{"About the Role", Summary},
 		{"About Us", Company},
-		{"About TeacherActive", Company},
-		{"Why Tradewind?", Benefits},
+		{"About Brightway Recruitment", Company},
+		{"Why Brightway?", Benefits},
 		{"How to Apply", Apply},
 		{"Interested?", Apply},
 		{"Equal Opportunities Statement", Legal},
@@ -111,6 +111,9 @@ func TestDivide(t *testing.T) {
 	var got []string
 	for _, s := range Divide(headings.Read(blocks.Split(html), "Driver")) {
 		line := fmt.Sprintf("%s %q:", s.Kind, s.Heading)
+		if s.ByName {
+			line = "by name " + line
+		}
 		for _, p := range s.Parts {
 			line += fmt.Sprintf(" %s(%s)", p.Role, p.Text)
 		}
@@ -120,7 +123,7 @@ func TestDivide(t *testing.T) {
 		`summary "": text(We're a friendly team.)`,
 		`responsibilities "Key Responsibilities": text(Drive)`,
 		`unmapped "Software Development": text(Some Go.) field(Salary: £30,000)`,
-		`benefits "Benefits": text(Pension)`,
+		`by name benefits "Benefits": text(Pension)`,
 	}
 	if !slices.Equal(got, want) {
 		t.Errorf("\n got: %q\nwant: %q", got, want)

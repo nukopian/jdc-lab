@@ -151,8 +151,8 @@ use each heading and field label, by key, with its commonest spelling.
 case; typographic quotes, dashes and odd spaces folded to plain ones;
 bullets, emoji and invisible characters dropped; punctuation other than
 `' & /` made a space. "What You’ll Be Doing:" and "what you'll be doing"
-have the same key. It borrows the idea of job-meta's `punct` package,
-with the characters these ads use as well, such as Word's bullet.
+have the same key. The table of characters it folds includes those these
+ads use, such as Word's bullet and the emoji variation selector.
 
 ## 4. Sections: what each heading starts
 
@@ -206,7 +206,8 @@ and unmapped's share of the text measures what's left to map.
 kind's phrase: `<p>Responsibilities</p>`, not "Our responsibilities to
 you".
 
-`cmd/sections` writes each ad's sections to `ads.jsonl`, and three tables
+`cmd/sections` writes each ad's sections to `ads.jsonl` (a section
+started by a plain line is marked `by_name`), and three tables
 to work from: `unmapped.tsv` (headings of no known kind, with the text
 under each), `disagree.tsv` (headings whose phrases point to two kinds,
 and the kind that won), and `named.tsv` (plain lines taken by name).

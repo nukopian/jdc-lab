@@ -80,8 +80,8 @@ then download the version `go.mod` asks for.
 Watch for other tools that rebuild the `PATH` at every prompt or change
 of folder, such as `mise activate`. Their hooks can run after direnv's
 and undo it, moving the lab's folders behind the system's. Then, in the
-lab, `perl` turns out to be macOS's own, or `python3`, `pytest`,
-`ruff` and `ty` Homebrew's, while the lab's are still there further down. This
+lab, `perl` turns out to be macOS's own, or `python3`, `pytest`, `ruff`
+and `ty` Homebrew's, while the lab's are still there further down. This
 lists the hooks in the order they run; direnv's, `_direnv_hook`, should
 be the last that changes the `PATH`:
 
@@ -314,10 +314,10 @@ cd "$lab"
 The fix is the `perl` command, with the text before and after as `old`
 and `new`: in single quotes the shell leaves them alone, and `\Q...\E`
 makes Perl match the old text literally, so nothing in them needs
-escaping. `grep` prints `1` when the fix is in. `INLINE_PYTHON_EXECUTABLE` builds
-it against the venv's Python, without asking which one to use. The
-build links that Python's shared library, so after changing the lab's
-Python, install Inline::Python again.
+escaping. `grep` prints `1` when the fix is in.
+`INLINE_PYTHON_EXECUTABLE` builds it against the venv's Python, without
+asking which one to use. The build links that Python's shared library,
+so after changing the lab's Python, install Inline::Python again.
 
 ### The rest
 
@@ -363,4 +363,11 @@ It ends with a line per language, and `pass` for each one set up.
 ## Data
 
 Job descriptions are not in the repository, and never go into it. Put
-them in `data/`, which is git-ignored.
+the export in `data/ingestion/`, which, like all of `data/`, is
+git-ignored, and convert it to the JSON Lines the lab reads:
+
+```
+go run ./cmd/xml-to-jsonl data/ingestion/extract.xml data/ingestion/ads.jsonl
+```
+
+[PIPELINE.md](PIPELINE.md#running-it) has what to run after that.

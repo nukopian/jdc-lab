@@ -28,10 +28,10 @@ has the steps).
   responsibilities, requirements, desirable, benefits, company, apply,
   legal and details sections, by the phrases in its headings. A heading
   of no known kind starts an unmapped section, so what's left to map
-  shows. The phrases are
-  data, synonym rules in the format Elasticsearch and Solr use, read
-  with a `grammar` word list. `cmd/sections` measures how well they
-  cover the ads, and lists the headings they miss.
+  shows. The phrases are data, synonym rules in the format
+  Elasticsearch and Solr use, read with a `grammar` word list.
+  `cmd/sections` measures how well they cover the ads, and lists the
+  headings they miss.
 - Boilerplate. `internal/boilerplate` finds text that ads repeat
   whatever the job, word for word in ads for different jobs, counting
   similar titles as one job so that a job posted in many places isn't
@@ -44,6 +44,15 @@ has the steps).
   decides and why, what it measured, and what it doesn't do yet, and
   how to improve each stage from the tables it writes. `cmd/heading-uses`
   shows how the ads use any one heading.
+- A wash-up before the release. Among smaller things, it found and
+  fixed a crash in `cmd/heading-counts` on a file with no ads; blocks
+  put out of order by a stray `</li>` or `</ul>`, or by a heading tag
+  inside a list item; a title with no words being grouped with every
+  other when finding boilerplate; and sections started by a plain line
+  going uncounted when the same ad had the same heading in bold. Only
+  the last changed a figure on the sample: 952 lines start a section by
+  name, not 950. The programs now share one way of reading ads, and
+  their errors say which ad.
 - Go does most of the work. Python stays for what needs its
   machine-learning tools: evaluating models, exporting them to ONNX,
   and notebooks.

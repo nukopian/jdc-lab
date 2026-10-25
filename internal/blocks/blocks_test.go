@@ -195,6 +195,16 @@ now.</p>`,
 			`</strong></ul></li><p>Text</p>`,
 			[]string{`paragraph "Text"`},
 		},
+		{
+			"a stray </li> or </ul> after text makes no list",
+			`Intro</li><p>More</p>Outro</ul>`,
+			[]string{`paragraph "Intro"`, `paragraph "More"`, `paragraph "Outro"`},
+		},
+		{
+			"a heading tag inside an item stays in the item",
+			`<ul><li>Intro <h3>Head</h3> more</li></ul>`,
+			[]string{"list", `  "Intro Head more"`},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -319,6 +319,14 @@ A release is a signed, annotated tag on `main`, with a GitHub release to
 match. Its notes live in [CHANGELOG.md](../CHANGELOG.md): add to
 Unreleased as work lands, then, to release:
 
+0. Wash up: review everything since the last tag together, code, tests,
+   docs and data files such as `headings.txt`, for inconsistency,
+   inefficiency, errors and slop, and fix what's found. Save each
+   stage's output on the ads first: afterwards it must be the same,
+   unless a fix means to change it, and then say how. Reproduce each
+   finding before fixing it, with a failing test where code is wrong,
+   and note the worst in the release's entry. A wash-up is also worth
+   doing whenever a run of work comes to a natural close.
 1. Turn Unreleased into the release's entry, `## vX.Y.Z (date)`, with a
    one-line title first, and start a fresh Unreleased above it. Commit.
 2. Check the commit you'll tag: `test-all.sh` passes, and

@@ -40,20 +40,22 @@ const (
 )
 
 // Kinds are all the kinds, in the order ads tend to have them.
-var Kinds = []Kind{Summary, Responsibilities, Requirements, Desirable, Benefits, Company, Apply, Legal, Details, Unmapped}
+var Kinds = []Kind{
+	Summary, Responsibilities, Requirements, Desirable, Benefits,
+	Company, Apply, Legal, Details, Unmapped,
+}
 
 //go:embed headings.txt
 var rules string
 
-// phrases is the word list built from rules, heading the grammar that
-// finds its phrases in a heading, and rank each kind's place among the
-// rules, which decides between kinds when a heading has phrases of more
-// than one.
+// phrases is the word list built from rules, finder the grammar that finds
+// its phrases in a heading, and rank each kind's place among the rules,
+// which decides between kinds when a heading has phrases of more than one.
 var (
 	phrases = grammar.NewWordList("sections",
 		grammar.FoldCase(), grammar.LooseSpacing(), grammar.Plurals(), grammar.WholeWords())
-	heading *grammar.Grammar
-	rank    = map[Kind]int{}
+	finder *grammar.Grammar
+	rank   = map[Kind]int{}
 )
 
 func init() {
@@ -69,7 +71,7 @@ func init() {
 			}
 		}
 	}
-	heading = grammar.MustCompile(`grammar Heading { token TOP { @sections } }`, phrases)
+	finder = grammar.MustCompile(`grammar Heading { token TOP { @sections } }`, phrases)
 
 	// A rule starts at the beginning of a line, and carries on in indented
 	// ones; its first phrase is its kind.
@@ -92,8 +94,8 @@ func init() {
 // Of returns the kind of section a heading starts, given its key (see
 // headings.Key), and whether it's known. Of the kinds its phrases point
 // to, the one whose rule comes first in headings.txt wins. With none, a
-// heading starting "about" is company ("About TeacherActive"), one
-// starting "why" benefits ("Why Tradewind?"), and a field's label details
+// heading starting "about" is company ("About Brightway Recruitment"), one
+// starting "why" benefits ("Why Brightway?"), and a field's label details
 // ("Working Hours").
 func Of(key string) (Kind, bool) {
 	if kinds := All(key); len(kinds) > 0 {
@@ -116,7 +118,7 @@ func Of(key string) (Kind, bool) {
 // disagree, and Of chose between them.
 func All(key string) []Kind {
 	var kinds []Kind
-	for _, m := range heading.FindAll(key).Items() {
+	for _, m := range finder.FindAll(key).Items() {
 		if k := Kind(m.At("made").String()); !slices.Contains(kinds, k) {
 			kinds = append(kinds, k)
 		}
@@ -142,6 +144,9 @@ type Section struct {
 	// Heading is the heading that started it, as written; empty for the
 	// summary before the first heading.
 	Heading string `json:"heading,omitempty"`
+	// ByName is true when Heading had no cue to be a heading, and started
+	// the section by being exactly a kind's phrase.
+	ByName bool `json:"by_name,omitempty"`
 	// Parts are what follows: text, list items and fields. A heading
 	// followed at once by another has none.
 	Parts []headings.Part `json:"parts,omitempty"`
@@ -156,7 +161,8 @@ func Divide(parts []headings.Part) []Section {
 	sections := []Section{{Kind: Summary}}
 	for _, p := range parts {
 		if kind, ok := starts(p); ok {
-			sections = append(sections, Section{Kind: kind, Heading: p.Text})
+			byName := p.Role != headings.Heading
+			sections = append(sections, Section{Kind: kind, Heading: p.Text, ByName: byName})
 			continue
 		}
 		last := &sections[len(sections)-1]

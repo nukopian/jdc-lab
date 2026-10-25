@@ -7,8 +7,7 @@ import (
 
 // fold maps characters that vary between ads, but not in meaning, to one
 // form: typographic quotes and dashes to ASCII, unusual spaces to a space,
-// and bullets, emoji modifiers and invisible characters to nothing. Like
-// job-meta's punct, with the bullets and modifiers these ads use as well.
+// and bullets, emoji modifiers and invisible characters to nothing.
 // Runes are written as numbers so that none is invisible in the source.
 var fold = map[rune]string{
 	// Quotes and primes.

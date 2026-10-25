@@ -58,10 +58,11 @@ func (c counter) add(parts []headings.Part, role headings.Role) int {
 	return len(seen)
 }
 
-// spelt is how a part's heading or label is written.
+// spelt is how a part's heading or label is written: for a field, its text
+// without its value.
 func spelt(p headings.Part, role headings.Role) string {
 	if role == headings.Field {
-		return strings.TrimSpace(p.Text[:len(p.Text)-len(p.Value)])
+		return strings.TrimSpace(strings.TrimSuffix(p.Text, p.Value))
 	}
 	return p.Text
 }
@@ -139,22 +140,14 @@ func main() {
 func tally(source string) (heads, fields counter, s summary, err error) {
 	heads, fields = counter{}, counter{}
 	s.roles = map[headings.Role]int{}
-	in, err := os.Open(source)
-	if err != nil {
-		return nil, nil, s, err
-	}
-	defer in.Close()
-
-	seen := map[string]bool{}
-	for ad, err := range ads.All(in) {
+	var d ads.Distinct
+	for ad, err := range ads.File(source) {
 		if err != nil {
-			return nil, nil, s, fmt.Errorf("%s: %w", source, err)
+			return nil, nil, s, err
 		}
-		if seen[ad.HTML] {
-			s.duplicates++
+		if !d.First(ad) {
 			continue
 		}
-		seen[ad.HTML] = true
 		s.ads++
 
 		parts := headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...)
@@ -168,6 +161,7 @@ func tally(source string) (heads, fields counter, s summary, err error) {
 			s.none++
 		}
 	}
+	s.duplicates = d.Duplicates
 	return heads, fields, s, nil
 }
 
@@ -180,7 +174,11 @@ func (s summary) print(heads, fields counter, dir string) {
 	}
 	fmt.Printf("\n\n")
 	fmt.Printf("ads with no heading:     %d (%.0f%%)\n", s.none, pct(s.none, s.ads))
-	fmt.Printf("headings in an ad:       median %d\n", s.perAd[len(s.perAd)/2])
+	median := 0
+	if len(s.perAd) > 0 {
+		median = s.perAd[len(s.perAd)/2]
+	}
+	fmt.Printf("headings in an ad:       median %d\n", median)
 
 	rows := heads.rows()
 	total, once := 0, 0

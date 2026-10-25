@@ -161,8 +161,14 @@ func groups(titles []string) int {
 
 // similar reports whether two title keys are titles of the same job: the
 // words of one are all in the other, or they share at least half their
-// words between them.
+// words between them. A title with no words is like no other.
 func similar(a, b string) bool {
+	if a == b {
+		return true
+	}
+	if a == "" || b == "" {
+		return false
+	}
 	wa, wb := words(a), words(b)
 	shared := 0
 	for w := range wa {

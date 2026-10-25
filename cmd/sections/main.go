@@ -58,9 +58,9 @@ type heading struct {
 // tally is what's counted over all the ads.
 type tally struct {
 	ads, duplicates int
-	uses, mapped    int            // headings, and those that start a section
+	uses, mapped    int            // headings, and those of a known kind
 	named           map[string]int // lines of text that start a section by name alone
-	allMapped       int            // ads whose every heading starts a section
+	allMapped       int            // ads whose every heading is of a known kind
 	onlySummary     int            // ads with no section but the summary
 	kindAds         map[sections.Kind]int
 	kindChars       map[sections.Kind]int // characters of text in each kind
@@ -87,11 +87,6 @@ func main() {
 func run(source, dir string) (t tally, err error) {
 	t.kindAds, t.kindChars = map[sections.Kind]int{}, map[sections.Kind]int{}
 	t.headings, t.named = map[string]*heading{}, map[string]int{}
-	in, err := os.Open(source)
-	if err != nil {
-		return t, err
-	}
-	defer in.Close()
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return t, err
 	}
@@ -108,16 +103,14 @@ func run(source, dir string) (t tally, err error) {
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(false)
 
-	seen := map[string]bool{}
-	for ad, err := range ads.All(in) {
+	var d ads.Distinct
+	for ad, err := range ads.File(source) {
 		if err != nil {
-			return t, fmt.Errorf("%s: %w", source, err)
+			return t, err
 		}
-		if seen[ad.HTML] {
-			t.duplicates++
+		if !d.First(ad) {
 			continue
 		}
-		seen[ad.HTML] = true
 		parts := headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...)
 		ss := sections.Divide(parts)
 		t.add(ad.ID, parts, ss)
@@ -125,6 +118,7 @@ func run(source, dir string) (t tally, err error) {
 			return t, err
 		}
 	}
+	t.duplicates = d.Duplicates
 	return t, buf.Flush()
 }
 
@@ -155,9 +149,7 @@ func (t *tally) add(id string, parts []headings.Part, ss []sections.Section) {
 	kinds := map[sections.Kind]bool{}
 	for _, s := range ss {
 		kinds[s.Kind] = true
-		if s.Heading != "" && !slices.ContainsFunc(parts, func(p headings.Part) bool {
-			return p.Role == headings.Heading && p.Text == s.Heading
-		}) {
+		if s.ByName {
 			t.named[s.Heading]++
 		}
 		for _, p := range s.Parts {
@@ -178,7 +170,7 @@ func (t *tally) add(id string, parts []headings.Part, ss []sections.Section) {
 	}
 }
 
-// tables writes unmapped.tsv and disagree.tsv.
+// tables writes unmapped.tsv, disagree.tsv and named.tsv.
 func (t tally) tables(dir string) error {
 	keys := make([]string, 0, len(t.headings))
 	for k := range t.headings {
