@@ -439,6 +439,9 @@ first answer to whether retrieval can improve while embedding less.
 
 ## Known gaps
 
+What the pipeline doesn't do yet. [TODO.md](../TODO.md) has a plan for
+each, and a gap leaves this table when its task is done.
+
 | Gap | Effect | Likely fix |
 |---|---|---|
 | Walls of text | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
