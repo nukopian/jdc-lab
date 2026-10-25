@@ -59,11 +59,15 @@ print the table.
   each run of work, so `main` is never far behind.
 - There are no feature branches, for now: changes are made one at a
   time.
-- `TODO.md`, when there is one, lists work planned for a later session.
-  It's committed on `develop` and gone before a release, so it never
-  reaches `main`: each task is done, or moved to a GitHub issue, before
-  the release (see [Before committing](#before-committing) and
-  [Releases](#releases)).
+- Plans for the pipeline's known gaps live in PIPELINE.md's
+  [Known gaps](PIPELINE.md#known-gaps), one for each gap, where readers
+  of the pipeline find them, and go when the gap is closed.
+- `TODO.md`, when there is one, lists other work planned for a later
+  session, such as tasks from grammar's and scalar's sessions. It's
+  committed on `develop` and gone before a release, so it never reaches
+  `main`: each task is done, or, if it's a gap in the pipeline, moved
+  word for word into PIPELINE.md's plans (see
+  [Before committing](#before-committing) and [Releases](#releases)).
 
 `main` is protected on GitHub. Pushes to it need signed commits, a linear
 history (no merge commits) and CI passing on every job, and it can't be
@@ -399,8 +403,9 @@ release from `develop` in these steps. Claude asks before tagging.
    gitleaks git --redact --no-banner .
    ```
 
-   If `TODO.md` is there, its tasks come first: do them, or move each to
-   a GitHub issue, and delete the file before going on. `go.mod` names a
+   If `TODO.md` is there, its tasks come first: do them, or move a gap
+   in the pipeline word for word into PIPELINE.md's plans, with a row
+   in Known gaps linking to it, and delete the file before going on. `go.mod` names a
    grammar tag, such as `v0.2.0`, never a pseudo-version or a `replace`
    pointing at `../grammar`.
 

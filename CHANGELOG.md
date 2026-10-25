@@ -28,7 +28,9 @@ has the steps).
 - Branches and releases, as in grammar and scalar. Work happens on
   `develop`, where CI runs on every push, and `main` is the latest
   release, moved only by a fast-forward at a release, and protected.
-  `TODO.md` lives on `develop` and never reaches `main`. CI now runs the
+  `TODO.md` lives on `develop` and never reaches `main`, and the plans
+  for the pipeline's known gaps, which were in it, are now in
+  docs/PIPELINE.md, word for word, beside the gaps. CI now runs the
   Go checks and tests (gofmt, vet, the race detector, govulncheck) as
   well as the secret scan. docs/MAINTAINING.md has the branches and the
   release steps.
