@@ -9,9 +9,9 @@ requires 'perl', '5.036';
 
 requires 'Inline', '0.87';
 
-# 0.58 needs a one-line fix on macOS (upstream issue #44). Install it as
-# docs/SETUP.md describes first; cpanm then finds it already there.
-requires 'Inline::Python', '0.58';
+# Built against the Python that INLINE_PYTHON_EXECUTABLE names: the
+# venv's, as docs/SETUP.md says.
+requires 'Inline::Python', '0.59';
 
 # The lab's test toolchain, Test2 rather than Test::More, listed ahead of
 # the first test in perl/t. Test2::V0 comes with Test-Simple.

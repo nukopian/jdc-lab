@@ -262,11 +262,6 @@ Inline::Python is in the cpanfile by hand.
 
 Things learnt the hard way, kept here so they needn't be learnt again.
 
-- **Inline::Python must stay patched** until a release fixes issue #44.
-  On a fresh library, install it as [SETUP.md](SETUP.md#inlinepython)
-  says before `cpanm --installdeps --with-develop .`, which would
-  otherwise fetch the unpatched 0.58 and fail.
-  `cpanm --reinstall Inline::Python` breaks it the same way.
 - **Compiled modules may crash on macOS** since Xcode 27.1: a module
   with C or C++ code can build cleanly, then segfault. Rebuilding it
   with the `SDKROOT` and `MACOSX_DEPLOYMENT_TARGET` prefix from

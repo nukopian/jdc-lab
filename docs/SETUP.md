@@ -293,49 +293,28 @@ trips over this toolchain's `nm`, so `--notest` is still needed for
 perlbrew to finish. It needs about 12 GB of disk; the `SDKROOT` way
 needs nothing extra.
 
-### Inline::Python
+### The modules
 
-Inline::Python 0.58 doesn't link Python's library on macOS unless
-Python is Apple's own, so it fails all its tests and won't install
-([issue #44](https://github.com/niner/inline-python-pm/issues/44) has
-the cause and the fix). Until a fixed release is out, install it with
-that one-line fix applied. When one is, replace these steps with plain
-`cpanm Inline::Python`. In the lab's folder, with direnv on:
+Then install the lab's Perl modules, listed in the
+[`cpanfile`](../cpanfile), with the tools for working on the code. In
+the lab's folder, with direnv on:
 
 ```
-lab=$PWD
-cd "$(mktemp -d)"
-curl -sSL https://cpan.metacpan.org/authors/id/N/NI/NINE/Inline-Python-0.58.tar.gz | tar -xz
-cd Inline-Python-0.58
-old='(?:\.\Q$Config{dlext}\E|' \
-new='(?:\.\Q$Config{so}\E|\.\Q$Config{dlext}\E|' \
-perl -pi -e 's/\Q$ENV{old}\E/$ENV{new}/' Makefile.PL
-grep -c 'Config{so}' Makefile.PL
-INLINE_PYTHON_EXECUTABLE="$lab/.venv/bin/python3" cpanm -v .
-cd "$lab"
+INLINE_PYTHON_EXECUTABLE="$PWD/.venv/bin/python3" cpanm --installdeps --with-develop .
 ```
 
-The fix is the `perl` command, with the text before and after as `old`
-and `new`: in single quotes the shell leaves them alone, and `\Q...\E`
-makes Perl match the old text literally, so nothing in them needs
-escaping. `grep` prints `1` when the fix is in.
-`INLINE_PYTHON_EXECUTABLE` builds it against the venv's Python, without
-asking which one to use. The build links that Python's shared library,
-so after changing the lab's Python, install Inline::Python again.
-
-### The rest
-
-Then install the rest of the lab's Perl modules, listed in the
-[`cpanfile`](../cpanfile), with the tools for working on the code:
+That installs Inline::Python, the test toolchain (Test2::V0 and its
+plugins) and the tools (`yath`, `perlcritic`, `perltidy` and
+`scan-perl-prereqs`). Leave out `--with-develop` to skip the tools.
+`INLINE_PYTHON_EXECUTABLE` builds Inline::Python against the venv's
+Python: without it, Inline::Python asks which Python on the `PATH` to
+use, and cpanm answers with the first it finds. The build links that Python's shared
+library, so after changing the lab's Python, install Inline::Python
+again:
 
 ```
-cpanm --installdeps --with-develop .
+INLINE_PYTHON_EXECUTABLE="$PWD/.venv/bin/python3" cpanm --reinstall Inline::Python
 ```
-
-That installs the test toolchain (Test2::V0 and its plugins) and the
-tools (`yath`, `perlcritic`, `perltidy` and `scan-perl-prereqs`). Leave
-out `--with-develop` to skip the tools. It must come after
-Inline::Python: on its own, it would fetch the unpatched 0.58 and fail.
 
 ## Check it works
 

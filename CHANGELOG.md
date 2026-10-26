@@ -12,7 +12,9 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Setup installs Inline::Python 0.59 straight from CPAN: it carries the
+  macOS fix that 0.58 had to be patched with by hand, so one `cpanm`
+  command now installs all the lab's Perl modules.
 
 ## v0.3.2 (2026-10-25)
 
