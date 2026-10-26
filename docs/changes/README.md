@@ -69,6 +69,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Take up grammar v0.3.0 and scalar v0.6.0](2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md),
+  shipped, unreleased
 - [Check the rules on a second sample](2026-10-25-check-the-rules-on-a-second-sample.md)
   (roadmap 1), in progress
 - [Stop shift times passing as headings](2026-10-25-stop-shift-times-passing-as-headings.md)

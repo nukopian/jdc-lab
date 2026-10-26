@@ -12,7 +12,10 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.3.0, which changes nothing in grammar itself but brings
+  scalar from v0.5.9 to v0.6.0 (long numbers keep their digits, and `%`
+  and `++` follow Perl further). The pipeline's output is unchanged
+  ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md)).
 
 ## v0.3.4 (2026-10-26)
 

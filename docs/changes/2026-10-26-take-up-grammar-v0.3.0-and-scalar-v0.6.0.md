@@ -1,6 +1,14 @@
-# TODO
+# Take up grammar v0.3.0 and scalar v0.6.0
 
-## Take up grammar v0.3.0 and scalar v0.6.0
+**Status:** shipped, unreleased
+
+**Origin:** a TODO task from grammar's session (grammar 62136b8d57a65a8358f23887a01daec4d8cec929)
+
+**Started:** 2026-10-26, in 0ab27117ac1108a4f85bc7634d967ef0212ff372
+
+**Finished:** 2026-10-26
+
+## The plan
 
 **From:** grammar's session, 2026-10-26 (grammar 62136b8d57a65a8358f23887a01daec4d8cec929)
 **Waiting on:** nothing
@@ -40,3 +48,18 @@ GOWORK=off go run ./cmd/pipeline compare before after
 
 `go.mod` names grammar v0.3.0 and scalar v0.6.0, and the compare shows
 every stage unchanged, or the commit message says what changed and why.
+
+## What happened
+
+- **Outcome:** done. `go.mod` names grammar v0.3.0 and scalar v0.6.0,
+  `go test ./...` and `scripts/test-all.sh` pass, and the compare shows
+  every stage unchanged in all three runs (both samples and `all`).
+- **Changes from the plan:** the runs were named `pre-grammar-v030` and
+  `grammar-v030` rather than `before` and `after`, which held older
+  runs.
+- **Measurements:** `pipeline compare pre-grammar-v030 grammar-v030`,
+  both built with `GOWORK=off` against the published modules: blocks,
+  heading counts, sections and boilerplate unchanged, no heading newly
+  mapped or unmapped.
+- **Tried and reverted:** nothing.
+- **What's left:** nothing.
