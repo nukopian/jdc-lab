@@ -43,9 +43,9 @@ takes the match's positions, so it's done on the matches before
    once jdc-lab has tried it", set Waiting on to "nothing" and add what
    the lab found, especially anything grammar should change before
    the release; commit and push it there as a `docs:` commit. Keep the
-   lab's change uncommitted, or on `develop` only with `go.work`, until
-   grammar has released, then take up the release and say so in the
-   CHANGELOG.
+   lab's change uncommitted until grammar has released (CI builds
+   without `go.work`, and v0.3.1 has no `Overlap`), then take up the
+   release and commit it, saying so in the CHANGELOG.
 
 **How to check it's done:** grammar's task says the lab has tried it,
 and the lab's sections use `Overlap` with nested matches dropped, its
