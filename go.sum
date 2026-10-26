@@ -1,9 +1,9 @@
 github.com/dlclark/regexp2 v1.12.0 h1:0j4c5qQmnC6XOWNjP3PIXURXN2gWx76rd3KvgdPkCz8=
 github.com/dlclark/regexp2 v1.12.0/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
-github.com/nukopian/grammar v0.2.1 h1:/zpLA4Y5kgzU4VpTJzBI1dws/CZR3nLT+dTvv536nyo=
-github.com/nukopian/grammar v0.2.1/go.mod h1:g8MC7qQaTCFSpHtU+FXT5dF7XN/NALPsnLBNZotrqwM=
-github.com/nukopian/scalar v0.5.7 h1:iI64CDKEJkZagCMSosRgF0xH92wEjLKg2NuG+7LnP4U=
-github.com/nukopian/scalar v0.5.7/go.mod h1:QcGfKLMNBeQdkevywVW0MJ5upL7LlKLE/wY4yOsPkPk=
+github.com/nukopian/grammar v0.2.2 h1:jAlsWj/18y4cdFI3k3d6M/EBogN1wGn/ddo9PilWZlk=
+github.com/nukopian/grammar v0.2.2/go.mod h1:cpUvYck4Ex89Xf/5UhAEWOhGHfW9LBMKYDFyPCOmmgE=
+github.com/nukopian/scalar v0.5.9 h1:nb5HE199T+V372am1hUoUrWKTJPMh+sIvjXafFdHjlc=
+github.com/nukopian/scalar v0.5.9/go.mod h1:QcGfKLMNBeQdkevywVW0MJ5upL7LlKLE/wY4yOsPkPk=
 github.com/yalue/onnxruntime_go v1.38.0 h1:rbEIjA428hAv5QD71NpkH7TT/Sg89cAuj8bRuwt8ZxQ=
 github.com/yalue/onnxruntime_go v1.38.0/go.mod h1:b4X26A8pekNb1ACJ58wAXgNKeUCGEAQ9dmACut9Sm/4=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
