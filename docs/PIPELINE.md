@@ -233,9 +233,9 @@ equal opportunity, equal opportunities, diversity, ...,
 
 Legal's rule is, because "legal" in a heading more often names a job's
 field than a notice: "The successful Legal Secretary will have:" isn't
-one. This is the lab's reading of `=>`: grammar's, as Elasticsearch's,
-would keep the name as a phrase, so `internal/sections` reads the rules
-first, then builds its list without the names of the kinds so written.
+one. `internal/sections` asks grammar to read `=>` so, with its
+`MapOnly` option: by default, as in Elasticsearch, the name would be a
+phrase too.
 
 **"Why" first.** A heading starting "why" is benefits, whatever phrases
 are in it: it's a pitch to the reader, as in "Why join us?", and also

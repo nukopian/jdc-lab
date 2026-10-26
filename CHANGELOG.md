@@ -12,6 +12,11 @@ has the steps).
 
 ## Unreleased
 
+- grammar v0.3.1, whose `MapOnly` option reads a rule written
+  `phrases => kind` without making the kind a phrase, as the lab asked
+  for legal's rule. `internal/sections` now uses it, in place of reading
+  its rules twice; the pipeline's output is unchanged
+  ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md)).
 - The rules hold on the second sample. Headings of a known kind there
   rose from 73% of uses to 76%, as on the first (now 77%), and unmapped
   text fell from 16% to 13%, with new phrases and field labels and two

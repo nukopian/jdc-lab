@@ -108,8 +108,9 @@ gap is out of PIPELINE.md, and its figures are updated.
   Secretary will have:"), and one an agency. Matching against the ad's
   own title would have caught one, as the others word the job
   differently. Instead, legal's rule is now written `phrases => legal`,
-  which the lab reads as leaving the name out (grammar doesn't, so
-  `internal/sections` builds its list itself), with the only headings
+  which the lab reads as leaving the name out (grammar didn't, so
+  `internal/sections` built its list itself, until grammar v0.3.1's
+  `MapOnly`, suggested from here, did it for the lab), with the only headings
   that rightly relied on the word, "legal information" and "the legal
   bit" (10 ads each), as phrases. Compared on both samples, exactly the
   four headings moved: one to responsibilities, one to company, two to

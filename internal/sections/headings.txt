@@ -15,8 +15,9 @@
 # A rule written as phrases => section lists only the phrases: the
 # section's name isn't one of them, as it is in a rule without =>. Legal's
 # rule is written so, as "legal" in a heading more often names a job's
-# field ("Legal Secretary") than a notice. (This is the lab's reading:
-# grammar, as Elasticsearch, would take the name as a phrase too.)
+# field ("Legal Secretary") than a notice. (grammar reads => so with its
+# MapOnly option; without it, as Elasticsearch does, it would take the
+# name as a phrase too.)
 #
 # A heading with none of these phrases is a details heading if it's a
 # field's label ("Working Hours", followed by a list), as internal/headings
