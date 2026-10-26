@@ -20,7 +20,10 @@ has the steps).
   20 words, as such lines introduce lists. Boilerplate on the second
   sample fell from 13.3% to 12.5%: some job text had been counted as
   boilerplate only because it sat in unmapped sections, but some
-  benefits and application text is now filed under requirements
+  benefits and application text is now filed under requirements. And
+  "legal" alone is no longer a phrase, so a heading such as "The
+  successful Legal Secretary will have:" isn't taken for a legal notice:
+  a rule written `phrases => kind` leaves the kind's name out
   (roadmap 1; [record](docs/changes/2026-10-25-check-the-rules-on-a-second-sample.md)).
 - grammar v0.3.0, which changes nothing in grammar itself but brings
   scalar from v0.5.9 to v0.6.0 (long numbers keep their digits, and `%`

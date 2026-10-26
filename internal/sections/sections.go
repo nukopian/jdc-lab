@@ -11,6 +11,7 @@ package sections
 import (
 	_ "embed"
 	"fmt"
+	"regexp"
 	"slices"
 	"strings"
 
@@ -58,14 +59,36 @@ var (
 	rank   = map[Kind]int{}
 )
 
+// unnamed finds the kinds whose rule is written "phrases => kind", whose
+// name isn't one of their phrases.
+var unnamed = regexp.MustCompile(`(?m)^[^#\n]*=>\s*(\S+)\s*$`)
+
 func init() {
-	if err := phrases.AddRules(rules); err != nil {
+	// The rules are read as written first, then added to phrases with
+	// AddAs, which leaves out the name of each kind in unnamed: grammar's
+	// rules always make the name a phrase too.
+	read := grammar.NewWordList("rules")
+	if err := read.AddRules(rules); err != nil {
 		panic(fmt.Sprintf("sections: headings.txt: %v", err))
+	}
+	named := map[string]bool{}
+	for _, k := range read.Canonicals() {
+		named[k] = true
+	}
+	for _, m := range unnamed.FindAllStringSubmatch(rules, -1) {
+		delete(named, m[1])
+	}
+	for _, p := range read.Phrases() {
+		for _, k := range read.Canonical(p) {
+			if p != k || named[k] {
+				phrases.AddAs(k, p)
+			}
+		}
 	}
 	// Each rule's kind must be one of Kinds: a misspelt one would
 	// otherwise be a ninth kind of section, quietly. Its rank is where its
 	// first rule comes.
-	for i, k := range phrases.Canonicals() {
+	for i, k := range read.Canonicals() {
 		if !slices.Contains(Kinds, Kind(k)) {
 			panic(fmt.Sprintf("sections: headings.txt: %q is no kind of section", k))
 		}

@@ -83,6 +83,13 @@ func TestOf(t *testing.T) {
 		{"Recruitment Process", Apply},
 		{"What you need:", Requirements},
 		{"What you need to do now", Apply},
+		// Legal's name isn't one of its phrases: in a heading, it's more often a
+		// job's field than a notice.
+		{"Legal Information:", Legal},
+		{"The Legal Bit:", Legal},
+		{"As a Temporary Legal Secretary, your day-to-day tasks will include:", Responsibilities},
+		{"About Brightway Legal Recruitment", Company},
+		{"Temp Legal Secretary", ""},
 		{"Software Development", ""},
 		{"Your impact", ""},
 	}
@@ -122,9 +129,16 @@ func TestRules(t *testing.T) {
 		t.Errorf("phrases with more than one kind: %v", amb)
 	}
 	for _, k := range Kinds {
-		if _, ok := Named(string(k)); !ok && k != Unmapped {
+		if _, ok := rank[k]; !ok && k != Unmapped {
 			t.Errorf("kind %q has no rule", k)
 		}
+	}
+	// A rule written with => leaves out its kind's name.
+	if k, ok := Named("legal"); ok {
+		t.Errorf(`"legal" is a phrase, of %q`, k)
+	}
+	if k, ok := Named("benefits"); !ok || k != Benefits {
+		t.Errorf(`"benefits" = %q, %t; want benefits`, k, ok)
 	}
 }
 

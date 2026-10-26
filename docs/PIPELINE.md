@@ -222,6 +222,21 @@ anywhere in a heading's key, as whole words, in any case, and in the
 plural ("duty" finds "Main Duties"). So adding a synonym means adding a
 phrase to the file, not changing code.
 
+**A kind's name is a phrase too,** as "benefits" is in the rule above,
+unless its rule is written the other way round, phrases first and
+`=> kind` at the end:
+
+```
+equal opportunity, equal opportunities, diversity, ...,
+	legal information, the legal bit => legal
+```
+
+Legal's rule is, because "legal" in a heading more often names a job's
+field than a notice: "The successful Legal Secretary will have:" isn't
+one. This is the lab's reading of `=>`: grammar's, as Elasticsearch's,
+would keep the name as a phrase, so `internal/sections` reads the rules
+first, then builds its list without the names of the kinds so written.
+
 **"Why" first.** A heading starting "why" is benefits, whatever phrases
 are in it: it's a pitch to the reader, as in "Why join us?", and also
 "Why you'll love this role" or "Why should you apply?", whose phrases
@@ -484,7 +499,7 @@ section but the summary, 5% and 4%.
 | benefits | 13% | 12% | 12% | 32% | 30% | 33% |
 | company | 5% | 3% | 3% | 46% | 28% | 39% |
 | apply | 3% | 3% | 3% | 37% | 42% | 44% |
-| legal | 1% | 1% | 1% | 76% | 69% | 74% |
+| legal | 1% | 1% | 1% | 77% | 69% | 75% |
 | details | 2% | 2% | 2% | 9% | 15% | 14% |
 | unmapped | 13% | 13% | 13% | 17% | 19% | 20% |
 
@@ -517,6 +532,7 @@ requirements, as footers are, and counted as template too (see
 | Evidence first, decisions later | Blocks record cues; headings decide. Each decision can be measured and changed alone. |
 | Text kept, keys normalised | Grammars later need the text as written (`£`, `–`); matching needs one form. |
 | Phrases as data, canonical first | Synonyms are edited, not coded, in the format search engines use. |
+| Legal's name isn't a phrase | In headings, "legal" is more often a job's field ("Legal Secretary") than a notice. |
 | Rule order as ranking | Which kind wins is data too, changed by moving a line. |
 | "Why" headings are benefits | They pitch the job to the reader, whatever words follow "why". |
 | Unmapped and details sections | So what's left to map shows, and the job's terms are kept together for grammars. |

@@ -12,6 +12,12 @@
 # skills" is desirable, not requirements, and "What our client offers" is
 # benefits, not company.
 #
+# A rule written as phrases => section lists only the phrases: the
+# section's name isn't one of them, as it is in a rule without =>. Legal's
+# rule is written so, as "legal" in a heading more often names a job's
+# field ("Legal Secretary") than a notice. (This is the lab's reading:
+# grammar, as Elasticsearch, would take the name as a phrase too.)
+#
 # A heading with none of these phrases is a details heading if it's a
 # field's label ("Working Hours", followed by a list), as internal/headings
 # knows them, and otherwise starts an unmapped section: the headings to
@@ -29,11 +35,11 @@ benefits, benefit, perk, offer, offering, what's on offer, on offer,
 	training, training and development, salary & benefits,
 	what you'll receive, you'll receive, you will receive
 
-legal, equal opportunity, equal opportunities, diversity, inclusion,
+equal opportunity, equal opportunities, diversity, inclusion,
 	equality, safeguarding, dbs, sponsorship, no sponsorship available,
 	right to work, gdpr, privacy, data protection, disclaimer,
 	uk applicants only, rehabilitation of offenders, disability confident,
-	reasonable adjustments, adjustments
+	reasonable adjustments, adjustments, legal information, the legal bit => legal
 
 requirements, requirement, what we're looking for, what we are looking for,
 	who we're looking for, who we are looking for, we're looking for, looking for,

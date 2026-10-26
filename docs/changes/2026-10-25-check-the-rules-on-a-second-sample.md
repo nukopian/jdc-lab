@@ -101,6 +101,21 @@ gap is out of PIPELINE.md, and its figures are updated.
   rule order. Added afterwards, "what you need" took 16 headings to
   requirements, all rightly, one of them from apply: "What you need to
   apply for the …:", which lists requirements.
+- **Legal's name, put right too:** each rule's first word, the kind's
+  name, was one of its phrases, so the word "legal" anywhere in a
+  heading made it a legal notice. Four headings in both samples had it
+  for another reason: three name the job ("The successful Legal
+  Secretary will have:"), and one an agency. Matching against the ad's
+  own title would have caught one, as the others word the job
+  differently. Instead, legal's rule is now written `phrases => legal`,
+  which the lab reads as leaving the name out (grammar doesn't, so
+  `internal/sections` builds its list itself), with the only headings
+  that rightly relied on the word, "legal information" and "the legal
+  bit" (10 ads each), as phrases. Compared on both samples, exactly the
+  four headings moved: one to responsibilities, one to company, two to
+  unmapped, as no phrase fits "Temp Legal Secretary" or "The
+  successful Legal Secretary will have:". Legal's boilerplate share
+  rose a point on the first sample, 76% to 77%.
 - **Tried and kept apart:** lines of job terms, such as
   "Permanent | Full-Time" (16 ads) as a heading, weren't made details:
   the text under them is a summary.
@@ -114,11 +129,6 @@ gap is out of PIPELINE.md, and its figures are updated.
     us and be successful in this role you will need:" is
     responsibilities: "in this role you will" takes the words that "you
     will need" would have matched.
-  - Each rule's first word, the kind's name, is one of its phrases
-    too, so the word "legal" anywhere in a heading makes it a legal
-    notice. Where it names the job, as in "The successful Legal
-    Secretary will have:", that's wrong: three headings in both
-    samples, which should be requirements or responsibilities.
   - "What to expect from our recruitment process:" (apply) and "What to
     Expect from …:" (an agency's pitch) are responsibilities, one ad
     each.
