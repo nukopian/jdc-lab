@@ -15,14 +15,23 @@ names the part of the lab's question it serves:
 - **search:** whether any of it makes search better, for less;
 - **deployment:** running it all from Go.
 
-Items come in three groups, the most useful first in each:
+Items come in four groups, the most useful first in each:
 
 - **Now:** being worked on, each with a plan detailed enough to pick up
   cold; never more than three, so that it stays a queue;
 - **Next:** decided, but not started;
-- **Later:** ideas worth keeping.
+- **Later:** meant to be done, but not yet planned;
+- **Ideas:** might be done, or never; kept so they aren't lost, in a
+  line or two, newest last.
 
-When an item ships, it moves from here to the CHANGELOG. Unless a plan
+Each item has a number, given when it's added, in whichever group. It
+keeps it as it moves between groups, and a number is never used again,
+so that 7 means the same item in a commit message months later. Next
+number: 12.
+
+When an item ships, it moves from here to the CHANGELOG, whose line
+for it ends with its number, such as "(roadmap 7)". An idea that's
+dropped is deleted, and the commit that drops it names its number. Unless a plan
 says otherwise, its figures are from the first sample, `ads-20261024`
 (1,890 distinct ads), and its commands run from the lab's folder, with
 `RUN` standing for a run's name (see
@@ -30,7 +39,7 @@ says otherwise, its figures are from the first sample, `ads-20261024`
 
 ## Now
 
-### Check the rules on a second sample
+### 1. Check the rules on a second sample
 
 **Serves:** structure
 
@@ -69,7 +78,7 @@ business has a strong presence across:", so check each in context.
 first's 76%, neither sample's figures got worse, the lone conjunctions
 gap is out of PIPELINE.md, and its figures are updated.
 
-### Stop shift times passing as headings
+### 2. Stop shift times passing as headings
 
 **Serves:** structure
 
@@ -94,7 +103,7 @@ other heading was lost (compare the table before and after).
 
 ## Next
 
-### Find near-duplicate boilerplate
+### 3. Find near-duplicate boilerplate
 
 **Serves:** structure, embeddings: what isn't found as boilerplate gets embedded
 
@@ -131,7 +140,7 @@ remeasured, a sample of the newly found texts has been checked by eye
 to be standard text and not job text, tests cover the matching, and
 PIPELINE.md describes it.
 
-### Catch footers filed under requirements
+### 4. Catch footers filed under requirements
 
 **Serves:** structure, embeddings
 
@@ -164,7 +173,7 @@ five groups or more is already boilerplate wherever it is.
 job has become boilerplate (check the newly flipped texts by eye), a
 test covers it, and PIPELINE.md's figures are updated.
 
-### Split walls of text into sentences
+### 5. Split walls of text into sentences
 
 **Serves:** structure
 
@@ -200,7 +209,7 @@ no full stop between them.
 them, boilerplate found in them), tests cover the splitting with
 made-up text in the shapes seen, and PIPELINE.md has the new stage.
 
-### Find headings written as plain lines
+### 6. Find headings written as plain lines
 
 **Serves:** structure
 
@@ -226,7 +235,7 @@ ones by eye), and tests cover it.
 
 ## Later
 
-### Facts from the details
+### 7. Facts from the details
 
 **Serves:** metadata
 
@@ -235,7 +244,7 @@ in an ad's details sections and fields: salary and its period, hours,
 working pattern, contract type and location, as metadata with definite
 values, so that search can filter on them and they needn't be embedded.
 
-### Skills and occupations as taxonomy links
+### 8. Skills and occupations as taxonomy links
 
 **Serves:** taxonomies
 
@@ -243,7 +252,7 @@ Link the skills in requirements, and the job itself, to taxonomies of
 skills and occupations, so that search can match on what a job needs
 rather than on how its ad words it.
 
-### A fair test of embedding models
+### 9. A fair test of embedding models
 
 **Serves:** embeddings
 
@@ -253,7 +262,7 @@ prefixes E5 is trained with, on many headings and sections rather than
 one, and with other small local models beside them. Separation between
 kinds matters more than the scores themselves.
 
-### Does it make search better?
+### 10. Does it make search better?
 
 **Serves:** search
 
@@ -263,10 +272,16 @@ embeddings of its chosen sections, with and without metadata to filter
 on, and against a managed embedding service. This is what answers the
 lab's question.
 
-### Embeddings from Go
+### 11. Embeddings from Go
 
 **Serves:** deployment
 
 Run the chosen model from Go with ONNX Runtime over the sections worth
 embedding, as the ONNX demo does for its toy model, so that nothing in
 the pipeline needs a Python service.
+
+## Ideas
+
+None yet. An idea is a numbered heading, the date it was added, and a
+line or two on what and why. Each wash-up prunes them: each is kept,
+promoted to Later or Next with its number, or dropped.

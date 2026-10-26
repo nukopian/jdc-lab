@@ -61,12 +61,19 @@ print the table.
   time.
 - [ROADMAP.md](../ROADMAP.md) holds what the lab means to do: features
   and outcomes, in Now, Next and Later, each saying which of the lab's
-  questions it serves. It's public, on both branches, and in every
-  release. Now holds three items at most, so the roadmap stays a queue
-  to pull from, not a list pushing work. Each item in Now has a plan
-  written to be picked up cold, and an item leaves when it ships, in
-  the commit that adds it to the CHANGELOG. Each of the pipeline's
-  [Known gaps](PIPELINE.md#known-gaps) links to its item.
+  questions it serves, and Ideas, kept so they aren't lost. It's
+  public, on both branches, and in every release. Now holds three items
+  at most, so the roadmap stays a queue to pull from, not a list
+  pushing work. Each item in Now has a plan written to be picked up
+  cold, and an item leaves when it ships, in the commit that adds it to
+  the CHANGELOG, whose line ends "(roadmap 7)". Every item has a
+  number, the next one when it's added (the roadmap's opening says
+  which), kept as it moves between groups and never used again; a
+  heading such as `### 7. Title` holds it, as a Markdown numbered list
+  would renumber itself. An idea is that heading, the date it was
+  added, and a line or two; ideas need no Serves line until promoted,
+  and are added in a `docs:` commit whenever one comes up. Each of the
+  pipeline's [Known gaps](PIPELINE.md#known-gaps) links to its item.
 - `TODO.md`, when there is one, lists tasks for the next session: the
   concrete steps of an item being worked on, or tasks from grammar's
   and scalar's sessions. Its tasks come before the roadmap's items. It's
@@ -390,7 +397,10 @@ release from `develop` in these steps. Claude asks before tagging.
    and note the worst in the release's entry. Check the README's Where
    it stands against the work since the last tag, as it's what
    visitors to `main` read first, and ROADMAP.md: what shipped is out of
-   it, and Now is what's really being worked on. A wash-up is also worth
+   it, and Now is what's really being worked on. Prune the Ideas: list
+   them by number, and the maintainer keeps, promotes or drops each. A
+   promoted idea keeps its number and gains a Serves line; a dropped
+   one is deleted, and the commit message names its number. A wash-up is also worth
    doing whenever a run of work comes to a natural close.
 
 1. **Check `develop`:** CI is green on its last commit, there's no

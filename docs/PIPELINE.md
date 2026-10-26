@@ -518,12 +518,12 @@ figures in [What it measured](#what-it-measured) are updated.
 
 | Gap | Effect | Likely fix |
 |---|---|---|
-| [Walls of text](../ROADMAP.md#split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
-| [Near-duplicate boilerplate](../ROADMAP.md#find-near-duplicate-boilerplate) | Standard text with a job title or place swapped in doesn't match word for word, which likely hides boilerplate in summaries | Fuzzy matching, such as shingles or MinHash |
-| [Footers under few title groups](../ROADMAP.md#catch-footers-filed-under-requirements) | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
-| [Plain lines without cues](../ROADMAP.md#find-headings-written-as-plain-lines) | Only exact phrases are taken as headings | More evidence from the following text |
-| [Shift times as headings](../ROADMAP.md#stop-shift-times-passing-as-headings) | "2:00pm–10:00pm" in bold passes as a heading | A rule for times |
-| [Lone conjunctions as headings](../ROADMAP.md#check-the-rules-on-a-second-sample) | "OR" or "and" alone in bold, between list items, is taken for a heading, and what follows it for an unmapped section | A heading needs a word that isn't a conjunction |
+| [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
+| [Near-duplicate boilerplate](../ROADMAP.md#3-find-near-duplicate-boilerplate) | Standard text with a job title or place swapped in doesn't match word for word, which likely hides boilerplate in summaries | Fuzzy matching, such as shingles or MinHash |
+| [Footers under few title groups](../ROADMAP.md#4-catch-footers-filed-under-requirements) | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
+| [Plain lines without cues](../ROADMAP.md#6-find-headings-written-as-plain-lines) | Only exact phrases are taken as headings | More evidence from the following text |
+| [Shift times as headings](../ROADMAP.md#2-stop-shift-times-passing-as-headings) | "2:00pm–10:00pm" in bold passes as a heading | A rule for times |
+| [Lone conjunctions as headings](../ROADMAP.md#1-check-the-rules-on-a-second-sample) | "OR" or "and" alone in bold, between list items, is taken for a heading, and what follows it for an unmapped section | A heading needs a word that isn't a conjunction |
 
 ## Words used here
 
