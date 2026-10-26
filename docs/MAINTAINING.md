@@ -65,8 +65,9 @@ print the table.
   public, on both branches, and in every release. Now holds three items
   at most, so the roadmap stays a queue to pull from, not a list
   pushing work. Each item in Now has a plan written to be picked up
-  cold, and an item leaves when it ships, in the commit that adds it to
-  the CHANGELOG, whose line ends "(roadmap 7)". Every item has a
+  cold, in its change record, and an item leaves when it ships, in the
+  commit that adds it to the CHANGELOG, whose line ends "(roadmap 7)"
+  and links to the record. Every item has a
   number, the next one when it's added (the roadmap's opening says
   which), kept as it moves between groups and never used again; a
   heading such as `### 7. Title` holds it, as a Markdown numbered list
@@ -74,6 +75,13 @@ print the table.
   added, and a line or two; ideas need no Serves line until promoted,
   and are added in a `docs:` commit whenever one comes up. Each of the
   pipeline's [Known gaps](PIPELINE.md#known-gaps) links to its item.
+- [docs/changes/](changes/README.md) holds a record of each planned
+  change: the plan as it was written, and what happened, with changes
+  from the plan, measurements, and what was tried and reverted. A
+  record is opened when work starts on a roadmap item or a `TODO.md`
+  task with steps, named for that day and the change, and finished in
+  the commit that ships or drops it; its README has the rules and the
+  template.
 - `TODO.md`, when there is one, lists tasks for the next session: the
   concrete steps of an item being worked on, or tasks from grammar's
   and scalar's sessions. Its tasks come before the roadmap's items. It's
@@ -426,8 +434,16 @@ release from `develop` in these steps. Claude asks before tagging.
 2. **Turn Unreleased into the release** in CHANGELOG.md: rename the
    heading to the version and date, as in `## v0.3.0 (2026-10-26)`,
    start the entry with a one-line title (it becomes the tag's title),
-   and add an Unreleased above it, saying `Nothing yet.` Commit
-   (`docs: v0.3.0's entry in the CHANGELOG`), push, and wait for CI.
+   and add an Unreleased above it, saying `Nothing yet.` In each change
+   record whose status is "shipped, unreleased", and its line in the
+   records' README, put the version in its place, as in "shipped in
+   v0.3.0"; the `grep` lists both, and nothing once they're done.
+   Commit (`docs: v0.3.0's entry in the CHANGELOG`), push, and wait
+   for CI.
+
+   ```
+   grep -n 'shipped, unreleased$' docs/changes/*.md
+   ```
 
 3. **Write the tag message from the entry,** and read it. The entry is
    also the GitHub release's notes, and the tag message is the same with

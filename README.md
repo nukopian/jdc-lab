@@ -84,6 +84,7 @@ apart. Everything in the repository, folder by folder:
 | `cmd/`, `internal/` | Go programs and packages |
 | `perl/bin/`, `perl/lib/`, `perl/t/` | Optional Perl programs, the lab's Perl modules, and their tests |
 | `docs/` | [PIPELINE.md](docs/PIPELINE.md), [SETUP.md](docs/SETUP.md) and [MAINTAINING.md](docs/MAINTAINING.md), and the PDFs' style sheet |
+| `docs/changes/` | A [record](docs/changes/README.md) of each planned change: the plan, and what happened |
 | `scripts/` | Scripts for the repository itself: running every language's tests, and building the PDFs |
 | `.github/workflows/` | CI on every push: the Go checks and tests, and the secret scan |
 

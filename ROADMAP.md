@@ -18,7 +18,8 @@ names the part of the lab's question it serves:
 Items come in four groups, the most useful first in each:
 
 - **Now:** being worked on, each with a plan detailed enough to pick up
-  cold; never more than three, so that it stays a queue;
+  cold, in its [change record](docs/changes/README.md); never more than
+  three, so that it stays a queue;
 - **Next:** decided, but not started;
 - **Later:** meant to be done, but not yet planned;
 - **Ideas:** might be done, or never; kept so they aren't lost, in a
@@ -30,7 +31,8 @@ so that 7 means the same item in a commit message months later. Next
 number: 12.
 
 When an item ships, it moves from here to the CHANGELOG, whose line
-for it ends with its number, such as "(roadmap 7)". An idea that's
+for it ends with its number, such as "(roadmap 7)", and links to its
+record. An idea that's
 dropped is deleted, and the commit that drops it names its number. Unless a plan
 says otherwise, its figures are from the first sample, `ads-20261024`
 (1,890 distinct ads), and its commands run from the lab's folder, with
@@ -43,63 +45,17 @@ says otherwise, its figures are from the first sample, `ads-20261024`
 
 **Serves:** structure
 
-**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
-**Waiting on:** nothing
-
-**What:** work down the second sample's unmapped table, and change any
-rule that fitted only the first.
-
-**Why:** every rule, phrase and threshold was tuned on the first
-sample, which leans towards education jobs. The second leans towards
-vehicle jobs.
-
-**What's known:** both samples are in `data/ingestion/`, and their
-figures in PIPELINE.md's What it measured. The rules mostly hold. Where
-they don't: heading uses of a known kind fall from 76% to 73%, unmapped
-text rises from 14% to 16%, and a quarter of that is boilerplate. The
-biggest unmapped heading is "and" (39 ads, 82,000 characters), with
-"OR" beside it: one advertiser's template puts them alone in bold
-between requirements (Known gaps: lone conjunctions). Then phrases
-that look like kinds: "who thrives here", "what to expect", "the
-business", "what is in it for you", "vacancy type", "working
-arrangement", "important notice". "The business" also maps "The
-business has a strong presence across:", so check each in context.
-
-**Steps:**
-
-1. `go run ./cmd/pipeline run before`.
-2. Stop a lone conjunction passing as a heading, in
-   `internal/headings`, with a case in `TestRead`.
-3. Work down `data/runs/before/ads-20261025/sections/unmapped.tsv` as
-   PIPELINE.md's Improving it says, comparing each change on every
-   sample.
-
-**Done when** the second sample's known headings are at least the
-first's 76%, neither sample's figures got worse, the lone conjunctions
-gap is out of PIPELINE.md, and its figures are updated.
+Work down the second sample's unmapped table, and change any rule that
+fitted only the first. The plan, and how it's going, are in its
+[record](docs/changes/2026-10-25-check-the-rules-on-a-second-sample.md).
 
 ### 2. Stop shift times passing as headings
 
 **Serves:** structure
 
-**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
-**Waiting on:** nothing
-
-**What:** don't take a bold time range, such as "2:00pm–10:00pm", for a
-heading.
-
-**Why:** it starts a section of no known kind, splitting the section
-it's in.
-
-**What's known:** `headingShaped` refuses money and runs of three
-digits or more, but a time has only pairs. The headings with figures in
-are listed by a command in PIPELINE.md's Improving it.
-
-**Steps:** in `internal/headings`, refuse text whose key is mostly
-times (digits with am or pm, or hh:mm); add cases to `TestRead`.
-
-**Done when** no time range is in `data/runs/RUN/all/headings/headings.tsv`, and no
-other heading was lost (compare the table before and after).
+Don't take a bold time range, such as "2:00pm–10:00pm", for a
+heading. The plan, and how it's going, are in its
+[record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md).
 
 ## Next
 

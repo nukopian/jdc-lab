@@ -31,7 +31,8 @@ build() {
 }
 
 if [ $# -eq 0 ]; then
-	for doc in README.md CHANGELOG.md ROADMAP.md docs/PIPELINE.md docs/SETUP.md docs/MAINTAINING.md; do
+	cd "$root" # for the change records' glob
+	for doc in README.md CHANGELOG.md ROADMAP.md docs/PIPELINE.md docs/SETUP.md docs/MAINTAINING.md docs/changes/*.md; do
 		build "$root/$doc" "$root/${doc%.md}.pdf"
 	done
 else

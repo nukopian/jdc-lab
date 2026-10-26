@@ -18,6 +18,12 @@ has the steps).
   used again, so an item can be named by number, in pruning and in the
   CHANGELOG ("(roadmap 7)"). Later now means meant to be done, but not
   yet planned. Wash-ups prune the ideas.
+- Each planned change keeps a record in
+  [docs/changes/](docs/changes/README.md), opened when work starts: the
+  plan as it was written, then what happened, with changes from the
+  plan, measurements, and what was tried and reverted. The roadmap's
+  Now items keep a paragraph and a link to theirs, and the CHANGELOG
+  links to it when the change ships.
 - grammar v0.2.4, whose limit errors from `ParseErr` say where they
   stopped; the lab doesn't call it, and the pipeline's output is
   unchanged. It still needs scalar v0.5.9.
