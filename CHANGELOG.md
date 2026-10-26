@@ -15,6 +15,9 @@ has the steps).
 - Setup installs Inline::Python 0.59 straight from CPAN: it carries the
   macOS fix that 0.58 had to be patched with by hand, so one `cpanm`
   command now installs all the lab's Perl modules.
+- grammar v0.2.2, which changes nothing in grammar itself but brings
+  scalar from v0.5.7 to v0.5.9 (faster substitution with replacement
+  strings). The pipeline's output is unchanged.
 
 ## v0.3.2 (2026-10-25)
 
