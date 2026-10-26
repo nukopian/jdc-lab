@@ -308,9 +308,9 @@ plugins) and the tools (`yath`, `perlcritic`, `perltidy` and
 `scan-perl-prereqs`). Leave out `--with-develop` to skip the tools.
 `INLINE_PYTHON_EXECUTABLE` builds Inline::Python against the venv's
 Python: without it, Inline::Python asks which Python on the `PATH` to
-use, and cpanm answers with the first it finds. The build links that Python's shared
-library, so after changing the lab's Python, install Inline::Python
-again:
+use, and cpanm answers with the first it finds. The build links that
+Python's shared library, so after changing the lab's Python, install
+Inline::Python again:
 
 ```
 INLINE_PYTHON_EXECUTABLE="$PWD/.venv/bin/python3" cpanm --reinstall Inline::Python

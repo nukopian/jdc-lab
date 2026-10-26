@@ -246,7 +246,9 @@ The [`cpanfile`](../cpanfile), at the root beside `requirements.txt` and
   starts or stops using a module.
 
 To check it, list the CPAN modules the code loads, compare that with
-the cpanfile, then run `cpanm --installdeps --with-develop .` again.
+the cpanfile, then run SETUP.md's
+[`cpanm --installdeps`](SETUP.md#the-modules) again, with
+`INLINE_PYTHON_EXECUTABLE`, in case it upgrades Inline::Python.
 `scan-perl-prereqs`, from Perl::PrereqScanner, reads the code properly,
 leaving out modules that ship with Perl:
 
