@@ -50,9 +50,9 @@ gap is out of PIPELINE.md, and its figures are updated.
 ## What happened
 
 - **Outcome:** done. Headings of a known kind on the second sample went
-  from 73.4% of uses to 75.9% (12,198 of 16,062), past the first
-  sample's 75.7% when the plan was written; the first rose to 76.6%
-  (5,311 of 6,929). Unmapped text fell from 16% to 13% on the second,
+  from 73.4% of uses to 76.0% (12,212 of 16,062), past the first
+  sample's 75.7% when the plan was written; the first rose to 76.7%
+  (5,313 of 6,929). Unmapped text fell from 16% to 13% on the second,
   and 14% to 13% on the first. No heading of a known kind became
   unmapped on either. The lone conjunctions gap is out of PIPELINE.md,
   and its figures are updated. One figure fell, boilerplate on the
@@ -71,8 +71,8 @@ gap is out of PIPELINE.md, and its figures are updated.
     conjunction (and, or, either, nor, but, plus); `MaxIntroWords`; the
     field labels "vacancy type", "working arrangement(s)", "hybrid
     working" and "reports to".
-  - `headings.txt`: requirements "who thrives here", "candidate(s)
-    who", "teacher(s) who", "must have", "what we need", "qualities",
+  - `headings.txt`: requirements "who thrives here", "what you
+    need", "candidate(s) who", "teacher(s) who", "must have", "what we need", "qualities",
     "licence", "certification", "eligible"; benefits "what is in it for
     you", "what you can expect"; responsibilities "what to expect";
     company "the business", "our business", "the school"; apply
@@ -82,7 +82,7 @@ gap is out of PIPELINE.md, and its figures are updated.
     where they belong.
 - **Measurements:** runs `before` and `now` (the same as `after`) on
   2026-10-26. Boilerplate on the second sample fell 0.8 points, and
-  template rose from 2.6% to 3.2%: 35 repeated texts, 72,000
+  template rose from 2.6% to 3.3%: 35 repeated texts, 72,000
   characters, went from boilerplate to template, all of them from
   unmapped sections into known ones. About 41,000 characters of it is
   right: job text repeated across one advertiser's related jobs, under
@@ -93,9 +93,15 @@ gap is out of PIPELINE.md, and its figures are updated.
   into its licence requirement with no break in the HTML, now under
   requirements, with no heading of their own. On the first sample,
   boilerplate is unchanged at 13.2%.
-- **Tried and kept apart:** "what you need" for requirements would also
-  take "What you need to do now" (36 ads, apply), as requirements'
-  rule comes first; it wasn't added. Lines of job terms, such as
+- **A wrong turn, put right:** "what you need" was first left out, on
+  the belief that it would also take "What you need to do now" (36
+  ads, apply) to requirements, whose rule comes first. That was never
+  tested, and it's wrong: where two phrases start at the same word, the
+  longer is found, so "what you need to do now" is apply whatever the
+  rule order. Added afterwards, "what you need" took 16 headings to
+  requirements, all rightly, one of them from apply: "What you need to
+  apply for the …:", which lists requirements.
+- **Tried and kept apart:** lines of job terms, such as
   "Permanent | Full-Time" (16 ads) as a heading, weren't made details:
   the text under them is a summary.
 - **What's left:**
@@ -103,12 +109,16 @@ gap is out of PIPELINE.md, and its figures are updated.
     template, as footers do
     ([roadmap 4](../../ROADMAP.md#4-catch-footers-filed-under-requirements)),
     though here it isn't at the end of the ad.
-  - Phrases are found leftmost first, without overlapping, so "To join
+  - Phrases are found leftmost first, without overlapping (the longest
+    where two start at the same word), so "To join
     us and be successful in this role you will need:" is
     responsibilities: "in this role you will" takes the words that "you
     will need" would have matched.
-  - A kind's own name is one of its phrases, so "Legal Secretary" in a
-    heading makes it legal (three headings in both samples).
+  - Each rule's first word, the kind's name, is one of its phrases
+    too, so the word "legal" anywhere in a heading makes it a legal
+    notice. Where it names the job, as in "The successful Legal
+    Secretary will have:", that's wrong: three headings in both
+    samples, which should be requirements or responsibilities.
   - "What to expect from our recruitment process:" (apply) and "What to
     Expect from …:" (an agency's pitch) are responsibilities, one ad
     each.

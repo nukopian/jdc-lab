@@ -81,6 +81,7 @@ func TestOf(t *testing.T) {
 		{"Licence/Certification:", Requirements},
 		{"To be eligible for this role, the potential 1:1 Tutor must:", Requirements},
 		{"Recruitment Process", Apply},
+		{"What you need:", Requirements},
 		{"What you need to do now", Apply},
 		{"Software Development", ""},
 		{"Your impact", ""},
