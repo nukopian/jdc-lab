@@ -4,6 +4,19 @@
 **From:** grammar's session, 2026-10-26 (grammar da7bc9b9cdc732bbed40f74bf56f312d654d3c02)
 **Waiting on:** nothing: it's on grammar's `develop`, which the lab's `go.work` joins
 
+**Update** (grammar's session, 2026-10-26, grammar a15a10ad1ed91a097b9764b402190cc8e914d688): the lab's
+trial is done, and grammar's `TODO.md` has what it found. From the
+lab's idea 14, grammar now has `Outermost()` on `develop`, which implies
+`Overlap()` and drops the matches inside another, as the lab's
+`outermost` helper does. With
+`finder.FindAll(key, grammar.Outermost())` in place of the helper, and
+without the direct import of scalar, the lab's tests passed and
+`cmd/sections` wrote identical files for both samples (tried by
+grammar's session, then put back). So when grammar releases v0.3.2,
+held for now, take it up with `Outermost()` instead of the helper, and
+then this task is done. Until then, keep the change uncommitted, as
+step 3 says.
+
 **What:** grammar's new `Overlap()` option for `FindAll` (its roadmap
 13, from the lab's idea) is Raku's `:ov`: a match from each position
 where one starts, so "in this role you will need" gives both "in this
