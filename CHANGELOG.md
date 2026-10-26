@@ -18,6 +18,9 @@ has the steps).
   used again, so an item can be named by number, in pruning and in the
   CHANGELOG ("(roadmap 7)"). Later now means meant to be done, but not
   yet planned. Wash-ups prune the ideas.
+- grammar v0.2.4, whose limit errors from `ParseErr` say where they
+  stopped; the lab doesn't call it, and the pipeline's output is
+  unchanged. It still needs scalar v0.5.9.
 
 ## v0.3.3 (2026-10-26)
 
