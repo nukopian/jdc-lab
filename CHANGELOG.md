@@ -12,6 +12,18 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.3.4 (2026-10-26)
+
+A numbered roadmap, and a record of each change
+
+The roadmap numbers its items and keeps ideas, each planned change
+keeps a record of how it went, and the lab takes up grammar v0.2.4.
+These change how the lab is worked on, which would usually make this
+v0.4.0, but they change documents and none of the lab's code, so it's
+a patch release, as v0.3.1 was.
+
 - The roadmap numbers its items, and has a fourth group, Ideas, after
   Later, for what might be done, or never, kept so it isn't lost. A
   number stays with its item as it moves between groups and is never
@@ -27,6 +39,9 @@ has the steps).
 - grammar v0.2.4, whose limit errors from `ParseErr` say where they
   stopped; the lab doesn't call it, and the pipeline's output is
   unchanged. It still needs scalar v0.5.9.
+- A wash-up before the release found PIPELINE.md still saying each
+  gap's plan was in the roadmap, after two had moved into change
+  records; it now says where to find each.
 
 ## v0.3.3 (2026-10-26)
 
