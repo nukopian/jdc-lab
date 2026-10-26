@@ -1,10 +1,12 @@
 # Check the rules on a second sample
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 1
 
 **Started:** 2026-10-25, in dedfbc7b228ede0069cd12c0393301288fe88f0f
+
+**Finished:** 2026-10-26
 
 ## The plan
 
@@ -47,5 +49,69 @@ gap is out of PIPELINE.md, and its figures are updated.
 
 ## What happened
 
-Nothing yet: the item has been in Now since the roadmap began, but no
-work on it has been committed.
+- **Outcome:** done. Headings of a known kind on the second sample went
+  from 73.4% of uses to 75.9% (12,198 of 16,062), past the first
+  sample's 75.7% when the plan was written; the first rose to 76.6%
+  (5,311 of 6,929). Unmapped text fell from 16% to 13% on the second,
+  and 14% to 13% on the first. No heading of a known kind became
+  unmapped on either. The lone conjunctions gap is out of PIPELINE.md,
+  and its figures are updated. One figure fell, boilerplate on the
+  second sample, from 13.3% to 12.5%: see Measurements, as it's partly
+  a correction.
+- **Changes from the plan:** step 3 found that a rule, not only
+  phrases, had fitted the first sample: `MaxWords`. A bold line ending
+  in a colon now has up to `MaxIntroWords` (20) words, as such lines
+  introduce lists ("To be successful in this role as a Vehicle
+  Technician, you should have:"); one advertiser's benefits list was
+  being filed under requirements without it. "Either:" and "Plus:"
+  joined "and" and "or" as conjunctions.
+- **What changed,** each measured with `pipeline compare` on both
+  samples, and each new heading's kind checked by eye:
+  - `internal/headings`: a heading needs a word that isn't a
+    conjunction (and, or, either, nor, but, plus); `MaxIntroWords`; the
+    field labels "vacancy type", "working arrangement(s)", "hybrid
+    working" and "reports to".
+  - `headings.txt`: requirements "who thrives here", "candidate(s)
+    who", "teacher(s) who", "must have", "what we need", "qualities",
+    "licence", "certification", "eligible"; benefits "what is in it for
+    you", "what you can expect"; responsibilities "what to expect";
+    company "the business", "our business", "the school"; apply
+    "recruitment process"; summary "purpose of job", "main purpose".
+    "Candidates who" also took eleven headings such as "We welcome
+    applications from candidates who:" from apply to requirements,
+    where they belong.
+- **Measurements:** runs `before` and `now` (the same as `after`) on
+  2026-10-26. Boilerplate on the second sample fell 0.8 points, and
+  template rose from 2.6% to 3.2%: 35 repeated texts, 72,000
+  characters, went from boilerplate to template, all of them from
+  unmapped sections into known ones. About 41,000 characters of it is
+  right: job text repeated across one advertiser's related jobs, under
+  "What to expect" and "Who thrives here?", and other employers'
+  requirements, counted as boilerplate before only because unmapped is
+  outside the sections that describe a job. About 21,000 is wrong: the
+  same advertiser's application line, and a development paragraph run
+  into its licence requirement with no break in the HTML, now under
+  requirements, with no heading of their own. On the first sample,
+  boilerplate is unchanged at 13.2%.
+- **Tried and kept apart:** "what you need" for requirements would also
+  take "What you need to do now" (36 ads, apply), as requirements'
+  rule comes first; it wasn't added. Lines of job terms, such as
+  "Permanent | Full-Time" (16 ads) as a heading, weren't made details:
+  the text under them is a summary.
+- **What's left:**
+  - Text with no heading of its own, after the requirements, counts as
+    template, as footers do
+    ([roadmap 4](../../ROADMAP.md#4-catch-footers-filed-under-requirements)),
+    though here it isn't at the end of the ad.
+  - Phrases are found leftmost first, without overlapping, so "To join
+    us and be successful in this role you will need:" is
+    responsibilities: "in this role you will" takes the words that "you
+    will need" would have matched.
+  - A kind's own name is one of its phrases, so "Legal Secretary" in a
+    heading makes it legal (three headings in both samples).
+  - "What to expect from our recruitment process:" (apply) and "What to
+    Expect from …:" (an agency's pitch) are responsibilities, one ad
+    each.
+  - Mixed headings stay unmapped, as "please note" does: "important
+    notice", "additional information", "please read before applying",
+    "footnote".

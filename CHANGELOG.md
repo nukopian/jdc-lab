@@ -12,6 +12,16 @@ has the steps).
 
 ## Unreleased
 
+- The rules hold on the second sample. Headings of a known kind there
+  rose from 73% of uses to 76%, as on the first (now 77%), and unmapped
+  text fell from 16% to 13%, with new phrases and field labels and two
+  rule changes. "OR", "and", "Either:" or "Plus:" alone in bold no
+  longer start a section. A bold line ending in a colon can have up to
+  20 words, as such lines introduce lists. Boilerplate on the second
+  sample fell from 13.3% to 12.5%: some job text had been counted as
+  boilerplate only because it sat in unmapped sections, but some
+  benefits and application text is now filed under requirements
+  (roadmap 1; [record](docs/changes/2026-10-25-check-the-rules-on-a-second-sample.md)).
 - grammar v0.3.0, which changes nothing in grammar itself but brings
   scalar from v0.5.9 to v0.6.0 (long numbers keep their digits, and `%`
   and `++` follow Perl further). The pipeline's output is unchanged

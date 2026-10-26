@@ -65,6 +65,11 @@ type Part struct {
 // sentence, not a heading.
 const MaxWords = 10
 
+// MaxIntroWords is the most words a heading has when it's in bold, or a
+// heading tag, and ends with a colon: it introduces what follows, as in
+// "As a Mobile Mechanic, you'll get benefits that go the extra mile:".
+const MaxIntroWords = 20
+
 // fieldLabels are the labels of fields, by key. A label not here is no
 // field: "Financial reporting: Oversee the accounts" is a list item with a
 // bold lead, not data.
@@ -77,10 +82,12 @@ func init() {
 		"location", "work location", "job location", "based", "base", "area",
 		"hours", "working hours", "hours of work", "hours per week", "working pattern",
 		"work pattern", "shift", "shifts", "shift pattern", "working days", "days", "schedule",
-		"contract", "contract type", "job type", "employment type", "employment", "type",
+		"working arrangement", "working arrangements", "hybrid working",
+		"contract", "contract type", "job type", "employment type", "employment", "type", "vacancy type",
 		"contract length", "length of contract", "duration", "term",
 		"start", "start date", "starting", "closing date", "deadline", "interview date",
 		"job title", "job role", "position", "role", "reference", "ref", "job reference",
+		"reports to",
 		"sector", "industry", "department", "employer", "client", "consultant",
 		"contact", "email", "keywords",
 	} {
@@ -144,13 +151,17 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 	if p, ok := field(text); ok {
 		return []Part{p}
 	}
-	if headingShaped(text, key) && (cues.Heading || cues.Bold || endsAsLabel(text)) {
+	most := MaxWords
+	if (cues.Heading || cues.Bold) && strings.HasSuffix(strings.TrimRightFunc(text, unicode.IsSpace), ":") {
+		most = MaxIntroWords
+	}
+	if headingShaped(text, key, most) && (cues.Heading || cues.Bold || endsAsLabel(text)) {
 		return []Part{{Role: Heading, Text: text, Key: key}}
 	}
 	// A bold lead that's a heading of its own, run into its text.
 	if lead := cues.BoldLead; lead != "" {
 		rest := strings.TrimLeftFunc(strings.TrimPrefix(text, lead), unicode.IsSpace)
-		if k := Key(lead); rest != "" && headingShaped(lead, k) {
+		if k := Key(lead); rest != "" && headingShaped(lead, k, MaxWords) {
 			return []Part{{Role: Heading, Text: lead, Key: k}, {Role: Text, Text: rest}}
 		}
 	}
@@ -194,14 +205,30 @@ func field(text string) (Part, bool) {
 // "£30,000 per annum" in bold is pay, and "Ref 225682916" a reference.
 var money = regexp.MustCompile(`[£$€]|\d{3,}`)
 
+// conjunctions join what comes before them to what comes after: "OR" alone
+// in bold, between two lists of requirements, is no heading.
+var conjunctions = map[string]bool{"and": true, "or": true, "either": true, "nor": true, "but": true, "plus": true}
+
+// onlyConjunctions reports whether every word of key is a conjunction, as
+// in "or", "either" and "and/or".
+func onlyConjunctions(key string) bool {
+	words := strings.FieldsFunc(key, func(r rune) bool { return r == ' ' || r == '/' || r == '&' })
+	for _, w := range words {
+		if !conjunctions[w] {
+			return false
+		}
+	}
+	return len(words) > 0
+}
+
 // headingShaped reports whether text, with its key, could be a heading:
-// some letters, at most MaxWords words, no money or long figures, and not
-// ending as a sentence does.
-func headingShaped(text, key string) bool {
-	if !strings.ContainsFunc(key, unicode.IsLetter) {
+// some letters, a word that isn't a conjunction, at most most words, no
+// money or long figures, and not ending as a sentence does.
+func headingShaped(text, key string, most int) bool {
+	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > MaxWords || money.MatchString(text) {
+	if len(strings.Fields(key)) > most || money.MatchString(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })

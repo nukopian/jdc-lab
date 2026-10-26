@@ -114,6 +114,16 @@ func TestRead(t *testing.T) {
 			},
 		},
 		{
+			"labels from the second sample",
+			`<p><b>Vacancy Type:</b> Permanent, Full Time</p><p>Working Arrangement: Hybrid</p><p><b>Reports To:</b> Team Leader</p><p><b>Hybrid Working:</b></p><p>3 days onsite, 2 from home</p>`,
+			[]string{
+				`field "Vacancy Type: Permanent, Full Time" key="vacancy type" value="Permanent, Full Time"`,
+				`field "Working Arrangement: Hybrid" key="working arrangement" value="Hybrid"`,
+				`field "Reports To: Team Leader" key="reports to" value="Team Leader"`,
+				`field "Hybrid Working: 3 days onsite, 2 from home" key="hybrid working" value="3 days onsite, 2 from home"`,
+			},
+		},
+		{
 			"a bar for a colon",
 			`<p>Salary | £30,000</p>`,
 			[]string{`field "Salary | £30,000" key="salary" value="£30,000"`},
@@ -144,9 +154,26 @@ func TestRead(t *testing.T) {
 			[]string{`heading "Why join us?" key="why join us"`, `heading "And there's more..." key="and there's more"`},
 		},
 		{
+			"lone conjunctions between items are no headings",
+			`<ul><li>A degree</li></ul><p><b>OR</b></p><p><b>Either:</b></p><p><b>Plus:</b></p><p><b>&amp;</b></p><p><b>And/or</b></p><p><b>Or call:</b></p>`,
+			[]string{
+				`item text "A degree"`, `text "OR"`, `text "Either:"`, `text "Plus:"`, `text "&"`, `text "And/or"`,
+				`heading "Or call:" key="or call"`,
+			},
+		},
+		{
 			"long bold text is a bold sentence",
 			`<p><b>We are looking for an experienced and motivated engineer to join our team</b></p>`,
 			[]string{`text "We are looking for an experienced and motivated engineer to join our team"`},
+		},
+		{
+			"a long bold line ending in a colon introduces what follows",
+			`<p><b>As a Mobile Mechanic with us, you'll get benefits that go the extra mile:</b></p><p>As a Mobile Mechanic with us, you'll get benefits that go the extra mile:</p><p><b>As a Mobile Mechanic with us, you'll get benefits that go the extra mile and more besides.</b></p>`,
+			[]string{
+				`heading "As a Mobile Mechanic with us, you'll get benefits that go the extra mile:" key="as a mobile mechanic with us you'll get benefits that go the extra mile"`,
+				`text "As a Mobile Mechanic with us, you'll get benefits that go the extra mile:"`,
+				`text "As a Mobile Mechanic with us, you'll get benefits that go the extra mile and more besides."`,
+			},
 		},
 		{
 			"bold items are text",

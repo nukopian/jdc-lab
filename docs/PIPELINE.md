@@ -146,7 +146,7 @@ returns them as **parts**:
 
 | Role | How it's recognised | Example |
 |---|---|---|
-| `heading` | short (`MaxWords`, 10), with a cue (heading tag, all bold) or ending in `:` or `;`; no money or long numbers; not ending in `.` | "**Key Responsibilities**" |
+| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money or long numbers; not ending in `.` | "**Key Responsibilities**" |
 | `field` | "Label: value" or "Label \| value", where the label is a known one | "Hours: 40 per week" |
 | `repeat` | only the ad's title or location again | "**Delivery Driver**" at the top |
 | `text` | everything else | |
@@ -158,6 +158,13 @@ A few rules refine this:
 - **A field's label written as a heading,** with a short value (up to
   `MaxValueWords`, 15) on the next line, is joined into one field:
   "**Working Hours**", then "Monday to Friday".
+- **A long line in bold that ends with a colon** introduces what follows,
+  as a heading does, so it can have up to `MaxIntroWords` (20) words:
+  "**As a Mobile Mechanic, you'll get benefits that go the extra mile:**".
+  Without the colon, or the bold, it's a sentence.
+- **Conjunctions alone aren't headings.** "**OR**", "**and**",
+  "**Either:**" or "**Plus:**" on a line of their own join what's before
+  them to what's after, so the section carries on.
 - **List items are never headings.** A bold item is far more often a
   point made strongly than a heading.
 - **Field labels are a list** (`fieldLabels`), so that a labelled bullet
@@ -402,7 +409,7 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | The wrong kind won | Move the winning kind's rule below the right one's, or make the phrase longer | `headings.txt` |
 | A plain line wrongly taken by name | Make the phrase longer, or drop it | `headings.txt` |
 | A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
-| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `money`); add a case to `TestRead` | `internal/headings/headings.go` |
+| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `money`); add a case to `TestRead` | `internal/headings/headings.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
 | A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
 | An advertiser's name as a heading | Nothing: it stays unmapped, and its text is found as boilerplate | |
@@ -445,7 +452,7 @@ become the new `before`: `go run ./cmd/pipeline run before` again.
 
 ## What it measured
 
-On two samples, measured on 2026-10-25 with
+On two samples, measured on 2026-10-26 with
 `go run ./cmd/pipeline run now`, which gives current figures:
 
 | Sample | Ads | Distinct | Leans towards |
@@ -454,14 +461,15 @@ On two samples, measured on 2026-10-25 with
 | `ads-20261025` | 5,000 | 4,296 | vehicles: mobile technicians, mechanics |
 | `all` | 7,000 | 6,167 | both; 19 ads' text is in both samples |
 
-The rules were tuned on the first, and mostly hold on the second: how
-the text divides into sections moves by two points at most, except for
-company. How much of each section is boilerplate moves more, as each
-slice has advertisers of its own.
+The rules were tuned on the first, then checked on the second
+([record](changes/2026-10-25-check-the-rules-on-a-second-sample.md)),
+and hold on both: how the text divides into sections moves by two
+points at most, except for company. How much of each section is
+boilerplate moves more, as each slice has advertisers of its own.
 
 **Headings.** 89% of ads have at least one heading, in both samples.
-Headings of a known kind are 76% of heading uses in the first, 73% in
-the second; ads with every heading known, 51% and 49%; ads with no
+Headings of a known kind are 77% of heading uses in the first, 76% in
+the second; ads with every heading known, 52% and 51%; ads with no
 section but the summary, 5% and 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
@@ -470,28 +478,35 @@ section but the summary, 5% and 4%.
 |---|---:|---:|---:|---:|---:|---:|
 | | **1024** | **1025** | **all** | **1024** | **1025** | **all** |
 | summary | 28% | 28% | 28% | 6% | 7% | 7% |
-| responsibilities | 16% | 16% | 16% | 0% | 1% | 1% |
-| requirements | 19% | 19% | 19% | 7% | 7% | 9% |
+| responsibilities | 16% | 17% | 16% | 0% | 1% | 1% |
+| requirements | 19% | 20% | 20% | 7% | 7% | 9% |
 | desirable | 2% | 2% | 2% | 3% | 4% | 4% |
-| benefits | 12% | 12% | 12% | 32% | 27% | 31% |
-| company | 5% | 2% | 3% | 45% | 28% | 40% |
-| apply | 3% | 3% | 3% | 36% | 41% | 42% |
-| legal | 1% | 1% | 1% | 77% | 69% | 74% |
+| benefits | 13% | 12% | 12% | 32% | 30% | 33% |
+| company | 5% | 3% | 3% | 46% | 28% | 39% |
+| apply | 3% | 3% | 3% | 37% | 42% | 44% |
+| legal | 1% | 1% | 1% | 76% | 69% | 74% |
 | details | 2% | 2% | 2% | 9% | 15% | 14% |
-| unmapped | 14% | 16% | 15% | 17% | 25% | 24% |
+| unmapped | 13% | 13% | 13% | 17% | 19% | 20% |
 
-Boilerplate is 13.2% of the text in the first sample, 13.3% in the
-second, and 14.5% in both together, as more ads show more of what's
-repeated; template for the job is 2.1%, 2.6% and 2.3%. So boilerplate,
+Boilerplate is 13.2% of the text in the first sample, 12.5% in the
+second, and 14.0% in both together, as more ads show more of what's
+repeated; template for the job is 2.1%, 3.2% and 2.8%. So boilerplate,
 with the company, apply and legal text that isn't, is roughly 15–20% of
 an ad that probably needn't be embedded. That's a first answer to
 whether retrieval can improve while embedding less.
 
 What the second sample showed: its employers say less about themselves
-under a heading of their own (company 2% of the text, not 5%), and more
-of its unmapped text is boilerplate (25%, not 17%): one advertiser's
-template puts "OR" and "and" alone on a line between requirements, and
-they're taken for headings (see [Known gaps](#known-gaps)).
+under a heading of their own (company 3% of the text, not 5%), and its
+headings were worded differently enough to need phrases of their own
+("Who thrives here?", "What you can expect", "The business"), labels
+("Vacancy type", "Reports to"), and two rule changes: conjunctions alone
+in bold aren't headings, and a long bold line ending in a colon is. Its
+boilerplate fell from 13.3% to 12.5% with them: one advertiser's job
+text had been counted as boilerplate only because it was in unmapped
+sections, and is now template, as it should be; but some of the same
+advertiser's benefits and application text is now filed under
+requirements, as footers are, and counted as template too (see
+[Known gaps](#known-gaps)).
 
 ## Decisions, and why
 
@@ -525,7 +540,6 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | [Footers under few title groups](../ROADMAP.md#4-catch-footers-filed-under-requirements) | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
 | [Plain lines without cues](../ROADMAP.md#6-find-headings-written-as-plain-lines) | Only exact phrases are taken as headings | More evidence from the following text |
 | [Shift times as headings](../ROADMAP.md#2-stop-shift-times-passing-as-headings) | "2:00pm–10:00pm" in bold passes as a heading | A rule for times |
-| [Lone conjunctions as headings](../ROADMAP.md#1-check-the-rules-on-a-second-sample) | "OR" or "and" alone in bold, between list items, is taken for a heading, and what follows it for an unmapped section | A heading needs a word that isn't a conjunction |
 
 ## Words used here
 

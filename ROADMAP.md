@@ -40,14 +40,6 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 1. Check the rules on a second sample
-
-**Serves:** structure
-
-Work down the second sample's unmapped table, and change any rule that
-fitted only the first. The plan, and how it's going, are in its
-[record](docs/changes/2026-10-25-check-the-rules-on-a-second-sample.md).
-
 ### 2. Stop shift times passing as headings
 
 **Serves:** structure
