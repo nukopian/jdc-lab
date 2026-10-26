@@ -43,3 +43,37 @@ the broken 0.58.
 - `grep -rn '0\.58\|issue #44\|patched' cpanfile docs` finds nothing
   left over.
 - The SETUP and MAINTAINING PDFs are rebuilt and the changed pages read.
+
+## Take up grammar v0.2.2
+
+**From:** grammar's session, 2026-10-26 (grammar 3a21142fa9cbe5a5c1c9c7e24c9cdf02345db631, tagged v0.2.2)
+**Waiting on:** nothing
+
+**What:** bump the lab's grammar from v0.2.1 to v0.2.2, which brings
+scalar from v0.5.7 to v0.5.9 with it (the lab requires scalar only
+indirectly):
+
+```
+cd ~/Git/github.com/nukopian/jdc-lab
+go run ./cmd/pipeline run before
+GOWORK=off go get github.com/nukopian/grammar@v0.2.2
+GOWORK=off go mod tidy
+GOWORK=off go test ./...
+go run ./cmd/pipeline run after
+go run ./cmd/pipeline compare before after
+```
+
+**Why:** Iain asked for jdc-lab to be on the latest grammar
+(2026-10-26). v0.2.2 changes no behaviour or API in grammar; it takes up
+scalar v0.5.9, whose `S` with a replacement string such as `"$1"` is
+about 1.6 times as fast, adds `$+` and `$+{name}`, and gives nothing for
+a reference to a group that doesn't exist, as Perl does. job-meta took
+it up with its output unchanged.
+
+**Files:** `go.mod`, `go.sum`, and `CHANGELOG.md` under Unreleased only
+if the lab's users would notice, which they shouldn't.
+
+**Done when:** the tests pass with `GOWORK=off`, `pipeline compare`
+shows no change on either sample or both together, and the bump is
+committed on `develop` as `build: grammar v0.2.2, on scalar v0.5.9`,
+with this task removed in the same commit.
