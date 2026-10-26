@@ -61,20 +61,20 @@ print the table.
   time.
 - [ROADMAP.md](../ROADMAP.md) holds what the lab means to do: features
   and outcomes, in Now, Next and Later, each saying which of the lab's
-  questions it serves, and Ideas, kept so they aren't lost. It's
-  public, on both branches, and in every release. Now holds three items
-  at most, so the roadmap stays a queue to pull from, not a list
-  pushing work. Each item in Now has a plan written to be picked up
-  cold, in its change record, and an item leaves when it ships, in the
-  commit that adds it to the CHANGELOG, whose line ends "(roadmap 7)"
-  and links to the record. Every item has a
-  number, the next one when it's added (the roadmap's opening says
-  which), kept as it moves between groups and never used again; a
-  heading such as `### 7. Title` holds it, as a Markdown numbered list
-  would renumber itself. An idea is that heading, the date it was
-  added, and a line or two; ideas need no Serves line until promoted,
-  and are added in a `docs:` commit whenever one comes up. Each of the
-  pipeline's [Known gaps](PIPELINE.md#known-gaps) links to its item.
+  questions it serves, and Ideas, kept so they aren't lost. It's public,
+  on both branches, and in every release. Now holds three items at most,
+  so the roadmap stays a queue to pull from, not a list pushing work.
+  Each item in Now has a plan written to be picked up cold, in its
+  change record, and an item leaves when it ships, in the commit that
+  adds it to the CHANGELOG, whose line ends "(roadmap 7)" and links to
+  the record. Every item has a number, the next one when it's added (the
+  roadmap's opening says which), kept as it moves between groups and
+  never used again; a heading such as `### 7. Title` holds it, as a
+  Markdown numbered list would renumber itself. An idea is that heading,
+  the date it was added, and a line or two; ideas need no Serves line
+  until promoted, and are added in a `docs:` commit whenever one comes
+  up. Each of the pipeline's [Known gaps](PIPELINE.md#known-gaps) links
+  to its item.
 - [docs/changes/](changes/README.md) holds a record of each planned
   change: the plan as it was written, and what happened, with changes
   from the plan, measurements, and what was tried and reverted. A
@@ -351,13 +351,14 @@ PIPELINE.md's figures.
 ## Before committing
 
 - **TODO.md:** on `develop`, `git pull --ff-only` and re-read it.
-  Sessions working on grammar and scalar add tasks to it, and a commit that completes one
-  removes it. Each task opens with **From** (the session that added it,
-  the date, and the commit that prompted it, or the last commit and
-  "work uncommitted") and **Waiting on** (what it needs first, or
-  nothing). A task added to grammar's or scalar's TODO.md, also on
-  their `develop`, is committed and pushed there at once, after the same
-  pull, so TODO.md only ever changes through commits.
+  Sessions working on grammar and scalar add tasks to it, and a commit
+  that completes one removes it. Each task opens with **From** (the
+  session that added it, the date, and the commit that prompted it, or
+  the last commit and "work uncommitted") and **Waiting on** (what it
+  needs first, or nothing). A task added to grammar's or scalar's
+  TODO.md, also on their `develop`, is committed and pushed there at
+  once, after the same pull, so TODO.md only ever changes through
+  commits.
 - **Notebooks:** clear their outputs. They carry local paths, and job
   description text once data is in use.
 - **Style and tests:** the checks above, for each language touched.
@@ -368,9 +369,10 @@ PIPELINE.md's figures.
   [PIPELINE.md](PIPELINE.md) in the same commit, with its figures if
   they moved. A change to what the lab can do, what it has measured or
   what comes next updates the README's
-  [Where it stands](../README.md#where-it-stands) too, so that it's never
-  behind, and a change that ships, starts or drops a feature updates
-  [ROADMAP.md](../ROADMAP.md). Rebuild the PDFs and read the pages that changed.
+  [Where it stands](../README.md#where-it-stands) too, so that it's
+  never behind, and a change that ships, starts or drops a feature
+  updates [ROADMAP.md](../ROADMAP.md). Rebuild the PDFs and read the
+  pages that changed.
 - **Messages:** commits follow
   [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
   `fix:`, `docs:`, `chore:`, `build(deps):` and so on), and are signed.
@@ -396,20 +398,20 @@ patch (v0.2.0 to v0.2.1). Its notes live in
 release from `develop` in these steps. Claude asks before tagging.
 
 0. **Wash up:** review everything since the last tag together, code,
-   tests, docs and data files such as `headings.txt`, for
-   inconsistency, inefficiency, errors and slop, and fix what's found.
-   Save a run first (`go run ./cmd/pipeline run before`): afterwards
+   tests, docs and data files such as `headings.txt`, for inconsistency,
+   inefficiency, errors and slop, and fix what's found. Save a run first
+   (`go run ./cmd/pipeline run before`): afterwards
    `go run ./cmd/pipeline compare before after` must show no change,
    unless a fix means to make one, and then say how. Reproduce each
    finding before fixing it, with a failing test where code is wrong,
    and note the worst in the release's entry. Check the README's Where
-   it stands against the work since the last tag, as it's what
-   visitors to `main` read first, and ROADMAP.md: what shipped is out of
-   it, and Now is what's really being worked on. Prune the Ideas: list
-   them by number, and the maintainer keeps, promotes or drops each. A
-   promoted idea keeps its number and gains a Serves line; a dropped
-   one is deleted, and the commit message names its number. A wash-up is also worth
-   doing whenever a run of work comes to a natural close.
+   it stands against the work since the last tag, as it's what visitors
+   to `main` read first, and ROADMAP.md: what shipped is out of it, and
+   Now is what's really being worked on. Prune the Ideas: list them by
+   number, and the maintainer keeps, promotes or drops each. A promoted
+   idea keeps its number and gains a Serves line; a dropped one is
+   deleted, and the commit message names its number. A wash-up is also
+   worth doing whenever a run of work comes to a natural close.
 
 1. **Check `develop`:** CI is green on its last commit, there's no
    `TODO.md`, the tests pass against the grammar `go.mod` asks for, and

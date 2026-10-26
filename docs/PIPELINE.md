@@ -7,8 +7,8 @@ how many can be recognised without AI, and how much of an ad is worth
 embedding at all.
 
 It covers each stage in order, how to run it, what it decided and why,
-what it measured, and what it doesn't do yet, with the
-[roadmap](../ROADMAP.md) holding a plan for each. Keep it up to date: a
+what it measured, and what it doesn't do yet, with an item in the
+[roadmap](../ROADMAP.md) for each. Keep it up to date: a
 change to a stage changes this document in the same commit
 ([MAINTAINING.md](MAINTAINING.md#before-committing)).
 
@@ -511,10 +511,12 @@ they're taken for headings (see [Known gaps](#known-gaps)).
 
 ## Known gaps
 
-What the pipeline doesn't do yet. Each gap's plan is in the
-[roadmap](../ROADMAP.md), written to be picked up cold. When a gap is
-closed, its row here and its item there go, in the same commit, and the
-figures in [What it measured](#what-it-measured) are updated.
+What the pipeline doesn't do yet. Each gap has an item in the
+[roadmap](../ROADMAP.md), with a plan written to be picked up cold:
+there, or, once work on it starts, in its
+[change record](changes/README.md). When a gap is closed, its row here
+and its item there go, in the same commit that finishes its record,
+and the figures in [What it measured](#what-it-measured) are updated.
 
 | Gap | Effect | Likely fix |
 |---|---|---|

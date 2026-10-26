@@ -30,14 +30,13 @@ keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
 number: 12.
 
-When an item ships, it moves from here to the CHANGELOG, whose line
-for it ends with its number, such as "(roadmap 7)", and links to its
-record. An idea that's
-dropped is deleted, and the commit that drops it names its number. Unless a plan
-says otherwise, its figures are from the first sample, `ads-20261024`
-(1,890 distinct ads), and its commands run from the lab's folder, with
-`RUN` standing for a run's name (see
-[Before and after](docs/PIPELINE.md#before-and-after)).
+When an item ships, it moves from here to the CHANGELOG, whose line for
+it ends with its number, such as "(roadmap 7)", and links to its record.
+An idea that's dropped is deleted, and the commit that drops it names
+its number. Unless a plan says otherwise, its figures are from the first
+sample, `ads-20261024` (1,890 distinct ads), and its commands run from
+the lab's folder, with `RUN` standing for a run's name (see [Before and
+after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
@@ -113,8 +112,9 @@ requirements. Under five title groups, they're then counted as
 templates for the job, and kept for embedding.
 
 **What's known:** the largest templates in
-`data/runs/RUN/ads-20261024/boilerplate/repeated.tsv` are almost all such footers. Text under
-five groups or more is already boilerplate wherever it is.
+`data/runs/RUN/ads-20261024/boilerplate/repeated.tsv` are almost all
+such footers. Text under five groups or more is already boilerplate
+wherever it is.
 
 **Steps:**
 
@@ -184,7 +184,8 @@ followed by a list are the likeliest headings.
 
 **Steps:** in `internal/headings`, consider a short plain line that's
 followed by a list, and contains a kind's phrase, as a heading; check
-`data/runs/RUN/all/sections/named.tsv` and the unmapped table before and after.
+`data/runs/RUN/all/sections/named.tsv` and the unmapped table before and
+after.
 
 **Done when** more headings are found with none wrongly (check the new
 ones by eye), and tests cover it.
