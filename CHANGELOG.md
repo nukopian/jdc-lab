@@ -12,12 +12,28 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.3.3 (2026-10-26)
+
+Inline::Python from CPAN
+
+The optional Perl setup gets shorter, and the lab takes up grammar
+v0.2.2. A change to how the lab is set up would usually make this
+v0.4.0, but this one only shortens an optional step and changes no
+code, so it's a patch release.
+
 - Setup installs Inline::Python 0.59 straight from CPAN: it carries the
   macOS fix that 0.58 had to be patched with by hand, so one `cpanm`
   command now installs all the lab's Perl modules.
 - grammar v0.2.2, which changes nothing in grammar itself but brings
   scalar from v0.5.7 to v0.5.9 (faster substitution with replacement
   strings). The pipeline's output is unchanged.
+- A wash-up before the release found MAINTAINING.md re-running
+  `cpanm --installdeps` without `INLINE_PYTHON_EXECUTABLE`. That command
+  now upgrades a 0.58, and with direnv off it would have built
+  Inline::Python against Homebrew's Python rather than the venv's. It
+  now uses SETUP.md's command.
 
 ## v0.3.2 (2026-10-25)
 
