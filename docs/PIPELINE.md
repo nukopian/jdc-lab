@@ -424,15 +424,16 @@ the structure too: each chunk's text is a block of its lines.
 
 The summary, responsibilities, requirements and desirable chunks are
 embedded; details are metadata, with their fields; benefits, company,
-apply and legal are left out; and unmapped chunks, whose kind isn't
-known, are **unclassified**: not embedded, as an unmapped heading is
-mapping still to do. Text found as boilerplate leaves the embedded chunks for
-a **boilerplate** chunk of its own, at the end, left out, each line with
-the section it came from: the verdict takes in job lines common to many
-ads as well as advertisers' footers, and this is where to see them.
-Other chunks keep theirs, so an advertiser's standard perks are still a
-list of benefits. Each ad totals its tokens, its embedded tokens and
-its unclassified ones, so the last shows what's left to map. Boilerplate is what the run's
+apply and legal are left out. Text found as boilerplate leaves the
+embedded chunks for a **boilerplate** chunk of its own, at the end,
+left out, each line with the section it came from: the verdict takes
+in job lines common to many ads as well as advertisers' footers, and
+this is where to see them. Other chunks keep theirs, so an
+advertiser's standard perks are still a list of benefits. The text of
+an unmapped section goes there too, under its heading, as an unmapped
+heading is mapping still to do; its fields become a details chunk.
+Each ad totals its tokens, its embedded tokens and its unclassified
+ones (the unmapped text), so the last shows what's left to map. Boilerplate is what the run's
 `boilerplate/repeated.tsv` says, so a run comes first (`-run` chooses
 which, `data/runs/latest` by default). What placed a chunk is the
 heading and the phrase in it that won, with any phrases of other kinds

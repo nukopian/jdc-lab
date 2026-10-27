@@ -107,6 +107,12 @@ say how to run it.
   theirs. On a support worker's ad, the advertiser's standard list of
   benefits, filed under the summary, is gathered there: 192 tokens no
   longer embedded.
+- **Unmapped text goes to the boilerplate chunk too** (Iain,
+  2026-10-27), under its heading, still counted as unclassified; an
+  unmapped section's fields become a details chunk. On a driver's ad,
+  the location and pay under its title stay as fields, and its
+  introduction, under "Ongoing opportunity", goes to the boilerplate
+  chunk until that heading is mapped.
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go
