@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 17.
+number: 18.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -43,43 +43,6 @@ after](docs/PIPELINE.md#before-and-after)).
 Nothing at the moment: the next to start comes from Next.
 
 ## Next
-
-### 3. Find near-duplicate boilerplate
-
-**Serves:** structure, embeddings: what isn't found as boilerplate gets embedded
-
-**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
-**Waiting on:** nothing
-
-**What:** find boilerplate that's the same standard text with a few
-words changed, which `internal/boilerplate` misses because it matches
-word for word.
-
-**Why:** most of it is likely in summaries, which are 28% of the text
-but measured only 6% boilerplate. It's probably the largest amount of
-boilerplate still hidden, and what isn't found gets embedded.
-
-**What's known:** texts of eight words or more whose first 50
-characters recur in five ads or more number 178, against 155 whole
-texts: about 23 groups of variants. The commonest change is likely the
-ad's own title or place written into the standard text ("we're
-recruiting a … in …").
-
-**Steps:**
-
-1. Cheapest first: before keying a text, replace the words of the ad's
-   own title and locations in it with one placeholder, so that
-   templated text keys the same in every ad. Measure what that finds.
-2. If that leaves much, compare texts by shingles (overlapping runs of
-   five words) and their overlap, or MinHash for speed, grouping texts
-   above a threshold; tune it on the variant groups above.
-3. Keep the title-groups rule: variants count as one text across
-   different jobs.
-
-**Done when** boilerplate's share of summaries and of the whole has been
-remeasured, a sample of the newly found texts has been checked by eye
-to be standard text and not job text, tests cover the matching, and
-PIPELINE.md describes it.
 
 ### 4. Catch footers filed under requirements
 
@@ -257,3 +220,10 @@ Added 2026-10-27. About 30 bold paragraphs start with the ad's title
 and run on into a heading ("General Foreman Responsibilities") or a
 line of facts; split off as a repeat, the rest would read as it
 should.
+
+### 17. Keep a list item's own blocks in the ad's order
+
+Added 2026-10-27. When a list item holds a list or paragraphs of its
+own, `internal/blocks` puts its text after the blocks that follow it,
+so it lands under the wrong heading: 20 ads of the three samples, which
+`cmd/view` counts and shows.

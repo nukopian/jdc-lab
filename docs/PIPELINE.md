@@ -302,7 +302,26 @@ and the kind that won), and `named.tsv` (plain lines taken by name).
 Boilerplate is text about the advertiser, not the job: its description of
 itself, its standard benefits, its notices. The ads don't say who placed
 them, so it's found by **repetition**: a text of `MinWords` (8) words or
-more, word for word by its key, in ads for different jobs.
+more, by its key, in ads for different jobs.
+
+**Not always word for word.** Standard text often has the ad's own
+title or place written in ("we're recruiting a Chef in Leeds"), or a
+few words changed, such as a school's or an agency's name. So a text is
+known by up to three keys, and counts as repeated, or boilerplate, if
+any of them does:
+
+- its own key;
+- its key with the ad's title and places, where they stand as whole
+  words, as placeholders, so "a Chef in Leeds" and "a Nurse in York"
+  key alike;
+- for a text of `LongWords` (20) words or more, its group of **texts
+  alike**: long texts that share at least `Overlap` (60%) of their runs
+  of five words, a group taking in any text alike to one of its own.
+
+Short lines are matched only by the first two: phrased alike, as
+"assist with goods in and goods out" and "assisting with goods in and
+goods out processes" are, they're more often about the job than
+standard text.
 
 **Different jobs, not different ads.** An advertiser posting one job in
 ten towns repeats every block of it, and none of that is boilerplate. So
@@ -330,7 +349,8 @@ which, though about the job, are in so many jobs that they say nothing of
 any: as with a common word in a search index.
 
 `cmd/boilerplate` writes `repeated.tsv`: every repeated text, with its
-groups, ads, characters, the kinds of section it's in, and its verdict.
+groups (by the key that finds the most), ads, characters, the kinds of
+section it's in, and its verdict.
 
 ## 6. View: ads to read
 
@@ -345,12 +365,14 @@ before any heading, which is summary by default) or when its heading is
 of no known kind. Fields and repeats are marked, and so is the text
 found as boilerplate or a template, where it sits.
 
-The ads are the same in every run: they're chosen by a fixed hash of
-their IDs, so a diff of two runs' views shows what a change did, ad by
-ad. One each is chosen on purpose, where there is one: an ad with no
+The ads are chosen by a fixed hash of their IDs, and written in its
+order, so a diff of two runs' views shows what a change did, ad by ad.
+Sixteen are always the first by the hash; up to four more are chosen on
+purpose, as a random draw mostly shows the easy cases: an ad with no
 heading, one with an unmapped section, one over half boilerplate, and
-one with text in no section or out of order (below), as a random draw
-mostly shows the easy cases.
+one with text in no section or out of order (below), each where none of
+the others shown is one already. A change to the pipeline can change
+those four, but never the sixteen, nor any ad's place among them.
 
 It also checks every ad of the sample, comparing the letters and digits
 of what its HTML shows with those of its sections. Text in no section
@@ -531,65 +553,52 @@ next change, run `claude/before` again.
 
 ## What it measured
 
-On two samples, measured on 2026-10-27 by running each stage on each
-sample, and on the two together (`all` below). A third sample,
-`ads-20261027`, isn't in these figures yet; `run latest` gives the
-three together:
+On the three samples together, measured on 2026-10-27 with
+`go run ./cmd/pipeline run latest`:
 
-| Sample | Ads | Distinct | Leans towards |
-|---|---:|---:|---|
-| `ads-20261024` | 2,000 | 1,890 | education: teaching, support staff |
-| `ads-20261025` | 5,000 | 4,296 | vehicles: mobile technicians, mechanics |
-| `all` | 7,000 | 6,167 | both; 19 ads' text is in both samples |
+| Sample | Ads | Leans towards |
+|---|---:|---|
+| `ads-20261024` | 2,000 | education: teaching, support staff |
+| `ads-20261025` | 5,000 | vehicles: mobile technicians, mechanics |
+| `ads-20261027` | 21,000 | not yet looked at by kind of job |
+| together | 28,000 | 25,954 distinct |
 
-The rules were tuned on the first, then checked on the second
+The rules were tuned on the first sample, checked on the second
 ([record](changes/2026-10-25-check-the-rules-on-a-second-sample.md)),
-and hold on both: how the text divides into sections moves by two
-points at most, except for company. How much of each section is
-boilerplate moves more, as each slice has advertisers of its own.
+and hold on the third: how the text divides into sections moved by two
+points at most from one sample to another, except for company.
 
-**Headings.** 89% of ads have at least one heading, in both samples.
-Headings of a known kind are 78% of heading uses in the first, 77% in
-the second; ads with every heading known, 53% in both; ads with no
-section but the summary, 5% and 4%.
+**Headings.** 89% of ads have at least one heading. Headings of a known
+kind are 77% of heading uses; ads with every heading known, 53%; ads
+with no section but the summary, 5%.
 
 **Sections and boilerplate**, by share of all the ads' text:
 
-| Section | Of the text | | | Of it, boilerplate | | |
-|---|---:|---:|---:|---:|---:|---:|
-| | **1024** | **1025** | **all** | **1024** | **1025** | **all** |
-| summary | 28% | 28% | 28% | 6% | 7% | 7% |
-| responsibilities | 16% | 17% | 16% | 0% | 1% | 1% |
-| requirements | 19% | 20% | 20% | 7% | 7% | 8% |
-| desirable | 2% | 2% | 2% | 3% | 4% | 4% |
-| benefits | 13% | 12% | 12% | 32% | 30% | 33% |
-| company | 5% | 3% | 3% | 46% | 28% | 39% |
-| apply | 3% | 3% | 3% | 37% | 42% | 44% |
-| legal | 1% | 1% | 1% | 77% | 69% | 75% |
-| details | 2% | 2% | 2% | 9% | 16% | 15% |
-| unmapped | 13% | 13% | 13% | 18% | 19% | 20% |
+| Section | Of the text | Of it, boilerplate |
+|---|---:|---:|
+| summary | 28% | 10% |
+| responsibilities | 16% | 2% |
+| requirements | 20% | 12% |
+| desirable | 2% | 8% |
+| benefits | 12% | 37% |
+| company | 3% | 49% |
+| apply | 3% | 56% |
+| legal | 1% | 83% |
+| details | 2% | 20% |
+| unmapped | 13% | 25% |
 
-Boilerplate is 13.2% of the text in the first sample, 12.5% in the
-second, and 13.9% in both together, as more ads show more of what's
-repeated (15.1% in the third sample, of 21,000 ads: the thresholds are
-counts of title groups, which a larger sample passes more easily, so
-boilerplate figures from samples of different sizes don't compare); template for the job is 2.1%, 3.3% and 2.9%. So boilerplate,
-with the company, apply and legal text that isn't, is roughly 15–20% of
-an ad that probably needn't be embedded. That's a first answer to
-whether retrieval can improve while embedding less.
+Boilerplate is 17.6% of the text, and template for the job 3.1%; with
+the company, apply and legal text that isn't boilerplate, about a fifth
+of an ad probably needn't be embedded. That's a first answer to whether
+retrieval can improve while embedding less. Word for word matching
+alone found 15.8%: standard text with the ad's own title or place
+written in, or a few words changed, is most of the rest
+([record](changes/2026-10-27-find-near-duplicate-boilerplate.md)).
 
-What the second sample showed: its employers say less about themselves
-under a heading of their own (company 3% of the text, not 5%), and its
-headings were worded differently enough to need phrases of their own
-("Who thrives here?", "What you can expect", "The business"), labels
-("Vacancy type", "Reports to"), and two rule changes: conjunctions alone
-in bold aren't headings, and a long bold line ending in a colon is. Its
-boilerplate fell from 13.3% to 12.5% with them: one advertiser's job
-text had been counted as boilerplate only because it was in unmapped
-sections, and is now template, as it should be; but some of the same
-advertiser's benefits and application text is now filed under
-requirements, as footers are, and counted as template too (see
-[Known gaps](#known-gaps)).
+Boilerplate's thresholds are counts of title groups, which a larger
+sample passes more easily, so boilerplate figures from samples of
+different sizes don't compare: on its own, the first sample has 13.2%
+by word for word matching, the third 15.1% (idea 12 on the roadmap).
 
 ## Decisions, and why
 
@@ -620,9 +629,9 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Gap | Effect | Likely fix |
 |---|---|---|
 | [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
-| [Near-duplicate boilerplate](../ROADMAP.md#3-find-near-duplicate-boilerplate) | Standard text with a job title or place swapped in doesn't match word for word, which likely hides boilerplate in summaries | Fuzzy matching, such as shingles or MinHash |
 | [Footers under few title groups](../ROADMAP.md#4-catch-footers-filed-under-requirements) | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
 | [Plain lines without cues](../ROADMAP.md#6-find-headings-written-as-plain-lines) | Only exact phrases are taken as headings | More evidence from the following text |
+| [Text out of order](../ROADMAP.md#17-keep-a-list-items-own-blocks-in-the-ads-order) | A list item holding a list or paragraphs of its own comes out after the blocks that follow it, under the wrong heading (20 ads) | Emit an item's own blocks where they stand |
 
 ## Words used here
 

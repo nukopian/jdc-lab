@@ -77,5 +77,10 @@ on today's samples).
   advertiser's "Operative</strong>to", kept as written, for a loss; it
   compares letters and digits instead. Its first version called the
   out-of-order text missing, until both counts were compared.
-- **What's left:** the blocks stage's order fault, not yet on the
+- **What's left:** the blocks stage's order fault, idea 17 on the
   roadmap.
+- **Afterwards,** in roadmap 3: the ads chosen on purpose came first,
+  and could change with a change to boilerplate, shuffling the view.
+  Sixteen ads are now always the first by the hash, and all are
+  written in its order (see that
+  [record](2026-10-27-find-near-duplicate-boilerplate.md)).

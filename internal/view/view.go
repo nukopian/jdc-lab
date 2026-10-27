@@ -42,11 +42,13 @@ type Candidate struct {
 	Lost bool
 }
 
-// Pick returns the indexes of n candidates to show: first one each with
-// no heading, with an unmapped section, mostly boilerplate, and with text
-// lost, where there are any, then the rest by the hash of their IDs. A random draw
-// would mostly show the easy cases. The order is the same however the
-// candidates come.
+// Pick returns the indexes of n candidates to show, in a fixed order: by
+// the hash of their IDs. All but one for each kind worth showing on
+// purpose are the first by that order, always, so a change to the
+// pipeline never moves them; then, for each kind (no heading, an unmapped
+// section, mostly boilerplate, text lost), the first with it, if none
+// shown has it already, as a random draw would mostly show the easy
+// cases; and the rest are the next by the order.
 func Pick(cs []Candidate, n int) []int {
 	order := make([]int, len(cs))
 	for i := range order {
@@ -55,6 +57,12 @@ func Pick(cs []Candidate, n int) []int {
 	slices.SortFunc(order, func(a, b int) int {
 		return cmp.Or(cmp.Compare(rank(cs[a].ID), rank(cs[b].ID)), cmp.Compare(cs[a].ID, cs[b].ID))
 	})
+	wanted := []func(Candidate) bool{
+		func(c Candidate) bool { return c.NoHeading },
+		func(c Candidate) bool { return c.Unmapped },
+		func(c Candidate) bool { return c.MostlyBoilerplate },
+		func(c Candidate) bool { return c.Lost },
+	}
 	var picked []int
 	taken := map[int]bool{}
 	take := func(i int) {
@@ -63,14 +71,15 @@ func Pick(cs []Candidate, n int) []int {
 			taken[i] = true
 		}
 	}
-	for _, wanted := range []func(Candidate) bool{
-		func(c Candidate) bool { return c.NoHeading },
-		func(c Candidate) bool { return c.Unmapped },
-		func(c Candidate) bool { return c.MostlyBoilerplate },
-		func(c Candidate) bool { return c.Lost },
-	} {
+	for _, i := range order[:min(len(order), max(0, n-len(wanted)))] {
+		take(i)
+	}
+	for _, is := range wanted {
+		if slices.ContainsFunc(picked, func(i int) bool { return is(cs[i]) }) {
+			continue
+		}
 		for _, i := range order {
-			if wanted(cs[i]) && !taken[i] {
+			if is(cs[i]) && !taken[i] {
 				take(i)
 				break
 			}
@@ -79,6 +88,7 @@ func Pick(cs []Candidate, n int) []int {
 	for _, i := range order {
 		take(i)
 	}
+	slices.SortFunc(picked, func(a, b int) int { return slices.Index(order, a) - slices.Index(order, b) })
 	return picked
 }
 

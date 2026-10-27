@@ -52,10 +52,10 @@ embeddings, and a large language model only where those fall short.
 - **Measured on two samples** of 2,000 and 5,000 ads, from different
   kinds of job, and checked on a third of 21,000. 89% of ads have
   headings, and about three in four heading uses are recognised by
-  rule, on all three. Roughly 15–20% of an ad is boilerplate, or
-  company, application and legal text, that probably needn't be
-  embedded: a first answer to whether search can improve while
-  embedding less. A third of ads state a working pattern, such as
+  rule, on all three. About a fifth of an ad is boilerplate, found
+  even with a few words changed, or company, application and legal
+  text, that probably needn't be embedded: a first answer to whether
+  search can improve while embedding less. A third of ads state a working pattern, such as
   "Monday to Friday, 9am–5pm": a fact for metadata, not embedding.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
   and why: first the pipeline's known gaps, then grammars for the facts

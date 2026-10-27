@@ -62,7 +62,13 @@ func main() {
 
 // read divides every ad into sections, and indexes their text. It keeps
 // each ad's sections for the second pass.
-func read(source string) (all [][]sections.Section, ix boilerplate.Index, dups int, err error) {
+// divided is an ad's sections, with the ad they're from.
+type divided struct {
+	src boilerplate.Source
+	ss  []sections.Section
+}
+
+func read(source string) (all []divided, ix boilerplate.Index, dups int, err error) {
 	var d ads.Distinct
 	for a, err := range ads.File(source) {
 		if err != nil {
@@ -72,6 +78,7 @@ func read(source string) (all [][]sections.Section, ix boilerplate.Index, dups i
 			continue
 		}
 		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
+		src := boilerplate.SourceOf(a)
 		for _, s := range ss {
 			var texts []string
 			for _, p := range s.Parts {
@@ -79,9 +86,9 @@ func read(source string) (all [][]sections.Section, ix boilerplate.Index, dups i
 					texts = append(texts, p.Text)
 				}
 			}
-			ix.Add(a.Title, s.Kind, texts...)
+			ix.Add(src, s.Kind, texts...)
 		}
-		all = append(all, ss)
+		all = append(all, divided{src, ss})
 	}
 	return all, ix, d.Duplicates, nil
 }
@@ -94,12 +101,12 @@ type tally struct {
 	repeats                           map[string]*repeat
 }
 
-func measure(all [][]sections.Section, ix *boilerplate.Index) tally {
+func measure(all []divided, ix *boilerplate.Index) tally {
 	t := tally{kindChars: map[sections.Kind]int{}, kindBoiler: map[sections.Kind]int{}, repeats: map[string]*repeat{}}
 	for _, a := range all {
 		chars, boiler := 0, 0
 		seen := map[string]bool{}
-		for _, s := range a {
+		for _, s := range a.ss {
 			for _, p := range s.Parts {
 				if p.Role != headings.Text {
 					continue
@@ -107,11 +114,11 @@ func measure(all [][]sections.Section, ix *boilerplate.Index) tally {
 				n := len(p.Text)
 				chars += n
 				t.kindChars[s.Kind] += n
-				if !ix.Repeated(p.Text) {
+				if !ix.Repeated(a.src, p.Text) {
 					continue
 				}
 				t.repeated += n
-				if ix.Boilerplate(p.Text) {
+				if ix.Boilerplate(a.src, p.Text) {
 					boiler += n
 					t.kindBoiler[s.Kind] += n
 				} else {
@@ -120,8 +127,8 @@ func measure(all [][]sections.Section, ix *boilerplate.Index) tally {
 				k := headings.Key(p.Text)
 				r := t.repeats[k]
 				if r == nil {
-					r = &repeat{text: p.Text, groups: ix.Groups(p.Text), kinds: map[sections.Kind]bool{},
-						boilerplate: ix.Boilerplate(p.Text)}
+					r = &repeat{text: p.Text, groups: ix.Groups(a.src, p.Text), kinds: map[sections.Kind]bool{},
+						boilerplate: ix.Boilerplate(a.src, p.Text)}
 					t.repeats[k] = r
 				}
 				if !seen[k] {

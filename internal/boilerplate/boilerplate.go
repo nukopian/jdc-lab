@@ -25,12 +25,22 @@
 // work as part of a team", though about the job, is in so many jobs that
 // it says nothing of any of them: as with a common word in a search
 // index, being everywhere is what makes it worth little.
+//
+// Standard text isn't always word for word the same. Agencies write each
+// ad's own title and place into it ("we're recruiting a Chef in Leeds"),
+// so a text is also keyed with those as placeholders. And long texts are
+// often changed in a word or two, a school's or an agency's name, so
+// texts of LongWords words or more that share most of their runs of five
+// words are taken as one text. Short lines are matched only as written:
+// phrased alike, they're more often about the job than standard text.
 package boilerplate
 
 import (
+	"hash/fnv"
 	"slices"
 	"strings"
 
+	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
@@ -48,88 +58,297 @@ const MinGroups = 2
 // under to be boilerplate wherever it's found.
 const Widespread = 5
 
-// An Index knows, for each text, the titles of the ads it's in, and the
-// kinds of section it's in there. Add every ad first, then ask about any
-// text. Its zero value is ready to use.
-type Index struct {
-	titles map[string][]string // text key → distinct title keys
-	where  map[string]*where   // text key → the kinds of section it's in
-	groups map[string]int      // text key → groups of similar titles, once counted
+// LongWords is the fewest words a text needs to be matched to texts that
+// differ from it in a few words.
+const LongWords = 20
+
+// Overlap is how much of their runs of five words two long texts must
+// share to be one text: the share of all their runs that both have.
+const Overlap = 0.6
+
+// commonRun is how many texts a run of five words can be in and still
+// be used to find texts like one another: one in more is too common to
+// say they're alike, and would make finding them slow.
+const commonRun = 300
+
+// A Source is the ad a text is from: its title, and its places, which
+// standard text often has written into it.
+type Source struct {
+	Title  string
+	Places []string
 }
 
-// where counts a text's times in sections that describe the job, and in
-// others.
-type where struct{ describes, elsewhere int }
-
-// Add records texts from a section of kind, in an ad whose title is title.
-func (ix *Index) Add(title string, kind sections.Kind, texts ...string) {
-	if ix.titles == nil {
-		ix.titles, ix.where = map[string][]string{}, map[string]*where{}
+// SourceOf returns an ad's Source: its title, and each part of each of its
+// locations, as "Leeds, West Yorkshire" names two places.
+func SourceOf(a ads.Ad) Source {
+	s := Source{Title: a.Title}
+	for _, l := range a.Locations() {
+		for _, p := range strings.Split(l, ",") {
+			if p = strings.TrimSpace(p); p != "" {
+				s.Places = append(s.Places, p)
+			}
+		}
 	}
-	t := headings.Key(title)
-	for _, text := range texts {
-		k := headings.Key(text)
+	return s
+}
+
+// The placeholders for an ad's own title and places in a key. Keys are
+// made by headings.Key, which never writes braces.
+const (
+	titleMark = "{title}"
+	placeMark = "{place}"
+)
+
+// template returns key with the source's title and places, where they
+// stand as whole words, replaced by placeholders: places first, the
+// longest first, as a title such as "Driver - Leeds" holds one.
+func (s Source) template(key string) string {
+	var places []string
+	for _, p := range s.Places {
+		if k := headings.Key(p); k != "" {
+			places = append(places, k)
+		}
+	}
+	slices.SortFunc(places, func(a, b string) int { return len(b) - len(a) })
+	k := " " + key + " "
+	for _, p := range places {
+		k = strings.ReplaceAll(k, " "+p+" ", " "+placeMark+" ")
+	}
+	if t := headings.Key(s.Title); t != "" {
+		k = strings.ReplaceAll(k, " "+t+" ", " "+titleMark+" ")
+	}
+	return strings.TrimSpace(k)
+}
+
+// An Index knows, for each text, the titles of the ads it's in, and the
+// kinds of section it's in there. Add every ad first, then ask about any
+// text, with the ad it's from. Its zero value is ready to use.
+type Index struct {
+	texts  map[string]*text // key → where the text is
+	long   []string         // keys of the long texts, templated, in the order added
+	isLong map[string]bool
+	// alike maps a long text's templated key to its group of texts alike,
+	// and groups counts each key's groups of titles; both are made when
+	// first asked for, and forgotten when a text is added.
+	alike  map[string]string
+	groups map[string]int
+}
+
+// text is what's known of a text: the distinct title keys of its ads,
+// and its times in sections that describe the job, and in others.
+type text struct {
+	titles               []string
+	describes, elsewhere int
+}
+
+// Add records texts from a section of kind, in an ad from src.
+func (ix *Index) Add(src Source, kind sections.Kind, texts ...string) {
+	if ix.texts == nil {
+		ix.texts, ix.isLong = map[string]*text{}, map[string]bool{}
+	}
+	t := headings.Key(src.Title)
+	for _, s := range texts {
+		k := headings.Key(s)
 		if len(strings.Fields(k)) < MinWords {
 			continue
 		}
-		if !slices.Contains(ix.titles[k], t) {
-			ix.titles[k] = append(ix.titles[k], t)
+		tk := src.template(k)
+		ix.record(k, t, kind)
+		if tk != k {
+			ix.record(tk, t, kind)
 		}
-		w := ix.where[k]
-		if w == nil {
-			w = &where{}
-			ix.where[k] = w
-		}
-		if Describes(kind) {
-			w.describes++
-		} else {
-			w.elsewhere++
+		if len(strings.Fields(tk)) >= LongWords && !ix.isLong[tk] {
+			ix.isLong[tk] = true
+			ix.long = append(ix.long, tk)
 		}
 	}
-	ix.groups = nil // counts made before are out of date
+	ix.alike, ix.groups = nil, nil // what was worked out before is out of date
 }
 
-// Groups returns how many groups of similar titles text appears under: 0
-// for a text shorter than MinWords, or never added.
-func (ix *Index) Groups(text string) int {
-	k := headings.Key(text)
-	if n, ok := ix.groups[k]; ok {
-		return n
+// record adds one ad's use of a text, by its key.
+func (ix *Index) record(key, title string, kind sections.Kind) {
+	x := ix.texts[key]
+	if x == nil {
+		x = &text{}
+		ix.texts[key] = x
 	}
-	n := groups(ix.titles[k])
-	if ix.groups == nil {
-		ix.groups = map[string]int{}
+	if !slices.Contains(x.titles, title) {
+		x.titles = append(x.titles, title)
 	}
-	ix.groups[k] = n
+	if Describes(kind) {
+		x.describes++
+	} else {
+		x.elsewhere++
+	}
+}
+
+// keys returns the keys a text from src is known by: its own, its
+// templated one, and its group of texts alike, those it has.
+func (ix *Index) keys(src Source, s string) []string {
+	k := headings.Key(s)
+	ks := []string{k}
+	tk := src.template(k)
+	if tk != k {
+		ks = append(ks, tk)
+	}
+	if ix.isLong[tk] {
+		ix.findAlike()
+		ks = append(ks, ix.alike[tk])
+	}
+	return ks
+}
+
+// Groups returns how many groups of similar titles a text from src
+// appears under, by the key that finds the most: 0 for a text shorter
+// than MinWords, or never added.
+func (ix *Index) Groups(src Source, s string) int {
+	n := 0
+	for _, k := range ix.keys(src, s) {
+		n = max(n, ix.groupsOf(k))
+	}
 	return n
 }
 
-// Repeated reports whether text appears under at least MinGroups groups
-// of similar titles.
-func (ix *Index) Repeated(text string) bool {
-	return ix.Groups(text) >= MinGroups
+// groupsOf counts a key's groups of similar titles, once.
+func (ix *Index) groupsOf(key string) int {
+	if n, ok := ix.groups[key]; ok {
+		return n
+	}
+	n := 0
+	if x := ix.texts[key]; x != nil {
+		n = groups(x.titles)
+	}
+	if ix.groups == nil {
+		ix.groups = map[string]int{}
+	}
+	ix.groups[key] = n
+	return n
 }
 
-// Boilerplate reports whether text is boilerplate: under Widespread groups
-// of titles or more, or repeated and found more often outside the sections
-// that describe the job than in them.
-func (ix *Index) Boilerplate(text string) bool {
-	if !ix.Repeated(text) {
-		return false
-	}
-	if ix.Groups(text) >= Widespread {
-		return true
-	}
-	w := ix.where[headings.Key(text)]
-	return w.elsewhere > w.describes
+// Repeated reports whether a text from src appears under at least
+// MinGroups groups of similar titles.
+func (ix *Index) Repeated(src Source, s string) bool {
+	return ix.Groups(src, s) >= MinGroups
 }
 
-// Template reports whether text is a template for the job: repeated, but
-// not widespread, and found at least as often in the sections that
-// describe the job as outside them. A tie goes this way, as keeping text
-// about the job is the safer mistake.
-func (ix *Index) Template(text string) bool {
-	return ix.Repeated(text) && !ix.Boilerplate(text)
+// Boilerplate reports whether a text from src is boilerplate, by any of
+// its keys: under Widespread groups of titles or more, or repeated and
+// found more often outside the sections that describe the job than in
+// them.
+func (ix *Index) Boilerplate(src Source, s string) bool {
+	for _, k := range ix.keys(src, s) {
+		n := ix.groupsOf(k)
+		if n >= Widespread || n >= MinGroups && ix.texts[k].elsewhere > ix.texts[k].describes {
+			return true
+		}
+	}
+	return false
+}
+
+// Template reports whether a text from src is a template for the job:
+// repeated, but not widespread, and found at least as often in the
+// sections that describe the job as outside them. A tie goes this way, as
+// keeping text about the job is the safer mistake.
+func (ix *Index) Template(src Source, s string) bool {
+	return ix.Repeated(src, s) && !ix.Boilerplate(src, s)
+}
+
+// findAlike groups the long texts that share at least Overlap of their
+// runs of five words, a group taking in any text alike to one of its
+// own, and records each group as a text of its own, under the key "~"
+// and its first text's key, with all its texts' titles and kinds.
+func (ix *Index) findAlike() {
+	if ix.alike != nil {
+		return
+	}
+	for k := range ix.texts { // groups made before, worked out again below
+		if strings.HasPrefix(k, "~") {
+			delete(ix.texts, k)
+		}
+	}
+	runs := make([]map[uint64]bool, len(ix.long))
+	in := map[uint64][]int{} // a run of words → the texts it's in
+	for i, k := range ix.long {
+		runs[i] = shingles(k)
+		for r := range runs[i] {
+			in[r] = append(in[r], i)
+		}
+	}
+	group := make([]int, len(ix.long)) // union-find: each text's parent
+	for i := range group {
+		group[i] = i
+	}
+	root := func(i int) int {
+		for group[i] != i {
+			group[i] = group[group[i]]
+			i = group[i]
+		}
+		return i
+	}
+	for i := range ix.long {
+		tried := map[int]bool{}
+		for r := range runs[i] {
+			if len(in[r]) > commonRun {
+				continue
+			}
+			for _, j := range in[r] {
+				if j <= i || tried[j] {
+					continue
+				}
+				tried[j] = true
+				if alike(runs[i], runs[j]) {
+					group[root(j)] = root(i)
+				}
+			}
+		}
+	}
+	ix.alike = map[string]string{}
+	for i, k := range ix.long {
+		g := "~" + ix.long[root(i)]
+		ix.alike[k] = g
+		x, y := ix.texts[g], ix.texts[k]
+		if x == nil {
+			x = &text{}
+			ix.texts[g] = x
+		}
+		for _, t := range y.titles {
+			if !slices.Contains(x.titles, t) {
+				x.titles = append(x.titles, t)
+			}
+		}
+		x.describes += y.describes
+		x.elsewhere += y.elsewhere
+	}
+}
+
+// shingles returns a key's runs of five words, each as a hash of its
+// words: far smaller than the words themselves, and two runs' hashes are
+// the same only if their words are, as near as matters.
+func shingles(key string) map[uint64]bool {
+	w := strings.Fields(key)
+	m := map[uint64]bool{}
+	h := fnv.New64a()
+	for i := 0; i+5 <= len(w); i++ {
+		h.Reset()
+		h.Write([]byte(strings.Join(w[i:i+5], " ")))
+		m[h.Sum64()] = true
+	}
+	return m
+}
+
+// alike reports whether two texts' runs of words overlap by Overlap.
+func alike(a, b map[uint64]bool) bool {
+	if len(a) > len(b) {
+		a, b = b, a
+	}
+	shared := 0
+	for r := range a {
+		if b[r] {
+			shared++
+		}
+	}
+	all := len(a) + len(b) - shared
+	return all > 0 && float64(shared) >= Overlap*float64(all)
 }
 
 // Describes reports whether a section of kind describes the job itself,

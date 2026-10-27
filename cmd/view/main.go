@@ -50,20 +50,24 @@ func main() {
 		log.Fatal(err)
 	}
 
-	verdict := func(text string) view.Verdict {
-		switch {
-		case !ix.Repeated(text):
-			return view.Own
-		case ix.Boilerplate(text):
-			return view.Boilerplate
+	// verdict says what boilerplate found the texts of an ad to be.
+	verdict := func(a ads.Ad) func(string) view.Verdict {
+		src := boilerplate.SourceOf(a)
+		return func(text string) view.Verdict {
+			switch {
+			case !ix.Repeated(src, text):
+				return view.Own
+			case ix.Boilerplate(src, text):
+				return view.Boilerplate
+			}
+			return view.Template
 		}
-		return view.Template
 	}
 	cs := make([]view.Candidate, len(all))
 	lost := make([]view.Lost, len(all))
 	missing, moved := 0, 0
 	for i, c := range all {
-		cs[i] = candidate(c, verdict)
+		cs[i] = candidate(c, verdict(c.ad))
 		switch lost[i] = view.Missing(c.ad.HTML, c.ss); {
 		case lost[i].Moved:
 			moved++
@@ -119,7 +123,7 @@ func read(source string) (all []chunked, ix boilerplate.Index, dups int, err err
 					texts = append(texts, p.Text)
 				}
 			}
-			ix.Add(a.Title, s.Kind, texts...)
+			ix.Add(boilerplate.SourceOf(a), s.Kind, texts...)
 		}
 		all = append(all, chunked{a, ss})
 	}
@@ -152,7 +156,7 @@ func candidate(c chunked, verdict func(string) view.Verdict) view.Candidate {
 }
 
 // write writes the picked ads to path, in the order picked.
-func write(path string, all []chunked, picked []int, verdict func(string) view.Verdict, lost []view.Lost) (err error) {
+func write(path string, all []chunked, picked []int, verdict func(ads.Ad) func(string) view.Verdict, lost []view.Lost) (err error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
@@ -168,7 +172,7 @@ func write(path string, all []chunked, picked []int, verdict func(string) view.V
 	w := bufio.NewWriter(f)
 	fmt.Fprintf(w, "# %d ads in their sections\n\n", len(picked))
 	for _, i := range picked {
-		if err := view.Render(w, all[i].ad, all[i].ss, verdict, lost[i]); err != nil {
+		if err := view.Render(w, all[i].ad, all[i].ss, verdict(all[i].ad), lost[i]); err != nil {
 			return err
 		}
 	}

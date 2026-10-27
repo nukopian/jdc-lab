@@ -69,6 +69,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Find near-duplicate boilerplate](2026-10-27-find-near-duplicate-boilerplate.md)
+  (roadmap 3), shipped, unreleased
 - [A readable view of chunked ads](2026-10-27-a-readable-view-of-chunked-ads.md)
   (roadmap 16), shipped, unreleased
 - [Try grammar's Overlap in sections.All, then take up grammar v0.3.2](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md),

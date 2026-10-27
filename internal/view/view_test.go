@@ -1,6 +1,8 @@
 package view
 
 import (
+	"cmp"
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -12,30 +14,56 @@ import (
 
 func TestPick(t *testing.T) {
 	var cs []Candidate
-	for _, id := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"} {
-		cs = append(cs, Candidate{ID: id})
+	for i := range 30 {
+		cs = append(cs, Candidate{ID: fmt.Sprint(i)})
 	}
-	cs[6].NoHeading, cs[7].Unmapped, cs[8].MostlyBoilerplate, cs[9].Lost = true, true, true, true
-	got := Pick(cs, 5)
-	if len(got) != 5 || got[0] != 6 || got[1] != 7 || got[2] != 8 || got[3] != 9 {
-		t.Fatalf("got %v, want 6, 7, 8 and 9 first, then one more", got)
+	byRank := slices.Clone(cs)
+	slices.SortFunc(byRank, func(a, b Candidate) int { return cmp.Compare(rank(a.ID), rank(b.ID)) })
+	// The last of the 30 by rank has every property worth showing.
+	last := slices.IndexFunc(cs, func(c Candidate) bool { return c.ID == byRank[29].ID })
+	cs[last].NoHeading, cs[last].Unmapped, cs[last].MostlyBoilerplate, cs[last].Lost = true, true, true, true
+
+	got := ids(cs, Pick(cs, 10))
+	want := []string{}
+	for _, c := range byRank[:6] { // 10 less the four purposes, always
+		want = append(want, c.ID)
+	}
+	if !slices.Equal(got[:6], want) || !slices.Contains(got, byRank[29].ID) {
+		t.Fatalf("got %v; want the six lowest by rank, %v, and %s", got, want, byRank[29].ID)
+	}
+	if len(got) != 10 {
+		t.Fatalf("got %d ads, want 10", len(got))
+	}
+	// In order of rank, so that each ad keeps its place in the view.
+	if !slices.IsSortedFunc(got, func(a, b string) int { return cmp.Compare(rank(a), rank(b)) }) {
+		t.Errorf("got %v, not in order of rank", got)
+	}
+	// Changing what makes an ad worth showing doesn't move the fixed ones.
+	cs[last].NoHeading = false
+	again := ids(cs, Pick(cs, 10))
+	for _, id := range want {
+		if !slices.Contains(again, id) {
+			t.Errorf("%s left the view when another ad's properties changed: %v", id, again)
+		}
 	}
 	// The same ads however the candidates come.
 	rev := slices.Clone(cs)
 	slices.Reverse(rev)
-	var a, b []string
-	for _, i := range got {
-		a = append(a, cs[i].ID)
+	if r := ids(rev, Pick(rev, 10)); !slices.Equal(r, again) {
+		t.Errorf("reversed, got %v, want %v", r, again)
 	}
-	for _, i := range Pick(rev, 5) {
-		b = append(b, rev[i].ID)
+	if n := len(Pick(cs[:5], 50)); n != 5 {
+		t.Errorf("asked for more than there are: got %d, want 5", n)
 	}
-	if !slices.Equal(a, b) {
-		t.Errorf("reversed, got %v, want %v", b, a)
+}
+
+// ids returns the IDs of the candidates at indexes.
+func ids(cs []Candidate, indexes []int) []string {
+	var out []string
+	for _, i := range indexes {
+		out = append(out, cs[i].ID)
 	}
-	if n := len(Pick(cs, 50)); n != len(cs) {
-		t.Errorf("asked for more than there are: got %d, want %d", n, len(cs))
-	}
+	return out
 }
 
 func TestRender(t *testing.T) {

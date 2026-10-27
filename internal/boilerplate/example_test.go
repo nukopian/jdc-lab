@@ -16,15 +16,15 @@ func ExampleIndex() {
 		duties = "Prepare learning materials and support pupils with their reading every day."
 	)
 	var ix boilerplate.Index
-	ix.Add("Crane Operator", sections.Company, agency)
-	ix.Add("Teaching Assistant", sections.Company, agency)
-	ix.Add("Teaching Assistant", sections.Responsibilities, duties)
-	ix.Add("Cover Supervisor", sections.Responsibilities, duties)
-	ix.Add("SEN Teaching Assistant", sections.Responsibilities, duties)
+	ix.Add(boilerplate.Source{Title: "Crane Operator"}, sections.Company, agency)
+	ix.Add(boilerplate.Source{Title: "Teaching Assistant"}, sections.Company, agency)
+	ix.Add(boilerplate.Source{Title: "Teaching Assistant"}, sections.Responsibilities, duties)
+	ix.Add(boilerplate.Source{Title: "Cover Supervisor"}, sections.Responsibilities, duties)
+	ix.Add(boilerplate.Source{Title: "SEN Teaching Assistant"}, sections.Responsibilities, duties)
 
 	for _, text := range []string{agency, duties} {
 		fmt.Printf("groups %d, boilerplate %t, template %t\n",
-			ix.Groups(text), ix.Boilerplate(text), ix.Template(text))
+			ix.Groups(boilerplate.Source{}, text), ix.Boilerplate(boilerplate.Source{}, text), ix.Template(boilerplate.Source{}, text))
 	}
 	// Output:
 	// groups 2, boilerplate true, template false

@@ -12,6 +12,15 @@ has the steps).
 
 ## Unreleased
 
+- Boilerplate is found when it isn't word for word the same: with the
+  ad's own title or place written in, as placeholders, or, in texts of
+  20 words or more, with a few words changed, by their runs of five
+  words. On the three samples together it's 17.6% of the text, from
+  15.8%, and 10% of summaries, from 7%; short lines are matched only
+  as written, as alike they're more often about the job. The view's
+  ads keep their places: sixteen are always the first by the hash
+  (roadmap 3;
+  [record](docs/changes/2026-10-27-find-near-duplicate-boilerplate.md)).
 - `pipeline run` runs every stage once, on all the samples together,
   in place of each sample and `all`: a run's tables are in
   `data/runs/RUN/STAGE/`, with the samples it read in `samples.txt`. A
