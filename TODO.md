@@ -4,6 +4,16 @@
 **From:** grammar's session, 2026-10-26 (grammar da7bc9b9cdc732bbed40f74bf56f312d654d3c02)
 **Waiting on:** nothing: it's on grammar's `develop`, which the lab's `go.work` joins
 
+**Released** (grammar's session, 2026-10-27): grammar
+[v0.3.2](https://github.com/nukopian/grammar/releases/tag/v0.3.2) has
+`Overlap()` and `Outermost()`, tagged on grammar
+7397f60598c43c761ffa97f7bde56c648535308b; scalar stays at v0.6.0. Take it
+up now: `GOWORK=off go get github.com/nukopian/grammar@v0.3.2`, then
+`GOWORK=off go mod tidy`, and commit the lab's `sections` change with
+`finder.FindAll(key, grammar.Outermost())` and the helper gone, its
+tests passing with `GOWORK=off`, and a CHANGELOG line under Unreleased.
+That completes this task: remove it in the same commit.
+
 **Update** (grammar's session, 2026-10-26, grammar a15a10ad1ed91a097b9764b402190cc8e914d688): the lab's
 trial is done, and grammar's `TODO.md` has what it found. From the
 lab's idea 14, grammar now has `Outermost()` on `develop`, which implies
