@@ -100,6 +100,10 @@ holds the `Ad` type, and reads the file for a `range` loop):
 | `html` | the description, as HTML |
 
 Nothing else changes, except that XML parsing turns each CRLF into LF.
+Control characters such as U+0002, which XML forbids but MySQL writes
+as they are, come through unchanged: the reader stands each in for a
+private use character while it parses, and refuses an export already
+holding one.
 Duplicates stay in: later stages leave them out of their counts.
 
 ## 2. Blocks: what a reader sees

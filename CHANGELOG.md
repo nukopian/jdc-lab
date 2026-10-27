@@ -12,7 +12,11 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- The conversion reads exports holding control characters. XML 1.0
+  forbids characters such as U+0002, but MySQL's `--xml` writes them
+  as they are, and Go's decoder refused the whole export. They now
+  come through to the JSON Lines unchanged; earlier exports convert
+  exactly as before.
 
 ## v0.3.5 (2026-10-27)
 

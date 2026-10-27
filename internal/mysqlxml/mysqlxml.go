@@ -10,6 +10,13 @@
 // The conversion keeps every row and every value as it was: duplicates, HTML
 // and odd characters are for later steps to deal with. The one change is
 // XML's own: parsing turns each CRLF in a value into LF.
+//
+// That includes control characters such as U+0002. XML 1.0 forbids them,
+// even escaped, but MySQL writes them as they are, so Go's decoder would
+// refuse the export. The Reader stands each in for a character in Unicode's
+// private use area while the XML is parsed, then swaps it back; an export
+// that already holds one of those stand-ins is refused, as it couldn't be
+// read back as it was.
 package mysqlxml
 
 import (
@@ -19,6 +26,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
 )
@@ -33,7 +42,76 @@ type Reader struct {
 
 // NewReader returns a Reader that reads an export from r.
 func NewReader(r io.Reader) *Reader {
-	return &Reader{d: xml.NewDecoder(r)}
+	return &Reader{d: xml.NewDecoder(&controls{r: r})}
+}
+
+// standIn is where the stand-ins start: control character c becomes
+// standIn+c, from U+E000 to U+E01F.
+const standIn = 0xE000
+
+// isControl reports whether XML 1.0 forbids byte b, which is then a whole
+// character: in UTF-8, bytes below 0x80 are never part of a longer one.
+func isControl(b byte) bool {
+	return b < 0x20 && b != '\t' && b != '\n' && b != '\r'
+}
+
+// controls is an io.Reader that replaces each control character read from
+// r with its stand-in, and fails on a stand-in already there.
+type controls struct {
+	r    io.Reader
+	buf  [32 << 10]byte
+	held int    // bytes at the start of buf that may begin a stand-in
+	out  []byte // what's ready to be read
+	err  error
+}
+
+func (c *controls) Read(p []byte) (int, error) {
+	for len(c.out) == 0 {
+		if c.err != nil {
+			return 0, c.err
+		}
+		n, err := c.r.Read(c.buf[c.held:])
+		c.err = err
+		data := c.buf[:c.held+n]
+		// A stand-in is EE 80 then 80 to 9F, so one that may be split
+		// across reads waits for the next.
+		keep := 0
+		if err == nil {
+			switch {
+			case len(data) >= 2 && data[len(data)-2] == 0xEE && data[len(data)-1] == 0x80:
+				keep = 2
+			case len(data) >= 1 && data[len(data)-1] == 0xEE:
+				keep = 1
+			}
+		}
+		c.out = c.out[:0]
+		for i, b := range data[:len(data)-keep] {
+			if b == 0xEE && i+2 < len(data) && data[i+1] == 0x80 && data[i+2] >= 0x80 && data[i+2] <= 0x9F {
+				c.out, c.err = nil, fmt.Errorf("the export holds U+%04X, which the reader uses for a control character", standIn+rune(data[i+2]-0x80))
+				return 0, c.err
+			}
+			if isControl(b) {
+				c.out = utf8.AppendRune(c.out, standIn+rune(b))
+			} else {
+				c.out = append(c.out, b)
+			}
+		}
+		c.held = copy(c.buf[:], data[len(data)-keep:])
+	}
+	n := copy(p, c.out)
+	c.out = c.out[n:]
+	return n, nil
+}
+
+// restore swaps the stand-ins in s back to the control characters they
+// stand for.
+func restore(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r >= standIn && r < standIn+0x20 {
+			return r - standIn
+		}
+		return r
+	}, s)
 }
 
 // row is a <row> as it's written, for the decoder to fill.
@@ -68,7 +146,8 @@ func (r *Reader) Read() (Row, error) {
 			if f.Nil == "true" {
 				out[*f.Name] = nil
 			} else {
-				out[*f.Name] = &f.Text
+				text := restore(f.Text)
+				out[*f.Name] = &text
 			}
 		}
 		return out, nil

@@ -7,6 +7,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"testing/iotest"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
 )
@@ -79,6 +80,27 @@ func TestReadValues(t *testing.T) {
 		if !tt.ok {
 			t.Errorf("Read doesn't: %s", tt.name)
 		}
+	}
+}
+
+// XML 1.0 forbids control characters such as U+0002, but MySQL writes
+// them as they are, and they turn up in ads.
+func TestReadKeepsControlCharacters(t *testing.T) {
+	text := strings.Replace(export, "next", "high\x02volume\x1f", 1)
+	html := *readAll(t, text)[0]["description_formatted"]
+	if !strings.Contains(html, "\nhigh\x02volume\x1f</p>") {
+		t.Errorf("got %q, want the control characters kept", html)
+	}
+}
+
+// The control characters stand in the private use area while the XML is
+// parsed, so a real character there would be changed: it's refused.
+func TestReadRefusesTheStandInCharacters(t *testing.T) {
+	// Split across the reader's reads, a byte at a time.
+	r := NewReader(iotest.OneByteReader(strings.NewReader(strings.Replace(export, "next", "", 1))))
+	_, err := r.Read()
+	if err == nil || !strings.Contains(err.Error(), "U+E002") {
+		t.Fatalf("got %v, want an error naming U+E002", err)
 	}
 }
 
