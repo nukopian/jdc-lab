@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 12.
+number: 16.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -229,6 +229,31 @@ the pipeline needs a Python service.
 
 ## Ideas
 
-None yet. An idea is a numbered heading, the date it was added, and a
-line or two on what and why. Each wash-up prunes them: each is kept,
-promoted to Later or Next with its number, or dropped.
+An idea is a numbered heading, the date it was added, and a line or
+two on what and why. Each wash-up prunes them: each is kept, promoted
+to Later or Next with its number, or dropped.
+
+### 12. Boilerplate thresholds scaled to a sample's size
+
+Added 2026-10-27. Boilerplate's thresholds are counts of title groups,
+which a larger sample passes more easily (12.5% of text on 5,000 ads,
+15.1% on 21,000), so its figures from samples of different sizes
+don't compare.
+
+### 13. "Label – value" lines with a dash as fields
+
+Added 2026-10-27. "Working Hours - Monday to Friday, 08:00 - 16:30" is
+a field, but fields split only at a colon or bar, so 39 such lines
+became plain text when roadmap 2 stopped them passing as headings.
+
+### 14. Pay without a currency sign
+
+Added 2026-10-27. "Pay Rate – 13.10" in bold still passes as a heading
+(25 ads), as the rule against money looks for £, $ or €.
+
+### 15. The ad's title run into a heading
+
+Added 2026-10-27. About 30 bold paragraphs start with the ad's title
+and run on into a heading ("General Foreman Responsibilities") or a
+line of facts; split off as a repeat, the rest would read as it
+should.

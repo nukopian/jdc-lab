@@ -85,8 +85,8 @@ The item was in Now from the roadmap's start, and its work was done on
 - **What's left:** the 39 details lines would be better read as
   fields, a label and its value, but a dash isn't a field's separator,
   as a colon or bar is. Pay written without a currency sign ("Pay Rate
-  – 13.10", in 25 ads) still passes as a heading. Neither is on the
-  roadmap yet. Three bold shift times with bare ranges and no range of
+  – 13.10", in 25 ads) still passes as a heading. They're ideas 13 and
+  14 on the roadmap. Three bold shift times with bare ranges and no range of
   days beside them still pass as headings, once each: "Shifts (6-2 /
   2-10)", "Continental Day Shift 6-6" and "6-6 shifts". "Shift" beside a
   bare range would catch them; they're left for the grammar for working
