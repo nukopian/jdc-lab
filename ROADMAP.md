@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 18.
+number: 21.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -40,23 +40,36 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment: the next to start comes from Next.
+### 7. Facts from the details
+
+**Serves:** metadata, structure
+
+Grammars for the facts ads state in lines of their own (pay, seniority,
+location, work pattern, schedule), so that each comes out as details
+with its values, wherever it was. The plan is in its
+[record](docs/changes/2026-10-27-facts-from-the-details.md).
 
 ## Next
 
-### 10. Does it make search better?
+### 19. Requirements and responsibilities by their wording
 
-**Serves:** search
+**Serves:** structure
 
-Measure retrieval, not only structure: a set of queries with the ads
-that should answer them, and a comparison of one embedding per ad with
-embeddings of its chosen sections, with and without metadata to filter
-on, and against a managed embedding service. This is what answers the
-lab's question.
+A grammar for the lines that say what they are ("Experience of…",
+"You will…", "Must have…"), so that requirements and responsibilities
+no heading placed come out in their sections, each saying which rule
+placed it. Done when the share of summary text there by default, 61%
+now, is remeasured and a sample checked by eye.
 
-A first slice has shipped: job titles as queries, local
-representations only ([record](docs/changes/2026-10-27-a-first-retrieval-test.md)).
-The rest, judged queries beyond titles first, is still to come.
+### 20. Before and after pages
+
+**Serves:** structure, embeddings
+
+For a dozen ads chosen to show where chunking does well and badly,
+the ad as posted beside its chunks: what's embedded, what's dropped as
+boilerplate, what became metadata, and which rule placed each. In the
+private data store, as the ads aren't ours to publish. Done when the
+pages show the chunker's current output, from `chunk` itself.
 
 ### 4. Catch footers filed under requirements
 
@@ -155,44 +168,7 @@ ones by eye), and tests cover it.
 
 ## Later
 
-### 7. Facts from the details
-
-**Serves:** metadata
-
-Grammars ([grammar](https://github.com/nukopian/grammar)) for the facts
-in an ad's details sections and fields: salary and its period, hours,
-working pattern, contract type and location, as metadata with definite
-values, so that search can filter on them and they needn't be embedded.
-A third of ads state a working pattern: a grammar for it would first
-replace `internal/headings`' regular expressions for times and patterns
-(their cues are in roadmap 2's
-[record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md)).
-
-### 8. Skills and occupations as taxonomy links
-
-**Serves:** taxonomies
-
-Link the skills in requirements, and the job itself, to taxonomies of
-skills and occupations, so that search can match on what a job needs
-rather than on how its ad words it.
-
-### 9. A fair test of embedding models
-
-**Serves:** embeddings
-
-Rerun the first comparison of `BAAI/bge-base-en-v1.5` and
-`intfloat/e5-small-v2` fairly: with the `query: ` and `passage: `
-prefixes E5 is trained with, on many headings and sections rather than
-one, and with other small local models beside them. Separation between
-kinds matters more than the scores themselves.
-
-### 11. Embeddings from Go
-
-**Serves:** deployment
-
-Run the chosen model from Go with ONNX Runtime over the sections worth
-embedding, as the ONNX demo does for its toy model, so that nothing in
-the pipeline needs a Python service.
+Nothing at the moment.
 
 ## Ideas
 
@@ -231,3 +207,28 @@ Added 2026-10-27. When a list item holds a list or paragraphs of its
 own, `internal/blocks` puts its text after the blocks that follow it,
 so it lands under the wrong heading: 20 ads of the three samples, which
 `cmd/view` counts and shows.
+
+### 8. Skills and occupations as taxonomy links
+
+Added 2026-10-25, to Ideas 2026-10-27. Link the skills and occupations
+an ad names to the existing taxonomies, so they're filtered on, not
+embedded.
+
+### 9. A fair test of embedding models
+
+Added 2026-10-25, to Ideas 2026-10-27. Rerun the first comparison of
+`BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2` fairly, with E5's
+prefixes and many sections, beside other small local models.
+
+### 10. Does it make search better?
+
+Added 2026-10-25, to Ideas 2026-10-27. Measure retrieval: a first slice,
+with job titles as queries, is in its
+[record](docs/changes/2026-10-27-a-first-retrieval-test.md); judged
+queries, a check of boilerplate's verdict, metadata and a managed
+service are still to come.
+
+### 11. Embeddings from Go
+
+Added 2026-10-25, to Ideas 2026-10-27. Run the chosen model from Go
+with ONNX Runtime, so nothing in the pipeline needs a Python service.

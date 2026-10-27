@@ -12,6 +12,13 @@ has the steps).
 
 ## Unreleased
 
+- `chunk` prints any ad's chunks, as an embedding job would take them:
+  each section with its kind, whether to embed it, keep it as metadata
+  or leave it out, about how many tokens it is, and what placed it,
+  down to the phrase in `headings.txt` and any it outranked. Given an
+  ID in a run's ads, a file of HTML or standard input; text to read,
+  or JSON with `-json` (roadmap 18;
+  [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md)).
 - A first test of retrieval: `cmd/retrieval-set` builds it from a run,
   5,000 ads with the texts each representation embeds and 50 job
   titles as queries, and `python/bin/retrieval_eval.py` scores it with

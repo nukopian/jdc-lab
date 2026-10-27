@@ -45,8 +45,9 @@ embeddings, and a large language model only where those fall short.
 - **A pipeline, by rules alone.** It splits each ad into the blocks a
   reader sees, finds its headings and fields, divides it into sections
   (summary, responsibilities, requirements, benefits and the rest), and
-  finds the boilerplate that ads repeat whatever the job. Each run also
-  shows 20 ads in their sections, the same in every run, to read by
+  finds the boilerplate that ads repeat whatever the job. `chunk` shows
+  any ad's chunks, saying what to embed and what placed each, and each
+  run shows 20 ads in their sections, the same in every run, to read by
   eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
   what it measured, and how to improve it.
 - **Measured on two samples** of 2,000 and 5,000 ads, from different
@@ -58,8 +59,10 @@ embeddings, and a large language model only where those fall short.
   search can improve while embedding less. A third of ads state a working pattern, such as
   "Monday to Friday, 9am–5pm": a fact for metadata, not embedding.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: first the pipeline's known gaps, then grammars for the facts
-  in the details sections, and a fair test of embeddings.
+  and why: now, a chunker for any ad, and grammars for the facts ads
+  state (pay, seniority, location, work pattern, schedule); then
+  requirements and responsibilities placed by their wording, and pages
+  showing ads before and after.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

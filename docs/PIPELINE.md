@@ -382,6 +382,31 @@ comes out after the blocks that follow it, so its text lands under the
 wrong heading. The view shows where, for each ad it has, and the
 summary counts both over the sample.
 
+## Chunking an ad
+
+**Package** `internal/chunk`, **program** `cmd/chunk`.
+
+Everything above, for one ad, as an embedding job would take it: its
+sections as chunks, each with its kind and heading, its text without
+its boilerplate, what to do with it, about how many tokens it is (four
+for every three words), and what placed it there.
+
+```
+go run ./cmd/chunk 225682916
+go run ./cmd/chunk -json 225682916
+go run ./cmd/chunk -title "Driver" ad.html
+```
+
+The summary, responsibilities, requirements, desirable and unmapped
+chunks are embedded; details are metadata, with their fields; benefits,
+company, apply and legal are left out. Boilerplate is what the run's
+`boilerplate/repeated.tsv` says, so a run comes first (`-run` chooses
+which, `data/runs/latest` by default). What placed a chunk is the
+heading and the phrase in it that won, with any phrases of other kinds
+it outranked, or the rule (`it starts "why"`), or that nothing came
+before it, so a wrong kind points at the line of `headings.txt` to
+change.
+
 ## Testing retrieval
 
 **Package** `internal/retrieval`, **programs** `cmd/retrieval-set`

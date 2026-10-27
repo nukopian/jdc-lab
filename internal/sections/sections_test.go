@@ -192,3 +192,18 @@ func TestDivideWithNoSummary(t *testing.T) {
 		t.Errorf("got %+v, want one company section", ss)
 	}
 }
+
+func TestExplain(t *testing.T) {
+	for key, want := range map[string]string{
+		"why join us":          `it starts "why"`,
+		"what you'll be doing": `"what you'll be doing" in headings.txt`,
+		"desirable skills":     `"desirable" in headings.txt, over "skills" (requirements)`,
+		"about brightway":      `it starts "about"`,
+		"working hours":        `"working hours" in headings.txt`,
+		"our depots":           "no phrase in headings.txt",
+	} {
+		if got := Explain(key); got != want {
+			t.Errorf("Explain(%q) = %q, want %q", key, got, want)
+		}
+	}
+}

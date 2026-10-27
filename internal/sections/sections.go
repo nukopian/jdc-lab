@@ -107,6 +107,42 @@ func Of(key string) (Kind, bool) {
 	return "", false
 }
 
+// Explain says, in words, why Of gives a heading the kind it does, or
+// why it gives none, following Of's order: for a phrase, the phrase as
+// the heading has it, and any phrases of other kinds it outranked.
+func Explain(key string) string {
+	first, _, _ := strings.Cut(key, " ")
+	if first == "why" {
+		return `it starts "why"`
+	}
+	if kind, ok := Of(key); ok && len(All(key)) > 0 {
+		matches := finder.FindAll(key, grammar.Outermost())
+		made, _ := grammar.ToAll[Kind](matches)
+		var won string
+		var over []string
+		for i, m := range matches.Items() {
+			text := m.At("~").Str()
+			switch {
+			case made[i] == kind && won == "":
+				won = text
+			case made[i] != kind:
+				over = append(over, fmt.Sprintf("%q (%s)", text, made[i]))
+			}
+		}
+		if len(over) > 0 {
+			return fmt.Sprintf("%q in headings.txt, over %s", won, strings.Join(over, ", "))
+		}
+		return fmt.Sprintf("%q in headings.txt", won)
+	}
+	switch {
+	case first == "about":
+		return `it starts "about"`
+	case headings.IsLabel(key):
+		return "a field's label"
+	}
+	return "no phrase in headings.txt"
+}
+
 // All returns every kind the phrases in a heading point to, in the order
 // they come in it, each once: more than one means the heading's words
 // disagree, and Of chose between them.
