@@ -8,10 +8,13 @@
 // responsibilities, requirements and desirable. Details are metadata;
 // benefits, company, apply and legal are left out; and unmapped ones,
 // whose kind isn't known, are unclassified, not embedded: they're what's
-// left to map. Text found as boilerplate stays in a chunk's text, and an
-// embedded chunk lists it: the verdict catches advertisers' footers, but
-// also job lines common to many ads ("high levels of accuracy and
-// attention to detail"), so nothing is taken out until it's surer.
+// left to map. Text found as boilerplate leaves the embedded chunks for
+// one chunk of its own, at the end, left out but there to see, each line
+// with the section it came from: the verdict catches advertisers'
+// footers, but also job lines common to many ads ("high levels of
+// accuracy and attention to detail"), and this is where they show. Other
+// chunks keep theirs, as part of what they say: an advertiser's
+// standard perks are still a list of benefits.
 package chunk
 
 import (
@@ -21,6 +24,9 @@ import (
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
+
+// Boilerplate is the kind of the chunk of an ad's boilerplate.
+const Boilerplate sections.Kind = "boilerplate"
 
 // What to do with a chunk.
 const (
@@ -45,11 +51,8 @@ type Chunk struct {
 	// Use is Embed, Metadata, LeaveOut or Unclassified.
 	Use string `json:"use" yaml:"use"`
 	// Text is the chunk's heading and text, a line each.
-	Text string `json:"text" yaml:"text"`
-	// Boilerplate is the text of an embedded chunk found as boilerplate,
-	// kept in Text: where taking it out would save tokens.
-	Boilerplate []string `json:"boilerplate,omitempty" yaml:"boilerplate,omitempty"`
-	Fields      []Field  `json:"fields,omitempty" yaml:"fields,omitempty"`
+	Text   string  `json:"text" yaml:"text"`
+	Fields []Field `json:"fields,omitempty" yaml:"fields,omitempty"`
 	// Tokens is about how many tokens Text is: four for every three
 	// words, as models' tokenizers make of English.
 	Tokens int `json:"tokens" yaml:"tokens"`
@@ -59,6 +62,7 @@ type Chunk struct {
 // part was found to be boilerplate.
 func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	var cs []Chunk
+	var gathered []string // the boilerplate of the embedded chunks
 	for _, s := range ss {
 		c := Chunk{Kind: s.Kind, Heading: s.Heading, PlacedBy: placedBy(s), Use: use(s.Kind)}
 		var lines []string
@@ -66,11 +70,9 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			lines = append(lines, s.Heading)
 		}
 		for _, p := range s.Parts {
-			// Boilerplate is marked in an embedded chunk, where it would
-			// count, but kept: its verdict also takes in job lines common
-			// to many ads. Elsewhere it's part of what the section says.
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
-				c.Boilerplate = append(c.Boilerplate, p.Text)
+				gathered = append(gathered, string(s.Kind)+": "+p.Text)
+				continue
 			}
 			if p.Role == headings.Field {
 				c.Fields = append(c.Fields, Field{Label: p.Key, Value: p.Value})
@@ -80,6 +82,13 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		c.Text = strings.Join(lines, "\n")
 		c.Tokens = Tokens(c.Text)
 		cs = append(cs, c)
+	}
+	if len(gathered) > 0 {
+		text := strings.Join(gathered, "\n")
+		cs = append(cs, Chunk{
+			Kind: Boilerplate, Use: LeaveOut, Text: text, Tokens: Tokens(text),
+			PlacedBy: "found as boilerplate in the chunks above: in ads for five groups of titles or more, or more often outside the sections about the job",
+		})
 	}
 	return cs
 }

@@ -58,12 +58,6 @@ func (a Ad) WriteYAML(w io.Writer) error {
 				fmt.Fprintf(&b, "      - label: %s\n        value: %s\n", scalar(f.Label), scalar(f.Value))
 			}
 		}
-		if len(c.Boilerplate) > 0 {
-			b.WriteString("    boilerplate:\n")
-			for _, s := range c.Boilerplate {
-				fmt.Fprintf(&b, "      - %s\n", scalar(s))
-			}
-		}
 	}
 	_, err := io.WriteString(w, b.String())
 	return err

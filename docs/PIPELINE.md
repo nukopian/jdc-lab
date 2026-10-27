@@ -408,9 +408,7 @@ summary counts both over the sample.
 **Package** `internal/chunk`, **program** `cmd/chunk`.
 
 Everything above, for one ad, as an embedding job would take it: its
-sections as chunks, each with its kind and heading, its text (all of
-it: an embedded chunk lists what's found as boilerplate, but keeps it,
-as the verdict also takes in job lines common to many ads), what to do with it, about how many tokens it is (four
+sections as chunks, each with its kind and heading, its text, what to do with it, about how many tokens it is (four
 for every three words), and what placed it there.
 
 ```
@@ -428,7 +426,12 @@ The summary, responsibilities, requirements and desirable chunks are
 embedded; details are metadata, with their fields; benefits, company,
 apply and legal are left out; and unmapped chunks, whose kind isn't
 known, are **unclassified**: not embedded, as an unmapped heading is
-mapping still to do. Each ad totals its tokens, its embedded tokens and
+mapping still to do. Text found as boilerplate leaves the embedded chunks for
+a **boilerplate** chunk of its own, at the end, left out, each line with
+the section it came from: the verdict takes in job lines common to many
+ads as well as advertisers' footers, and this is where to see them.
+Other chunks keep theirs, so an advertiser's standard perks are still a
+list of benefits. Each ad totals its tokens, its embedded tokens and
 its unclassified ones, so the last shows what's left to map. Boilerplate is what the run's
 `boilerplate/repeated.tsv` says, so a run comes first (`-run` chooses
 which, `data/runs/latest` by default). What placed a chunk is the

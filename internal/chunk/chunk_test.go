@@ -24,14 +24,14 @@ func TestOf(t *testing.T) {
 	}
 	boiler := func(s string) bool { return s == "We are an agency." }
 	cs := Of(ss, boiler)
-	if len(cs) != 5 {
-		t.Fatalf("got %d chunks, want 5", len(cs))
+	if len(cs) != 6 {
+		t.Fatalf("got %d chunks, want 5 and one of boilerplate", len(cs))
 	}
 	tests := []struct {
 		use, placed, text string
 	}{
 		{Embed, "nothing before it: summary by default", "We deliver parcels across the north of England every day."},
-		{Embed, `the heading "What you'll be doing": "what you'll be doing" in headings.txt`, "What you'll be doing\nDrive the van.\nWe are an agency."},
+		{Embed, `the heading "What you'll be doing": "what you'll be doing" in headings.txt`, "What you'll be doing\nDrive the van."},
 		{Metadata, `the heading "Job details": "job details" in headings.txt`, "Job details\nSalary: £30,000"},
 		{LeaveOut, `the heading "About Brightway": it starts "about"`, "About Brightway\nWe are a family firm."},
 		{LeaveOut, `the line "How to apply": exactly a section's name`, "How to apply\nApply today."},
@@ -42,9 +42,11 @@ func TestOf(t *testing.T) {
 			t.Errorf("chunk %d: got %s, %q, %q; want %s, %q, %q", i, c.Use, c.PlacedBy, c.Text, tt.use, tt.placed, tt.text)
 		}
 	}
-	// Boilerplate is marked, not taken out: its verdict isn't sure enough.
-	if got := cs[1].Boilerplate; len(got) != 1 || got[0] != "We are an agency." {
-		t.Errorf("the responsibilities' boilerplate marked: %q", got)
+	// Boilerplate leaves an embedded chunk for one of its own, at the end,
+	// each line with the section it came from.
+	b := cs[5]
+	if b.Kind != Boilerplate || b.Use != LeaveOut || b.Text != "responsibilities: We are an agency." {
+		t.Errorf("the boilerplate chunk: %+v", b)
 	}
 	if got := cs[2].Fields; len(got) != 1 || got[0].Label != "salary" || got[0].Value != "£30,000" {
 		t.Errorf("the details' fields: %+v", got)
@@ -75,7 +77,7 @@ func TestYAML(t *testing.T) {
 	for i, s := range tricky {
 		a.Chunks = append(a.Chunks, Chunk{
 			Kind: sections.Summary, Heading: s, PlacedBy: s, Use: Embed, Text: s, Tokens: i,
-			Fields: []Field{{Label: "pay", Value: s}}, Boilerplate: []string{s},
+			Fields: []Field{{Label: "pay", Value: s}},
 		})
 	}
 	var b strings.Builder
@@ -108,18 +110,29 @@ func TestTotals(t *testing.T) {
 	}
 }
 
-// Boilerplate stays in every chunk's text; it's marked in embedded ones,
-// where it would count, and not in others, where it's part of a list.
-func TestBoilerplateKeptAndMarked(t *testing.T) {
+// Boilerplate leaves embedded chunks for a chunk of its own; other
+// chunks keep theirs, as part of a list such as an advertiser's perks.
+func TestBoilerplateGathered(t *testing.T) {
 	ss := []sections.Section{
 		{Kind: sections.Benefits, Heading: "Perks", Parts: []headings.Part{text("A virtual GP."), text("A pension plan.")}},
 		{Kind: sections.Requirements, Heading: "You'll need", Parts: []headings.Part{text("A licence."), text("A pension plan.")}},
+		{Kind: sections.Summary, Parts: []headings.Part{text("We hire drivers."), text("A pension plan.")}},
 	}
 	cs := Of(ss, func(s string) bool { return s == "A pension plan." })
-	if got := cs[0].Text; got != "Perks\nA virtual GP.\nA pension plan." || len(cs[0].Boilerplate) != 0 {
-		t.Errorf("benefits: text %q, boilerplate %q; want every line kept, none listed", got, cs[0].Boilerplate)
+	if len(cs) != 4 {
+		t.Fatalf("got %d chunks, want 3 and one of boilerplate", len(cs))
 	}
-	if got := cs[1].Text; got != "You'll need\nA licence.\nA pension plan." || len(cs[1].Boilerplate) != 1 {
-		t.Errorf("requirements: text %q, boilerplate %q; want the boilerplate kept and marked", got, cs[1].Boilerplate)
+	if got := cs[0].Text; got != "Perks\nA virtual GP.\nA pension plan." {
+		t.Errorf("benefits: %q; want every line kept", got)
+	}
+	if got := cs[1].Text; got != "You'll need\nA licence." {
+		t.Errorf("requirements: %q; want the boilerplate gone", got)
+	}
+	if got := cs[3].Text; got != "requirements: A pension plan.\nsummary: A pension plan." {
+		t.Errorf("boilerplate: %q; want each line with where it was", got)
+	}
+	// No boilerplate, no chunk of it.
+	if got := Of(ss[:1], func(string) bool { return false }); len(got) != 1 {
+		t.Errorf("got %d chunks, want 1", len(got))
 	}
 }

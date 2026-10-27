@@ -99,6 +99,14 @@ say how to run it.
   under five groups of titles is boilerplate also takes in common job
   wording. So every chunk keeps its text; an embedded one lists what's
   marked. Telling footers from common job wording is still to do.
+- **Then gathered into a chunk of its own** (Iain, 2026-10-27): kept in
+  embedded chunks, boilerplate cost tokens; taken out, it was lost from
+  sight. So it leaves the embedded chunks for one `boilerplate` chunk at
+  the end of the ad, left out, each line with the section it came from,
+  where a job line the verdict took is plain to see. Other chunks keep
+  theirs. On a support worker's ad, the advertiser's standard list of
+  benefits, filed under the summary, is gathered there: 192 tokens no
+  longer embedded.
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go
