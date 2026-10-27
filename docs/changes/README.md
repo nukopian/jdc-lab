@@ -70,7 +70,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Check the paths read from grammar matches with CheckPath](2026-10-27-check-match-paths-with-checkpath.md),
-  shipped, unreleased
+  shipped in v0.5.1
 - [A chunker for any ad](2026-10-27-a-chunker-for-any-ad.md)
   (roadmap 18), shipped in v0.5.0
 - [Facts from the details, by grammar](2026-10-27-facts-from-the-details.md)

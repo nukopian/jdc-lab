@@ -1,6 +1,6 @@
 # Check the paths read from grammar matches with CheckPath
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.5.1
 
 **Origin:** a TODO task from grammar's session (grammar fe34207b5d6bfbd3b10ff6b2eea0416fb8a5cfec)
 
