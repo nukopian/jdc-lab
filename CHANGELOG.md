@@ -12,7 +12,11 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.4.0 and scalar v0.6.1. grammar's new `CheckPath` now
+  tests every path the lab reads from a match, in `internal/facts` and
+  `internal/wording`, so a misspelt capture fails `go test` rather than
+  reading undef silently. The pipeline's output is unchanged
+  ([record](docs/changes/2026-10-27-check-match-paths-with-checkpath.md)).
 
 ## v0.5.0 (2026-10-27)
 

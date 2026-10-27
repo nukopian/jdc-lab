@@ -192,6 +192,12 @@ onnx-demo
 Avoid a bare `go build` inside `cmd/<tool>/`: it leaves the binary
 beside the code. `.gitignore` hides it, but it's clutter.
 
+A package that reads a grammar's matches lists every path it reads, as
+`m.At("per.week")` does, in its `paths_test.go`, which checks each with
+grammar's `CheckPath`. A misspelt capture reads undef, just as one that
+didn't match does, so without the check a typo fails silently. Add a
+path to the list when the code first reads it.
+
 Dependencies come in with the code that imports them: `go get` adds a
 module to `go.mod`, and `go mod tidy` drops what's no longer imported.
 `go.mod` requires the published versions of grammar and scalar; with a
