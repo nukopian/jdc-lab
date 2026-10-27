@@ -66,6 +66,23 @@ say how to run it.
   won and those of other kinds it outranked, as well as the rule; the
   plan had a phrase only. Tokens are estimated at four for every three
   words, rounded, as the chunker runs without a model.
+- **Second increment, text cleaned:** blocks now cleans an ad's text
+  for every stage after it (`internal/clean`), the ad itself kept as
+  received: structure in English, not symbols. A symbol that opens a
+  line and stands for one thing becomes its label when what follows is
+  a value of it ("📍 Leeds" is "Location: Leeds", a field), and goes
+  otherwise; lines in a row opening with the same symbol are a list;
+  other emoji, bullets and invisible characters go; quotes, dashes and
+  ellipses become ASCII, an em dash " -- ". `headings.Key` now parts
+  words at a typographic dash, as at a hyphen, the fault found in
+  roadmap 10, so titles, uncleaned, still match their text. On the
+  three samples together: 32,767 lines become items of 5,297 lists,
+  most of them "•" bullets in ads laid out as plain text; 554 more
+  fields; heading uses fall 251, as bulleted points that were taken for
+  headings become items; ads with every heading known rise from 53% to
+  54%; 66 ads lose a section of a known kind, almost all such points,
+  and none checked lost a real heading. No text is lost (the view's
+  check).
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go

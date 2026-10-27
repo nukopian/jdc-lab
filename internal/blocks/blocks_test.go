@@ -23,6 +23,9 @@ func show(blocks []Block) []string {
 		if it.Cues.BoldLead != "" {
 			s += fmt.Sprintf(" lead=%q", it.Cues.BoldLead)
 		}
+		if it.Cues.Added != "" {
+			s += fmt.Sprintf(" added=%q", it.Cues.Added)
+		}
 		return s
 	}
 	for _, b := range blocks {
@@ -120,9 +123,9 @@ func TestSplit(t *testing.T) {
 			[]string{`paragraph "About us" heading`, `paragraph "We care."`},
 		},
 		{
-			"entities decoded, white space collapsed, the no-break space kept",
+			"entities decoded, white space collapsed, the no-break space made plain",
 			"<p>Fish &amp; chips\n\t  for &pound;5&nbsp;each &lt;p&gt;</p>",
-			[]string{`paragraph "Fish & chips for £5\u00a0each <p>"`}, // %q shows the no-break space as \u00a0
+			[]string{`paragraph "Fish & chips for £5 each <p>"`},
 		},
 		{
 			"script and style dropped",
@@ -130,9 +133,41 @@ func TestSplit(t *testing.T) {
 			[]string{`paragraph "Text"`},
 		},
 		{
+			// Text is cleaned (see internal/clean): an emoji bullet goes,
+			// and with it the bold lead it was.
 			"an emoji bullet in bold",
 			`<p><strong>✏️ </strong>Enjoy flexibility.</p>`,
-			[]string{`paragraph "✏️ Enjoy flexibility." lead="✏️"`},
+			[]string{`paragraph "Enjoy flexibility."`},
+		},
+		{
+			"a label symbol becomes its English label",
+			`<p>📍 Leeds</p><p><b>💷 </b>£30,000 a year</p><ul><li>✅ Long term work</li></ul>`,
+			[]string{`paragraph "Location: Leeds" added="Location: "`, `paragraph "Pay: £30,000 a year" added="Pay: "`,
+				"list", `  "Long term work"`},
+		},
+		{
+			// Lines that open with the same symbol, not closing with it,
+			// are a list; a lone one, or ones that differ, aren't.
+			"lines opening with the same symbol are a list",
+			`<p>✅ Weekly pay<br>✅ Free parking<br>✔️ Training</p><p>📢 Hiring now 📢</p><p>📢 Apply today</p>`,
+			[]string{"list", `  "Weekly pay"`, `  "Free parking"`, `line "Training"`,
+				`paragraph "Hiring now"`, `paragraph "Apply today"`},
+		},
+		{
+			"paragraphs opening with the same symbol are a list too",
+			`<p>✨ One</p><p>✨ Two</p><p>Then text.</p>`,
+			[]string{"list", `  "One"`, `  "Two"`, `paragraph "Then text."`},
+		},
+		{
+			// All in bold, it's a heading's, and takes no label.
+			"a bold line opening with a label symbol keeps no label",
+			`<p><strong>💷 What We Offer</strong></p><p><b>📍 The Role</b></p>`,
+			[]string{`paragraph "What We Offer" bold`, `paragraph "The Role" bold`},
+		},
+		{
+			"typographic punctuation made plain",
+			`<p>“Quoted” – text…</p>`,
+			[]string{`paragraph "\"Quoted\" - text..."`},
 		},
 		{
 			"bold later in the text is no cue",

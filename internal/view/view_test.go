@@ -160,6 +160,12 @@ func TestMissing(t *testing.T) {
 	if got := Missing(lost, ss); !strings.Contains(got.Context, "A company car") || got.Moved {
 		t.Errorf("Missing gives %+v, want the text around A company car, missing", got)
 	}
+	// Labels cleaning added aren't the ad's, and aren't missing from it.
+	located := []sections.Section{{Kind: sections.Details, Parts: []headings.Part{
+		{Role: headings.Field, Text: "Location: Leeds", Key: "location", Value: "Leeds", Added: "Location: "}}}}
+	if got := Missing("<p>📍 Leeds</p>", located); got != (Lost{}) {
+		t.Errorf("an added label counted against the ad: %+v", got)
+	}
 	if got := Missing("<p></p>", nil); got != (Lost{}) {
 		t.Errorf("an empty ad loses nothing, but Missing gives %+v", got)
 	}

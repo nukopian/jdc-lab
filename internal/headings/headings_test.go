@@ -136,7 +136,7 @@ func TestRead(t *testing.T) {
 		{
 			"an emoji in bold is no heading",
 			`<p><strong>✏️ </strong>Enjoy flexibility.</p>`,
-			[]string{`text "✏️ Enjoy flexibility."`},
+			[]string{`text "Enjoy flexibility."`},
 		},
 		{
 			"repeats of the title and location",
@@ -165,7 +165,7 @@ func TestRead(t *testing.T) {
 				// follows it; a word that only starts as a unit is no unit.
 				`<p><b>Mon - Fri 7-3 Days</b></p><p><b>Monday to Friday 6-2 Nights</b></p>` +
 				`<p><b>Monday - Friday 9-5 Minimum</b></p><p><b>Mon-Fri 8 till 5</b></p>`,
-			[]string{`text "Monday - Friday 8-5"`, `text "M-F 8-4"`, `text "Mon–Thu 7–3:30"`,
+			[]string{`text "Monday - Friday 8-5"`, `text "M-F 8-4"`, `text "Mon-Thu 7-3:30"`,
 				`text "9-5pm"`, `text "8-5 Monday - Friday"`,
 				`text "Mon - Fri 7-3 Days"`, `text "Monday to Friday 6-2 Nights"`,
 				`text "Monday - Friday 9-5 Minimum"`, `text "Mon-Fri 8 till 5"`},
@@ -269,5 +269,31 @@ func TestRoleString(t *testing.T) {
 		if got := r.String(); got != want {
 			t.Errorf("Role(%d).String() = %q, want %q", int(r), got, want)
 		}
+	}
+}
+
+// A label cleaning added for a symbol makes a field, and the part says
+// what was added.
+func TestReadAddedLabel(t *testing.T) {
+	parts := Read(blocks.Split(`<p>📍 Leeds</p><ul><li>💷 £30,000</li></ul>`), "Driver")
+	if len(parts) != 2 {
+		t.Fatalf("got %+v", parts)
+	}
+	for i, want := range []struct{ key, value, added string }{{"location", "Leeds", "Location: "}, {"pay", "£30,000", "Pay: "}} {
+		p := parts[i]
+		if p.Role != Field || p.Key != want.key || p.Value != want.value || p.Added != want.added {
+			t.Errorf("part %d: got %+v, want a %s field of %q, added %q", i, p, want.key, want.value, want.added)
+		}
+	}
+}
+
+// A typographic dash keys as a hyphen does, so a title as written and the
+// ad's text, cleaned, still match.
+func TestKeyDashes(t *testing.T) {
+	if a, b := Key("Teacher \u2013 Leeds"), Key("Teacher - Leeds"); a != b {
+		t.Errorf("Key(en dash) = %q, Key(hyphen) = %q; want the same", a, b)
+	}
+	if a, b := Key("Mon\u2013Fri"), Key("Mon-Fri"); a != b {
+		t.Errorf("Key(en dash) = %q, Key(hyphen) = %q; want the same", a, b)
 	}
 }

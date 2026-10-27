@@ -221,7 +221,7 @@ func Missing(src string, ss []sections.Section) Lost {
 	for _, s := range ss {
 		add(s.Heading)
 		for _, p := range s.Parts {
-			add(p.Text)
+			add(strings.TrimPrefix(p.Text, p.Added)) // what cleaning added isn't the ad's
 		}
 	}
 	wanted := appendLetters(nil, shown)

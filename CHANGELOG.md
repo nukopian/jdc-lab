@@ -12,6 +12,14 @@ has the steps).
 
 ## Unreleased
 
+- An ad's text is cleaned for every stage after blocks, the ad kept as
+  received: a symbol that opens a line and stands for one thing becomes
+  its English label when a value follows ("📍 Leeds" is "Location:
+  Leeds", a field); lines opening with the same symbol are a list;
+  other emoji, bullets and invisible characters go; quotes and dashes
+  become ASCII, an em dash " -- ". On the three samples, 32,767 lines
+  become list items and 554 more fields are read; `headings.Key` parts
+  words at a typographic dash, as at a hyphen (roadmap 18).
 - `chunk` prints any ad's chunks, as an embedding job would take them:
   each section with its kind, whether to embed it, keep it as metadata
   or leave it out, about how many tokens it is, and what placed it,

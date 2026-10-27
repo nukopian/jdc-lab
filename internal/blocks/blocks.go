@@ -14,6 +14,8 @@ import (
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+
+	"github.com/nukopian/jdc-lab/internal/clean"
 )
 
 // A Kind is what sort of block a Block is.
@@ -54,6 +56,12 @@ type Cues struct {
 	// BoldLead is the bold text it starts with, when not all of it is
 	// bold: "Salary:" in "<strong>Salary:</strong> £30,000".
 	BoldLead string `json:"bold_lead,omitempty"`
+	// Added is the English label cleaning added at its start, for a
+	// symbol that stood for it: "Location: " for "📍 Leeds".
+	Added string `json:"added,omitempty"`
+	// Bullet is the symbol it opened with, as a bullet (see
+	// clean.Bullet): lines in a row with the same one are a list.
+	Bullet string `json:"bullet,omitempty"`
 }
 
 // An Item is a piece of text with its cues: a list item, or the text of a
@@ -89,7 +97,7 @@ func Split(src string) []Block {
 		switch z.Next() {
 		case html.ErrorToken: // the end of src: the tokenizer stops at nothing else
 			b.finish()
-			return b.blocks
+			return bulleted(b.blocks)
 		case html.TextToken:
 			b.text(string(z.Text()))
 		case html.StartTagToken, html.SelfClosingTagToken:
@@ -287,6 +295,31 @@ func (b *builder) add(block Block) {
 }
 
 // finish ends whatever is open at the end of the HTML.
+// bulleted makes each run of two or more paragraphs or lines that open
+// with the same bullet a list, each an item: ads lay lists out so as
+// often as with list tags.
+func bulleted(bs []Block) []Block {
+	var out []Block
+	for i := 0; i < len(bs); {
+		j := i
+		for j < len(bs) && bs[j].Kind != List && bs[j].Cues.Bullet != "" && bs[j].Cues.Bullet == bs[i].Cues.Bullet {
+			j++
+		}
+		if j-i < 2 {
+			out = append(out, bs[i])
+			i++
+			continue
+		}
+		list := Block{Kind: List}
+		for _, b := range bs[i:j] {
+			list.Items = append(list.Items, Item{Text: b.Text, Cues: b.Cues})
+		}
+		out = append(out, list)
+		i = j
+	}
+	return out
+}
+
 func (b *builder) finish() {
 	if b.inItem || b.list > 0 {
 		b.endItem()
@@ -366,11 +399,15 @@ func (p *piece) write(s string, bold bool) {
 // take returns what's been gathered as an Item, and whether it has anything
 // visible, and starts afresh.
 func (p *piece) take() (Item, bool) {
-	text := strings.TrimFunc(p.text.String(), unicode.IsSpace)
-	it := Item{Text: text}
+	// The text is cleaned for the stages after: see internal/clean.
+	text, added := clean.Line(p.text.String())
+	if p.bold && !p.plain { // all bold, a heading's, so no label
+		text, added = clean.Text(p.text.String()), ""
+	}
+	it := Item{Text: text, Cues: Cues{Added: added, Bullet: clean.Bullet(p.text.String())}}
 	it.Cues.Bold = p.bold && !p.plain
 	if p.bold && p.plain && p.leadDone {
-		it.Cues.BoldLead = strings.TrimFunc(p.lead.String(), unicode.IsSpace)
+		it.Cues.BoldLead = clean.Text(p.lead.String())
 	}
 	ok := visible(text)
 	*p = piece{}

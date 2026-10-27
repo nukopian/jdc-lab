@@ -60,6 +60,9 @@ type Part struct {
 	Value string `json:"value,omitempty"`
 	// Item is true for an item of a list.
 	Item bool `json:"item,omitempty"`
+	// Added is the English label cleaning added at the start of Text,
+	// for a symbol that stood for it (see blocks.Cues): not the ad's own.
+	Added string `json:"added,omitempty"`
 }
 
 // MaxWords is the most words a heading has. Longer bold text is a bold
@@ -111,11 +114,13 @@ func Read(bs []blocks.Block, title string, locations ...string) []Part {
 			for _, it := range b.Items {
 				p := item(it.Text)
 				p.Item = true
-				parts = append(parts, p)
+				parts = append(parts, added(p, it.Cues))
 			}
 			continue
 		}
-		parts = append(parts, block(b.Text, b.Cues, repeats)...)
+		ps := block(b.Text, b.Cues, repeats)
+		ps[0] = added(ps[0], b.Cues)
+		parts = append(parts, ps...)
 	}
 	return joinFields(parts)
 }
@@ -167,6 +172,14 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 		}
 	}
 	return []Part{{Role: Text, Text: text}}
+}
+
+// added records on p the label cleaning added, if p starts with it.
+func added(p Part, cues blocks.Cues) Part {
+	if cues.Added != "" && strings.HasPrefix(p.Text, cues.Added) {
+		p.Added = cues.Added
+	}
+	return p
 }
 
 // item reads a list item: a field, or text. Items aren't taken as headings:

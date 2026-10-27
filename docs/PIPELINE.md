@@ -45,9 +45,12 @@ stands, and runs in `claude/`, such as `claude/before` and
 in `samples.txt`. To check a rule on one sample alone, run a stage's
 program on it by hand (below).
 
-Every stage only adds to what the one before it found, and never changes
-the ad's text. Text is kept as written, and only a separate **key** (see
-[Keys](#keys)) is normalised for matching.
+The ad is kept as it was received. Blocks, the first stage, **cleans**
+its text for the stages after it, and for search: structure in English
+words, not symbols (see [Blocks](#2-blocks-what-a-reader-sees)). After
+that, every stage only adds to what the one before it found, and a
+separate **key** (see [Keys](#keys)) is normalised further for
+matching.
 
 ## Running it
 
@@ -137,15 +140,32 @@ blocks a reader would see, in order:
 | `line` | one of several lines a `<br>` split a block into |
 | `list` | consecutive list items, each an item of its own |
 
-Each block keeps its text as a browser shows it (entities decoded, runs
-of spaces made one), and its **cues**: what the markup says that the text
-doesn't.
+Each block has its text as a browser shows it (entities decoded, runs
+of spaces made one), **cleaned** (`internal/clean`), and its **cues**:
+what the markup says that the text doesn't.
+
+Cleaning keeps what means something to search, and makes structure
+English:
+
+| What | Becomes | Example |
+|---|---|---|
+| A symbol that opens a line, stands for one thing, and is followed by a value of it | its English label, unless the line has one, is bold, or ends as a heading does (`:` `?` `!`) | "📍 Leeds" → "Location: Leeds", a field; also 💷 💰 Pay, ⏰ 🕒 ⏱ Hours, 📞 Contact, 📧 Email; but "💷 What We Offer" keeps no label |
+| Lines in a row that open with the same symbol, not ending with it | a list, each an item | "✅ Weekly pay" and "✅ Free parking" on lines of their own → two items |
+| Other emoji and pictographs, and symbols used as bullets | nothing: when in doubt, a symbol goes | "✅ Long term work" → "Long term work"; "📢 Hiring now 📢" → "Hiring now" |
+| Invisible and control characters, Word's bullet, the replacement character | nothing | |
+| Odd spaces, such as the no-break space | a plain space | |
+| Typographic quotes, dashes and ellipses, and full-width forms | plain ASCII; an em dash ` -- ` | "Mon–Fri…" → "Mon-Fri...", "rest—then" → "rest -- then" |
+| Letters, accents, figures, currency signs | kept | "Café", "£30,000" |
+
+Of the three samples' 864,828 lines, 1.1% open with a symbol; the label
+symbols are about 1,150 of them.
 
 | Cue | Example |
 |---|---|
 | `heading` | the text was in `<h1>` to `<h6>` |
 | `bold` | all of it was in `<strong>` or `<b>` |
 | `bold_lead` | it starts with bold text: `Salary:` in "**Salary:** £30,000" |
+| `added` | the English label cleaning added: `Location: ` for "📍 Leeds" |
 
 It decides nothing. Whether a bold block is a heading is the next stage's
 call, which keeps the HTML parsing apart from the judgement, so either
@@ -202,9 +222,10 @@ use each heading and field label, by key, with its commonest spelling.
 ### Keys
 
 `headings.Key` is the form of text used for matching and counting: lower
-case; typographic quotes, dashes and odd spaces folded to plain ones;
-bullets, emoji and invisible characters dropped; punctuation other than
-`' & /` made a space. "What You’ll Be Doing:" and "what you'll be doing"
+case; typographic quotes and odd spaces folded to plain ones; dashes,
+typographic or not, and punctuation other than `' & /` made a space;
+bullets, emoji and invisible characters dropped. It folds what cleaning
+does as well, as titles and locations reach it uncleaned. "What You’ll Be Doing:" and "what you'll be doing"
 have the same key. The table of characters it folds includes those these
 ads use, such as Word's bullet and the emoji variation selector.
 
@@ -663,7 +684,7 @@ by word for word matching, the third 15.1% (idea 12 on the roadmap).
 | Rules before models | The lab's principle: the cheapest accurate technique first. Every stage so far is rules and data. |
 | Go for the stages | Go is the lab's main language; Python is kept for what needs its machine-learning tools. |
 | Evidence first, decisions later | Blocks record cues; headings decide. Each decision can be measured and changed alone. |
-| Text kept, keys normalised | Grammars later need the text as written (`£`, `–`); matching needs one form. |
+| The ad kept, its text cleaned, keys normalised | The ad as received is there to show and check against; the stages and search want text without symbols, structure in words; matching wants one form. |
 | Phrases as data, canonical first | Synonyms are edited, not coded, in the format search engines use. |
 | Legal's name isn't a phrase | In headings, "legal" is more often a job's field ("Legal Secretary") than a notice. |
 | Rule order as ranking | Which kind wins is data too, changed by moving a line. |
