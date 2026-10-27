@@ -17,6 +17,9 @@ has the steps).
   `internal/wording`, so a misspelt capture fails `go test` rather than
   reading undef silently. The pipeline's output is unchanged
   ([record](docs/changes/2026-10-27-check-match-paths-with-checkpath.md)).
+- `readme-pdf.sh` refuses the CHANGELOG and change records by their full
+  path, so `changes/x.md` given from `docs/` no longer gets a PDF, as
+  scalar's wash-up found in its copy of the script.
 
 ## v0.5.0 (2026-10-27)
 
