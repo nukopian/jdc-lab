@@ -1,0 +1,286 @@
+// Package view shows ads in their chunked form, for reading by eye: each
+// section with its kind and heading, its fields, repeats and list items,
+// and the text found as boilerplate or a template marked where it sits.
+// It also shows what no heading placed (the opening that's summary only
+// because nothing headed it, and unmapped sections), and any of an ad's
+// text that's in no section at all, or out of the ad's order.
+//
+// The ads shown are chosen by a fixed hash of their IDs, so that every
+// run of the pipeline shows the same ones, and a diff of two runs' views
+// shows what a change did to them.
+package view
+
+import (
+	"cmp"
+	"fmt"
+	"hash/fnv"
+	"io"
+	"slices"
+	"strings"
+	"unicode"
+
+	"golang.org/x/net/html"
+
+	"github.com/nukopian/jdc-lab/internal/ads"
+	"github.com/nukopian/jdc-lab/internal/headings"
+	"github.com/nukopian/jdc-lab/internal/sections"
+)
+
+// A Candidate is an ad that could be shown, with what makes it worth
+// showing on purpose.
+type Candidate struct {
+	ID string
+	// NoHeading is true for an ad with no heading at all.
+	NoHeading bool
+	// Unmapped is true for an ad with a section of no known kind.
+	Unmapped bool
+	// MostlyBoilerplate is true for an ad over half of whose text is
+	// boilerplate.
+	MostlyBoilerplate bool
+	// Lost is true for an ad with text in no section, or out of its
+	// order (see Missing).
+	Lost bool
+}
+
+// Pick returns the indexes of n candidates to show: first one each with
+// no heading, with an unmapped section, mostly boilerplate, and with text
+// lost, where there are any, then the rest by the hash of their IDs. A random draw
+// would mostly show the easy cases. The order is the same however the
+// candidates come.
+func Pick(cs []Candidate, n int) []int {
+	order := make([]int, len(cs))
+	for i := range order {
+		order[i] = i
+	}
+	slices.SortFunc(order, func(a, b int) int {
+		return cmp.Or(cmp.Compare(rank(cs[a].ID), rank(cs[b].ID)), cmp.Compare(cs[a].ID, cs[b].ID))
+	})
+	var picked []int
+	taken := map[int]bool{}
+	take := func(i int) {
+		if len(picked) < n && !taken[i] {
+			picked = append(picked, i)
+			taken[i] = true
+		}
+	}
+	for _, wanted := range []func(Candidate) bool{
+		func(c Candidate) bool { return c.NoHeading },
+		func(c Candidate) bool { return c.Unmapped },
+		func(c Candidate) bool { return c.MostlyBoilerplate },
+		func(c Candidate) bool { return c.Lost },
+	} {
+		for _, i := range order {
+			if wanted(cs[i]) && !taken[i] {
+				take(i)
+				break
+			}
+		}
+	}
+	for _, i := range order {
+		take(i)
+	}
+	return picked
+}
+
+// rank is an ID's place in the fixed order: its FNV-1a hash.
+func rank(id string) uint64 {
+	h := fnv.New64a()
+	h.Write([]byte(id))
+	return h.Sum64()
+}
+
+// A Verdict says what boilerplate found a text to be.
+type Verdict int
+
+const (
+	// Own is text of the ad's own.
+	Own Verdict = iota
+	// Boilerplate is text ads repeat whatever the job.
+	Boilerplate
+	// Template is text repeated across ads for similar jobs.
+	Template
+)
+
+// Render writes an ad and its sections to w as Markdown. verdict says
+// what each text part is; lost is what Missing found, shown at the end
+// when there is some.
+func Render(w io.Writer, ad ads.Ad, ss []sections.Section, verdict func(string) Verdict, lost Lost) error {
+	var b strings.Builder
+	fmt.Fprintf(&b, "## %s · %s\n\n", escape(ad.Title), ad.ID)
+	if ls := slices.Compact(ad.Locations()); len(ls) > 0 {
+		fmt.Fprintf(&b, "%s\n\n", escape(strings.Join(ls, " · ")))
+	}
+	for _, s := range ss {
+		b.WriteString("### " + string(s.Kind))
+		switch {
+		case s.Heading == "":
+			b.WriteString(" · no heading, placed by default")
+		case s.Kind == sections.Unmapped:
+			fmt.Fprintf(&b, " · “%s” · no kind known", escape(s.Heading))
+		case s.ByName:
+			fmt.Fprintf(&b, " · “%s” · a plain line naming it", escape(s.Heading))
+		default:
+			fmt.Fprintf(&b, " · “%s”", escape(s.Heading))
+		}
+		b.WriteString("\n\n")
+		if len(s.Parts) == 0 {
+			b.WriteString("*(nothing under it)*\n\n")
+		}
+		for i, p := range s.Parts {
+			b.WriteString(part(p, verdict))
+			// A list's items run together, and a blank line ends it.
+			if p.Item && (i+1 == len(s.Parts) || !s.Parts[i+1].Item) {
+				b.WriteString("\n")
+			}
+		}
+	}
+	switch {
+	case lost.Moved:
+		fmt.Fprintf(&b, "### out of the ad's order\n\n%s\n\n", escape(lost.Context))
+	case lost.Context != "":
+		fmt.Fprintf(&b, "### not in any section\n\n%s\n\n", escape(lost.Context))
+	}
+	_, err := io.WriteString(w, b.String())
+	return err
+}
+
+// part renders one part as a line of Markdown.
+func part(p headings.Part, verdict func(string) Verdict) string {
+	text := escape(p.Text)
+	switch p.Role {
+	case headings.Field:
+		text = "*field* " + text
+	case headings.Repeat:
+		text = "*repeat* " + text
+	case headings.Heading:
+		text = "*heading* " + text // as a section's first part, it heads nothing
+	}
+	quote := ""
+	if p.Role == headings.Text {
+		switch verdict(p.Text) {
+		case Boilerplate:
+			text, quote = "*boilerplate* "+text, "> "
+		case Template:
+			text, quote = "*template* "+text, "> "
+		}
+	}
+	if p.Item {
+		return quote + "- " + text + "\n"
+	}
+	return quote + text + "\n\n"
+}
+
+// escaper keeps an ad's own text from being read as Markdown.
+var escaper = strings.NewReplacer(
+	`\`, `\\`, "`", "\\`", "*", `\*`, "_", `\_`, "[", `\[`, "]", `\]`,
+	"<", `\<`, ">", `\>`, "#", `\#`, "|", `\|`, "~", `\~`,
+)
+
+// escape returns s with what Markdown would read as markup escaped,
+// including a leading "-", "+" or "1." that would start a list.
+func escape(s string) string {
+	s = escaper.Replace(s)
+	if strings.HasPrefix(s, "-") || strings.HasPrefix(s, "+") {
+		return `\` + s
+	}
+	if i := strings.IndexFunc(s, func(r rune) bool { return !unicode.IsDigit(r) }); i > 0 && s[i] == '.' {
+		return s[:i] + `\` + s[i:]
+	}
+	return s
+}
+
+// Lost is what Missing found: nothing, when Context is empty.
+type Lost struct {
+	// Context is the ad's text around the first place its sections
+	// part from it.
+	Context string
+	// Moved is true when the sections have all the ad's text, but not
+	// in its order.
+	Moved bool
+}
+
+// Missing compares an ad's sections with what its HTML shows, and finds
+// where they first part: text that's in no section, or that's in one but
+// out of the ad's order. Only letters and digits are compared, as the
+// pipeline tidies spaces and leaves out what isn't visible; so an
+// advertiser's "Operative</strong>to" is no loss, kept as written.
+func Missing(src string, ss []sections.Section) Lost {
+	shown, at := visibleText(src)
+	var kept []rune
+	add := func(s string) { kept = appendLetters(kept, s) }
+	for _, s := range ss {
+		add(s.Heading)
+		for _, p := range s.Parts {
+			add(p.Text)
+		}
+	}
+	wanted := appendLetters(nil, shown)
+	if len(wanted) == 0 {
+		return Lost{}
+	}
+	i := 0
+	for i < len(wanted) && i < len(kept) && wanted[i] == kept[i] {
+		i++
+	}
+	if i == len(wanted) && i == len(kept) {
+		return Lost{}
+	}
+	if i == len(wanted) { // the sections have more than the ad: none of it lost
+		i = len(wanted) - 1
+	}
+	// at maps each letter of wanted to its place in shown.
+	start := max(0, at[i]-40)
+	end := min(len(shown), at[i]+80)
+	context := "…" + strings.Join(strings.Fields(shown[start:end]), " ") + "…"
+	slices.Sort(wanted)
+	slices.Sort(kept)
+	return Lost{Context: context, Moved: slices.Equal(wanted, kept)}
+}
+
+// visibleText returns the text of an HTML fragment, leaving out scripts
+// and styles, with the byte offset in it of each letter or digit, in
+// order.
+func visibleText(src string) (string, []int) {
+	var b strings.Builder
+	var at []int
+	skip := 0
+	z := html.NewTokenizer(strings.NewReader(src))
+	for {
+		switch z.Next() {
+		case html.ErrorToken:
+			return b.String(), at
+		case html.StartTagToken:
+			if name, _ := z.TagName(); string(name) == "script" || string(name) == "style" {
+				skip++
+			}
+			b.WriteByte(' ')
+		case html.EndTagToken:
+			if name, _ := z.TagName(); (string(name) == "script" || string(name) == "style") && skip > 0 {
+				skip--
+			}
+			b.WriteByte(' ')
+		case html.SelfClosingTagToken:
+			b.WriteByte(' ')
+		case html.TextToken:
+			if skip > 0 {
+				continue
+			}
+			for _, r := range string(z.Text()) { // Text has decoded the entities
+				if unicode.IsLetter(r) || unicode.IsDigit(r) {
+					at = append(at, b.Len())
+				}
+				b.WriteRune(r)
+			}
+		}
+	}
+}
+
+// appendLetters appends the letters and digits of s to rs, in lower case.
+func appendLetters(rs []rune, s string) []rune {
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			rs = append(rs, unicode.ToLower(r))
+		}
+	}
+	return rs
+}

@@ -5,8 +5,8 @@
 //
 //	pipeline run RUN
 //
-// runs cmd/blocks, cmd/heading-counts, cmd/sections and cmd/boilerplate on
-// each sample, built afresh, so the code as it stands is what runs. Each
+// runs cmd/blocks, cmd/heading-counts, cmd/sections, cmd/boilerplate and
+// cmd/view on each sample, built afresh, so the code as it stands is what runs. Each
 // stage's tables go in data/runs/RUN/SAMPLE/STAGE/ and its summary in
 // data/runs/RUN/SAMPLE/STAGE.txt. A run of the same name is replaced.
 // It ends with how long each stage took on each sample, and how much
@@ -53,6 +53,7 @@ var stages = []struct{ program, dir string }{
 	{"heading-counts", "headings"},
 	{"sections", "sections"},
 	{"boilerplate", "boilerplate"},
+	{"view", "view"},
 }
 
 // shown is how many headings compare lists each way, of the most text.

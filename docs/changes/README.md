@@ -69,6 +69,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [A readable view of chunked ads](2026-10-27-a-readable-view-of-chunked-ads.md)
+  (roadmap 16), shipped, unreleased
 - [Try grammar's Overlap in sections.All, then take up grammar v0.3.2](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md),
   shipped in v0.3.5
 - [Take up grammar v0.3.1, and read headings.txt with MapOnly](2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md),

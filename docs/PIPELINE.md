@@ -24,8 +24,9 @@ data/ingestion/ads-DATE.jsonl     a sample: one ad per line: id, title, location
         │  internal/headings       blocks → parts, with roles    (cmd/heading-counts)
         │  internal/sections       parts → sections, by kind     (cmd/sections)
         │  internal/boilerplate    sections → boilerplate        (cmd/boilerplate)
+        │  internal/view           all of it → ads to read       (cmd/view)
         ▼
-data/runs/RUN/SAMPLE/  blocks/  headings/  sections/  boilerplate/
+data/runs/RUN/SAMPLE/  blocks/  headings/  sections/  boilerplate/  view/
 ```
 
 Each stage is a package in `internal/`, with tests and examples beside
@@ -94,6 +95,7 @@ go run ./cmd/blocks         data/ingestion/ads-20261025.jsonl data/blocks
 go run ./cmd/heading-counts data/ingestion/ads-20261025.jsonl data/headings
 go run ./cmd/sections       data/ingestion/ads-20261025.jsonl data/sections
 go run ./cmd/boilerplate    data/ingestion/ads-20261025.jsonl data/boilerplate
+go run ./cmd/view           data/ingestion/ads-20261025.jsonl data/view
 ```
 
 `cmd/heading-uses` is for looking at one heading across a sample's ads,
@@ -333,6 +335,34 @@ any: as with a common word in a search index.
 `cmd/boilerplate` writes `repeated.tsv`: every repeated text, with its
 groups, ads, characters, the kinds of section it's in, and its verdict.
 
+## 6. View: ads to read
+
+**Package** `internal/view`, **program** `cmd/view`.
+
+The figures say how much moved, not what a change did to real ads, and
+reading ads is how most faults are found. So each run also writes
+`view/ads.md`: 20 of the sample's ads in their chunked form, in
+Markdown, to read in an editor's preview or as text. Each section has
+its kind and heading, and says when no heading placed it (the opening
+before any heading, which is summary by default) or when its heading is
+of no known kind. Fields and repeats are marked, and so is the text
+found as boilerplate or a template, where it sits.
+
+The ads are the same in every run: they're chosen by a fixed hash of
+their IDs, so a diff of two runs' views shows what a change did, ad by
+ad. One each is chosen on purpose, where there is one: an ad with no
+heading, one with an unmapped section, one over half boilerplate, and
+one with text in no section or out of order (below), as a random draw
+mostly shows the easy cases.
+
+It also checks every ad of the sample, comparing the letters and digits
+of what its HTML shows with those of its sections. Text in no section
+should never happen. Text out of the ad's order does, in 20 ads of the
+three samples: a list item that holds a list or paragraphs of its own
+comes out after the blocks that follow it, so its text lands under the
+wrong heading. The view shows where, for each ad it has, and the
+summary counts both over the sample.
+
 ## Improving it
 
 Each program leaves tables in `data/` that say where its stage falls
@@ -342,7 +372,9 @@ short. Improving the pipeline is a loop over them:
    every sample (see [Before and after](#before-and-after)).
 2. **Pick** the biggest gap: the table row with the most ads or text.
    Work on one sample, and check the others as you go.
-3. **Look** at it in the ads, in context, before deciding anything.
+3. **Look** at it in the ads, in context, before deciding anything:
+   `view/ads.md` has 20 of them, and `cmd/heading-uses` every use of a
+   heading.
 4. **Change one thing:** a phrase, a label, a rule, a threshold.
 5. **Measure again,** as the run `after`, and compare. Keep the change
    only if it helped and broke nothing, on every sample: one that helps
@@ -492,6 +524,12 @@ other table can be compared by hand, as in:
 
 ```
 diff data/runs/before/all/boilerplate/repeated.tsv data/runs/after/all/boilerplate/repeated.tsv | head -20
+```
+
+and the views show the change in the ads themselves:
+
+```
+diff data/runs/before/ads-20261025/view/ads.md data/runs/after/ads-20261025/view/ads.md
 ```
 
 Then run the tests (`test-all.sh`). For the next change, `after` can

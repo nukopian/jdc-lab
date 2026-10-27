@@ -45,9 +45,10 @@ embeddings, and a large language model only where those fall short.
 - **A pipeline, by rules alone.** It splits each ad into the blocks a
   reader sees, finds its headings and fields, divides it into sections
   (summary, responsibilities, requirements, benefits and the rest), and
-  finds the boilerplate that ads repeat whatever the job.
-  [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works, what
-  it measured, and how to improve it.
+  finds the boilerplate that ads repeat whatever the job. Each run also
+  shows 20 ads in their sections, the same in every run, to read by
+  eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
+  what it measured, and how to improve it.
 - **Measured on two samples** of 2,000 and 5,000 ads, from different
   kinds of job, and checked on a third of 21,000. 89% of ads have
   headings, and about three in four heading uses are recognised by

@@ -12,7 +12,15 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Each run writes, for each sample, 20 of its ads in their chunked
+  form, to read by eye: `view/ads.md`, with each section's kind and
+  heading, fields, repeats, and boilerplate and template text marked,
+  and the text no heading placed. The ads are the same in every run,
+  so a diff of two runs' views shows what a change did, ad by ad. It
+  also checks every ad's text is in its sections, in the ad's order:
+  none is lost, but 20 ads of the three samples have text out of order
+  (roadmap 16;
+  [record](docs/changes/2026-10-27-a-readable-view-of-chunked-ads.md)).
 
 ## v0.4.0 (2026-10-27)
 
