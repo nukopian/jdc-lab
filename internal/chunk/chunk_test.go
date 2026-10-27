@@ -106,3 +106,19 @@ func TestTotals(t *testing.T) {
 		t.Errorf("got %d, %d, %d; want 30, 11, 4", a.Tokens, a.Embedded, a.Unclassified)
 	}
 }
+
+// Boilerplate comes out of a chunk only if it's embedded: in one left
+// out, or kept as metadata, it's part of the list it's in.
+func TestBoilerplateKeptWhereNotEmbedded(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Benefits, Heading: "Perks", Parts: []headings.Part{text("A virtual GP."), text("A pension plan.")}},
+		{Kind: sections.Requirements, Heading: "You'll need", Parts: []headings.Part{text("A licence."), text("A pension plan.")}},
+	}
+	cs := Of(ss, func(s string) bool { return s == "A pension plan." })
+	if got := cs[0].Text; got != "Perks\nA virtual GP.\nA pension plan." || len(cs[0].Boilerplate) != 0 {
+		t.Errorf("benefits: text %q, boilerplate %q; want every line kept, none listed", got, cs[0].Boilerplate)
+	}
+	if got := cs[1].Text; got != "You'll need\nA licence." || len(cs[1].Boilerplate) != 1 {
+		t.Errorf("requirements: text %q, boilerplate %q; want the boilerplate out and listed", got, cs[1].Boilerplate)
+	}
+}

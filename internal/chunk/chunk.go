@@ -1,14 +1,16 @@
 // Package chunk turns an ad's sections into chunks, as an embedding job
 // would ask for them: each with its kind and heading, its text, what to
-// do with it (embed it, keep it as metadata, or leave it out), about how
-// many tokens it is, and what placed it in its section.
+// do with it (embed it, keep it as metadata, leave it out, or nothing yet,
+// as it's unclassified), about how many tokens it is, and what placed it
+// in its section.
 //
 // The sections that say what the job is are embedded: the summary,
 // responsibilities, requirements and desirable. Details are metadata;
 // benefits, company, apply and legal are left out; and unmapped ones,
 // whose kind isn't known, are unclassified, not embedded: they're what's
-// left to map. Text found as boilerplate is left out of a
-// chunk's text wherever it is, and listed.
+// left to map. Text found as boilerplate is taken out of an embedded
+// chunk's text, and listed; in other chunks it stays where it is, as part
+// of what they say.
 package chunk
 
 import (
@@ -42,9 +44,10 @@ type Chunk struct {
 	// Use is Embed, Metadata, LeaveOut or Unclassified.
 	Use string `json:"use" yaml:"use"`
 	// Text is the chunk's heading and text, a line each, without its
-	// boilerplate.
+	// boilerplate if it's embedded.
 	Text string `json:"text" yaml:"text"`
-	// Boilerplate is the text left out of Text as boilerplate.
+	// Boilerplate is the text taken out of an embedded chunk's Text as
+	// boilerplate.
 	Boilerplate []string `json:"boilerplate,omitempty" yaml:"boilerplate,omitempty"`
 	Fields      []Field  `json:"fields,omitempty" yaml:"fields,omitempty"`
 	// Tokens is about how many tokens Text is: four for every three
@@ -63,7 +66,9 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			lines = append(lines, s.Heading)
 		}
 		for _, p := range s.Parts {
-			if p.Role == headings.Text && boilerplate(p.Text) {
+			// Only an embedded chunk loses its boilerplate: elsewhere it's
+			// part of what the section says, a list of benefits and all.
+			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
 				c.Boilerplate = append(c.Boilerplate, p.Text)
 				continue
 			}
