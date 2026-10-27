@@ -150,3 +150,37 @@ say how to run it.
   own key; a text the run found by its templated key or as alike to
   another counts too, as the table lists every repeated text by its own
   key, with the verdict of the first ad it was seen in.
+- **Folded in** (Iain, 2026-10-27), as what's left to close 18, their
+  roadmap text kept as it was:
+
+  > ### 19. Requirements and responsibilities by their wording
+  >
+  > **Serves:** structure
+  >
+  > A grammar for the lines that say what they are ("Experience of…",
+  > "You will…", "Must have…"), so that requirements and responsibilities
+  > no heading placed come out in their sections, each saying which rule
+  > placed it. Done when the share of summary text there by default, 61%
+  > now, is remeasured and a sample checked by eye.
+
+  > ### 15. The ad's title run into a heading
+  >
+  > Added 2026-10-27. About 30 bold paragraphs start with the ad's title
+  > and run on into a heading ("General Foreman Responsibilities") or a
+  > line of facts; split off as a repeat, the rest would read as it
+  > should.
+
+  > ### 20. Before and after pages
+  >
+  > **Serves:** structure, embeddings
+  >
+  > For a dozen ads chosen to show where chunking does well and badly,
+  > the ad as posted beside its chunks: what's embedded, what's dropped as
+  > boilerplate, what became metadata, and which rule placed each. In the
+  > private data store, as the ads aren't ours to publish. Done when the
+  > pages show the chunker's current output, from `chunk` itself.
+
+- **Roadmap 6 done on the way:** the rule for a short line before a
+  list is its plan, and meets its Done when (more headings found, a
+  sample checked by eye, one of 30 wrong; tests cover it). It leaves
+  the roadmap, with its row in PIPELINE.md's Known gaps.

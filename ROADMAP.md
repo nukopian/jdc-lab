@@ -45,12 +45,18 @@ after](docs/PIPELINE.md#before-and-after)).
 **Serves:** structure, embeddings
 
 The near-term aim: chunking shown working, with grammars. One ad in,
-its chunks out, each with its kind, whether it's worth embedding, its
-size, and what placed it there, down to the grammar's phrase. The first
-increment is in place (`chunk`, as text, JSON or YAML); 7, 19 and 20
-build on it, and it's done when 20's pages show it. The plan, and how
-it's going, are in its
-[record](docs/changes/2026-10-27-a-chunker-for-any-ad.md).
+its chunks out, each with its kind, whether it's embedded, kept as
+metadata or left out, its size, and what placed it there, down to the
+grammar's phrase. In place: `chunk` (text, JSON or YAML); text cleaned,
+structure in English not symbols; summary and role apart; sub-headings
+before lists found; boilerplate and unmapped text gathered in a chunk
+of their own; the view showing the same chunks. Still to come, folded
+in from the roadmap: requirements and responsibilities placed by their
+wording, where no heading placed them (was 19); the ad's title split
+off where it runs into a heading or a line of facts (was idea 15); and
+pages of ads before and after, which close it (was 20). Roadmap 7's
+facts come out as its chunks too. The plan, and how it's going, are in
+its [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md).
 
 ### 7. Facts from the details
 
@@ -58,64 +64,52 @@ it's going, are in its
 
 Grammars for the facts ads state in lines of their own (pay, seniority,
 location, work pattern, schedule), so that each comes out as details
-with its values, wherever it was. The plan is in its
-[record](docs/changes/2026-10-27-facts-from-the-details.md).
+with its values, wherever it was: pay written without a currency sign
+("Pay Rate - 13.10", was idea 14) and lines whose label ends in a dash
+("Working Hours - Monday to Friday", was idea 13) among them. The plan
+is in its [record](docs/changes/2026-10-27-facts-from-the-details.md).
 
 ## Next
 
-### 19. Requirements and responsibilities by their wording
-
-**Serves:** structure
-
-A grammar for the lines that say what they are ("Experience of…",
-"You will…", "Must have…"), so that requirements and responsibilities
-no heading placed come out in their sections, each saying which rule
-placed it. Done when the share of summary text there by default, 61%
-now, is remeasured and a sample checked by eye.
-
-### 20. Before and after pages
+### 4. Make boilerplate's verdict right
 
 **Serves:** structure, embeddings
 
-For a dozen ads chosen to show where chunking does well and badly,
-the ad as posted beside its chunks: what's embedded, what's dropped as
-boilerplate, what became metadata, and which rule placed each. In the
-private data store, as the ads aren't ours to publish. Done when the
-pages show the chunker's current output, from `chunk` itself.
-
-### 4. Catch footers filed under requirements
-
-**Serves:** structure, embeddings
-
-**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
+**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c), widened 2026-10-27
 **Waiting on:** nothing
 
-**What:** treat repeated text that comes after an ad's job content, at
-its end, as boilerplate, even when it's repeated under only two to four
-title groups.
+**What:** make the verdict on repeated text right both ways: footers
+filed under requirements counted as boilerplate, and common job wording
+no longer counted as it.
 
 **Why:** footers (an agency's notices, equal opportunities statements)
 often have no heading, so they're filed under the last one, usually
-requirements. Under five title groups, they're then counted as
-templates for the job, and kept for embedding.
+requirements, and under five title groups they're counted as templates
+for the job and embedded. The other way, text under five title groups
+or more is boilerplate wherever it is, so job lines common to many ads
+("High levels of accuracy and attention to detail") are taken out of
+what's embedded: about half of a sample of what's taken from summaries
+and requirements is about the job.
 
 **What's known:** the largest templates in the first sample's
-`boilerplate/repeated.tsv` (`cmd/boilerplate` run on `ads-20261024`)
-are almost all such footers. Text under five groups or more is already boilerplate
-wherever it is.
+`boilerplate/repeated.tsv` are almost all such footers. `chunk`'s
+boilerplate chunk lists, ad by ad, every line the verdict takes from an
+embedded chunk, with the section it came from: where to check it.
 
 **Steps:**
 
 1. Record where each text comes in its ad: whether it's in the run of
-   repeated texts that ends the ad.
-2. Count a repeated text found mostly in such end runs as boilerplate,
-   whatever its section.
-3. Check the templates under three or more groups (the command in
-   PIPELINE.md's Improving it) before and after.
+   repeated texts that ends the ad; count a repeated text found mostly
+   in such end runs as boilerplate, whatever its section.
+2. Keep a widespread text that's found mostly in the sections that
+   describe the job, and is phrased as a requirement or a duty, out of
+   boilerplate.
+3. Check the templates under three or more groups, and a sample of the
+   boilerplate chunks, before and after.
 
-**Done when** those footers are boilerplate, no line that describes a
-job has become boilerplate (check the newly flipped texts by eye), a
-test covers it, and PIPELINE.md's figures are updated.
+**Done when** those footers are boilerplate, common job lines aren't, a
+sample of the newly flipped texts is checked by eye both ways, tests
+cover it, and PIPELINE.md's figures are updated.
 
 ### 5. Split walls of text into sentences
 
@@ -153,31 +147,6 @@ no full stop between them.
 them, boilerplate found in them), tests cover the splitting with
 made-up text in the shapes seen, and PIPELINE.md has the new stage.
 
-### 6. Find headings written as plain lines
-
-**Serves:** structure
-
-**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
-**Waiting on:** nothing
-
-**What:** take more plain lines, with no bold and no colon, as headings
-when what follows shows they are.
-
-**Why:** a plain line starts a section only if it's exactly a kind's
-phrase, so "Your role in the team" written plainly before a list is
-missed.
-
-**What's known:** 952 plain lines start a section by name. Short lines
-followed by a list are the likeliest headings.
-
-**Steps:** in `internal/headings`, consider a short plain line that's
-followed by a list, and contains a kind's phrase, as a heading; check
-`data/runs/RUN/sections/named.tsv` and the unmapped table before and
-after.
-
-**Done when** more headings are found with none wrongly (check the new
-ones by eye), and tests cover it.
-
 ## Later
 
 Nothing at the moment.
@@ -192,7 +161,8 @@ to Later or Next with its number, or dropped.
 
 Added 2026-10-25, to Ideas 2026-10-27. Link the skills and occupations
 an ad names to the existing taxonomies, so they're filtered on, not
-embedded.
+embedded: its "Keywords:" lists, now filed as details, and its title
+first.
 
 ### 9. A fair test of embedding models
 
@@ -213,30 +183,12 @@ service are still to come.
 Added 2026-10-25, to Ideas 2026-10-27. Run the chosen model from Go
 with ONNX Runtime, so nothing in the pipeline needs a Python service.
 
-### 12. Boilerplate thresholds scaled to a sample's size
+### 12. Boilerplate thresholds scaled to the ads' number
 
 Added 2026-10-27. Boilerplate's thresholds are counts of title groups,
-which a larger sample passes more easily (12.5% of text on 5,000 ads,
-15.1% on 21,000), so its figures from samples of different sizes
-don't compare.
-
-### 13. "Label – value" lines with a dash as fields
-
-Added 2026-10-27. "Working Hours - Monday to Friday, 08:00 - 16:30" is
-a field, but fields split only at a colon or bar, so 39 such lines
-became plain text when roadmap 2 stopped them passing as headings.
-
-### 14. Pay without a currency sign
-
-Added 2026-10-27. "Pay Rate – 13.10" in bold still passes as a heading
-(25 ads), as the rule against money looks for £, $ or €.
-
-### 15. The ad's title run into a heading
-
-Added 2026-10-27. About 30 bold paragraphs start with the ad's title
-and run on into a heading ("General Foreman Responsibilities") or a
-line of facts; split off as a repeat, the rest would read as it
-should.
+which more ads pass more easily, so its share rises as each batch is
+added (12.5% of text on 5,000 ads, 15.1% on 21,000, by word for word
+matching): figures from before and after a new batch don't compare.
 
 ### 17. Keep a list item's own blocks in the ad's order
 

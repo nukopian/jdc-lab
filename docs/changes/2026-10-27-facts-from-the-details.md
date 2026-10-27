@@ -48,3 +48,20 @@ describes the grammars.
 ## What happened
 
 Work started 2026-10-27.
+
+- **Folded in** (Iain, 2026-10-27), two ideas that are facts to read,
+  their roadmap text kept as it was:
+
+  > ### 14. Pay without a currency sign
+  >
+  > Added 2026-10-27. "Pay Rate – 13.10" in bold still passes as a heading
+  > (25 ads), as the rule against money looks for £, $ or €.
+
+  > ### 13. "Label – value" lines with a dash as fields
+  >
+  > Added 2026-10-27. "Working Hours - Monday to Friday, 08:00 - 16:30" is
+  > a field, but fields split only at a colon or bar, so 39 such lines
+  > became plain text when roadmap 2 stopped them passing as headings.
+
+  Cleaning has since made every dash ASCII, so a label and " - " is the
+  one shape to read.

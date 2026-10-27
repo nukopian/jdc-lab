@@ -725,8 +725,7 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Gap | Effect | Likely fix |
 |---|---|---|
 | [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
-| [Footers under few title groups](../ROADMAP.md#4-catch-footers-filed-under-requirements) | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
-| [Plain lines without cues](../ROADMAP.md#6-find-headings-written-as-plain-lines) | Only exact phrases are taken as headings | More evidence from the following text |
+| [Boilerplate's verdict](../ROADMAP.md#4-make-boilerplates-verdict-right) | Footers filed under requirements count as template and are embedded; job lines common to many ads count as boilerplate | Their place at the end of the ad; their wording as requirements or duties |
 | [Text out of order](../ROADMAP.md#17-keep-a-list-items-own-blocks-in-the-ads-order) | A list item holding a list or paragraphs of its own comes out after the blocks that follow it, under the wrong heading (20 ads) | Emit an item's own blocks where they stand |
 
 ## Words used here
