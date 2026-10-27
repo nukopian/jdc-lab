@@ -155,9 +155,9 @@ func TestRead(t *testing.T) {
 		},
 		{
 			"lone conjunctions between items are no headings",
-			`<ul><li>A degree</li></ul><p><b>OR</b></p><p><b>Either:</b></p><p><b>Plus:</b></p><p><b>&amp;</b></p><p><b>And/or</b></p><p><b>Or call:</b></p>`,
+			`<ul><li>A degree</li></ul><p><b>OR</b></p><p><b>Either:</b></p><p><b>Plus:</b></p><p><b>And &amp; or</b></p><p><b>And/or</b></p><p><b>Or call:</b></p>`,
 			[]string{
-				`item text "A degree"`, `text "OR"`, `text "Either:"`, `text "Plus:"`, `text "&"`, `text "And/or"`,
+				`item text "A degree"`, `text "OR"`, `text "Either:"`, `text "Plus:"`, `text "And & or"`, `text "And/or"`,
 				`heading "Or call:" key="or call"`,
 			},
 		},

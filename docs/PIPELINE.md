@@ -161,7 +161,7 @@ A few rules refine this:
 - **A long line in bold that ends with a colon** introduces what follows,
   as a heading does, so it can have up to `MaxIntroWords` (20) words:
   "**As a Mobile Mechanic, you'll get benefits that go the extra mile:**".
-  Without the colon, or the bold, it's a sentence.
+  Without the colon, or without the bold or a heading tag, it's a sentence.
 - **Conjunctions alone aren't headings.** "**OR**", "**and**",
   "**Either:**" or "**Plus:**" on a line of their own join what's before
   them to what's after, so the section carries on.
@@ -257,9 +257,10 @@ longer one doesn't count: "Company Profile" is company, though
 them so.
 
 **With no phrase**, a heading starting "about" is company ("About" and a
-company's name), and one that's a field's label is details. Any other starts an `unmapped` section: so the text
-under it counts as unmapped, rather than hiding in the section before,
-and unmapped's share of the text measures what's left to map.
+company's name), and one that's a field's label is details. Any other
+starts an `unmapped` section: so the text under it counts as unmapped,
+rather than hiding in the section before, and unmapped's share of the
+text measures what's left to map.
 
 **A plain line** with no cue starts a section only if it's exactly a
 kind's phrase: `<p>Responsibilities</p>`, not "Our responsibilities to

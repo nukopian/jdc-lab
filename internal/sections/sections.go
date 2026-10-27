@@ -66,7 +66,7 @@ func init() {
 		panic(fmt.Sprintf("sections: headings.txt: %v", err))
 	}
 	// Each rule's kind must be one of Kinds: a misspelt one would
-	// otherwise be a ninth kind of section, quietly. Its rank is where its
+	// otherwise be another kind of section, quietly. Its rank is where its
 	// first rule comes.
 	for i, k := range phrases.Canonicals() {
 		if !slices.Contains(Kinds, Kind(k)) {

@@ -129,10 +129,15 @@ gap is out of PIPELINE.md, and its figures are updated.
     where two start at the same word), so "To join
     us and be successful in this role you will need:" is
     responsibilities: "in this role you will" takes the words that "you
-    will need" would have matched.
+    will need" would have matched. Since put right, with grammar
+    v0.3.2's `Outermost`, suggested from here
+    ([record](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md)).
   - "What to expect from our recruitment process:" (apply) and "What to
     Expect from …:" (an agency's pitch) are responsibilities, one ad
     each.
+  - "The school" can head a job rather than the school, as in "The
+    School - 1:1 SEN Teaching Assistant" (one ad), which is company: the
+    risk that made legal's rule `=> legal`, but rare here, so kept.
   - Mixed headings stay unmapped, as "please note" does: "important
     notice", "additional information", "please read before applying",
     "footnote".

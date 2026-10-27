@@ -141,12 +141,8 @@ func TestRules(t *testing.T) {
 	if amb := phrases.Ambiguous(); len(amb) > 0 {
 		t.Errorf("phrases with more than one kind: %v", amb)
 	}
-	for _, k := range Kinds {
-		if _, ok := rank[k]; !ok && k != Unmapped {
-			t.Errorf("kind %q has no rule", k)
-		}
-	}
-	// A rule written with => leaves out its kind's name.
+	// That every kind has a rule, init checks. A rule written with =>
+	// leaves out its kind's name.
 	if k, ok := Named("legal"); ok {
 		t.Errorf(`"legal" is a phrase, of %q`, k)
 	}
