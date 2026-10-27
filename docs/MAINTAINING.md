@@ -372,7 +372,7 @@ PIPELINE.md's figures.
   [Where it stands](../README.md#where-it-stands) too, so that it's
   never behind, and a change that ships, starts or drops a feature
   updates [ROADMAP.md](../ROADMAP.md). Rebuild the PDFs and read the
-  pages that changed.
+  pages that changed (the CHANGELOG and change records have none).
 - **Messages:** commits follow
   [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
   `fix:`, `docs:`, `chore:`, `build(deps):` and so on), and are signed.
@@ -503,8 +503,10 @@ A tag is never moved or deleted once pushed: a fix is a new release.
 ## Documents
 
 `scripts/readme-pdf.sh` builds a PDF of each document, beside it, for
-reading offline. They're git-ignored, and never published: readers
-online have the Markdown, which GitHub shows.
+reading offline: the README, ROADMAP, PIPELINE, SETUP and MAINTAINING.
+They're git-ignored, and never published: readers online have the
+Markdown, which GitHub shows. The CHANGELOG and change records have no
+PDF, and the script refuses them.
 
 ```
 readme-pdf.sh

@@ -39,6 +39,10 @@ has the steps).
   headings of a known kind rise from 76% to 77% of uses, and ads with
   every heading known from 53% to 54%.
 
+- The CHANGELOG and change records no longer get PDFs: they're read
+  as Markdown, on GitHub or in an editor. `readme-pdf.sh` builds the
+  other five documents' PDFs, and refuses these.
+
 ## v0.3.5 (2026-10-27)
 
 The rules checked on a second sample
