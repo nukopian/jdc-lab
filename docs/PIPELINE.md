@@ -778,6 +778,12 @@ alone found 15.8%: standard text with the ad's own title or place
 written in, or a few words changed, is most of the rest
 ([record](changes/2026-10-27-find-near-duplicate-boilerplate.md)).
 
+**Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
+by the index): 57.5% of an ad's tokens are embedded, 3.0% kept as
+metadata, 20.3% left out (benefits, company, apply, legal), and 19.2%
+gathered in the boilerplate chunk, 10.7 points of it text under
+unmapped headings, mapping still to do. Facts are read in 34% of ads.
+
 Boilerplate's thresholds are counts of title groups, which a larger
 sample passes more easily, so boilerplate figures from samples of
 different sizes don't compare: on its own, the first sample has 13.2%

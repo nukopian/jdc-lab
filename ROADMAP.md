@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 21.
+number: 22.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -40,24 +40,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 18. A chunker for any ad
-
-**Serves:** structure, embeddings
-
-The near-term aim: chunking shown working, with grammars. One ad in,
-its chunks out, each with its kind, whether it's embedded, kept as
-metadata or left out, its size, and what placed it there, down to the
-grammar's phrase. In place: `chunk` (text, JSON or YAML); text cleaned,
-structure in English not symbols; summary and role apart; sub-headings
-before lists found; boilerplate and unmapped text gathered in a chunk
-of their own; the view showing the same chunks; and requirements,
-responsibilities and benefits placed by their wording, where no
-heading placed them (was 19); and the ad's title split off where it
-runs into a heading or a line of facts (was idea 15); and pages of ads
-before and after, from `chunk` (was 20). To close it: a review of the
-roadmap, and the record written up. Roadmap 7's
-facts are in its chunks. The plan, and how it's going, are in
-its [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md).
+Nothing at the moment.
 
 ## Next
 
@@ -186,3 +169,11 @@ Added 2026-10-27. When a list item holds a list or paragraphs of its
 own, `internal/blocks` puts its text after the blocks that follow it,
 so it lands under the wrong heading: 20 ads of the three samples, which
 `cmd/view` counts and shows.
+
+### 21. Map what's left
+
+Added 2026-10-27. The headings the pages of ads before and after show
+unmapped ("We are seeking:", "School Information"), the headings after
+a first one not found, and "Why …?" taking in the pay: on the three
+samples, 12% of the text is still under headings of no known kind, in
+43% of ads.

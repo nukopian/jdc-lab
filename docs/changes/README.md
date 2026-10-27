@@ -70,7 +70,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [A chunker for any ad](2026-10-27-a-chunker-for-any-ad.md)
-  (roadmap 18), in progress
+  (roadmap 18), shipped, unreleased
 - [Facts from the details, by grammar](2026-10-27-facts-from-the-details.md)
   (roadmap 7), shipped, unreleased
 - [Does it make search better? A first test](2026-10-27-a-first-retrieval-test.md)

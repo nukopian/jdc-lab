@@ -1,10 +1,12 @@
 # A chunker for any ad
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 18
 
 **Started:** 2026-10-27, in 4b2db1d612d6ac23271a366060c1752d39c0bb5f
+
+**Finished:** 2026-10-27
 
 ## The plan
 
@@ -47,6 +49,73 @@ JSON, each with what placed it; tests cover the chunking; and the docs
 say how to run it.
 
 ## What happened
+
+- **Outcome:** done, and more. `chunk` prints any ad's chunks, from an
+  ID in a run, a file of HTML or standard input: as text, as JSON for
+  programs, as YAML for people, or as web pages of ads before and
+  after. Each chunk has its kind, what's done with it (embedded, kept
+  as metadata, left out), about how many tokens it is, and what placed
+  it, down to the phrase in `headings.txt` and those it outranked, the
+  opening in `openings.txt`, or the facts grammar. Tests cover each
+  part, and PIPELINE.md and the README say how to run it. The item was
+  kept open past its first increment, as the near-term aim was
+  chunking shown working with grammars, and it closed when its pages
+  (was 20) showed the chunker as it stands.
+- **Grammars do the reading:** five grammars read the facts ads state
+  (pay, hours, work pattern, schedule, postcode), and one, over a word
+  list, places lines by their openings. The facts are in 34% of ads.
+- **Where an ad's tokens go,** over the 25,954 distinct ads of the three
+  samples, by the chunker as it stands: 57.5% embedded; 3.0% kept as
+  metadata; 20.3% left out (benefits, company, apply, legal); 19.2% in
+  the boilerplate chunk, of which 10.7 points are text under unmapped
+  headings, mapping still to do, and 8.5 boilerplate. The chunks come
+  to about 2.6% more tokens than the ads, as the boilerplate chunk's
+  lines say where each came from. So the summary, role and the job's
+  duties and requirements are a little over half an ad; the rest is
+  facts, the employer's pitch, notices, and text still to map.
+- **Measurements:** `pipeline run` at 18's start, 4b2db1d, as
+  `claude/start18`, against `latest` at its close, on the same three
+  samples (25,954 distinct ads):
+
+  | | At the start | At the close |
+  |---|---:|---:|
+  | list items | 395,650 | 458,083 |
+  | fields | 36,258 | 38,134 |
+  | distinct headings | 25,299 | 23,310 |
+  | lines starting a section by name | 14,262 | 18,831 |
+  | heading uses of a known kind | 77% | 78% |
+  | ads with every heading known | 53% | 57% |
+  | ads with only a summary | 5% | 4% |
+  | ads with a responsibilities section | 53% | 60% |
+  | ads with an unmapped section | 47% | 43% |
+  | the summary, of all text | 28% | 18% |
+  | the role, of all text | (none) | 8% |
+  | unmapped, of all text | 13% | 12% |
+  | boilerplate, of all text | 17.6% | 17.6% |
+  | ads with text in no section | 0 | 0 |
+
+  Boilerplate's verdict was left as it was: its share didn't move.
+- **Changes from the plan:** an unmapped section isn't embedded, as the
+  plan had it, but gathered with the boilerplate, its fields kept as
+  details; boilerplate isn't taken out of every chunk, but gathered
+  from the embedded ones into a chunk of its own, the rest keeping
+  theirs; role is a kind of its own, apart from the summary; the chunks
+  come in a fixed order. Beyond the plan: text cleaned for every stage
+  (`internal/clean`); plain lines before lists as sub-headings (roadmap
+  6); facts (roadmap 7, its own record); lines placed by their wording
+  (was 19); plain-text bullets; the title split off (was idea 15);
+  YAML; the view showing the same chunks; and the pages (was 20).
+- **Tried and reverted:** boilerplate marked in place, then taken out of
+  every chunk, before it was gathered; the first title split, which let
+  long bold lines become headings and read a bold title twice (117 ads
+  with text in no section), and the second, which split longer titles.
+  Each is below, as it went.
+- **What's left:** boilerplate's verdict, footers and common job lines
+  (roadmap 4); walls of text (roadmap 5); headings still to map, the
+  ones the pages show (idea 21); a list item's own blocks out of the
+  ad's order (idea 17). The pages show six ads done badly, for each.
+
+### As it went
 
 - **The item stays open** (2026-10-27): it's the near-term aim,
   chunking shown working with grammars, and roadmap 7 (facts), 19

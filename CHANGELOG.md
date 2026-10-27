@@ -17,7 +17,11 @@ has the steps).
   their size, what placed them, their fields and facts, and a bar of
   where the ad's tokens go; and an index, with why each ad is there.
   A dozen, showing where chunking does well and badly, are kept in the
-  private data store (roadmap 18, was 20).
+  private data store (roadmap 18, was 20). With them, roadmap 18, a
+  chunker for any ad, is done: by it, 57.5% of an ad's tokens are
+  embedded, the rest facts, notices, the employer's pitch and text
+  still to map (roadmap 18;
+  [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md)).
 - The ad's title run into the rest of its line is split off, as a
   repeat: "General Foreman Responsibilities:" is the title, then the
   heading; "Electrician (Permanent)" and "Support Worker - Hull £12.93

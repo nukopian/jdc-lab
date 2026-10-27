@@ -60,11 +60,14 @@ embeddings, and a large language model only where those fall short.
   rule, on all three. About a fifth of an ad is boilerplate, found
   even with a few words changed, or company, application and legal
   text, that probably needn't be embedded: a first answer to whether
-  search can improve while embedding less. A third of ads state a working pattern, such as
-  "Monday to Friday, 9am–5pm": a fact for metadata, not embedding.
+  search can improve while embedding less. A third of ads state a
+  working pattern, such as "Monday to Friday, 9am–5pm": a fact for
+  metadata, not embedding. Chunked, an ad's embedded text is 57% of its
+  tokens: the rest is facts, the employer's pitch, notices, and text
+  under headings still to map.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: now, finishing the chunker, with pages showing ads before
-  and after; then boilerplate's verdict made right both ways.
+  and why: the chunker is done for now; next, boilerplate's verdict made
+  right both ways, and walls of text split into sentences.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of
