@@ -534,12 +534,14 @@ section but the summary, 5% and 4%.
 | company | 5% | 3% | 3% | 46% | 28% | 39% |
 | apply | 3% | 3% | 3% | 37% | 42% | 44% |
 | legal | 1% | 1% | 1% | 77% | 69% | 75% |
-| details | 2% | 2% | 2% | 8% | 16% | 14% |
+| details | 2% | 2% | 2% | 9% | 16% | 15% |
 | unmapped | 13% | 13% | 13% | 18% | 19% | 20% |
 
 Boilerplate is 13.2% of the text in the first sample, 12.5% in the
 second, and 13.9% in both together, as more ads show more of what's
-repeated; template for the job is 2.1%, 3.3% and 2.9%. So boilerplate,
+repeated (15.1% in the third sample, of 21,000 ads: the thresholds are
+counts of title groups, which a larger sample passes more easily, so
+boilerplate figures from samples of different sizes don't compare); template for the job is 2.1%, 3.3% and 2.9%. So boilerplate,
 with the company, apply and legal text that isn't, is roughly 15–20% of
 an ad that probably needn't be embedded. That's a first answer to
 whether retrieval can improve while embedding less.

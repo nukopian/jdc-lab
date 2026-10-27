@@ -65,6 +65,7 @@ func TestOf(t *testing.T) {
 		{"Rotation:", Details},
 		{"Nights:", Details},
 		{"As a Shift Engineer, you will:", Responsibilities},
+		{"Shift Manager - About the Role", Summary},
 		{"Tasks", Responsibilities},
 		{"Candidates will also require:", Requirements},
 		{"What's in it for me?", Benefits},

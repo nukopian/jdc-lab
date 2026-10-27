@@ -111,8 +111,8 @@ func run(name string) error {
 
 	// The samples run at once, each in a goroutine, its stages in turn;
 	// errors.Join gathers what went wrong in any of them. Each sample is
-	// one process at a time, so on a machine with a processor for each,
-	// they barely slow each other.
+	// one process at a time, but a stage can use several processors, so
+	// samples running together slow each other a little.
 	start := time.Now()
 	var wg sync.WaitGroup
 	errs := make([]error, len(samples))

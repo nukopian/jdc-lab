@@ -53,13 +53,16 @@ The item was in Now from the roadmap's start, and its work was done on
   ("17:00"), or a range of hh.mm ("8.30-3.30"); a figure with a point
   and nothing more ("37.50") is not, as it's more often pay or hours.
   `TestRead` has a case for times, and one for figures that aren't.
-  After it shipped, still unreleased, the times took three cues from
-  how ads write working patterns. A bare range of hours, such as
-  "8-5", is a time beside a range of days, before or after it, as in
-  "Monday - Friday 8-5"; alone, as in "Ages 5-11", it isn't. M-F counts as
-  a range of days: in the ads, beside a time or pay, it always is one. With pm on the second
-  figure, as in "9-5pm", am is implied. A count stays a count whatever
-  is beside it: "2-3 days", "10-12 hr shifts", "4-5 nights".
+  After it shipped, still unreleased, the times took three cues from how
+  ads write working patterns. A bare range of hours, such as "8-5", is a
+  time beside a range of days, before or after it, as in "Monday -
+  Friday 8-5"; alone, as in "Ages 5-11", it isn't. M-F counts as a range
+  of days: in the ads, beside a time or pay, it always is one. With pm
+  on the second figure, as in "9-5pm", am is implied. A count stays a
+  count whatever is beside it: "2-3 days", "10-12 hr shifts", "4-5
+  nights"; but a range that runs back round the clock, as in "7-3
+  Days", is hours (from the wash-up before the release, with "till" as
+  a range's word, and day names whole, so "Monmouth" is none).
 - **Measurements:** runs `before` and `after`, compared. Across all
   three samples, heading uses fell from 95,174 to 94,674: 500 uses of
   365 headings, 326 of them unmapped. The other 39 had been mapped to

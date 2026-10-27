@@ -160,18 +160,26 @@ func TestRead(t *testing.T) {
 			// days, which M-F is too; with pm after it, am is implied.
 			"bold bare hours beside days are no headings",
 			`<p><b>Monday - Friday 8-5</b></p><p><b>M-F 8-4</b></p><p><b>Mon–Thu 7–3:30</b></p>` +
-				`<p><b>9-5pm</b></p><p><b>8-5 Monday - Friday</b></p>`,
+				`<p><b>9-5pm</b></p><p><b>8-5 Monday - Friday</b></p>` +
+				// A range that runs back round the clock is no count, whatever
+				// follows it; a word that only starts as a unit is no unit.
+				`<p><b>Mon - Fri 7-3 Days</b></p><p><b>Monday to Friday 6-2 Nights</b></p>` +
+				`<p><b>Monday - Friday 9-5 Minimum</b></p><p><b>Mon-Fri 8 till 5</b></p>`,
 			[]string{`text "Monday - Friday 8-5"`, `text "M-F 8-4"`, `text "Mon–Thu 7–3:30"`,
-				`text "9-5pm"`, `text "8-5 Monday - Friday"`},
+				`text "9-5pm"`, `text "8-5 Monday - Friday"`,
+				`text "Mon - Fri 7-3 Days"`, `text "Monday to Friday 6-2 Nights"`,
+				`text "Monday - Friday 9-5 Minimum"`, `text "Mon-Fri 8 till 5"`},
 		},
 		{
 			// A rota, or days or nights beside a range of days, is a pattern
 			// of work, a fact as a time is.
 			"bold shift patterns are no headings",
 			`<p><b>4 on 4 off (days)</b></p><p><b>4on 3off</b></p><p><b>4 days on, 4 days off</b></p>` +
-				`<p><b>Monday - Friday (Days)</b></p><p><b>Mon- Fri Nights</b></p>`,
+				`<p><b>Monday - Friday (Days)</b></p><p><b>Mon- Fri Nights</b></p>` +
+				`<p><b>4 on - 4 off</b></p><p><b>4ON4OFF</b></p>`,
 			[]string{`text "4 on 4 off (days)"`, `text "4on 3off"`, `text "4 days on, 4 days off"`,
-				`text "Monday - Friday (Days)"`, `text "Mon- Fri Nights"`},
+				`text "Monday - Friday (Days)"`, `text "Mon- Fri Nights"`,
+				`text "4 on - 4 off"`, `text "4ON4OFF"`},
 		},
 		{
 			// Alone, a shift's name heads its own hours; with a figure,
@@ -188,11 +196,14 @@ func TestRead(t *testing.T) {
 		{
 			"bold bare ranges without days are headings",
 			`<p><b>Ages 5-11</b></p><p><b>Monday to Friday, 2-3 days in the office</b></p>` +
-				`<p><b>Mon-Sun, 10-12 hr shifts</b></p><p><b>Sunday to Thursday, 4-5 nights</b></p>`,
+				`<p><b>Mon-Sun, 10-12 hr shifts</b></p><p><b>Sunday to Thursday, 4-5 nights</b></p>` +
+				// Places aren't days, however they start.
+				`<p><b>Monmouth to Sunderland, 2-4 stops</b></p>`,
 			[]string{`heading "Ages 5-11" key="ages 5 11"`,
 				`heading "Monday to Friday, 2-3 days in the office" key="monday to friday 2 3 days in the office"`,
 				`heading "Mon-Sun, 10-12 hr shifts" key="mon sun 10 12 hr shifts"`,
-				`heading "Sunday to Thursday, 4-5 nights" key="sunday to thursday 4 5 nights"`},
+				`heading "Sunday to Thursday, 4-5 nights" key="sunday to thursday 4 5 nights"`,
+				`heading "Monmouth to Sunderland, 2-4 stops" key="monmouth to sunderland 2 4 stops"`},
 		},
 		{
 			// A figure with a point is a time only with am or pm, or in a

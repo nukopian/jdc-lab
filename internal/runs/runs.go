@@ -37,13 +37,34 @@ func Samples(dir string) ([]Sample, error) {
 	return samples, nil
 }
 
-// Ads returns how many ads the sample has: its lines.
+// Ads returns how many ads the sample has: its lines, the last counted
+// whether it ends with a newline or not. It reads the file a piece at a
+// time, as the combined sample can be large.
 func (s Sample) Ads() (int, error) {
-	data, err := os.ReadFile(s.Path)
+	f, err := os.Open(s.Path)
 	if err != nil {
 		return 0, err
 	}
-	return bytes.Count(data, []byte("\n")), nil
+	defer f.Close()
+	n, last := 0, byte('\n')
+	buf := make([]byte, 64<<10)
+	for {
+		k, err := f.Read(buf)
+		if k > 0 {
+			n += bytes.Count(buf[:k], []byte("\n"))
+			last = buf[k-1]
+		}
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return 0, err
+		}
+	}
+	if last != '\n' {
+		n++
+	}
+	return n, nil
 }
 
 // A Timing is how one stage ran on one sample: its time on the clock

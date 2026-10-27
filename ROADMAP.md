@@ -186,9 +186,10 @@ Grammars ([grammar](https://github.com/nukopian/grammar)) for the facts
 in an ad's details sections and fields: salary and its period, hours,
 working pattern, contract type and location, as metadata with definite
 values, so that search can filter on them and they needn't be embedded.
-About a third of ads state a working pattern. The cues found so far:
-M-F is a range of days beside a time or pay; a bare range of hours,
-such as 8-5, is a time beside a range of days; "9-5pm" implies am.
+A third of ads state a working pattern: a grammar for it would first
+replace `internal/headings`' regular expressions for times and patterns
+(their cues are in roadmap 2's
+[record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md)).
 
 ### 8. Skills and occupations as taxonomy links
 

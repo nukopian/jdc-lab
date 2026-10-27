@@ -37,11 +37,22 @@ has the steps).
   shifts ("Shifts Available:", "Night Shift", "Rotation:") now start
   details sections, not unmapped ones. Across the three samples,
   headings of a known kind rise from 76% to 77% of uses, and ads with
-  every heading known from 53% to 54%.
-
+  every heading known from 13,672 to 13,882. A heading with both a
+  shift word and a summary phrase now goes to details, as in
+  "Production Supervisor – Nights The Role", the ad's title run into
+  a heading: a handful of uses.
 - The CHANGELOG and change records no longer get PDFs: they're read
   as Markdown, on GitHub or in an editor. `readme-pdf.sh` builds the
   other five documents' PDFs, and refuses these.
+- A wash-up before the release found two faults in the new rules and
+  fixed them. "Shift" alone among the details phrases took job titles
+  for details headings ("Shift Quality Inspector", "HGV Technician
+  Shift Supervisor – Leeds"): 59 headings, back to unmapped now that
+  the phrases name shift headings ("day shift", "shift times"). And
+  "Mon - Fri 7-3 Days", "Mon-Fri 8 till 5" and "4ON4OFF" still passed
+  as headings, while "Monmouth to Sunderland" was read as a range of
+  days. Ad counts in `pipeline run` no longer read each sample whole,
+  or miss a last line without a newline.
 
 ## v0.3.5 (2026-10-27)
 

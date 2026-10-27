@@ -110,6 +110,13 @@ func TestSampleAds(t *testing.T) {
 	if n, err := (Sample{Name: "ads", Path: path}).Ads(); err != nil || n != 3 {
 		t.Errorf("got %d, %v; want 3 ads", n, err)
 	}
+	// A last line without its newline is an ad too.
+	if err := os.WriteFile(path, []byte("{}\n{}"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if n, err := (Sample{Name: "ads", Path: path}).Ads(); err != nil || n != 2 {
+		t.Errorf("without a last newline: got %d, %v; want 2 ads", n, err)
+	}
 }
 
 func TestTimings(t *testing.T) {

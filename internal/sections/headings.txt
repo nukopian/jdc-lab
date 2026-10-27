@@ -80,7 +80,10 @@ apply, how to apply, apply now, apply today, application, applications,
 details, job details, role details, position details, contract details,
 	vacancy details, key details, the details, job information, key information,
 	location, hours, working hours, shift pattern, working pattern, salary, pay,
-	contract, duration, shift, rota, rotation, nights
+	contract, duration, shifts, shift times, shift timings, shift details,
+	shift options, shift and schedule, day shift, night shift, early shift,
+	late shift, afternoon shift, morning shift, twilight shift, am shift,
+	pm shift, rota, rotation, nights
 
 summary, the role, about the role, the opportunity, about the opportunity,
 	overview, role overview, job overview, job summary, role summary,

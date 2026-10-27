@@ -11,6 +11,7 @@ package headings
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -211,17 +212,22 @@ var money = regexp.MustCompile(`[£$€]|\d{3,}`)
 // "8.30-3.30": "37.50 hours" is a figure.
 var times = regexp.MustCompile(`(?i)\b\d{1,2}([:.]\d{2})? ?[ap]m\b|\b\d{1,2}:\d{2}\b|\b\d{1,2}\.\d{2} *(-|–|—|to) *\d{1,2}\.\d{2}\b`)
 
+// day is a day's name, whole or cut short: "Monday", "Thurs", "Fri.", but
+// not "Monmouth".
+const day = `(mon|monday|tue|tues|tuesday|wed|weds|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday|sun|sunday)\b\.?`
+
 // days matches a range of days: "Monday to Friday", "Mon–Thu", "M-F".
-var days = regexp.MustCompile(`(?i)\b(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.? *(-|–|—|to) *(mon|tue|wed|thu|fri|sat|sun)[a-z]*\b|\bM *[-–] *F\b`)
+var days = regexp.MustCompile(`(?i)\b` + day + ` *(-|–|—|to|till?|until) *` + day + `|\bM *[-–] *F\b`)
 
 // hours matches a bare range of hours, "8-5" or "7.30-4", which is a time
 // only beside a range of days: alone, "Ages 5-11" is no time. "2-3 days"
-// or "10-12 hr shifts" is a count, whatever's beside it.
-var hours = regexp.MustCompile(`(?i)\b([01]?\d|2[0-3])([:.]\d{2})? *(-|–|—|to) *([01]?\d|2[0-3])([:.]\d{2})?\b( *(hours?|hrs?|days?|nights?|weeks?|months?|years?|yrs|sessions?|mins?|minutes|%))?`)
+// or "10-12 hr shifts" is a count, whatever's beside it, but a range that
+// runs back round the clock, as "7-3 Days" does, is hours.
+var hours = regexp.MustCompile(`(?i)\b([01]?\d|2[0-3])([:.]\d{2})? *(-|–|—|to|till?|until) *([01]?\d|2[0-3])([:.]\d{2})?\b( *((hours?|hrs?|days?|nights?|weeks?|months?|years?|yrs|sessions?|mins?|minutes)\b|%))?`)
 
-// rota matches days on and off: "4 on 4 off", "4on 3off", "4 days on, 4
-// days off".
-var rota = regexp.MustCompile(`(?i)\b\d+ *((day|night)s? *)?on\b[ ,/&]*\d+ *((day|night)s? *)?off\b`)
+// rota matches days on and off: "4 on 4 off", "4ON4OFF", "4 on - 4 off",
+// "4 days on, 4 days off".
+var rota = regexp.MustCompile(`(?i)\b\d+ *((day|night)s? *)?on[ ,/&–-]*\d+ *((day|night)s? *)?off\b`)
 
 // shiftWord matches days or nights, and a figure before them: "2-3 days" is
 // a count, not the day shift.
@@ -252,7 +258,8 @@ func hasPattern(text string) bool {
 
 // hasTimes reports whether text holds a time of day: one of times, or a
 // bare range of hours beside a range of days, as in "Monday - Friday 8-5"
-// or "M-F 8-4".
+// or "M-F 8-4". Unlike a pattern, a time ending in a colon is still no
+// heading.
 func hasTimes(text string) bool {
 	if times.MatchString(text) {
 		return true
@@ -261,7 +268,9 @@ func hasTimes(text string) bool {
 		return false
 	}
 	for _, m := range hours.FindAllStringSubmatch(text, -1) {
-		if m[6] == "" { // not followed by a unit, so not a count
+		from, _ := strconv.Atoi(m[1])
+		to, _ := strconv.Atoi(m[4])
+		if m[6] == "" || from >= to { // no unit, or round the clock: not a count
 			return true
 		}
 	}
