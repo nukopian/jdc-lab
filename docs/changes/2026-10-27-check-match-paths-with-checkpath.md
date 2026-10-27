@@ -69,3 +69,8 @@ grammar, with `GOWORK=off`, and a misspelt path in either list fails.
   unchanged, no heading newly mapped or unmapped.
 - **Tried and reverted:** nothing.
 - **What's left:** nothing.
+- **Wash-up:** the plan missed `internal/sections`, whose `Explain`
+  reads `~` from its finder's matches, so MAINTAINING's rule that every
+  package reading a grammar's matches has a `paths_test.go` didn't hold.
+  It has one now; a path of `phrase` fails it, `rule TOP has no capture
+  "phrase"`.
