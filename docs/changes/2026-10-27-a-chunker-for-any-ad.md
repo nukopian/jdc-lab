@@ -88,6 +88,17 @@ say how to run it.
   worth embedding. Each ad totals its unclassified tokens beside its
   embedded ones; on a driver's ad tried, 46% of tokens are embedded and
   28% unclassified.
+- **Boilerplate is marked, not taken out** (Iain, 2026-10-27). Out of
+  a chunk left out or kept as metadata, it broke lists apart: an
+  advertiser's standard perks showed as one benefit and six lines of
+  boilerplate. And out of embedded chunks it took job text: of what's
+  found as boilerplate in summaries (9.7% of their text), requirements
+  (11.7%), responsibilities and desirable, about half of a sample is
+  about the job ("High levels of accuracy and attention to detail", an
+  agency's template for a SEND tutor's duties), as the rule that text
+  under five groups of titles is boilerplate also takes in common job
+  wording. So every chunk keeps its text; an embedded one lists what's
+  marked. Telling footers from common job wording is still to do.
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go

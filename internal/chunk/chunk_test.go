@@ -31,7 +31,7 @@ func TestOf(t *testing.T) {
 		use, placed, text string
 	}{
 		{Embed, "nothing before it: summary by default", "We deliver parcels across the north of England every day."},
-		{Embed, `the heading "What you'll be doing": "what you'll be doing" in headings.txt`, "What you'll be doing\nDrive the van."},
+		{Embed, `the heading "What you'll be doing": "what you'll be doing" in headings.txt`, "What you'll be doing\nDrive the van.\nWe are an agency."},
 		{Metadata, `the heading "Job details": "job details" in headings.txt`, "Job details\nSalary: £30,000"},
 		{LeaveOut, `the heading "About Brightway": it starts "about"`, "About Brightway\nWe are a family firm."},
 		{LeaveOut, `the line "How to apply": exactly a section's name`, "How to apply\nApply today."},
@@ -42,8 +42,9 @@ func TestOf(t *testing.T) {
 			t.Errorf("chunk %d: got %s, %q, %q; want %s, %q, %q", i, c.Use, c.PlacedBy, c.Text, tt.use, tt.placed, tt.text)
 		}
 	}
+	// Boilerplate is marked, not taken out: its verdict isn't sure enough.
 	if got := cs[1].Boilerplate; len(got) != 1 || got[0] != "We are an agency." {
-		t.Errorf("the responsibilities' boilerplate: %q", got)
+		t.Errorf("the responsibilities' boilerplate marked: %q", got)
 	}
 	if got := cs[2].Fields; len(got) != 1 || got[0].Label != "salary" || got[0].Value != "£30,000" {
 		t.Errorf("the details' fields: %+v", got)
@@ -107,9 +108,9 @@ func TestTotals(t *testing.T) {
 	}
 }
 
-// Boilerplate comes out of a chunk only if it's embedded: in one left
-// out, or kept as metadata, it's part of the list it's in.
-func TestBoilerplateKeptWhereNotEmbedded(t *testing.T) {
+// Boilerplate stays in every chunk's text; it's marked in embedded ones,
+// where it would count, and not in others, where it's part of a list.
+func TestBoilerplateKeptAndMarked(t *testing.T) {
 	ss := []sections.Section{
 		{Kind: sections.Benefits, Heading: "Perks", Parts: []headings.Part{text("A virtual GP."), text("A pension plan.")}},
 		{Kind: sections.Requirements, Heading: "You'll need", Parts: []headings.Part{text("A licence."), text("A pension plan.")}},
@@ -118,7 +119,7 @@ func TestBoilerplateKeptWhereNotEmbedded(t *testing.T) {
 	if got := cs[0].Text; got != "Perks\nA virtual GP.\nA pension plan." || len(cs[0].Boilerplate) != 0 {
 		t.Errorf("benefits: text %q, boilerplate %q; want every line kept, none listed", got, cs[0].Boilerplate)
 	}
-	if got := cs[1].Text; got != "You'll need\nA licence." || len(cs[1].Boilerplate) != 1 {
-		t.Errorf("requirements: text %q, boilerplate %q; want the boilerplate out and listed", got, cs[1].Boilerplate)
+	if got := cs[1].Text; got != "You'll need\nA licence.\nA pension plan." || len(cs[1].Boilerplate) != 1 {
+		t.Errorf("requirements: text %q, boilerplate %q; want the boilerplate kept and marked", got, cs[1].Boilerplate)
 	}
 }

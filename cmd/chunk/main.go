@@ -160,7 +160,7 @@ func write(w io.Writer, c chunk.Ad) {
 			fmt.Fprintf(w, "    field %s: %s\n", f.Label, f.Value)
 		}
 		for _, b := range ch.Boilerplate {
-			fmt.Fprintf(w, "    boilerplate, left out: %s\n", b)
+			fmt.Fprintf(w, "    marked boilerplate, kept: %s\n", b)
 		}
 	}
 	fmt.Fprintln(w)

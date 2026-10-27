@@ -8,9 +8,10 @@
 // responsibilities, requirements and desirable. Details are metadata;
 // benefits, company, apply and legal are left out; and unmapped ones,
 // whose kind isn't known, are unclassified, not embedded: they're what's
-// left to map. Text found as boilerplate is taken out of an embedded
-// chunk's text, and listed; in other chunks it stays where it is, as part
-// of what they say.
+// left to map. Text found as boilerplate stays in a chunk's text, and an
+// embedded chunk lists it: the verdict catches advertisers' footers, but
+// also job lines common to many ads ("high levels of accuracy and
+// attention to detail"), so nothing is taken out until it's surer.
 package chunk
 
 import (
@@ -43,11 +44,10 @@ type Chunk struct {
 	PlacedBy string `json:"placed_by" yaml:"placed_by"`
 	// Use is Embed, Metadata, LeaveOut or Unclassified.
 	Use string `json:"use" yaml:"use"`
-	// Text is the chunk's heading and text, a line each, without its
-	// boilerplate if it's embedded.
+	// Text is the chunk's heading and text, a line each.
 	Text string `json:"text" yaml:"text"`
-	// Boilerplate is the text taken out of an embedded chunk's Text as
-	// boilerplate.
+	// Boilerplate is the text of an embedded chunk found as boilerplate,
+	// kept in Text: where taking it out would save tokens.
 	Boilerplate []string `json:"boilerplate,omitempty" yaml:"boilerplate,omitempty"`
 	Fields      []Field  `json:"fields,omitempty" yaml:"fields,omitempty"`
 	// Tokens is about how many tokens Text is: four for every three
@@ -66,11 +66,11 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			lines = append(lines, s.Heading)
 		}
 		for _, p := range s.Parts {
-			// Only an embedded chunk loses its boilerplate: elsewhere it's
-			// part of what the section says, a list of benefits and all.
+			// Boilerplate is marked in an embedded chunk, where it would
+			// count, but kept: its verdict also takes in job lines common
+			// to many ads. Elsewhere it's part of what the section says.
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
 				c.Boilerplate = append(c.Boilerplate, p.Text)
-				continue
 			}
 			if p.Role == headings.Field {
 				c.Fields = append(c.Fields, Field{Label: p.Key, Value: p.Value})

@@ -408,9 +408,9 @@ summary counts both over the sample.
 **Package** `internal/chunk`, **program** `cmd/chunk`.
 
 Everything above, for one ad, as an embedding job would take it: its
-sections as chunks, each with its kind and heading, its text (an
-embedded chunk's without its boilerplate, which is listed; other
-chunks keep theirs, as part of what they say), what to do with it, about how many tokens it is (four
+sections as chunks, each with its kind and heading, its text (all of
+it: an embedded chunk lists what's found as boilerplate, but keeps it,
+as the verdict also takes in job lines common to many ads), what to do with it, about how many tokens it is (four
 for every three words), and what placed it there.
 
 ```
