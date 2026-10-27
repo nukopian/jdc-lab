@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/nukopian/jdc-lab/internal/facts"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
 	"go.yaml.in/yaml/v3"
@@ -94,6 +95,7 @@ func TestYAML(t *testing.T) {
 		a.Chunks = append(a.Chunks, Chunk{
 			Kind: sections.Summary, Heading: s, PlacedBy: s, Use: Embed, Text: s, Tokens: i,
 			Fields: []Field{{Label: "pay", Value: s}},
+			Facts:  []facts.Fact{{Kind: "pay", Text: s, Values: map[string]string{"min": "50000", "period": "year", "note": s}}},
 		})
 	}
 	var b strings.Builder
@@ -208,4 +210,60 @@ func kind(cs []Chunk, k sections.Kind) Chunk {
 		}
 	}
 	return Chunk{}
+}
+
+// Lines of facts leave the chunks they're in for a details chunk of
+// facts, each with its values; a details chunk keeps its lines, and
+// gains their facts.
+func TestFacts(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{
+			text("Join our team as a Project Manager."),
+			{Role: headings.Text, Text: "40hrs pw", Item: true},
+			{Role: headings.Text, Text: "50,000pa + excellent bonus and benefits", Item: true},
+			text("This is a permanent role working with an estates team across the north."),
+		}},
+		{Kind: sections.Details, Heading: "Job details", Parts: []headings.Part{
+			{Role: headings.Field, Text: "Pay: £16.50 per hour", Key: "pay", Value: "£16.50 per hour"},
+		}},
+	}
+	cs := Of(ss, func(string) bool { return false })
+	sum := kind(cs, sections.Summary)
+	if sum.Text != "Join our team as a Project Manager.\nThis is a permanent role working with an estates team across the north." {
+		t.Errorf("summary: %q; want its fact lines gone, the sentence with a fact in it kept", sum.Text)
+	}
+	var facts Chunk
+	for _, c := range cs {
+		if c.Kind == sections.Details && c.Heading == "" {
+			facts = c
+		}
+	}
+	if facts.Use != Metadata || facts.Text != "- 40hrs pw\n- 50,000pa + excellent bonus and benefits" || len(facts.Facts) != 2 ||
+		facts.Facts[0].Kind != "hours" || facts.Facts[1].Values["min"] != "50000" || !strings.Contains(facts.PlacedBy, "facts") {
+		t.Errorf("the facts: %+v", facts)
+	}
+	d := kind(cs, sections.Details)
+	if d.Heading != "Job details" || len(d.Facts) != 1 || d.Facts[0].Values["period"] != "hour" {
+		t.Errorf("the details: %+v; want its line kept and its pay read", d)
+	}
+}
+
+// Sentences, and lines with a work pattern in them among other words,
+// aren't lines of facts.
+func TestFactLine(t *testing.T) {
+	for line, want := range map[string]bool{
+		"40hrs pw":                                               true,
+		"Bromsgrove | Full-time | Permanent":                     true,
+		"- Hybrid working":                                       true,
+		"Mon - Fri 8:30am till 5:30pm":                           true,
+		"Monday - Friday, 9:00am - 5:00pm.":                      true,
+		"Contract administration and commercial risk management": false,
+		"You'll work 40 hours per week on a shift pattern, including sleep-ins.":   false,
+		"is hiring temporary School Cleaning Staff for schools in Chester. If you": false,
+		"Canteen on site": false,
+	} {
+		if got := factLine(line, facts.Find(line)); got != want {
+			t.Errorf("factLine(%q) = %t, want %t", line, got, want)
+		}
+	}
 }

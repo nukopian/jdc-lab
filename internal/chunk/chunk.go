@@ -28,6 +28,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/nukopian/jdc-lab/internal/facts"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
@@ -60,6 +61,9 @@ type Chunk struct {
 	// as "- " entries.
 	Text   string  `json:"text" yaml:"text"`
 	Fields []Field `json:"fields,omitempty" yaml:"fields,omitempty"`
+	// Facts are the facts read in a details chunk's lines (see
+	// internal/facts): pay, hours, work pattern, schedule, location.
+	Facts []facts.Fact `json:"facts,omitempty" yaml:"facts,omitempty"`
 	// Unmapped is how many of the boilerplate chunk's tokens are text of
 	// unmapped sections: what's left to map.
 	Unmapped int `json:"unmapped_tokens,omitempty" yaml:"unmapped_tokens,omitempty"`
@@ -74,6 +78,19 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	var cs []Chunk
 	var gathered []string // the boilerplate of the embedded chunks, and the unmapped text
 	unmapped := 0         // the unmapped text's tokens
+	var found Chunk       // the lines of facts taken from the chunks
+	takeFacts := func(p headings.Part) bool {
+		if p.Role != headings.Text {
+			return false
+		}
+		fs := facts.Find(p.Text)
+		if !factLine(p.Text, fs) {
+			return false
+		}
+		found.Text += "\n" + line(p)
+		found.Facts = append(found.Facts, placeless(fs)...)
+		return true
+	}
 	for _, s := range ss {
 		if s.Kind == sections.Unmapped {
 			// Unmapped text goes to the boilerplate, under its heading, and
@@ -85,6 +102,9 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 				if p.Role == headings.Field {
 					d.Fields = append(d.Fields, Field{Label: p.Key, Value: p.Value})
 					lines = append(lines, line(p))
+					continue
+				}
+				if takeFacts(p) {
 					continue
 				}
 				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, p.Text))
@@ -103,6 +123,9 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			lines = append(lines, s.Heading)
 		}
 		for _, p := range s.Parts {
+			if c.Use == Embed && takeFacts(p) {
+				continue
+			}
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
 				gathered = append(gathered, string(s.Kind)+": "+p.Text) // the gathered lines are a list
 				continue
@@ -114,7 +137,19 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		}
 		c.Text = strings.Join(lines, "\n")
 		c.Tokens = Tokens(c.Text)
+		if c.Kind == sections.Details {
+			for _, l := range lines {
+				c.Facts = append(c.Facts, placeless(facts.Find(l))...)
+			}
+		}
 		cs = append(cs, c)
+	}
+	if found.Text != "" {
+		found.Kind, found.Use = sections.Details, Metadata
+		found.Text = strings.TrimPrefix(found.Text, "\n")
+		found.Tokens = Tokens(found.Text)
+		found.PlacedBy = "lines of facts, read by the facts grammars (pay, hours, work pattern, schedule, location), from the chunks above"
+		cs = append(cs, found)
 	}
 	// What says what the job is comes first, in that order; the rest
 	// keep the ad's order, and the boilerplate comes last.
@@ -127,6 +162,57 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		})
 	}
 	return cs
+}
+
+// factLine reports whether a line, with the facts fs found in it, is a
+// line of facts, to be details. One with a postcode in it, of at most 30
+// words, is. Otherwise it must start with a fact, in its first three
+// words, be at most 25 words, and not be a sentence or a question; and if
+// its only facts are work patterns, words such as "contract" and
+// "temporary" that sentences use too, they must be nearly all of it: at
+// most two other words. "50,000pa + excellent bonus" and "Bromsgrove |
+// Full-time | Permanent" are lines of facts; "This is a permanent role
+// working with…" and "Contract administration" aren't.
+func factLine(text string, fs []facts.Fact) bool {
+	text = strings.TrimSpace(text)
+	words := strings.Fields(text)
+	if len(fs) == 0 || strings.HasSuffix(text, "?") {
+		return false
+	}
+	for _, f := range fs {
+		if f.Kind == "location" && len(words) <= 30 {
+			return true
+		}
+	}
+	sentence := strings.Contains(text, ". ") || strings.HasSuffix(text, ".") && len(words) > 10
+	runes := []rune(text)
+	before := len(strings.Fields(string(runes[:min(fs[0].From, len(runes))])))
+	if sentence || before >= 3 || len(words) > 25 {
+		return false
+	}
+	if slices.ContainsFunc(fs, func(f facts.Fact) bool { return f.Kind != "pattern" }) {
+		return true
+	}
+	rest := text
+	for _, f := range fs {
+		rest = strings.Replace(rest, f.Text, " ", 1)
+	}
+	others := 0
+	for _, w := range strings.Fields(rest) {
+		if strings.ContainsFunc(w, func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) }) {
+			others++
+		}
+	}
+	return others <= 2
+}
+
+// placeless returns facts without where they were in their line, which a
+// chunk's reader has no use for.
+func placeless(fs []facts.Fact) []facts.Fact {
+	for i := range fs {
+		fs[i].From = 0
+	}
+	return fs
 }
 
 // firsts are the kinds of chunk that come first, in this order.

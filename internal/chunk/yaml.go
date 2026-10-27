@@ -3,7 +3,9 @@ package chunk
 import (
 	"fmt"
 	"io"
+	"maps"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -59,6 +61,15 @@ func (a Ad) WriteYAML(w io.Writer) error {
 			b.WriteString("    fields:\n")
 			for _, f := range c.Fields {
 				fmt.Fprintf(&b, "      - label: %s\n        value: %s\n", scalar(f.Label), scalar(f.Value))
+			}
+		}
+		if len(c.Facts) > 0 {
+			b.WriteString("    facts:\n")
+			for _, f := range c.Facts {
+				fmt.Fprintf(&b, "      - kind: %s\n        text: %s\n        values:\n", scalar(f.Kind), scalar(f.Text))
+				for _, k := range slices.Sorted(maps.Keys(f.Values)) {
+					fmt.Fprintf(&b, "          %s: %s\n", k, scalar(f.Values[k]))
+				}
 			}
 		}
 	}

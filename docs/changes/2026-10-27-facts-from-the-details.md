@@ -1,10 +1,12 @@
 # Facts from the details, by grammar
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 7
 
 **Started:** 2026-10-27, in 4b2db1d612d6ac23271a366060c1752d39c0bb5f
+
+**Finished:** 2026-10-27
 
 ## The plan
 
@@ -65,3 +67,38 @@ Work started 2026-10-27.
 
   Cleaning has since made every dash ASCII, so a label and " - " is the
   one shape to read.
+
+- **Outcome:** done. `internal/facts` has a grammar each for pay,
+  hours, work pattern (a word list), schedule and location (a UK
+  postcode), each giving typed values; `chunk` takes lines of facts out
+  of embedded chunks and unmapped sections into a details chunk of
+  facts, and reads the facts in details chunks' own lines. On a project
+  manager's ad, the opening's "Gateshead NE8 1AQ", "Monday to Friday
+  …", "40hrs pw" and "50,000pa + excellent bonus" come out as location,
+  schedule, hours and pay of 50,000 a year. On the three samples, lines
+  of facts come out of 25% of ads: 9,277 lines, 0.5% of tokens, with
+  5,930 pay facts, 3,131 schedules, 2,623 work patterns, 709 hours and
+  261 postcodes.
+- **Checked by eye:** two samples of 30 lines taken out. The first
+  found five wrong ("Canteen on site", a sentence with "temporary" in
+  it, "Contract administration…", a sentence of hours, a list of
+  benefits opening with "Monday to Friday"), so a line of facts may not
+  be a sentence, work patterns alone must be nearly all of a line, and
+  "on site" left the word list. The second sample was right but for a
+  pay line of a bonus's terms.
+- **Changes from the plan:** seniority is left to the title, roadmap
+  18's increment for it, as in lines "senior" is more often about
+  stakeholders than the job. A pay figure needs a currency or a period,
+  or a pay label; location is a postcode, as place names need a
+  gazetteer. `internal/headings`' regular expressions for times and
+  patterns stay: they keep facts out of headings, and the grammars read
+  the facts; making one serve both is for later. Idea 13 is done by
+  reading a known label and " - " as a field: 1,267 more fields on the
+  three samples, 286 fewer heading uses ("Pay Rate - 13.10", "Location
+  - Plymouth"), and idea 14 by the pay label.
+- **Grammar:** written as the package's HOWTO shows, with no friction
+  to report: a capture named `from` is refused, clearly, as it's the
+  match's own; and `cur`, captured twice in a rule, is an array, as the
+  reference says.
+- **What's left:** a list of benefits that opens with a schedule is
+  taken as facts; place names without a postcode aren't read.

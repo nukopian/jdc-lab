@@ -297,3 +297,15 @@ func TestKeyDashes(t *testing.T) {
 		t.Errorf("Key(en dash) = %q, Key(hyphen) = %q; want the same", a, b)
 	}
 }
+
+// A known label, then " - ", is a field too, as with a colon; an unknown
+// one isn't.
+func TestReadDashedField(t *testing.T) {
+	parts := Read(blocks.Split(`<p>Working Hours - Monday to Friday, 08:00 - 16:30</p><p>Teacher - Leeds</p>`), "Driver")
+	if len(parts) != 2 || parts[0].Role != Field || parts[0].Key != "working hours" || parts[0].Value != "Monday to Friday, 08:00 - 16:30" {
+		t.Errorf("got %+v; want a working hours field", parts[0])
+	}
+	if parts[1].Role == Field {
+		t.Errorf("an unknown label before a dash made a field: %+v", parts[1])
+	}
+}

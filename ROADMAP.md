@@ -55,19 +55,8 @@ in from the roadmap: requirements and responsibilities placed by their
 wording, where no heading placed them (was 19); the ad's title split
 off where it runs into a heading or a line of facts (was idea 15); and
 pages of ads before and after, which close it (was 20). Roadmap 7's
-facts come out as its chunks too. The plan, and how it's going, are in
+facts are in its chunks. The plan, and how it's going, are in
 its [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md).
-
-### 7. Facts from the details
-
-**Serves:** metadata, structure
-
-Grammars for the facts ads state in lines of their own (pay, seniority,
-location, work pattern, schedule), so that each comes out as details
-with its values, wherever it was: pay written without a currency sign
-("Pay Rate - 13.10", was idea 14) and lines whose label ends in a dash
-("Working Hours - Monday to Friday", was idea 13) among them. The plan
-is in its [record](docs/changes/2026-10-27-facts-from-the-details.md).
 
 ## Next
 

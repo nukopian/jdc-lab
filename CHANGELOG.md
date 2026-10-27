@@ -12,6 +12,15 @@ has the steps).
 
 ## Unreleased
 
+- Facts read by grammar: pay, hours, work pattern, schedule and a UK
+  postcode, each with its values, `internal/facts` having a grammar
+  for each. `chunk` takes lines of facts out of the chunks that would
+  embed them into a details chunk of facts ("50,000pa + excellent
+  bonus" is pay of 50,000 a year), and reads the facts in details
+  chunks' own lines. On the three samples, lines of facts come out of
+  25% of ads. A known label and " - " is a field, as with a colon
+  (roadmap 7, with ideas 13 and 14;
+  [record](docs/changes/2026-10-27-facts-from-the-details.md)).
 - A short plain line with a section's phrase, before a list, starts
   that section: sub-headings such as "Highly Desirable", "Essential
   Experience & Qualifications" and "Key Skills". On the three samples,

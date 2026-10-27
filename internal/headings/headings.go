@@ -198,21 +198,25 @@ func IsLabel(key string) bool {
 }
 
 // labelled finds "Label: value" or "Label | value", the label up to the
-// first colon or bar.
+// first colon or bar; field also takes "Label - value".
 var labelled = regexp.MustCompile(`^([^:|]{1,40})[:|]\s*(\S.*)$`)
 
 // field reads text as a field, if its label is one of fieldLabels and it
 // has a value.
 func field(text string) (Part, bool) {
-	m := labelled.FindStringSubmatch(text)
-	if m == nil {
-		return Part{}, false
+	if m := labelled.FindStringSubmatch(text); m != nil {
+		if key := Key(m[1]); fieldLabels[key] {
+			return Part{Role: Field, Text: text, Key: key, Value: strings.TrimSpace(m[2])}, true
+		}
 	}
-	key := Key(m[1])
-	if !fieldLabels[key] {
-		return Part{}, false
+	// "Working Hours - Monday to Friday": a known label, then a dash with
+	// a space each side, as cleaning leaves every dash.
+	if label, value, ok := strings.Cut(text, " - "); ok && len(label) <= 40 {
+		if key := Key(label); fieldLabels[key] && strings.TrimSpace(value) != "" {
+			return Part{Role: Field, Text: text, Key: key, Value: strings.TrimSpace(value)}, true
+		}
 	}
-	return Part{Role: Field, Text: text, Key: key, Value: strings.TrimSpace(m[2])}, true
+	return Part{}, false
 }
 
 // money matches what headings don't have, money and long figures:

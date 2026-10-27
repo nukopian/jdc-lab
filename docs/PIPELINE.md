@@ -451,6 +451,33 @@ it outranked, or the rule (`it starts "why"`), or that nothing came
 before it, so a wrong kind points at the line of `headings.txt` to
 change.
 
+### Facts
+
+**Package** `internal/facts`.
+
+The facts ads state in lines of their own are read by grammars, with
+[grammar](https://github.com/nukopian/grammar), one for each kind, each
+in Raku's grammar syntax, so a rule reads much as the text it matches:
+
+| Fact | Reads | Values |
+|---|---|---|
+| pay | "£45k - £55,000 per annum", "£12.71ph", "50,000pa"; a bare figure after a pay label, "Pay Rate - 13.10" | `min`, `max`, `currency`, `period` |
+| hours | "40hrs pw", "37.5 hours per week" | `per_week` |
+| pattern | "Full-time", "Permanent", "Temp to perm", "Hybrid", from a word list of canonical values | `value` |
+| schedule | "Monday to Friday, 8am - 5pm", "Mon-Fri 07:00-15:30", "M-F 8-4", "4 on 4 off" | `days`, `times`, `rota` |
+| location | a UK postcode, "NE8 1AQ" | `postcode` |
+
+A figure is pay only with a currency sign or a period ("5 years" isn't),
+a bare range of hours a time only after a range of days. The chunker
+takes a **line of facts** out of an embedded chunk, or an unmapped
+section, into a details chunk of its own, with each fact and its
+values: a line with a postcode in it, of at most 30 words; or one that
+starts with a fact, in its first three words, of at most 25 words, not
+a sentence or a question, and, if its only facts are work patterns,
+with at most two other words. A details chunk keeps its lines, and
+gains the facts read from them. A known field label followed by " - "
+is a field, as one followed by a colon is.
+
 ## Testing retrieval
 
 **Package** `internal/retrieval`, **programs** `cmd/retrieval-set`
