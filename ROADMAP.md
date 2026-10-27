@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 22.
+number: 23.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -177,3 +177,11 @@ unmapped ("We are seeking:", "School Information"), the headings after
 a first one not found, and "Why …?" taking in the pay: on the three
 samples, 12% of the text is still under headings of no known kind, in
 43% of ads.
+
+### 22. One set of grammars for facts and headings
+
+Added 2026-10-27. `internal/headings` keeps pay, times, day ranges and
+rotas out of headings with regexes that repeat what `internal/facts`'
+grammars read, as `facts` imports `headings` and can't be imported
+back. With the grammars in a package both use, a line is a time or a
+rota by one rule, not two that can drift apart.
