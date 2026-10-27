@@ -28,11 +28,8 @@ type Ad struct {
 func Totalled(a Ad, tokens int) Ad {
 	a.Tokens, a.Embedded, a.Unclassified = tokens, 0, 0
 	for _, c := range a.Chunks {
-		switch c.Use {
-		case Embed:
+		if c.Use == Embed {
 			a.Embedded += c.Tokens
-		case Unclassified:
-			a.Unclassified += c.Tokens
 		}
 		a.Unclassified += c.Unmapped
 	}

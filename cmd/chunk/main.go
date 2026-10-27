@@ -1,8 +1,8 @@
 // Command chunk prints the chunks of job ads, as an embedding job would
 // ask for them (see internal/chunk): each section with its kind, what to
-// do with it (embed it, keep it as metadata, leave it out, or nothing yet,
-// as it's unclassified), about how many tokens it is, and what placed it
-// in its section.
+// do with it (embed it, keep it as metadata, or leave it out), about how
+// many tokens it is, and what placed it in its section; boilerplate and
+// unmapped text are gathered in a chunk of their own.
 //
 //	chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...
 //

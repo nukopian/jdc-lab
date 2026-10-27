@@ -119,7 +119,7 @@ func TestYAML(t *testing.T) {
 
 // An ad's totals: all its tokens, those embedded, and those unclassified.
 func TestTotals(t *testing.T) {
-	cs := []Chunk{{Use: Embed, Tokens: 10}, {Use: Unclassified, Tokens: 4}, {Use: LeaveOut, Tokens: 6}, {Use: Embed, Tokens: 1}}
+	cs := []Chunk{{Use: Embed, Tokens: 10}, {Kind: Boilerplate, Use: LeaveOut, Tokens: 9, Unmapped: 4}, {Use: LeaveOut, Tokens: 6}, {Use: Embed, Tokens: 1}}
 	a := Totalled(Ad{Chunks: cs}, 30)
 	if a.Tokens != 30 || a.Embedded != 11 || a.Unclassified != 4 {
 		t.Errorf("got %d, %d, %d; want 30, 11, 4", a.Tokens, a.Embedded, a.Unclassified)

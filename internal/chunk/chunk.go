@@ -1,8 +1,7 @@
 // Package chunk turns an ad's sections into chunks, as an embedding job
 // would ask for them: each with its kind and heading, its text, what to
-// do with it (embed it, keep it as metadata, leave it out, or nothing yet,
-// as it's unclassified), about how many tokens it is, and what placed it
-// in its section.
+// do with it (embed it, keep it as metadata, or leave it out), about how
+// many tokens it is, and what placed it in its section.
 //
 // The sections that say what the job is are embedded: the summary,
 // responsibilities, requirements and desirable. Details are metadata;
@@ -32,10 +31,9 @@ const Boilerplate sections.Kind = "boilerplate"
 
 // What to do with a chunk.
 const (
-	Embed        = "embed"
-	Metadata     = "metadata"
-	LeaveOut     = "leave out"
-	Unclassified = "unclassified"
+	Embed    = "embed"
+	Metadata = "metadata"
+	LeaveOut = "leave out"
 )
 
 // A Field is a label and its value: "salary", "£30,000".
@@ -50,7 +48,7 @@ type Chunk struct {
 	Heading string        `json:"heading,omitempty" yaml:"heading,omitempty"`
 	// PlacedBy says what gave the chunk its kind.
 	PlacedBy string `json:"placed_by" yaml:"placed_by"`
-	// Use is Embed, Metadata, LeaveOut or Unclassified.
+	// Use is Embed, Metadata or LeaveOut.
 	Use string `json:"use" yaml:"use"`
 	// Text is the chunk's heading and text, a line each.
 	Text   string  `json:"text" yaml:"text"`
@@ -134,8 +132,6 @@ func use(kind sections.Kind) string {
 		return Embed
 	case sections.Details:
 		return Metadata
-	case sections.Unmapped:
-		return Unclassified
 	}
 	return LeaveOut
 }
