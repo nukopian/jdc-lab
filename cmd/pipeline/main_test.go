@@ -7,10 +7,11 @@ import (
 	"testing"
 )
 
-// write puts a sample's summaries and unmapped table into run/sample.
-func write(t *testing.T, dir, run, sample, summary, unmapped string) {
+// write puts a run's summaries, unmapped table and list of samples into
+// dir/run.
+func write(t *testing.T, dir, run, summary, unmapped, samples string) {
 	t.Helper()
-	d := filepath.Join(dir, run, sample)
+	d := filepath.Join(dir, run)
 	if err := os.MkdirAll(filepath.Join(d, "sections"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -27,30 +28,51 @@ func write(t *testing.T, dir, run, sample, summary, unmapped string) {
 	if err := os.WriteFile(filepath.Join(d, "sections", "unmapped.tsv"), []byte(tsv), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.WriteFile(filepath.Join(d, "samples.txt"), []byte(samples), 0o644); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestCompare(t *testing.T) {
 	dir := t.TempDir()
-	write(t, dir, "before", "a", "headings of a known kind:  70 of 100 uses (70%)\n", "39\t81961\tand\tand\n")
-	write(t, dir, "after", "a", "headings of a known kind:  75 of 100 uses (75%)\n", "")
-	// A sample new to after, as a new export's is, and one gone from it.
-	write(t, dir, "after", "b", "", "")
-	write(t, dir, "before", "c", "", "")
+	write(t, dir, "claude/before", "headings of a known kind:  70 of 100 uses (70%)\n", "39\t81961\tand\tand\n", "ads-1\t2000\n")
+	write(t, dir, "claude/after", "headings of a known kind:  75 of 100 uses (75%)\n", "", "ads-1\t2000\n")
 
 	var out strings.Builder
-	if err := compare(&out, dir, "before", "after"); err != nil {
+	if err := compare(&out, dir, "claude/before", "claude/after"); err != nil {
 		t.Fatalf("compare: %v\n%s", err, out.String())
 	}
 	got := out.String()
 	for _, want := range []string{
-		"== a\n",
 		"  - headings of a known kind:  70 of 100 uses (70%)\n  + headings of a known kind:  75 of 100 uses (75%)\n",
 		"newly mapped: 1 headings\n",
-		"== b: new in after, not in before\n",
-		"== c: in before, gone from after\n",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("compare's output lacks %q; it was:\n%s", want, got)
+		}
+	}
+	if strings.Contains(got, "different samples") {
+		t.Errorf("the runs read the same samples, but compare says not:\n%s", got)
+	}
+
+	// Runs over different samples are compared, with a warning first.
+	write(t, dir, "latest", "", "", "ads-1\t2000\nads-2\t5000\n")
+	out.Reset()
+	if err := compare(&out, dir, "claude/before", "latest"); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.HasPrefix(out.String(), "The runs read different samples") {
+		t.Errorf("compare doesn't warn of different samples:\n%s", out.String())
+	}
+}
+
+func TestRunName(t *testing.T) {
+	for name, ok := range map[string]bool{
+		"latest": true, "claude/before": true,
+		"": false, ".": false, "..": false, "claude/..": false, "/tmp": false, "claude/": false, "a//b": false,
+	} {
+		if err := checkName(name); (err == nil) != ok {
+			t.Errorf("checkName(%q) = %v; want ok %v", name, err, ok)
 		}
 	}
 }

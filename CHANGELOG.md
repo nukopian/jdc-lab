@@ -12,6 +12,14 @@ has the steps).
 
 ## Unreleased
 
+- `pipeline run` runs every stage once, on all the samples together,
+  in place of each sample and `all`: a run's tables are in
+  `data/runs/RUN/STAGE/`, with the samples it read in `samples.txt`. A
+  run's name can have a folder, so runs keep to two groups: `latest`,
+  for where the pipeline stands, and `claude/NAME`, such as
+  `claude/before`, for comparing a change. `compare` warns when two
+  runs read different samples. A stage's program still runs on one
+  sample by hand.
 - Each run writes, for each sample, 20 of its ads in their chunked
   form, to read by eye: `view/ads.md`, with each section's kind and
   heading, fields, repeats, and boilerplate and template text marked,

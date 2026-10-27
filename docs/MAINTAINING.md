@@ -33,8 +33,8 @@ entry at the root.
   sample of the same date beside it (`ads-20261025.jsonl`), JSON Lines
   with one ad per line (`id`, `title`, `location`,
   `location_canonical`, `html`): the lab's code reads that, not the
-  XML. Samples are kept apart, so a rule tuned on one can be checked on
-  the others; `cmd/pipeline` runs them all into `data/runs/`.
+  XML. `cmd/pipeline` runs every stage on the samples together, into
+  `data/runs/latest`, or `data/runs/claude/NAME` for comparing a change.
   Everything else in `data/` is derived from `data/ingestion/`, each
   step in a folder of its own, so any of it can be deleted and rebuilt.
 
@@ -399,10 +399,10 @@ release from `develop` in these steps. Claude asks before tagging.
 
 0. **Wash up:** review everything since the last tag together, code,
    tests, docs and data files such as `headings.txt`, for inconsistency,
-   inefficiency, errors and slop, and fix what's found. Save a run first
-   (`go run ./cmd/pipeline run before`): afterwards
-   `go run ./cmd/pipeline compare before after` must show no change,
-   unless a fix means to make one, and then say how. Reproduce each
+   inefficiency, errors and slop, and fix what's found. Save a run
+   first (`go run ./cmd/pipeline run claude/before`): afterwards
+   `go run ./cmd/pipeline compare claude/before claude/after` must show
+   no change, unless a fix means to make one, and then say how. Reproduce each
    finding before fixing it, with a failing test where code is wrong,
    and note the worst in the release's entry. Check the README's Where
    it stands against the work since the last tag, as it's what visitors

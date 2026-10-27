@@ -1,31 +1,34 @@
-// Command pipeline runs every stage on every sample of ads, and compares
-// two such runs, for improving the stages (see docs/PIPELINE.md). A
-// sample is a .jsonl file in data/ingestion; with more than one, all of
-// them together are a sample too, named all.
+// Command pipeline runs every stage on the samples of ads together, and
+// compares two such runs, for improving the stages (see
+// docs/PIPELINE.md). A sample is a .jsonl file in data/ingestion, one for
+// each export.
 //
 //	pipeline run RUN
 //
-// runs cmd/blocks, cmd/heading-counts, cmd/sections, cmd/boilerplate and
-// cmd/view on each sample, built afresh, so the code as it stands is what runs. Each
-// stage's tables go in data/runs/RUN/SAMPLE/STAGE/ and its summary in
-// data/runs/RUN/SAMPLE/STAGE.txt. A run of the same name is replaced.
-// It ends with how long each stage took on each sample, and how much
-// memory it used, which it also keeps in data/runs/RUN/timings.tsv.
+// puts every sample into one file, data/runs/RUN/ads.jsonl, and runs
+// cmd/blocks, cmd/heading-counts, cmd/sections, cmd/boilerplate and
+// cmd/view on it, built afresh, so the code as it stands is what runs.
+// Each stage's tables go in data/runs/RUN/STAGE/ and its summary in
+// data/runs/RUN/STAGE.txt, and data/runs/RUN/samples.txt lists the
+// samples read. A run of the same name is replaced. A name can have a
+// folder, as claude/before does, to keep runs in groups. It ends with how
+// long each stage took, and how much memory it used, which it also keeps
+// in data/runs/RUN/timings.tsv.
 //
 //	pipeline compare BEFORE AFTER
 //
-// shows, for each sample, the summary lines whose figures moved between
-// two runs, and the headings newly mapped and newly unmapped.
+// shows the summary lines whose figures moved between two runs, and the
+// headings newly mapped and newly unmapped, after a warning if the runs
+// read different samples.
 //
 // From the lab's folder:
 //
-//	go run ./cmd/pipeline run before
+//	go run ./cmd/pipeline run latest
 //
 // or, once installed with `go install ./cmd/...`, just pipeline.
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -33,9 +36,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"slices"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/nukopian/jdc-lab/internal/runs"
@@ -78,10 +79,22 @@ func main() {
 	}
 }
 
-// run runs every stage on every sample, into data/runs/name.
+// checkName reports whether name is a run's name: plain names, such as
+// latest, or with a folder, as claude/before, but nothing that leaves
+// data/runs.
+func checkName(name string) error {
+	for _, part := range strings.Split(name, "/") {
+		if part == "" || part == "." || part == ".." || strings.ContainsRune(part, filepath.Separator) {
+			return fmt.Errorf("pipeline: %q: a run's name is a plain name, such as latest, or one in a folder, such as claude/before", name)
+		}
+	}
+	return nil
+}
+
+// run runs every stage on every sample together, into data/runs/name.
 func run(name string) error {
-	if name == "" || name == "." || name == ".." || strings.ContainsRune(name, filepath.Separator) {
-		return fmt.Errorf("pipeline: %q: a run's name is a plain name, such as before", name)
+	if err := checkName(name); err != nil {
+		return err
 	}
 	samples, err := runs.Samples(ingestion)
 	if err != nil {
@@ -90,16 +103,16 @@ func run(name string) error {
 	if len(samples) == 0 {
 		return fmt.Errorf("pipeline: no samples (.jsonl files) in %s", ingestion)
 	}
-	dir := filepath.Join(runsDir, name)
+	dir := filepath.Join(runsDir, filepath.FromSlash(name))
 	if err := os.RemoveAll(dir); err != nil {
 		return err
 	}
-	if len(samples) > 1 {
-		all, err := combine(samples, filepath.Join(dir, "all", "ads.jsonl"))
-		if err != nil {
-			return err
-		}
-		samples = append(samples, all)
+	all, err := combine(samples, filepath.Join(dir, "ads.jsonl"))
+	if err != nil {
+		return err
+	}
+	if err := list(samples, filepath.Join(dir, "samples.txt")); err != nil {
+		return err
 	}
 
 	// The stages are built once, so that their timings leave out the
@@ -110,40 +123,39 @@ func run(name string) error {
 	}
 	defer os.RemoveAll(bin)
 
-	// The samples run at once, each in a goroutine, its stages in turn;
-	// errors.Join gathers what went wrong in any of them. Each sample is
-	// one process at a time, but a stage can use several processors, so
-	// samples running together slow each other a little.
 	start := time.Now()
-	var wg sync.WaitGroup
-	errs := make([]error, len(samples))
-	timings := make([][]runs.Timing, len(samples))
-	for i, s := range samples {
-		wg.Go(func() { timings[i], errs[i] = stage(bin, s, filepath.Join(dir, s.Name)) })
-	}
-	wg.Wait()
-	if err := errors.Join(errs...); err != nil {
+	timings, err := stage(bin, all, dir)
+	if err != nil {
 		return err
 	}
-	for _, s := range samples {
-		fmt.Printf("%-16s %s\n", s.Name, filepath.Join(dir, s.Name))
-	}
-
-	all := slices.Concat(timings...)
-	fmt.Println()
-	if err := runs.WriteTimings(os.Stdout, all); err != nil {
+	fmt.Printf("%d samples together, in %s\n\n", len(samples), dir)
+	if err := runs.WriteTimings(os.Stdout, timings); err != nil {
 		return err
 	}
-	fmt.Printf("\n%d samples in %.1fs, on %d processors\n", len(samples), time.Since(start).Seconds(), runtime.NumCPU())
+	fmt.Printf("\nin %.1fs, on %d processors\n", time.Since(start).Seconds(), runtime.NumCPU())
 	tsv, err := os.Create(filepath.Join(dir, "timings.tsv"))
 	if err != nil {
 		return err
 	}
-	if err := runs.WriteTimingsTSV(tsv, all); err != nil {
+	if err := runs.WriteTimingsTSV(tsv, timings); err != nil {
 		tsv.Close()
 		return err
 	}
 	return tsv.Close()
+}
+
+// list writes the samples a run read to path, with their ads, one to a
+// line.
+func list(samples []runs.Sample, path string) error {
+	var b strings.Builder
+	for _, s := range samples {
+		n, err := s.Ads()
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(&b, "%s\t%d\n", s.Name, n)
+	}
+	return os.WriteFile(path, []byte(b.String()), 0o644)
 }
 
 // build builds the stages' programs into a new temporary folder, and
@@ -230,54 +242,22 @@ func combine(samples []runs.Sample, path string) (runs.Sample, error) {
 	return runs.Sample{Name: "all", Path: path}, out.Close()
 }
 
-// compare writes to w how each sample moved from run before to run after,
-// both in dir. A sample in only one of them, such as a new export's, is
-// named, with nothing to compare.
+// compare writes to w how run after moved from run before, both in dir,
+// first warning if they read different samples, as their figures then
+// differ for that reason too.
 func compare(w io.Writer, dir, before, after string) error {
-	was, err := sampleDirs(filepath.Join(dir, before))
-	if err != nil {
-		return err
+	was := filepath.Join(dir, filepath.FromSlash(before))
+	now := filepath.Join(dir, filepath.FromSlash(after))
+	a, errA := os.ReadFile(filepath.Join(was, "samples.txt"))
+	b, errB := os.ReadFile(filepath.Join(now, "samples.txt"))
+	if errA != nil || errB != nil || string(a) != string(b) {
+		fmt.Fprintf(w, "The runs read different samples, so figures differ for that too:\n%s: %s\n%s: %s\n\n",
+			before, strings.Join(strings.Fields(string(a)), " "), after, strings.Join(strings.Fields(string(b)), " "))
 	}
-	now, err := sampleDirs(filepath.Join(dir, after))
-	if err != nil {
-		return err
-	}
-	for _, name := range now {
-		if !slices.Contains(was, name) {
-			fmt.Fprintf(w, "== %s: new in %s, not in %s\n\n", name, after, before)
-			continue
-		}
-		fmt.Fprintf(w, "== %s\n", name)
-		if err := compareSample(w, filepath.Join(dir, before, name), filepath.Join(dir, after, name)); err != nil {
-			return err
-		}
-		fmt.Fprintln(w)
-	}
-	for _, name := range was {
-		if !slices.Contains(now, name) {
-			fmt.Fprintf(w, "== %s: in %s, gone from %s\n\n", name, before, after)
-		}
-	}
-	return nil
+	return compareSample(w, was, now)
 }
 
-// sampleDirs returns the names of a run's samples: its folders.
-func sampleDirs(run string) ([]string, error) {
-	entries, err := os.ReadDir(run)
-	if err != nil {
-		return nil, err
-	}
-	var names []string
-	for _, e := range entries {
-		if e.IsDir() {
-			names = append(names, e.Name())
-		}
-	}
-	return names, nil
-}
-
-// compareSample writes how one sample moved between its folders in two
-// runs.
+// compareSample writes how a run moved between two of its folders.
 func compareSample(w io.Writer, was, now string) error {
 	for _, st := range stages {
 		// A summary names the folder it wrote to, which differs

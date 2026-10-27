@@ -97,9 +97,9 @@ often have no heading, so they're filed under the last one, usually
 requirements. Under five title groups, they're then counted as
 templates for the job, and kept for embedding.
 
-**What's known:** the largest templates in
-`data/runs/RUN/ads-20261024/boilerplate/repeated.tsv` are almost all
-such footers. Text under five groups or more is already boilerplate
+**What's known:** the largest templates in the first sample's
+`boilerplate/repeated.tsv` (`cmd/boilerplate` run on `ads-20261024`)
+are almost all such footers. Text under five groups or more is already boilerplate
 wherever it is.
 
 **Steps:**
@@ -170,7 +170,7 @@ followed by a list are the likeliest headings.
 
 **Steps:** in `internal/headings`, consider a short plain line that's
 followed by a list, and contains a kind's phrase, as a heading; check
-`data/runs/RUN/all/sections/named.tsv` and the unmapped table before and
+`data/runs/RUN/sections/named.tsv` and the unmapped table before and
 after.
 
 **Done when** more headings are found with none wrongly (check the new

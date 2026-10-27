@@ -26,7 +26,7 @@ data/ingestion/ads-DATE.jsonl     a sample: one ad per line: id, title, location
         │  internal/boilerplate    sections → boilerplate        (cmd/boilerplate)
         │  internal/view           all of it → ads to read       (cmd/view)
         ▼
-data/runs/RUN/SAMPLE/  blocks/  headings/  sections/  boilerplate/  view/
+data/runs/RUN/  ads.jsonl (every sample)  blocks/  headings/  sections/  boilerplate/  view/
 ```
 
 Each stage is a package in `internal/`, with tests and examples beside
@@ -37,11 +37,13 @@ its own, which are fast. So any folder in `data/` except `ingestion/`
 can be deleted and rebuilt.
 
 A **sample** is one export's ads, converted: a `.jsonl` file in
-`data/ingestion/`, named by the export's date. Samples are kept apart,
-not merged, so that a rule tuned on one can be checked on another.
-`cmd/pipeline` runs every stage on every sample, and on all of them
-together as the sample `all`, and keeps each **run** under a name of its
-own in `data/runs/`.
+`data/ingestion/`, named by the export's date. `cmd/pipeline` runs
+every stage on all the samples together, and keeps each **run** under a
+name of its own in `data/runs/`: `latest` for where the pipeline
+stands, and runs in `claude/`, such as `claude/before` and
+`claude/after`, for comparing a change. A run lists the samples it read
+in `samples.txt`. To check a rule on one sample alone, run a stage's
+program on it by hand (below).
 
 Every stage only adds to what the one before it found, and never changes
 the ad's text. Text is kept as written, and only a separate **key** (see
@@ -56,36 +58,31 @@ its date:
 go run ./cmd/xml-to-jsonl data/ingestion/extract-20261025.xml data/ingestion/ads-20261025.jsonl
 ```
 
-Then run every stage on every sample, as a run called `now`:
+Then run every stage on the samples together, as the run `latest`:
 
 ```
-go run ./cmd/pipeline run now
+go run ./cmd/pipeline run latest
 ```
 
-It takes a few seconds, and prints where each sample's output went:
-`data/runs/now/ads-20261025/sections/` holds the sections stage's tables
-for that sample, and `data/runs/now/ads-20261025/sections.txt` its
-summary. A run of the same name is replaced, and
-`data/runs/now/all/` has the samples together.
+It takes under a minute: `data/runs/latest/sections/` holds the
+sections stage's tables, and `data/runs/latest/sections.txt` its
+summary. A run of the same name is replaced.
 
 It builds the stages first, so the code as it stands is what runs, and
-ends with how each stage ran on each sample, also kept in
-`data/runs/now/timings.tsv`:
+ends with how each stage ran, also kept in
+`data/runs/latest/timings.tsv`:
 
 ```
-sample        stage               ads      wall       cpu    ads/s      peak
-all           sections          28000     6.75s     7.66s     4147    206 MB
-all           boilerplate       28000     9.99s    11.56s     2804    671 MB
+sample  stage               ads      wall       cpu    ads/s      peak
+all     sections          28000     8.03s     8.56s     3487    206 MB
+all     boilerplate       28000    12.16s    13.02s     2302    676 MB
 ```
 
 `wall` is the time on the clock, `cpu` the time on the processors (more
 than `wall` when a stage uses several), and `peak` the most memory the
-stage held at once (on macOS and Linux; 0 elsewhere). The samples run at
-the same time, one stage each, so a machine with fewer processors than
-samples gives slower figures. The rate rises with a sample's size, as
-each stage has a fixed cost to start. `compare` leaves the timings out,
-as they move a little on every run: compare two runs' `timings.tsv` by
-hand.
+stage held at once (on macOS and Linux; 0 elsewhere). `compare` leaves
+the timings out, as they move a little on every run: compare two runs'
+`timings.tsv` by hand.
 
 Each stage's program can also be run alone, on one sample, into any
 folder:
@@ -368,35 +365,31 @@ summary counts both over the sample.
 Each program leaves tables in `data/` that say where its stage falls
 short. Improving the pipeline is a loop over them:
 
-1. **Measure:** `go run ./cmd/pipeline run before`, every stage on
-   every sample (see [Before and after](#before-and-after)).
+1. **Measure:** `go run ./cmd/pipeline run claude/before`, every stage
+   on the samples together (see [Before and after](#before-and-after)).
 2. **Pick** the biggest gap: the table row with the most ads or text.
-   Work on one sample, and check the others as you go.
 3. **Look** at it in the ads, in context, before deciding anything:
    `view/ads.md` has 20 of them, and `cmd/heading-uses` every use of a
    heading.
 4. **Change one thing:** a phrase, a label, a rule, a threshold.
-5. **Measure again,** as the run `after`, and compare. Keep the change
-   only if it helped and broke nothing, on every sample: one that helps
-   one sample and harms another fits that sample, not job ads.
+5. **Measure again,** as the run `claude/after`, and compare. Keep the
+   change only if it helped and broke nothing. A change that fits one
+   kind of job may harm another: to see a sample on its own, run the
+   stage's program on it by hand.
 6. **Pin it:** add a test case for what it settled, and update the
    figures in [What it measured](#what-it-measured).
 
 ### Questions, and where to look
 
 All from the lab's folder, after a run (see
-[Running it](#running-it)). The commands look at one sample of the
-run `before`, which these names choose; set them first, to the sample
-and run you want, and each command then runs as it stands:
+[Running it](#running-it)). The commands look at the run
+`claude/before`, which these names choose; set them first, to the run
+you want, and each command then runs as it stands:
 
 ```
-sample=ads-20261025
-r=data/runs/before/$sample
-ads=data/ingestion/$sample.jsonl
+r=data/runs/claude/before
+ads=$r/ads.jsonl
 ```
-
-For the samples together, `sample=all`, and their ads are in the run:
-`ads=$r/ads.jsonl`.
 
 **Which headings are worth working on?** The unmapped headings with the
 most text under them:
@@ -503,44 +496,45 @@ hours, so no one kind fits it.
 Keep a run from before a change:
 
 ```
-go run ./cmd/pipeline run before
+go run ./cmd/pipeline run claude/before
 ```
 
 Make the change, run again under another name, and compare:
 
 ```
-go run ./cmd/pipeline run after
-go run ./cmd/pipeline compare before after
+go run ./cmd/pipeline run claude/after
+go run ./cmd/pipeline compare claude/before claude/after
 ```
 
-For each sample, and all of them together, `compare` shows the summary
-lines whose figures moved, `-` before and `+` after, and the headings the
-change mapped and those it unmapped, with the most text first. A sample
-in only one of the runs, such as a new export's, is named, with nothing
-to compare: run `before` again to include it. Newly unmapped headings
+`compare` shows the summary lines whose figures moved, `-` before and
+`+` after, and the headings the change mapped and those it unmapped,
+with the most text first. If the two runs read different samples, as
+when a new export has come in between, it says so first, as figures
+then move for that too: run `claude/before` again. Newly unmapped headings
 should be none, and newly mapped ones should all be right: a phrase can match more than was meant, as "the business" would
 take "The business has a strong presence across:" to be company. Any
 other table can be compared by hand, as in:
 
 ```
-diff data/runs/before/all/boilerplate/repeated.tsv data/runs/after/all/boilerplate/repeated.tsv | head -20
+diff data/runs/claude/before/boilerplate/repeated.tsv data/runs/claude/after/boilerplate/repeated.tsv | head -20
 ```
 
 and the views show the change in the ads themselves:
 
 ```
-diff data/runs/before/ads-20261025/view/ads.md data/runs/after/ads-20261025/view/ads.md
+diff data/runs/claude/before/view/ads.md data/runs/claude/after/view/ads.md
 ```
 
-Then run the tests (`test-all.sh`). For the next change, `after` can
-become the new `before`: `go run ./cmd/pipeline run before` again.
+Then run the tests (`test-all.sh`), and `go run ./cmd/pipeline run
+latest`, so that `latest` shows where the pipeline now stands. For the
+next change, run `claude/before` again.
 
 ## What it measured
 
-On two samples, measured on 2026-10-27 with
-`go run ./cmd/pipeline run now`, which gives current figures. A third
-sample, `ads-20261027`, isn't in these figures yet, so `all` below is
-the first two together, and `run now` gives a different `all`:
+On two samples, measured on 2026-10-27 by running each stage on each
+sample, and on the two together (`all` below). A third sample,
+`ads-20261027`, isn't in these figures yet; `run latest` gives the
+three together:
 
 | Sample | Ads | Distinct | Leans towards |
 |---|---:|---:|---|
@@ -642,8 +636,8 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | section | a heading and what follows it, up to the next |
 | kind | what a section is: summary, requirements and the rest |
 | phrase | a synonym in `headings.txt` |
-| sample | one export's ads, as a `.jsonl` file in `data/ingestion/`; `all` is every sample together |
-| run | every stage on every sample, kept in `data/runs/` under a name |
+| sample | one export's ads, as a `.jsonl` file in `data/ingestion/` |
+| run | every stage on every sample together, kept in `data/runs/` under a name: `latest`, or one in `claude/` |
 | title group | titles similar enough to be the same job |
 | boilerplate | text repeated across different jobs, not about the job |
 | template | text repeated across related jobs that does describe the job |
