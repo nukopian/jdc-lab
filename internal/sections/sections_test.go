@@ -246,3 +246,25 @@ func TestDivideLineBeforeAList(t *testing.T) {
 		t.Errorf("\n got: %q\nwant: %q", got, want)
 	}
 }
+
+// The title run into a heading of no known kind is the ad's subtitle:
+// text, in the section it's in. Run into a known one, it starts it.
+func TestDivideSubtitle(t *testing.T) {
+	html := `<p><b>Head Chef - Oldham Gastropub</b></p><p>We cook.</p>` +
+		`<p><b>Head Chef - Key Responsibilities</b></p><p>Cooking.</p>`
+	var got []string
+	for _, s := range Divide(headings.Read(blocks.Split(html), "Head Chef")) {
+		line := fmt.Sprintf("%s %q:", s.Kind, s.Heading)
+		for _, p := range s.Parts {
+			line += fmt.Sprintf(" %s(%s)", p.Role, p.Text)
+		}
+		got = append(got, line)
+	}
+	want := []string{
+		`summary "": repeat(Head Chef) text(Oldham Gastropub) text(We cook.) repeat(Head Chef)`,
+		`responsibilities "Key Responsibilities": text(Cooking.)`,
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("\n got: %q\nwant: %q", got, want)
+	}
+}

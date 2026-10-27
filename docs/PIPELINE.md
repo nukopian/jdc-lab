@@ -198,6 +198,14 @@ A few rules refine this:
 
 - **A bold lead that isn't a field** is a heading run into its text:
   "**Key Responsibilities:** You will…" is a heading, then text.
+- **The ad's title run into the rest of its line** is split off as a
+  repeat, and the rest read as it would be alone, when the rest is a
+  field, or a heading, the line having been one with the title too
+  ("**General Foreman Responsibilities:**"), or, after a mark that ends
+  the title (a dash, bar, colon, comma or opening bracket), a short line that isn't
+  a sentence ("Electrician (Permanent)", "Support Worker - Hull £12.93
+  ph"). A line that goes on as a sentence, or with the title made
+  plural or longer ("Panel Beater / Panel Technician"), stays whole.
 - **A field's label written as a heading,** with a short value (up to
   `MaxValueWords`, 15) on the next line, is joined into one field:
   "**Working Hours**", then "Monday to Friday".
@@ -251,6 +259,12 @@ section of its **kind**:
 | `legal` | notices | "Equal opportunities", "Safeguarding" |
 | `details` | the job's terms | "Job details", "Working Hours" |
 | `unmapped` | under a heading of no known kind | anything not yet recognised |
+
+A heading of no known kind that the ad's title ran into is the ad's
+**subtitle**, "Oldham" of "Head Chef - Oldham": text in the section
+it's in, and not counted as a heading. Before, the whole line was an
+unmapped heading, and everything under it, sometimes the whole ad, was
+unmapped too.
 
 **The phrases are data.**
 [`internal/sections/headings.txt`](../internal/sections/headings.txt)
@@ -718,24 +732,24 @@ and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
 **Headings.** 89% of ads have at least one heading. Headings of a known
-kind are 77% of heading uses; ads with every heading known, 54%; ads
+kind are 78% of heading uses; ads with every heading known, 57%; ads
 with no section but the summary, 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
 
 | Section | Of the text | Of it, boilerplate |
 |---|---:|---:|
-| summary | 17% | 11% |
+| summary | 18% | 11% |
 | role | 8% | 8% |
 | responsibilities | 18% | 2% |
 | requirements | 20% | 11% |
 | desirable | 2% | 7% |
 | benefits | 13% | 38% |
 | company | 3% | 50% |
-| apply | 3% | 56% |
+| apply | 3% | 57% |
 | legal | 1% | 83% |
 | details | 2% | 18% |
-| unmapped | 12% | 25% |
+| unmapped | 12% | 26% |
 
 Boilerplate is 17.6% of the text, and template for the job 3.2%; with
 the company, apply and legal text that isn't boilerplate, about a fifth

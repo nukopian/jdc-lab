@@ -211,3 +211,24 @@ say how to run it.
   row with it are a list, as with symbols. On the three samples, 29,666
   more list items, in 5,221 more lists; ads with only a summary fall
   from 1,048 to 1,011.
+- **The title split off** (was idea 15): far more than its 30 bold
+  paragraphs open with the ad's title, about 4,750 lines with six words
+  or fewer after it, most of them a heading ("… Requirements:", "… - The
+  Role"), a place or facts. The title is split off as a repeat when
+  what follows is a field, a heading (the line having been one with the
+  title too), or, after a dash, bar, colon, comma or bracket, a short
+  line that isn't a sentence. Three tries: the first let a long bold
+  line become a heading once the title was off it, and doubled the
+  title where it was also the line's bold lead (117 ads with text in no
+  section, found by the view's check); the second split longer titles,
+  "Panel Beater / Panel Technician". A heading of no known kind after
+  the title is the ad's subtitle ("Oldham", "Healthcare"), text in its
+  section: before, it started an unmapped section, at times over the
+  whole ad, which went to the boilerplate chunk. On the three samples,
+  4,749 titles split off; distinct headings fall from 24,735 to 23,310;
+  headings of a known kind rise from 77% of uses to 78%, ads with every
+  heading known from 54% to 57%, and ads with an unmapped section fall
+  from 46% to 43%; the summary rises from 17% of the text to 18%. Of
+  30 splits checked by eye, all took the title off rightly. Among the
+  headings that moved, "Cover Supervisor work is ideal for:" leaves
+  "work is ideal for:", a weak heading, as the whole was.

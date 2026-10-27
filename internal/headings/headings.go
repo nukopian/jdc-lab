@@ -14,8 +14,10 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/nukopian/jdc-lab/internal/blocks"
+	"github.com/nukopian/jdc-lab/internal/clean"
 )
 
 // A Role is what a Part is.
@@ -63,6 +65,9 @@ type Part struct {
 	// Added is the English label cleaning added at the start of Text,
 	// for a symbol that stood for it (see blocks.Cues): not the ad's own.
 	Added string `json:"added,omitempty"`
+	// AfterTitle is true for what followed the ad's title in its block,
+	// the title split off as a repeat: "Oldham" of "Head Chef - Oldham".
+	AfterTitle bool `json:"after_title,omitempty"`
 }
 
 // MaxWords is the most words a heading has. Longer bold text is a bold
@@ -108,6 +113,7 @@ func Read(bs []blocks.Block, title string, locations ...string) []Part {
 			repeats[k] = true
 		}
 	}
+	title = clean.Text(title) // as the blocks' text is
 	var parts []Part
 	for _, b := range bs {
 		if b.Kind == blocks.List {
@@ -118,7 +124,10 @@ func Read(bs []blocks.Block, title string, locations ...string) []Part {
 			}
 			continue
 		}
-		ps := block(b.Text, b.Cues, repeats)
+		ps, ok := afterTitle(b.Text, b.Cues, title, repeats)
+		if !ok {
+			ps = block(b.Text, b.Cues, repeats)
+		}
 		ps[0] = added(ps[0], b.Cues)
 		parts = append(parts, ps...)
 	}
@@ -172,6 +181,52 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 		}
 	}
 	return []Part{{Role: Text, Text: text}}
+}
+
+// afterTitle splits the ad's title off a block that opens with it, as a
+// repeat, and reads the rest as it would be alone, when the rest is:
+// a field; a heading, the block having been one with the title too
+// ("General Foreman Responsibilities:"); or, after a mark that ends the
+// title, a short line that isn't a sentence ("General Foreman
+// (Permanent)"). A block that goes on as a sentence, or with the title
+// made plural or longer ("General Foreman / Site Manager"), isn't split.
+func afterTitle(text string, cues blocks.Cues, title string, repeats map[string]bool) ([]Part, bool) {
+	if title == "" || len(text) <= len(title) || !strings.EqualFold(text[:len(title)], title) {
+		return nil, false
+	}
+	head, after := text[:len(title)], text[len(title):]
+	if next, _ := utf8.DecodeRuneInString(after); unicode.IsLetter(next) || unicode.IsDigit(next) {
+		return nil, false // "General Foremans"
+	}
+	rest := strings.TrimLeft(after, " -|:,")
+	if rest == "" {
+		return nil, false
+	}
+	// The rest has a bold lead only if it's left once the title is off.
+	restCues := cues
+	restCues.BoldLead = strings.TrimLeft(strings.TrimPrefix(cues.BoldLead, head), " -|:,")
+	if !strings.HasPrefix(rest, restCues.BoldLead) {
+		restCues.BoldLead = ""
+	}
+	ps := block(rest, restCues, repeats)
+	first, _ := utf8.DecodeRuneInString(rest)
+	switch ps[0].Role {
+	case Heading:
+		whole := block(text, cues, repeats)
+		if len(whole) != 1 || whole[0].Role != Heading || !unicode.IsLetter(first) {
+			return nil, false
+		}
+	case Text:
+		marked := first == '(' || strings.ContainsAny(after[:len(after)-len(rest)], "-|:,")
+		sentence := strings.Contains(rest, ". ") || strings.HasSuffix(rest, ".")
+		if !marked || sentence || len(strings.Fields(rest)) > MaxWords {
+			return nil, false
+		}
+	}
+	for i := range ps {
+		ps[i].AfterTitle = true
+	}
+	return append([]Part{{Role: Repeat, Text: head}}, ps...), true
 }
 
 // added records on p the label cleaning added, if p starts with it.

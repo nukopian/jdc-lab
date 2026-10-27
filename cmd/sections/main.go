@@ -126,7 +126,7 @@ func (t *tally) add(id string, parts []headings.Part, ss []sections.Section) {
 	t.ads++
 	all := true
 	for _, p := range parts {
-		if p.Role != headings.Heading {
+		if p.Role != headings.Heading || sections.Subtitle(p) {
 			continue
 		}
 		t.uses++

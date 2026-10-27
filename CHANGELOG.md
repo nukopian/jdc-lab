@@ -12,6 +12,16 @@ has the steps).
 
 ## Unreleased
 
+- The ad's title run into the rest of its line is split off, as a
+  repeat: "General Foreman Responsibilities:" is the title, then the
+  heading; "Electrician (Permanent)" and "Support Worker - Hull £12.93
+  ph" the title, then a line of facts. A heading of no known kind after
+  the title, "Oldham" of "Head Chef - Oldham", is the ad's subtitle,
+  text in its section, not an unmapped heading over what follows. On
+  the three samples, 4,749 titles are split off; distinct headings fall
+  from 24,735 to 23,310; ads with every heading known rise from 54% to
+  57%, and ads with an unmapped section fall from 46% to 43% (roadmap
+  18, was idea 15).
 - Faults found in the wash-up, each now with a test:
   - A bold lead in emphasis marks, "\*Recommend a friend\*", was read
     twice: its line lost the opening mark as a bullet, so the lead no

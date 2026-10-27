@@ -209,6 +209,9 @@ func Divide(parts []headings.Part) []Section {
 			sections = append(sections, Section{Kind: kind, Heading: p.Text, ByName: byName})
 			continue
 		}
+		if Subtitle(p) {
+			p.Role, p.Key = headings.Text, ""
+		}
 		last := &sections[len(sections)-1]
 		last.Parts = append(last.Parts, p)
 	}
@@ -237,12 +240,26 @@ func beforeList(p headings.Part) (Kind, bool) {
 	return Of(key)
 }
 
+// Subtitle reports whether p is the ad's subtitle: a heading of no known
+// kind that the ad's title ran into, "Oldham" of "Head Chef - Oldham".
+// It's no heading, but text, in the section it's in.
+func Subtitle(p headings.Part) bool {
+	if p.Role != headings.Heading || !p.AfterTitle {
+		return false
+	}
+	_, ok := Of(p.Key)
+	return !ok
+}
+
 // starts reports whether p starts a section, and of what kind.
 func starts(p headings.Part) (Kind, bool) {
 	switch {
 	case p.Role == headings.Heading:
 		if kind, ok := Of(p.Key); ok {
 			return kind, true
+		}
+		if Subtitle(p) {
+			return "", false
 		}
 		return Unmapped, true
 	case p.Role == headings.Text && !p.Item:

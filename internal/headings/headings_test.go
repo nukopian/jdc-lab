@@ -309,3 +309,43 @@ func TestReadDashedField(t *testing.T) {
 		t.Errorf("an unknown label before a dash made a field: %+v", parts[1])
 	}
 }
+
+// The ad's title run into a heading, a field or a short line of its own
+// is split off as a repeat, the rest read as it would be alone.
+func TestReadTitleRunOn(t *testing.T) {
+	for _, tt := range []struct {
+		html string
+		want []string
+	}{
+		{`<p><b>General Foreman Responsibilities:</b></p>`,
+			[]string{`repeat "General Foreman"`, `heading "Responsibilities:" key="responsibilities"`}},
+		{`<p><b>General Foreman - The Role</b></p>`,
+			[]string{`repeat "General Foreman"`, `heading "The Role" key="the role"`}},
+		{`<p>General Foreman (Permanent)</p>`,
+			[]string{`repeat "General Foreman"`, `text "(Permanent)"`}},
+		{`<p>General Foreman - Leeds</p>`,
+			[]string{`repeat "General Foreman"`, `repeat "Leeds"`}},
+		{`<p>General Foreman | Salary: £40,000</p>`,
+			[]string{`repeat "General Foreman"`, `field "Salary: £40,000" key="salary" value="£40,000"`}},
+		// Not split: a sentence, a plural, a sentence after a dash.
+		{`<p>General Foreman required for a busy firm in Leeds.</p>`,
+			[]string{`text "General Foreman required for a busy firm in Leeds."`}},
+		{`<p><b>General Foreman / Site Manager</b></p>`,
+			[]string{`heading "General Foreman / Site Manager" key="general foreman / site manager"`}},
+		// A bold line too long for a heading stays text, though the rest is short enough.
+		{`<p><b>General Foreman Opportunity with the Civil Works Alliance, Supporting the Project</b></p>`,
+			[]string{`text "General Foreman Opportunity with the Civil Works Alliance, Supporting the Project"`}},
+		// A bold title as the lead of a sentence stays the lead.
+		{`<p><b>General Foreman</b> required for a busy firm in Leeds.</p>`,
+			[]string{`heading "General Foreman" key="general foreman"`, `text "required for a busy firm in Leeds."`}},
+		{`<p><b>General Foremans</b></p>`,
+			[]string{`heading "General Foremans" key="general foremans"`}},
+		{`<p>General Foreman - we are looking for someone to run our sites. You will lead a team.</p>`,
+			[]string{`text "General Foreman - we are looking for someone to run our sites. You will lead a team."`}},
+	} {
+		got := show(Read(blocks.Split(tt.html), "General Foreman", "Leeds"))
+		if !slices.Equal(got, tt.want) {
+			t.Errorf("Read(%q)\n got: %q\nwant: %q", tt.html, got, tt.want)
+		}
+	}
+}

@@ -62,9 +62,8 @@ embeddings, and a large language model only where those fall short.
   search can improve while embedding less. A third of ads state a working pattern, such as
   "Monday to Friday, 9am–5pm": a fact for metadata, not embedding.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: now, finishing the chunker, with the title split off, and
-  pages showing ads before and after; then boilerplate's verdict made
-  right both ways.
+  and why: now, finishing the chunker, with pages showing ads before
+  and after; then boilerplate's verdict made right both ways.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

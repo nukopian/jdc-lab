@@ -52,10 +52,10 @@ structure in English not symbols; summary and role apart; sub-headings
 before lists found; boilerplate and unmapped text gathered in a chunk
 of their own; the view showing the same chunks; and requirements,
 responsibilities and benefits placed by their wording, where no
-heading placed them (was 19). Still to come, folded in from the
-roadmap: the ad's title split off where it runs into a heading or a
-line of facts (was idea 15); and pages of ads before and after, which
-close it (was 20). Roadmap 7's
+heading placed them (was 19); and the ad's title split off where it
+runs into a heading or a line of facts (was idea 15). Still to come,
+folded in from the roadmap: pages of ads before and after, which close
+it (was 20). Roadmap 7's
 facts are in its chunks. The plan, and how it's going, are in
 its [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md).
 
