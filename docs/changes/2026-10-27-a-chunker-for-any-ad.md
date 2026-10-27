@@ -83,6 +83,11 @@ say how to run it.
   54%; 66 ads lose a section of a known kind, almost all such points,
   and none checked lost a real heading. No text is lost (the view's
   check).
+- **Unmapped chunks are unclassified,** not embedded (Iain, 2026-10-27):
+  an unmapped heading is mapping still to do, not a sign its text is
+  worth embedding. Each ad totals its unclassified tokens beside its
+  embedded ones; on a driver's ad tried, 46% of tokens are embedded and
+  28% unclassified.
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go

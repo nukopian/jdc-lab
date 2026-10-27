@@ -4,9 +4,10 @@
 // many tokens it is, and what placed it in its section.
 //
 // The sections that say what the job is are embedded: the summary,
-// responsibilities, requirements, desirable, and unmapped ones, whose
-// kind isn't known. Details are metadata, and benefits, company, apply
-// and legal are left out. Text found as boilerplate is left out of a
+// responsibilities, requirements and desirable. Details are metadata;
+// benefits, company, apply and legal are left out; and unmapped ones,
+// whose kind isn't known, are unclassified, not embedded: they're what's
+// left to map. Text found as boilerplate is left out of a
 // chunk's text wherever it is, and listed.
 package chunk
 
@@ -20,9 +21,10 @@ import (
 
 // What to do with a chunk.
 const (
-	Embed    = "embed"
-	Metadata = "metadata"
-	LeaveOut = "leave out"
+	Embed        = "embed"
+	Metadata     = "metadata"
+	LeaveOut     = "leave out"
+	Unclassified = "unclassified"
 )
 
 // A Field is a label and its value: "salary", "£30,000".
@@ -37,7 +39,7 @@ type Chunk struct {
 	Heading string        `json:"heading,omitempty" yaml:"heading,omitempty"`
 	// PlacedBy says what gave the chunk its kind.
 	PlacedBy string `json:"placed_by" yaml:"placed_by"`
-	// Use is Embed, Metadata or LeaveOut.
+	// Use is Embed, Metadata, LeaveOut or Unclassified.
 	Use string `json:"use" yaml:"use"`
 	// Text is the chunk's heading and text, a line each, without its
 	// boilerplate.
@@ -86,10 +88,12 @@ func Tokens(text string) int {
 // use says what's done with a section of kind.
 func use(kind sections.Kind) string {
 	switch kind {
-	case sections.Summary, sections.Responsibilities, sections.Requirements, sections.Desirable, sections.Unmapped:
+	case sections.Summary, sections.Responsibilities, sections.Requirements, sections.Desirable:
 		return Embed
 	case sections.Details:
 		return Metadata
+	case sections.Unmapped:
+		return Unclassified
 	}
 	return LeaveOut
 }

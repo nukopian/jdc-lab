@@ -423,9 +423,12 @@ The text is to read at a glance, JSON (`-json`, a line an ad) is for
 programs, and YAML (`-yaml`, a document an ad) is for people who want
 the structure too: each chunk's text is a block of its lines.
 
-The summary, responsibilities, requirements, desirable and unmapped
-chunks are embedded; details are metadata, with their fields; benefits,
-company, apply and legal are left out. Boilerplate is what the run's
+The summary, responsibilities, requirements and desirable chunks are
+embedded; details are metadata, with their fields; benefits, company,
+apply and legal are left out; and unmapped chunks, whose kind isn't
+known, are **unclassified**: not embedded, as an unmapped heading is
+mapping still to do. Each ad totals its tokens, its embedded tokens and
+its unclassified ones, so the last shows what's left to map. Boilerplate is what the run's
 `boilerplate/repeated.tsv` says, so a run comes first (`-run` chooses
 which, `data/runs/latest` by default). What placed a chunk is the
 heading and the phrase in it that won, with any phrases of other kinds

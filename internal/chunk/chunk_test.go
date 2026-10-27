@@ -57,8 +57,8 @@ func TestOf(t *testing.T) {
 func TestOfUnmapped(t *testing.T) {
 	ss := []sections.Section{{Kind: sections.Unmapped, Heading: "Our depots", Parts: []headings.Part{text("Leeds and York.")}}}
 	c := Of(ss, func(string) bool { return false })[0]
-	if c.Use != Embed || !strings.Contains(c.PlacedBy, "no phrase in headings.txt") {
-		t.Errorf("got %s, %q; want an unmapped section embedded, saying no phrase placed it", c.Use, c.PlacedBy)
+	if c.Use != Unclassified || !strings.Contains(c.PlacedBy, "no phrase in headings.txt") {
+		t.Errorf("got %s, %q; want an unmapped section unclassified, not embedded, saying no phrase placed it", c.Use, c.PlacedBy)
 	}
 }
 
@@ -70,7 +70,7 @@ func TestYAML(t *testing.T) {
 		"it's \"quoted\"", " leading space\nsecond", "control\x02character", "trailing ", "-", "",
 		"Pay: £130 - £170 per day", "tab\tin it",
 	}
-	a := Ad{ID: "225682916", Title: "Part-Time Teacher: Supply", Tokens: 525, Embedded: 143}
+	a := Ad{ID: "225682916", Title: "Part-Time Teacher: Supply", Tokens: 525, Embedded: 143, Unclassified: 60}
 	for i, s := range tricky {
 		a.Chunks = append(a.Chunks, Chunk{
 			Kind: sections.Summary, Heading: s, PlacedBy: s, Use: Embed, Text: s, Tokens: i,
@@ -89,11 +89,20 @@ func TestYAML(t *testing.T) {
 		t.Errorf("read back differs.\nwrote:\n%s\ngot %+v", b.String(), back)
 	}
 	for _, want := range []string{
-		"id: '225682916'\n", "tokens: 525\nembedded_tokens: 143\nchunks:\n",
+		"id: '225682916'\n", "tokens: 525\nembedded_tokens: 143\nunclassified_tokens: 60\nchunks:\n",
 		"    text: |-\n      📢 Calling all teachers 📢\n      next line\n", "    use: embed\n",
 	} {
 		if !strings.Contains(b.String(), want) {
 			t.Errorf("the YAML lacks %q; it was:\n%s", want, b.String())
 		}
+	}
+}
+
+// An ad's totals: all its tokens, those embedded, and those unclassified.
+func TestTotals(t *testing.T) {
+	cs := []Chunk{{Use: Embed, Tokens: 10}, {Use: Unclassified, Tokens: 4}, {Use: LeaveOut, Tokens: 6}, {Use: Embed, Tokens: 1}}
+	a := Totalled(Ad{Chunks: cs}, 30)
+	if a.Tokens != 30 || a.Embedded != 11 || a.Unclassified != 4 {
+		t.Errorf("got %d, %d, %d; want 30, 11, 4", a.Tokens, a.Embedded, a.Unclassified)
 	}
 }

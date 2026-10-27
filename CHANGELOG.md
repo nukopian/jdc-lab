@@ -22,7 +22,8 @@ has the steps).
   words at a typographic dash, as at a hyphen (roadmap 18).
 - `chunk` prints any ad's chunks, as an embedding job would take them:
   each section with its kind, whether to embed it, keep it as metadata
-  or leave it out, about how many tokens it is, and what placed it,
+  or leave it out, or that it's unclassified, an unmapped section not
+  embedded, about how many tokens it is, and what placed it,
   down to the phrase in `headings.txt` and any it outranked. Given an
   ID in a run's ads, a file of HTML or standard input; text to read,
   JSON with `-json` for programs, or YAML with `-yaml` for people,

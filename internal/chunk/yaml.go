@@ -13,11 +13,28 @@ import (
 type Ad struct {
 	ID    string `json:"id" yaml:"id"`
 	Title string `json:"title" yaml:"title"`
-	// Tokens is about how many tokens the whole ad is, and Embedded how
-	// many of them its embedded chunks are.
-	Tokens   int     `json:"tokens" yaml:"tokens"`
-	Embedded int     `json:"embedded_tokens" yaml:"embedded_tokens"`
-	Chunks   []Chunk `json:"chunks" yaml:"chunks"`
+	// Tokens is about how many tokens the whole ad is, Embedded how many
+	// of them its embedded chunks are, and Unclassified its unclassified
+	// ones: what's left to map.
+	Tokens       int     `json:"tokens" yaml:"tokens"`
+	Embedded     int     `json:"embedded_tokens" yaml:"embedded_tokens"`
+	Unclassified int     `json:"unclassified_tokens" yaml:"unclassified_tokens"`
+	Chunks       []Chunk `json:"chunks" yaml:"chunks"`
+}
+
+// Totalled returns a with its totals: tokens, the whole ad's, and its
+// chunks' embedded and unclassified.
+func Totalled(a Ad, tokens int) Ad {
+	a.Tokens, a.Embedded, a.Unclassified = tokens, 0, 0
+	for _, c := range a.Chunks {
+		switch c.Use {
+		case Embed:
+			a.Embedded += c.Tokens
+		case Unclassified:
+			a.Unclassified += c.Tokens
+		}
+	}
+	return a
 }
 
 // WriteYAML writes the ad to w as a YAML document, for people to read:
@@ -26,8 +43,8 @@ type Ad struct {
 // escapes emoji beyond the first 65,536 characters, which ads are full of.
 func (a Ad) WriteYAML(w io.Writer) error {
 	var b strings.Builder
-	fmt.Fprintf(&b, "id: %s\ntitle: %s\ntokens: %d\nembedded_tokens: %d\nchunks:\n",
-		scalar(a.ID), scalar(a.Title), a.Tokens, a.Embedded)
+	fmt.Fprintf(&b, "id: %s\ntitle: %s\ntokens: %d\nembedded_tokens: %d\nunclassified_tokens: %d\nchunks:\n",
+		scalar(a.ID), scalar(a.Title), a.Tokens, a.Embedded, a.Unclassified)
 	for _, c := range a.Chunks {
 		fmt.Fprintf(&b, "  - kind: %s\n", scalar(string(c.Kind)))
 		if c.Heading != "" {

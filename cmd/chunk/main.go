@@ -1,7 +1,8 @@
 // Command chunk prints the chunks of job ads, as an embedding job would
 // ask for them (see internal/chunk): each section with its kind, what to
-// do with it (embed it, keep it as metadata, or leave it out), about how
-// many tokens it is, and what placed it in its section.
+// do with it (embed it, keep it as metadata, leave it out, or nothing yet,
+// as it's unclassified), about how many tokens it is, and what placed it
+// in its section.
 //
 //	chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...
 //
@@ -68,18 +69,14 @@ func main() {
 			log.Fatal(err)
 		}
 		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
-		c := chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}
+		whole := 0
 		for _, s := range ss {
-			c.Tokens += chunk.Tokens(s.Heading)
+			whole += chunk.Tokens(s.Heading)
 			for _, p := range s.Parts {
-				c.Tokens += chunk.Tokens(p.Text)
+				whole += chunk.Tokens(p.Text)
 			}
 		}
-		for _, ch := range c.Chunks {
-			if ch.Use == chunk.Embed {
-				c.Embedded += ch.Tokens
-			}
-		}
+		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, whole)
 		if *asYAML {
 			fmt.Fprintln(w, "---")
 			if err := c.WriteYAML(w); err != nil {
@@ -145,12 +142,15 @@ func readBoilerplate(path string) (map[string]bool, error) {
 
 // write writes an ad's chunks as text to read.
 func write(w io.Writer, c chunk.Ad) {
-	share := 0
-	if c.Tokens > 0 {
-		share = 100 * c.Embedded / c.Tokens
+	share := func(n int) int {
+		if c.Tokens == 0 {
+			return 0
+		}
+		return 100 * n / c.Tokens
 	}
 	fmt.Fprintf(w, "%s · %s\n", c.Title, c.ID)
-	fmt.Fprintf(w, "about %d tokens in all; %d embedded (%d%%)\n", c.Tokens, c.Embedded, share)
+	fmt.Fprintf(w, "about %d tokens in all; %d embedded (%d%%), %d unclassified (%d%%)\n",
+		c.Tokens, c.Embedded, share(c.Embedded), c.Unclassified, share(c.Unclassified))
 	for i, ch := range c.Chunks {
 		fmt.Fprintf(w, "\n[%d] %s · %s · about %d tokens\n    placed by %s\n", i+1, ch.Kind, ch.Use, ch.Tokens, ch.PlacedBy)
 		for _, line := range strings.Split(ch.Text, "\n") {
