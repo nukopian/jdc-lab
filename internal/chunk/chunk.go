@@ -21,6 +21,7 @@ package chunk
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
@@ -50,7 +51,8 @@ type Chunk struct {
 	PlacedBy string `json:"placed_by" yaml:"placed_by"`
 	// Use is Embed, Metadata or LeaveOut.
 	Use string `json:"use" yaml:"use"`
-	// Text is the chunk's heading and text, a line each.
+	// Text is the chunk's heading and text, a line each, a list's items
+	// as "- " entries.
 	Text   string  `json:"text" yaml:"text"`
 	Fields []Field `json:"fields,omitempty" yaml:"fields,omitempty"`
 	// Unmapped is how many of the boilerplate chunk's tokens are text of
@@ -77,10 +79,10 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			for _, p := range s.Parts {
 				if p.Role == headings.Field {
 					d.Fields = append(d.Fields, Field{Label: p.Key, Value: p.Value})
-					lines = append(lines, p.Text)
+					lines = append(lines, line(p))
 					continue
 				}
-				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, p.Text))
+				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, line(p)))
 				unmapped += Tokens(p.Text)
 			}
 			if len(d.Fields) > 0 {
@@ -97,13 +99,13 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		}
 		for _, p := range s.Parts {
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
-				gathered = append(gathered, string(s.Kind)+": "+p.Text)
+				gathered = append(gathered, string(s.Kind)+": "+line(p))
 				continue
 			}
 			if p.Role == headings.Field {
 				c.Fields = append(c.Fields, Field{Label: p.Key, Value: p.Value})
 			}
-			lines = append(lines, p.Text)
+			lines = append(lines, line(p))
 		}
 		c.Text = strings.Join(lines, "\n")
 		c.Tokens = Tokens(c.Text)
@@ -119,10 +121,26 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	return cs
 }
 
+// line returns a part's text as a line of a chunk: an item of a list as
+// an entry, "- " first.
+func line(p headings.Part) string {
+	if p.Item {
+		return "- " + p.Text
+	}
+	return p.Text
+}
+
 // Tokens returns about how many tokens text is: four for every three
-// words.
+// words, a word being something with a letter or figure in it, so that a
+// list's "- " isn't one.
 func Tokens(text string) int {
-	return (len(strings.Fields(text))*4 + 1) / 3 // to the nearest
+	n := 0
+	for _, w := range strings.Fields(text) {
+		if strings.ContainsFunc(w, func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) }) {
+			n++
+		}
+	}
+	return (n*4 + 1) / 3 // to the nearest
 }
 
 // use says what's done with a section of kind.

@@ -152,3 +152,20 @@ func TestBoilerplateGathered(t *testing.T) {
 		t.Errorf("got %d chunks, want 1", len(got))
 	}
 }
+
+// List items are shown as entries of a list.
+func TestListItems(t *testing.T) {
+	ss := []sections.Section{{Kind: sections.Requirements, Heading: "You'll need", Parts: []headings.Part{
+		text("Some of:"),
+		{Role: headings.Text, Text: "A licence.", Item: true},
+		{Role: headings.Field, Text: "Hours: 40", Key: "hours", Value: "40", Item: true},
+	}}}
+	c := Of(ss, func(string) bool { return false })[0]
+	if c.Text != "You'll need\nSome of:\n- A licence.\n- Hours: 40" {
+		t.Errorf("got %q", c.Text)
+	}
+	// A list's dashes aren't words, so aren't counted as tokens.
+	if want := Tokens("You'll need Some of: A licence. Hours: 40"); c.Tokens != want {
+		t.Errorf("tokens: got %d, want %d", c.Tokens, want)
+	}
+}
