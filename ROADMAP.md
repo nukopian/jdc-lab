@@ -40,13 +40,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 2. Stop shift times passing as headings
-
-**Serves:** structure
-
-Don't take a bold time range, such as "2:00pm–10:00pm", for a
-heading. The plan, and how it's going, are in its
-[record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md).
+Nothing at the moment: the next to start comes from Next.
 
 ## Next
 

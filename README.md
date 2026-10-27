@@ -55,9 +55,8 @@ embeddings, and a large language model only where those fall short.
   probably needn't be embedded: a first answer to whether search can
   improve while embedding less.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: now, recognising more headings; then the rest of the
-  pipeline's known gaps, grammars for the facts in the details sections,
-  and a fair test of embeddings.
+  and why: first the pipeline's known gaps, then grammars for the facts
+  in the details sections, and a fair test of embeddings.
 - **Embeddings** have had a first look: two small local models,
   `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`, compared at
   matching section headings to section types. BGE separated the types

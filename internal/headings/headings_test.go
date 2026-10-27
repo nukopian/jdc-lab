@@ -149,6 +149,21 @@ func TestRead(t *testing.T) {
 			[]string{`text "£30,000 per annum"`, `text "Ref 225682916"`, `text "Apply today."`, `text "1"`},
 		},
 		{
+			"bold times are no headings",
+			`<p><b>- 2pm to 10pm</b></p><p><b>Monday to Friday, 8:00am - 5:00pm</b></p>` +
+				`<p><b>08:00 starts</b></p><p><b>Monday to Friday - 8.30-3.30</b></p>`,
+			[]string{`text "- 2pm to 10pm"`, `text "Monday to Friday, 8:00am - 5:00pm"`,
+				`text "08:00 starts"`, `text "Monday to Friday - 8.30-3.30"`},
+		},
+		{
+			// A figure with a point is a time only with am or pm, or in a
+			// range: 37.50 is hours, not half past.
+			"bold figures with a point aren't times",
+			`<p><b>37.50 hours per week</b></p><p><b>Top 10 reasons to join</b></p>`,
+			[]string{`heading "37.50 hours per week" key="37 50 hours per week"`,
+				`heading "Top 10 reasons to join" key="top 10 reasons to join"`},
+		},
+		{
 			"a bold question, and a trailing ellipsis, are headings",
 			`<p><b>Why join us?</b></p><p><b>And there's more...</b></p>`,
 			[]string{`heading "Why join us?" key="why join us"`, `heading "And there's more..." key="and there's more"`},

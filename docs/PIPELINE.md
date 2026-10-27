@@ -169,7 +169,7 @@ returns them as **parts**:
 
 | Role | How it's recognised | Example |
 |---|---|---|
-| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money or long numbers; not ending in `.` | "**Key Responsibilities**" |
+| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day; not ending in `.` | "**Key Responsibilities**" |
 | `field` | "Label: value" or "Label \| value", where the label is a known one | "Hours: 40 per week" |
 | `repeat` | only the ad's title or location again | "**Delivery Driver**" at the top |
 | `text` | everything else | |
@@ -456,7 +456,7 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | The wrong kind won | Move the winning kind's rule below the right one's, or make the phrase longer | `headings.txt` |
 | A plain line wrongly taken by name | Make the phrase longer, or drop it | `headings.txt` |
 | A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
-| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `money`); add a case to `TestRead` | `internal/headings/headings.go` |
+| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `money`, `times`); add a case to `TestRead` | `internal/headings/headings.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
 | A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
 | An advertiser's name as a heading | Nothing: it stays unmapped, and its text is found as boilerplate | |
@@ -499,8 +499,10 @@ become the new `before`: `go run ./cmd/pipeline run before` again.
 
 ## What it measured
 
-On two samples, measured on 2026-10-26 with
-`go run ./cmd/pipeline run now`, which gives current figures:
+On two samples, measured on 2026-10-27 with
+`go run ./cmd/pipeline run now`, which gives current figures. A third
+sample, `ads-20261027`, isn't in these figures yet, so `all` below is
+the first two together, and `run now` gives a different `all`:
 
 | Sample | Ads | Distinct | Leans towards |
 |---|---:|---:|---|
@@ -516,7 +518,7 @@ boilerplate moves more, as each slice has advertisers of its own.
 
 **Headings.** 89% of ads have at least one heading, in both samples.
 Headings of a known kind are 77% of heading uses in the first, 76% in
-the second; ads with every heading known, 52% and 51%; ads with no
+the second; ads with every heading known, 52% in both; ads with no
 section but the summary, 5% and 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
@@ -532,11 +534,11 @@ section but the summary, 5% and 4%.
 | company | 5% | 3% | 3% | 46% | 28% | 39% |
 | apply | 3% | 3% | 3% | 37% | 42% | 44% |
 | legal | 1% | 1% | 1% | 77% | 69% | 75% |
-| details | 2% | 2% | 2% | 9% | 15% | 14% |
-| unmapped | 13% | 13% | 13% | 17% | 19% | 20% |
+| details | 2% | 2% | 2% | 9% | 16% | 15% |
+| unmapped | 13% | 13% | 13% | 18% | 19% | 20% |
 
 Boilerplate is 13.2% of the text in the first sample, 12.5% in the
-second, and 14.0% in both together, as more ads show more of what's
+second, and 13.9% in both together, as more ads show more of what's
 repeated; template for the job is 2.1%, 3.3% and 2.9%. So boilerplate,
 with the company, apply and legal text that isn't, is roughly 15–20% of
 an ad that probably needn't be embedded. That's a first answer to
@@ -587,7 +589,6 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | [Near-duplicate boilerplate](../ROADMAP.md#3-find-near-duplicate-boilerplate) | Standard text with a job title or place swapped in doesn't match word for word, which likely hides boilerplate in summaries | Fuzzy matching, such as shingles or MinHash |
 | [Footers under few title groups](../ROADMAP.md#4-catch-footers-filed-under-requirements) | Filed under the last heading, usually requirements, they count as template | Their place at the end of the ad as a cue |
 | [Plain lines without cues](../ROADMAP.md#6-find-headings-written-as-plain-lines) | Only exact phrases are taken as headings | More evidence from the following text |
-| [Shift times as headings](../ROADMAP.md#2-stop-shift-times-passing-as-headings) | "2:00pm–10:00pm" in bold passes as a heading | A rule for times |
 
 ## Words used here
 

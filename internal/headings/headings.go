@@ -205,6 +205,12 @@ func field(text string) (Part, bool) {
 // "£30,000 per annum" in bold is pay, and "Ref 225682916" a reference.
 var money = regexp.MustCompile(`[£$€]|\d{3,}`)
 
+// times matches a time of day, which a heading doesn't have either: "- 2pm
+// to 10pm" or "Monday to Friday, 8:00am - 5:00pm" in bold is when the work
+// is. A figure with a point is a time only with am or pm, or in a range, as
+// "8.30-3.30": "37.50 hours" is a figure.
+var times = regexp.MustCompile(`(?i)\b\d{1,2}([:.]\d{2})? ?[ap]m\b|\b\d{1,2}:\d{2}\b|\b\d{1,2}\.\d{2} *(-|–|—|to) *\d{1,2}\.\d{2}\b`)
+
 // conjunctions join what comes before them to what comes after: "OR" alone
 // in bold, between two lists of requirements, is no heading.
 var conjunctions = map[string]bool{"and": true, "or": true, "either": true, "nor": true, "but": true, "plus": true}
@@ -223,12 +229,12 @@ func onlyConjunctions(key string) bool {
 
 // headingShaped reports whether text, with its key, could be a heading:
 // some letters, a word that isn't a conjunction, at most most words, no
-// money or long figures, and not ending as a sentence does.
+// money, long figures or times, and not ending as a sentence does.
 func headingShaped(text, key string, most int) bool {
 	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > most || money.MatchString(text) {
+	if len(strings.Fields(key)) > most || money.MatchString(text) || times.MatchString(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })

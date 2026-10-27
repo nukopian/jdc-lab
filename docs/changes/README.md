@@ -78,4 +78,4 @@ Newest first.
 - [Check the rules on a second sample](2026-10-25-check-the-rules-on-a-second-sample.md)
   (roadmap 1), shipped in v0.3.5
 - [Stop shift times passing as headings](2026-10-25-stop-shift-times-passing-as-headings.md)
-  (roadmap 2), in progress
+  (roadmap 2), shipped, unreleased
