@@ -1,11 +1,13 @@
 package chunk
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"go.yaml.in/yaml/v3"
 )
 
 func text(s string) headings.Part { return headings.Part{Role: headings.Text, Text: s} }
@@ -57,5 +59,41 @@ func TestOfUnmapped(t *testing.T) {
 	c := Of(ss, func(string) bool { return false })[0]
 	if c.Use != Embed || !strings.Contains(c.PlacedBy, "no phrase in headings.txt") {
 		t.Errorf("got %s, %q; want an unmapped section embedded, saying no phrase placed it", c.Use, c.PlacedBy)
+	}
+}
+
+// YAML writes an ad's chunks as YAML that reads back as written, a
+// chunk's text a block of its lines, whatever the text holds.
+func TestYAML(t *testing.T) {
+	tricky := []string{
+		"📢 Calling all teachers 📢\nnext line", "✏️ Pencils", "a: b", "# not a comment", "yes", "42",
+		"it's \"quoted\"", " leading space\nsecond", "control\x02character", "trailing ", "-", "",
+		"Pay: £130 - £170 per day", "tab\tin it",
+	}
+	a := Ad{ID: "225682916", Title: "Part-Time Teacher: Supply", Tokens: 525, Embedded: 143}
+	for i, s := range tricky {
+		a.Chunks = append(a.Chunks, Chunk{
+			Kind: sections.Summary, Heading: s, PlacedBy: s, Use: Embed, Text: s, Tokens: i,
+			Fields: []Field{{Label: "pay", Value: s}}, Boilerplate: []string{s},
+		})
+	}
+	var b strings.Builder
+	if err := a.WriteYAML(&b); err != nil {
+		t.Fatal(err)
+	}
+	var back Ad
+	if err := yaml.Unmarshal([]byte(b.String()), &back); err != nil {
+		t.Fatalf("not YAML: %v\n%s", err, b.String())
+	}
+	if !reflect.DeepEqual(a, back) {
+		t.Errorf("read back differs.\nwrote:\n%s\ngot %+v", b.String(), back)
+	}
+	for _, want := range []string{
+		"id: '225682916'\n", "tokens: 525\nembedded_tokens: 143\nchunks:\n",
+		"    text: |-\n      📢 Calling all teachers 📢\n      next line\n", "    use: embed\n",
+	} {
+		if !strings.Contains(b.String(), want) {
+			t.Errorf("the YAML lacks %q; it was:\n%s", want, b.String())
+		}
 	}
 }

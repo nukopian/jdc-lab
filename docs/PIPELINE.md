@@ -394,8 +394,13 @@ for every three words), and what placed it there.
 ```
 go run ./cmd/chunk 225682916
 go run ./cmd/chunk -json 225682916
+go run ./cmd/chunk -yaml 225682916
 go run ./cmd/chunk -title "Driver" ad.html
 ```
+
+The text is to read at a glance, JSON (`-json`, a line an ad) is for
+programs, and YAML (`-yaml`, a document an ad) is for people who want
+the structure too: each chunk's text is a block of its lines.
 
 The summary, responsibilities, requirements, desirable and unmapped
 chunks are embedded; details are metadata, with their fields; benefits,

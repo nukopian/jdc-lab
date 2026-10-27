@@ -27,27 +27,27 @@ const (
 
 // A Field is a label and its value: "salary", "£30,000".
 type Field struct {
-	Label string `json:"label"`
-	Value string `json:"value"`
+	Label string `json:"label" yaml:"label"`
+	Value string `json:"value" yaml:"value"`
 }
 
 // A Chunk is one section of an ad, ready for what's done with it.
 type Chunk struct {
-	Kind    sections.Kind `json:"kind"`
-	Heading string        `json:"heading,omitempty"`
+	Kind    sections.Kind `json:"kind" yaml:"kind"`
+	Heading string        `json:"heading,omitempty" yaml:"heading,omitempty"`
 	// PlacedBy says what gave the chunk its kind.
-	PlacedBy string `json:"placed_by"`
+	PlacedBy string `json:"placed_by" yaml:"placed_by"`
 	// Use is Embed, Metadata or LeaveOut.
-	Use string `json:"use"`
+	Use string `json:"use" yaml:"use"`
 	// Text is the chunk's heading and text, a line each, without its
 	// boilerplate.
-	Text string `json:"text"`
+	Text string `json:"text" yaml:"text"`
 	// Boilerplate is the text left out of Text as boilerplate.
-	Boilerplate []string `json:"boilerplate,omitempty"`
-	Fields      []Field  `json:"fields,omitempty"`
+	Boilerplate []string `json:"boilerplate,omitempty" yaml:"boilerplate,omitempty"`
+	Fields      []Field  `json:"fields,omitempty" yaml:"fields,omitempty"`
 	// Tokens is about how many tokens Text is: four for every three
 	// words, as models' tokenizers make of English.
-	Tokens int `json:"tokens"`
+	Tokens int `json:"tokens" yaml:"tokens"`
 }
 
 // Of returns an ad's sections as chunks; boilerplate says whether a text

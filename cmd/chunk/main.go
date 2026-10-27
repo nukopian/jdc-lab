@@ -3,18 +3,20 @@
 // do with it (embed it, keep it as metadata, or leave it out), about how
 // many tokens it is, and what placed it in its section.
 //
-//	chunk [-json] [-run DIR] [-title TITLE] AD...
+//	chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...
 //
 // An AD is an ad's ID in the run's ads, or a file of an ad's HTML, or "-"
 // for HTML on standard input; -title gives a file's title, which the
 // chunker uses to find the ad repeating it. Boilerplate is what the run's
 // boilerplate/repeated.tsv says it is, so run the pipeline first. It
-// prints each ad's chunks as text to read, or with -json as one JSON
-// object a line.
+// prints each ad's chunks as text to read; with -json as one JSON object
+// a line, for programs; or with -yaml as a YAML document each, for
+// people, each chunk's text a block of its lines.
 //
 // From the lab's folder:
 //
 //	go run ./cmd/chunk 225682916
+//	go run ./cmd/chunk -yaml 225682916
 //	go run ./cmd/chunk -json -title "Driver" ad.html
 //
 // or, once installed with `go install ./cmd/...`, just chunk.
@@ -39,25 +41,18 @@ import (
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
 
-// chunked is an ad's chunks, as -json writes them.
-type chunked struct {
-	ID     string        `json:"id"`
-	Title  string        `json:"title"`
-	Chunks []chunk.Chunk `json:"chunks"`
-	// Tokens is about how many tokens the whole ad is, and Embedded how
-	// many of them its embedded chunks are.
-	Tokens   int `json:"tokens"`
-	Embedded int `json:"embedded_tokens"`
-}
-
 func main() {
 	log.SetFlags(0)
 	asJSON := flag.Bool("json", false, "write each ad as a line of JSON")
+	asYAML := flag.Bool("yaml", false, "write each ad as a YAML document")
 	run := flag.String("run", "data/runs/latest", "the run whose ads and boilerplate to use")
 	title := flag.String("title", "", "the title of an ad given as HTML")
 	flag.Parse()
 	if flag.NArg() == 0 {
-		log.Fatal("usage: chunk [-json] [-run DIR] [-title TITLE] AD...")
+		log.Fatal("usage: chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...")
+	}
+	if *asJSON && *asYAML {
+		log.Fatal("chunk: -json or -yaml, not both")
 	}
 	boiler, err := readBoilerplate(filepath.Join(*run, "boilerplate", "repeated.tsv"))
 	if err != nil {
@@ -73,7 +68,7 @@ func main() {
 			log.Fatal(err)
 		}
 		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
-		c := chunked{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}
+		c := chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}
 		for _, s := range ss {
 			c.Tokens += chunk.Tokens(s.Heading)
 			for _, p := range s.Parts {
@@ -84,6 +79,13 @@ func main() {
 			if ch.Use == chunk.Embed {
 				c.Embedded += ch.Tokens
 			}
+		}
+		if *asYAML {
+			fmt.Fprintln(w, "---")
+			if err := c.WriteYAML(w); err != nil {
+				log.Fatal(err)
+			}
+			continue
 		}
 		if *asJSON {
 			enc := json.NewEncoder(w)
@@ -142,7 +144,7 @@ func readBoilerplate(path string) (map[string]bool, error) {
 }
 
 // write writes an ad's chunks as text to read.
-func write(w io.Writer, c chunked) {
+func write(w io.Writer, c chunk.Ad) {
 	share := 0
 	if c.Tokens > 0 {
 		share = 100 * c.Embedded / c.Tokens

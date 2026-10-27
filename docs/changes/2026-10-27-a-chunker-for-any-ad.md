@@ -63,6 +63,12 @@ say how to run it.
   won and those of other kinds it outranked, as well as the rule; the
   plan had a phrase only. Tokens are estimated at four for every three
   words, rounded, as the chunker runs without a model.
+- **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
+  document, for people, each chunk's text a block of its lines, where
+  JSON is for programs. The lab writes its own YAML, as the usual Go
+  library (`go.yaml.in/yaml/v3`) escapes emoji past the first 65,536
+  characters, as ads use; that library stays, in a test that reads the
+  YAML back, tricky strings and all, and finds it as written.
 - **Boilerplate** comes from the run's `repeated.tsv`, by each text's
   own key; a text the run found by its templated key or as alike to
   another counts too, as the table lists every repeated text by its own
