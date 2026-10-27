@@ -1,6 +1,6 @@
 # Stop shift times passing as headings
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.4.0
 
 **Origin:** roadmap 2
 

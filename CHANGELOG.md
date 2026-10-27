@@ -12,6 +12,19 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.4.0 (2026-10-27)
+
+Times and shift patterns kept out of headings
+
+Bold times of day and patterns of work, which are facts about the
+job, are no longer taken for headings, and headings about shifts start
+details sections. The lab gains a third sample, of 21,000 ads, on
+which the rules hold, and `pipeline run` times each stage. The
+CHANGELOG and change records no longer get PDFs, a change to how the
+lab is worked on, so a minor release.
+
 - The conversion reads exports holding control characters. XML 1.0
   forbids characters such as U+0002, but MySQL's `--xml` writes them
   as they are, and Go's decoder refused the whole export. They now
