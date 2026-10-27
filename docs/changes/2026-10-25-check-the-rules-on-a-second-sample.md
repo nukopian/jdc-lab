@@ -1,6 +1,6 @@
 # Check the rules on a second sample
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.3.5
 
 **Origin:** roadmap 1
 

@@ -12,17 +12,17 @@ has the steps).
 
 ## Unreleased
 
-- grammar v0.3.2, with `Overlap` and `Outermost`, both suggested from
-  the lab's use: phrases in a heading that overlap now all count, so
-  "To succeed in this role, you will need:" is requirements rather than
-  responsibilities (six headings, 22 uses), while one wholly inside a
-  longer one still doesn't, so "Company Profile" stays company
-  ([record](docs/changes/2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md)).
-- grammar v0.3.1, whose `MapOnly` option reads a rule written
-  `phrases => kind` without making the kind a phrase, as the lab asked
-  for legal's rule. `internal/sections` now uses it, in place of reading
-  its rules twice; the pipeline's output is unchanged
-  ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md)).
+Nothing yet.
+
+## v0.3.5 (2026-10-27)
+
+The rules checked on a second sample
+
+The lab's rules for headings and sections, tuned on its first sample,
+now hold on the second too, and the lab takes up three releases of
+grammar, two of them with features the lab's own use asked for. No
+change to how the lab is set up or worked on, so a patch release.
+
 - The rules hold on the second sample. Headings of a known kind there
   rose from 73% of uses to 76%, as on the first (now 77%), and unmapped
   text fell from 16% to 13%, with new phrases and field labels and two
@@ -36,10 +36,24 @@ has the steps).
   successful Legal Secretary will have:" isn't taken for a legal notice:
   a rule written `phrases => kind` leaves the kind's name out
   (roadmap 1; [record](docs/changes/2026-10-25-check-the-rules-on-a-second-sample.md)).
+- grammar v0.3.2, with `Overlap` and `Outermost`, both suggested from
+  the lab's use: phrases in a heading that overlap now all count, so
+  "To succeed in this role, you will need:" is requirements rather than
+  responsibilities (six headings, 22 uses), while one wholly inside a
+  longer one still doesn't, so "Company Profile" stays company
+  ([record](docs/changes/2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md)).
+- grammar v0.3.1, whose `MapOnly` option reads a rule written
+  `phrases => kind` without making the kind a phrase, as the lab asked
+  for legal's rule. `internal/sections` now uses it, in place of reading
+  its rules twice; the pipeline's output is unchanged
+  ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md)).
 - grammar v0.3.0, which changes nothing in grammar itself but brings
   scalar from v0.5.9 to v0.6.0 (long numbers keep their digits, and `%`
   and `++` follow Perl further). The pipeline's output is unchanged
   ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md)).
+- A wash-up before the release found only small things, none changing
+  the pipeline's output: a test that never reached the code it named,
+  a check made twice, and a stale comment and note.
 
 ## v0.3.4 (2026-10-26)
 

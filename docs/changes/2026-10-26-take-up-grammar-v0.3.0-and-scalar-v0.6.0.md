@@ -1,6 +1,6 @@
 # Take up grammar v0.3.0 and scalar v0.6.0
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.3.5
 
 **Origin:** a TODO task from grammar's session (grammar 62136b8d57a65a8358f23887a01daec4d8cec929)
 

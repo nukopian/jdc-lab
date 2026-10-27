@@ -1,6 +1,6 @@
 # Take up grammar v0.3.1, and read headings.txt with MapOnly
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.3.5
 
 **Origin:** a TODO task from grammar's session (grammar 675df5ba00d3828d4b37bbb6e439ba30e864b7e8)
 

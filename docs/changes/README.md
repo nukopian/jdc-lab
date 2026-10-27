@@ -70,12 +70,12 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Try grammar's Overlap in sections.All, then take up grammar v0.3.2](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md),
-  shipped, unreleased
+  shipped in v0.3.5
 - [Take up grammar v0.3.1, and read headings.txt with MapOnly](2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md),
-  shipped, unreleased
+  shipped in v0.3.5
 - [Take up grammar v0.3.0 and scalar v0.6.0](2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md),
-  shipped, unreleased
+  shipped in v0.3.5
 - [Check the rules on a second sample](2026-10-25-check-the-rules-on-a-second-sample.md)
-  (roadmap 1), shipped, unreleased
+  (roadmap 1), shipped in v0.3.5
 - [Stop shift times passing as headings](2026-10-25-stop-shift-times-passing-as-headings.md)
   (roadmap 2), in progress

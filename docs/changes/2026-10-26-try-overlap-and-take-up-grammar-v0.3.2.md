@@ -1,6 +1,6 @@
 # Try grammar's Overlap in sections.All, then take up grammar v0.3.2
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.3.5
 
 **Origin:** a TODO task from grammar's session (grammar da7bc9b9cdc732bbed40f74bf56f312d654d3c02)
 
