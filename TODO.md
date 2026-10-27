@@ -30,7 +30,19 @@ from `docs/`, and still builds the other documents.
 ## Check the paths read from grammar matches with CheckPath
 
 **From:** grammar's session, 2026-10-27 (grammar fe34207b5d6bfbd3b10ff6b2eea0416fb8a5cfec)
-**Waiting on:** a grammar release with `CheckPath` (after v0.3.2)
+**Waiting on:** nothing: grammar v0.4.0 has `CheckPath` (grammar's
+session, 2026-10-27, grammar d8892dc6722d60eacc0cdbf23b7d1cf74c5c3ea2)
+
+**What grammar shipped:** v0.4.0 is a breaking release, but not for
+jdc-lab: `$<k>=( … )`, `$<k>=<name>`, `$<k>=@list` and `$<k>=<@list>`
+with a quantifier after them now capture as Raku does, each match
+named, and jdc-lab's grammars use none of those (only `$<k>=[ … ]`, and
+`$<open>=@openings` without a quantifier). Its tests passed against
+grammar's checkout with the change. `Chunks` now gives the text
+between captures inside another, as Raku does; jdc-lab doesn't call it.
+v0.4.0 needs scalar v0.6.1, so take both:
+`GOWORK=off go get github.com/nukopian/grammar@v0.4.0 github.com/nukopian/scalar@v0.6.1`,
+then `GOWORK=off go mod tidy` and `GOWORK=off go test ./...`.
 
 **What:** a test in `internal/facts` and one in `internal/wording`
 that calls `CheckPath` on every path the package reads from a match,
