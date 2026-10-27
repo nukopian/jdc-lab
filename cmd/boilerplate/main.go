@@ -25,8 +25,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/nukopian/jdc-lab/internal/ads"
-	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/boilerplate"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
@@ -49,7 +47,7 @@ func main() {
 	}
 	source, dir := os.Args[1], os.Args[2]
 
-	all, ix, dups, err := read(source)
+	all, ix, dups, err := boilerplate.Read(source)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,39 +58,6 @@ func main() {
 	t.print(len(all), dups, dir)
 }
 
-// read divides every ad into sections, and indexes their text. It keeps
-// each ad's sections for the second pass.
-// divided is an ad's sections, with the ad they're from.
-type divided struct {
-	src boilerplate.Source
-	ss  []sections.Section
-}
-
-func read(source string) (all []divided, ix boilerplate.Index, dups int, err error) {
-	var d ads.Distinct
-	for a, err := range ads.File(source) {
-		if err != nil {
-			return nil, ix, 0, err
-		}
-		if !d.First(a) {
-			continue
-		}
-		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
-		src := boilerplate.SourceOf(a)
-		for _, s := range ss {
-			var texts []string
-			for _, p := range s.Parts {
-				if p.Role == headings.Text {
-					texts = append(texts, p.Text)
-				}
-			}
-			ix.Add(src, s.Kind, texts...)
-		}
-		all = append(all, divided{src, ss})
-	}
-	return all, ix, d.Duplicates, nil
-}
-
 // tally is what's measured.
 type tally struct {
 	chars, repeated, boiler, template int
@@ -101,12 +66,13 @@ type tally struct {
 	repeats                           map[string]*repeat
 }
 
-func measure(all []divided, ix *boilerplate.Index) tally {
+func measure(all []boilerplate.Divided, ix *boilerplate.Index) tally {
 	t := tally{kindChars: map[sections.Kind]int{}, kindBoiler: map[sections.Kind]int{}, repeats: map[string]*repeat{}}
 	for _, a := range all {
+		src := boilerplate.SourceOf(a.Ad)
 		chars, boiler := 0, 0
 		seen := map[string]bool{}
-		for _, s := range a.ss {
+		for _, s := range a.Sections {
 			for _, p := range s.Parts {
 				if p.Role != headings.Text {
 					continue
@@ -114,11 +80,11 @@ func measure(all []divided, ix *boilerplate.Index) tally {
 				n := len(p.Text)
 				chars += n
 				t.kindChars[s.Kind] += n
-				if !ix.Repeated(a.src, p.Text) {
+				if !ix.Repeated(src, p.Text) {
 					continue
 				}
 				t.repeated += n
-				if ix.Boilerplate(a.src, p.Text) {
+				if ix.Boilerplate(src, p.Text) {
 					boiler += n
 					t.kindBoiler[s.Kind] += n
 				} else {
@@ -127,8 +93,8 @@ func measure(all []divided, ix *boilerplate.Index) tally {
 				k := headings.Key(p.Text)
 				r := t.repeats[k]
 				if r == nil {
-					r = &repeat{text: p.Text, groups: ix.Groups(a.src, p.Text), kinds: map[sections.Kind]bool{},
-						boilerplate: ix.Boilerplate(a.src, p.Text)}
+					r = &repeat{text: p.Text, groups: ix.Groups(src, p.Text), kinds: map[sections.Kind]bool{},
+						boilerplate: ix.Boilerplate(src, p.Text)}
 					t.repeats[k] = r
 				}
 				if !seen[k] {

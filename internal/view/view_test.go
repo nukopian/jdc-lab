@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
+	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
@@ -160,6 +161,16 @@ func TestMissing(t *testing.T) {
 	if got := Missing("<p>📍 Leeds</p>", located); got != (Lost{}) {
 		t.Errorf("an added label counted against the ad: %+v", got)
 	}
+	// Faults found in the wash-up: sections with more than the ad lose
+	// nothing, and full-width letters are the letters they're the width of.
+	more := []sections.Section{{Kind: sections.Summary, Parts: []headings.Part{{Role: headings.Text, Text: "Hello world again"}}}}
+	if got := Missing("<p>Hello world</p>", more); got != (Lost{}) {
+		t.Errorf("more in the sections than the ad: %+v", got)
+	}
+	wide := []sections.Section{{Kind: sections.Summary, Parts: []headings.Part{{Role: headings.Text, Text: "Full time role"}}}}
+	if got := Missing("<p>\uff26ull time role</p>", wide); got != (Lost{}) {
+		t.Errorf("full-width letters: %+v", got)
+	}
 	if got := Missing("<p></p>", nil); got != (Lost{}) {
 		t.Errorf("an empty ad loses nothing, but Missing gives %+v", got)
 	}
@@ -167,5 +178,20 @@ func TestMissing(t *testing.T) {
 	moved := []sections.Section{ss[1], ss[0]}
 	if got := Missing(whole, moved); !got.Moved || !strings.Contains(got.Context, "We are hiring") {
 		t.Errorf("Missing gives %+v, want the text around We are hiring, moved", got)
+	}
+}
+
+// A bold lead in emphasis marks, found in the wash-up: its line lost the
+// opening mark as a bullet, so the lead no longer started it, and the
+// line kept the lead's text as well, read twice.
+func TestMissingBoldLead(t *testing.T) {
+	for _, src := range []string{
+		"<p><strong>*Recommend a friend*</strong> - Do you know someone looking for a position?</p>",
+		"<p><strong>*Please note</strong>:- We reserve the right to close this vacancy early.</p>",
+	} {
+		ss := sections.Divide(headings.Read(blocks.Split(src), ""))
+		if got := Missing(src, ss); got != (Lost{}) {
+			t.Errorf("Missing(%q) = %+v, want none", src, got)
+		}
 	}
 }

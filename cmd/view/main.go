@@ -23,7 +23,6 @@ import (
 	"path/filepath"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
-	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/boilerplate"
 	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
@@ -34,19 +33,13 @@ import (
 // shown is how many ads the view has.
 const shown = 20
 
-// an ad, with its sections.
-type chunked struct {
-	ad ads.Ad
-	ss []sections.Section
-}
-
 func main() {
 	log.SetFlags(0)
 	if len(os.Args) != 3 {
 		log.Fatal("usage: view ADS.jsonl OUTDIR")
 	}
 	source, dir := os.Args[1], os.Args[2]
-	all, ix, dups, err := read(source)
+	all, ix, dups, err := boilerplate.Read(source)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,8 +53,8 @@ func main() {
 	lost := make([]view.Lost, len(all))
 	missing, moved := 0, 0
 	for i, c := range all {
-		cs[i] = candidate(c, isBoilerplate(c.ad))
-		switch lost[i] = view.Missing(c.ad.HTML, c.ss); {
+		cs[i] = candidate(c, isBoilerplate(c.Ad))
+		switch lost[i] = view.Missing(c.Ad.HTML, c.Sections); {
 		case lost[i].Moved:
 			moved++
 		case lost[i].Context != "":
@@ -97,37 +90,11 @@ func main() {
 	fmt.Printf("ads with text out of order:  %d\n", moved)
 }
 
-// read reads the sample's distinct ads, divided into sections, and
-// indexes their texts for boilerplate, as cmd/boilerplate does.
-func read(source string) (all []chunked, ix boilerplate.Index, dups int, err error) {
-	var d ads.Distinct
-	for a, err := range ads.File(source) {
-		if err != nil {
-			return nil, ix, 0, err
-		}
-		if !d.First(a) {
-			continue
-		}
-		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
-		for _, s := range ss {
-			var texts []string
-			for _, p := range s.Parts {
-				if p.Role == headings.Text {
-					texts = append(texts, p.Text)
-				}
-			}
-			ix.Add(boilerplate.SourceOf(a), s.Kind, texts...)
-		}
-		all = append(all, chunked{a, ss})
-	}
-	return all, ix, d.Duplicates, nil
-}
-
 // candidate says what makes an ad worth showing.
-func candidate(c chunked, isBoilerplate func(string) bool) view.Candidate {
-	can := view.Candidate{ID: c.ad.ID, NoHeading: true}
+func candidate(c boilerplate.Divided, isBoilerplate func(string) bool) view.Candidate {
+	can := view.Candidate{ID: c.Ad.ID, NoHeading: true}
 	chars, boiler := 0, 0
-	for _, s := range c.ss {
+	for _, s := range c.Sections {
 		if s.Heading != "" {
 			can.NoHeading = false
 		}
@@ -149,7 +116,7 @@ func candidate(c chunked, isBoilerplate func(string) bool) view.Candidate {
 }
 
 // write writes the picked ads to path, in the order picked.
-func write(path string, all []chunked, picked []int, isBoilerplate func(ads.Ad) func(string) bool, lost []view.Lost) (err error) {
+func write(path string, all []boilerplate.Divided, picked []int, isBoilerplate func(ads.Ad) func(string) bool, lost []view.Lost) (err error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
@@ -165,15 +132,8 @@ func write(path string, all []chunked, picked []int, isBoilerplate func(ads.Ad) 
 	w := bufio.NewWriter(f)
 	fmt.Fprintf(w, "# %d ads in their sections\n\n", len(picked))
 	for _, i := range picked {
-		a := all[i].ad
-		whole := 0
-		for _, s := range all[i].ss {
-			whole += chunk.Tokens(s.Heading)
-			for _, p := range s.Parts {
-				whole += chunk.Tokens(p.Text)
-			}
-		}
-		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(all[i].ss, isBoilerplate(a))}, whole)
+		a, ss := all[i].Ad, all[i].Sections
+		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate(a))}, chunk.Whole(ss))
 		if err := view.Render(w, a, c, lost[i]); err != nil {
 			return err
 		}

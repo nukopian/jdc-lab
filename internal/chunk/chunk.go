@@ -6,8 +6,9 @@
 // The sections that say what the job is are embedded: the summary, the
 // role, responsibilities, requirements and desirable. Details are metadata;
 // benefits, company, apply and legal are left out; and unmapped ones,
-// whose kind isn't known, aren't embedded: they're what's left to map. An unmapped section's text goes to the boilerplate chunk,
-// under its heading, and its fields to a details chunk.
+// whose kind isn't known, aren't embedded: they're what's left to map. An
+// unmapped section's text goes to the boilerplate chunk, under its
+// heading, and its fields to a details chunk.
 //
 // Text found as boilerplate leaves the embedded chunks for
 // one chunk of its own, at the end, left out but there to see, each line
@@ -18,8 +19,9 @@
 // standard perks are still a list of benefits.
 //
 // The chunks come with what says what the job is first: the summary, the
-// role, responsibilities and requirements, in that order; then the rest,
-// as the ad has them; and the boilerplate last.
+// role, responsibilities and requirements, in that order; then the rest
+// in the ad's order, the chunks of lines placed by their wording and of
+// lines of facts after its own; and the boilerplate last.
 package chunk
 
 import (
@@ -201,10 +203,11 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 // words, is. Otherwise it must start with a fact, in its first three
 // words, be at most 25 words, and not be a sentence or a question; and if
 // its only facts are work patterns, words such as "contract" and
-// "temporary" that sentences use too, they must be nearly all of it: at
-// most two other words. "50,000pa + excellent bonus" and "Bromsgrove |
-// Full-time | Permanent" are lines of facts; "This is a permanent role
-// working with…" and "Contract administration" aren't.
+// "temporary" that sentences use too, they must be all of it, or set
+// apart by "|", "," or "/" from at most two other words. "50,000pa +
+// excellent bonus" and "Bromsgrove | Full-time | Permanent" are lines of
+// facts; "This is a permanent role working with…" and "Contract
+// administration" aren't.
 func factLine(text string, fs []facts.Fact) bool {
 	text = strings.TrimSpace(text)
 	words := strings.Fields(text)
@@ -235,7 +238,7 @@ func factLine(text string, fs []facts.Fact) bool {
 			others++
 		}
 	}
-	return others <= 2
+	return others == 0 || others <= 2 && strings.ContainsAny(rest, "|,/")
 }
 
 // placeless returns facts without where they were in their line, which a
@@ -278,6 +281,19 @@ func Tokens(text string) int {
 		}
 	}
 	return (n*4 + 1) / 3 // to the nearest
+}
+
+// Whole returns about how many tokens an ad's sections are, all of them:
+// the whole ad, as an embedding of it would take it.
+func Whole(ss []sections.Section) int {
+	n := 0
+	for _, s := range ss {
+		n += Tokens(s.Heading)
+		for _, p := range s.Parts {
+			n += Tokens(p.Text)
+		}
+	}
+	return n
 }
 
 // use says what's done with a section of kind.

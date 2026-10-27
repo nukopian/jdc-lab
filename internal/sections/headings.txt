@@ -55,7 +55,7 @@ requirements, requirement, what we're looking for, what we are looking for,
 	who thrives here, candidate who, candidates who, teacher who, teachers who,
 	what you need, must have, what we need, qualities, licence, certification, eligible
 
-responsibilities, responsibility, duty, main duties, key duties,
+responsibilities, responsibility, duty, main duties, key duties, duties required,
 	what you'll be doing, what you will be doing, what you'll do, what you will do,
 	what will you be doing, what you will be responsible for, you will be responsible,
 	your role, role responsibilities, day to day, day in the life, your day,

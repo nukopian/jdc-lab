@@ -12,6 +12,31 @@ has the steps).
 
 ## Unreleased
 
+- Faults found in the wash-up, each now with a test:
+  - A bold lead in emphasis marks, "\*Recommend a friend\*", was read
+    twice: its line lost the opening mark as a bullet, so the lead no
+    longer started it, and the line kept the lead's words as well as
+    making them a heading. The view's check had 11 ads with text in no
+    section; it has none again.
+  - "£25-28k" was pay from £25 to £28,000: the top figure's k is now
+    the bottom's too. "12 hours per day" was 12 hours a week, and
+    "24h support" was hours; "£12.50/hr" and "£14 per hr" were pay a
+    year.
+  - A line whose only facts were work patterns, with two other words,
+    such as "Contract administration" or "Remote team", was a line of
+    facts, and left the embedded chunks: now the other words must be
+    set apart, as in "Leeds | Permanent".
+  - A pay symbol before a heading with a figure in it, "💷 What we offer
+    in 2025", made it a Pay field: pay's figure must now open the text.
+    7 lines are text again.
+  - Cleaning deleted an acute accent or backtick used as an apostrophe,
+    making "don´t" "dont", and the degree sign, making "30°C" "30C".
+  - `pipeline run` would have joined the last ad of a sample with no
+    final line break to the first of the next.
+  - The view's check reported text as lost when an ad's sections held
+    all of it and more, and when full-width letters had been cleaned.
+  - "Duties required" is a heading of responsibilities.
+
 - Lines placed by their wording: a summary's lines and a role's list
   items that open as requirements ("Experience of…", "Must have…"),
   responsibilities ("Conduct…", "Responsible for…") or benefits ("Free
@@ -83,10 +108,10 @@ has the steps).
   `claude/before`, for comparing a change. `compare` warns when two
   runs read different samples. A stage's program still runs on one
   sample by hand.
-- Each run writes, for each sample, 20 of its ads in their chunked
-  form, to read by eye: `view/ads.md`, with each section's kind and
-  heading, fields, repeats, and boilerplate and template text marked,
-  and the text no heading placed. The ads are the same in every run,
+- Each run writes 20 of its ads in their chunked form, to read by eye:
+  `view/ads.md`, each ad's chunks as `chunk` makes them, with each
+  chunk's kind, heading, use, size and what placed it, and the
+  boilerplate gathered at the end. The ads are the same in every run,
   so a diff of two runs' views shows what a change did, ad by ad. It
   also checks every ad's text is in its sections, in the ad's order:
   none is lost, but 20 ads of the three samples have text out of order

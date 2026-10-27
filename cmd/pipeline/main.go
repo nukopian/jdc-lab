@@ -48,7 +48,7 @@ const (
 	runsDir   = "data/runs"
 )
 
-// stages are the programs run on each sample, each with its folder.
+// stages are the programs a run runs, each with its folder.
 var stages = []struct{ program, dir string }{
 	{"blocks", "blocks"},
 	{"heading-counts", "headings"},
@@ -179,8 +179,8 @@ func build() (string, error) {
 	return bin, nil
 }
 
-// stage runs each stage, built in bin, on one sample, into dir, and
-// returns how each ran.
+// stage runs each stage, built in bin, on s, the samples together, into
+// dir, and returns how each ran.
 func stage(bin string, s runs.Sample, dir string) ([]runs.Timing, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
@@ -217,7 +217,8 @@ func stage(bin string, s runs.Sample, dir string) ([]runs.Timing, error) {
 	return timings, nil
 }
 
-// combine writes every sample into one file, as the sample named all.
+// combine writes every sample into one file, at path, and returns it as
+// the sample named all.
 func combine(samples []runs.Sample, path string) (runs.Sample, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return runs.Sample{}, err
@@ -232,7 +233,7 @@ func combine(samples []runs.Sample, path string) (runs.Sample, error) {
 			out.Close()
 			return runs.Sample{}, err
 		}
-		_, err = io.Copy(out, in)
+		err = copyLines(out, in)
 		in.Close()
 		if err != nil {
 			out.Close()
@@ -240,6 +241,27 @@ func combine(samples []runs.Sample, path string) (runs.Sample, error) {
 		}
 	}
 	return runs.Sample{Name: "all", Path: path}, out.Close()
+}
+
+// copyLines copies in to out, ending it with a line break if it lacks
+// one, so that the next file's first line doesn't join its last.
+func copyLines(out io.Writer, in io.Reader) error {
+	last := make([]byte, 1)
+	n, err := io.Copy(io.MultiWriter(out, lastByte(last)), in)
+	if err == nil && n > 0 && last[0] != '\n' {
+		_, err = io.WriteString(out, "\n")
+	}
+	return err
+}
+
+// lastByte is a writer that keeps the last byte written to it.
+type lastByte []byte
+
+func (l lastByte) Write(p []byte) (int, error) {
+	if len(p) > 0 {
+		l[0] = p[len(p)-1]
+	}
+	return len(p), nil
 }
 
 // compare writes to w how run after moved from run before, both in dir,
@@ -286,8 +308,7 @@ func compareSample(w io.Writer, was, now string) error {
 	return moved(w, was, now)
 }
 
-// moved writes the headings newly mapped and unmapped between two runs of
-// one sample.
+// moved writes the headings newly mapped and unmapped between two runs.
 func moved(w io.Writer, was, now string) error {
 	a, err := runs.Unmapped(filepath.Join(was, "sections", "unmapped.tsv"))
 	if err != nil {

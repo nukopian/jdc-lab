@@ -88,3 +88,40 @@ func TestBullet(t *testing.T) {
 		}
 	}
 }
+
+// Faults found in the wash-up.
+func TestWashUp(t *testing.T) {
+	for in, want := range map[string]string{
+		"don\u00b4t": "don't", // an acute accent used as an apostrophe
+		"you`ll":     "you'll",
+		"30\u00b0C":  "30\u00b0C", // the degree sign means something
+	} {
+		if got := Text(in); got != want {
+			t.Errorf("Text(%q) = %q, want %q", in, got, want)
+		}
+	}
+	for _, tt := range []struct{ in, text, added string }{
+		{"* Hiring now *", "Hiring now", ""}, // decoration, both ends
+		{"💷 What we offer in 2025", "What we offer in 2025", ""},
+		{"💷 30,000 per annum", "Pay: 30,000 per annum", "Pay: "},
+	} {
+		if text, added := Line(tt.in); text != tt.text || added != tt.added {
+			t.Errorf("Line(%q) = %q, %q; want %q, %q", tt.in, text, added, tt.text, tt.added)
+		}
+	}
+}
+
+func TestLead(t *testing.T) {
+	for _, tt := range []struct{ lead, line, wantLead, wantLine string }{
+		{"Salary:", "Salary: £30,000", "Salary:", "Salary: £30,000"},
+		// The line lost a bullet the lead opened with.
+		{"*Please note", "Please note:- We reserve the right", "Please note", "Please note:- We reserve the right"},
+		// A lead in marks is in emphasis: both go.
+		{"*Recommend a friend*", "Recommend a friend* - Do you know someone?", "Recommend a friend", "Recommend a friend - Do you know someone?"},
+	} {
+		lead, line := Lead(tt.lead, tt.line)
+		if lead != tt.wantLead || line != tt.wantLine {
+			t.Errorf("Lead(%q, %q) = %q, %q; want %q, %q", tt.lead, tt.line, lead, line, tt.wantLead, tt.wantLine)
+		}
+	}
+}

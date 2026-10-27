@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/nukopian/jdc-lab/internal/runs"
 )
 
 // write puts a run's summaries, unmapped table and list of samples into
@@ -74,5 +76,20 @@ func TestRunName(t *testing.T) {
 		if err := checkName(name); (err == nil) != ok {
 			t.Errorf("checkName(%q) = %v; want ok %v", name, err, ok)
 		}
+	}
+}
+
+// Samples are combined a line each, even when one lacks a last newline.
+func TestCombine(t *testing.T) {
+	dir := t.TempDir()
+	a, b := filepath.Join(dir, "a.jsonl"), filepath.Join(dir, "b.jsonl")
+	os.WriteFile(a, []byte(`{"id":"1"}`), 0o644) // no newline at its end
+	os.WriteFile(b, []byte("{\"id\":\"2\"}\n"), 0o644)
+	if _, err := combine([]runs.Sample{{Name: "a", Path: a}, {Name: "b", Path: b}}, filepath.Join(dir, "all.jsonl")); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := os.ReadFile(filepath.Join(dir, "all.jsonl"))
+	if string(got) != "{\"id\":\"1\"}\n{\"id\":\"2\"}\n" {
+		t.Errorf("got %q", got)
 	}
 }

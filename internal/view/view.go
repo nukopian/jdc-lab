@@ -211,11 +211,8 @@ func Missing(src string, ss []sections.Section) Lost {
 	for i < len(wanted) && i < len(kept) && wanted[i] == kept[i] {
 		i++
 	}
-	if i == len(wanted) && i == len(kept) {
+	if i == len(wanted) { // all of the ad is there, and maybe more: none of it lost
 		return Lost{}
-	}
-	if i == len(wanted) { // the sections have more than the ad: none of it lost
-		i = len(wanted) - 1
 	}
 	// at maps each letter of wanted to its place in shown.
 	start := max(0, at[i]-40)
@@ -267,6 +264,9 @@ func visibleText(src string) (string, []int) {
 // appendLetters appends the letters and digits of s to rs, in lower case.
 func appendLetters(rs []rune, s string) []rune {
 	for _, r := range s {
+		if r >= 0xFF01 && r <= 0xFF5E { // full-width forms, as cleaning folds them
+			r -= 0xFEE0
+		}
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			rs = append(rs, unicode.ToLower(r))
 		}

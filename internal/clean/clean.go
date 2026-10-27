@@ -39,12 +39,15 @@ var fold = map[rune]string{
 	0x2010: "-", 0x2011: "-", 0x2012: "-", 0x2013: "-", 0x2212: "-", 0xFE63: "-",
 	0x2014: " -- ", 0x2015: " -- ",
 	0x2026: "...",
+	0x00B4: "'", '`': "'", // an acute accent and a backtick, used as apostrophes
 }
 
-// gone reports whether r goes: a symbol other than a currency sign, a
-// bullet, or a character no one sees.
+// gone reports whether r goes: a symbol other than a currency sign or
+// the degree sign, a bullet, or a character no one sees.
 func gone(r rune) bool {
 	switch {
+	case r == 0x00B0: // the degree sign: "30°C"
+		return false
 	case unicode.Is(unicode.So, r), unicode.Is(unicode.Sk, r), unicode.Is(unicode.Co, r), unicode.Is(unicode.Cf, r):
 		return true // emoji, pictographs, modifiers, private use (Word's bullet), zero-width
 	case unicode.IsControl(r) && r != '\n' && r != '\t':
@@ -67,7 +70,10 @@ func gone(r rune) bool {
 func Text(s string) string {
 	var b strings.Builder
 	for _, r := range s {
+		f, folds := fold[r] // before gone, as some it folds are symbols
 		switch {
+		case folds:
+			b.WriteString(f)
 		case gone(r):
 			continue
 		case unicode.IsSpace(r):
@@ -75,11 +81,7 @@ func Text(s string) string {
 		case r >= 0xFF01 && r <= 0xFF5E: // full-width forms of ASCII
 			b.WriteRune(r - 0xFEE0)
 		default:
-			if f, ok := fold[r]; ok {
-				b.WriteString(f)
-			} else {
-				b.WriteRune(r)
-			}
+			b.WriteRune(r)
 		}
 	}
 	return strings.Join(strings.Fields(b.String()), " ")
@@ -94,6 +96,9 @@ func Text(s string) string {
 func Line(s string) (text, added string) {
 	if mark, rest := asciiBullet(s); mark != "" {
 		s = rest // "*Servicing…" and "- Full-time…" lose their bullet
+		if t := strings.TrimSpace(s); strings.HasSuffix(t, mark) {
+			s = strings.TrimSuffix(t, mark) // "* Hiring now *" is decoration
+		}
 	}
 	text = Text(s)
 	label := opening(s)
@@ -102,6 +107,28 @@ func Line(s string) (text, added string) {
 	}
 	added = label + ": "
 	return added + text, added
+}
+
+// Lead returns a line's bold lead, cleaned as Text cleans it, and the
+// line, as Line cleaned it, made to agree: if the line lost a bullet the
+// lead opened with, the lead loses it too ("*Please note" of "*Please
+// note:- …"), and if the lead closes with the same mark, the marks are
+// emphasis, and the closing one goes from both ("*Recommend a friend* -
+// …" is "Recommend a friend - …").
+func Lead(lead, line string) (string, string) {
+	l := Text(lead)
+	if strings.HasPrefix(line, l) {
+		return l, line
+	}
+	mark, rest := asciiBullet(lead)
+	if mark == "" {
+		return l, line
+	}
+	l = Text(rest)
+	if inner := strings.TrimSpace(strings.TrimSuffix(l, mark)); inner != l && strings.HasPrefix(line, l) {
+		return inner, inner + line[len(l):]
+	}
+	return l, line
 }
 
 // values say what a label's value has in it, so that a heading after a
@@ -116,11 +143,14 @@ var values = map[string][]string{
 
 // fits reports whether text could be a value of label: a location can be
 // anything, and the others need a figure or one of their values' words.
+// Pay's figure must open the text, as "What we offer in 2025" isn't pay.
 func fits(label, text string) bool {
-	if label == "Location" {
+	switch first, _ := utf8.DecodeRuneInString(text); {
+	case label == "Location":
 		return true
-	}
-	if strings.ContainsFunc(text, unicode.IsDigit) {
+	case label == "Pay" && unicode.IsDigit(first):
+		return true
+	case label != "Pay" && strings.ContainsFunc(text, unicode.IsDigit):
 		return true
 	}
 	lower := strings.ToLower(text)

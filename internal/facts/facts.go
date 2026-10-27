@@ -45,18 +45,22 @@ grammar Pay {
     token num    { \d+ [ ',' \d ** 3 ]* [ '.' \d+ ]? }
     token sep    { \s* [ '-' | :i to ] \s* }
     token period { \s* :i [ 'p.a.' | 'p/a' | pa | per \s+ annum | per \s+ year | a \s+ year | annually
-                          | per \s+ hour | an \s+ hour | 'p/h' | phr | ph | hourly
+                          | per \s+ hour | per \s+ hr | an \s+ hour | 'p/hr' | 'p/h' | '/hr' | '/hour' | phr | ph | hourly
                           | per \s+ day | a \s+ day | daily
                           | per \s+ week | a \s+ week | weekly
                           | per \s+ month | a \s+ month | monthly ] >> }
 }`)
 
-// hours is hours of work: "40hrs pw", "37.5 hours per week".
+// hours is hours of work: "40hrs pw", "37.5 hours per week", "12 hours
+// per day", "40 hours". A bare "h" is hours only with a period after it,
+// as "24h support" isn't.
 var hours = grammar.MustCompile(`
 grammar Hours {
-    token TOP  { <num> \s* :i [ hours | hrs | hr | h ] >> [ \s* <week> ]? }
+    token TOP  { <num> \s* :i [ [ hours | hrs | hr ] >> [ \s* <per> ]? | h >> \s* <per> ] }
     token num  { \d+ [ '.' \d+ ]? }
+    token per  { <week> | <day> }
     token week { :i [ per \s+ week | pw | 'p/w' | a \s+ week | weekly ] >> }
+    token day  { :i [ per \s+ day | a \s+ day | daily | per \s+ shift ] >> }
 }`)
 
 // patterns are the work patterns and arrangements, each rule its
@@ -119,7 +123,14 @@ func Find(line string) []Fact {
 		}
 	}
 	for _, m := range all(hours, line) {
-		v := map[string]string{"per_week": number(m.At("num.~").Str())}
+		n := number(m.At("num.~").Str())
+		v := map[string]string{"hours": n} // with no period, just hours
+		switch {
+		case m.At("per.week").Defined():
+			v = map[string]string{"per_week": n}
+		case m.At("per.day").Defined():
+			v = map[string]string{"per_day": n}
+		}
 		fs = append(fs, fact("hours", m, v))
 	}
 	for _, m := range all(pattern, line) {
@@ -160,6 +171,11 @@ func payOf(m *scalar.SV) (Fact, bool) {
 	v := map[string]string{"min": amount(m.At("min"))}
 	if m.At("max").Defined() {
 		v["max"] = amount(m.At("max"))
+		// "£25-28k": the k of the top figure is the bottom's too.
+		if m.At("max.k").Defined() && !m.At("min.k").Defined() {
+			n, _ := strconv.ParseFloat(v["min"], 64)
+			v["min"] = strconv.FormatFloat(n*1000, 'f', -1, 64)
+		}
 	}
 	if m.At("upto").Defined() && !m.At("max").Defined() {
 		v["max"], v["min"] = v["min"], "" // "up to £30k" is a most, not a least
@@ -196,7 +212,7 @@ func number(s string) string {
 func periodOf(s string) string {
 	s = strings.ToLower(strings.TrimSpace(s))
 	switch {
-	case strings.Contains(s, "hour"), s == "ph", s == "phr", s == "p/h":
+	case strings.Contains(s, "hour"), strings.HasSuffix(s, "hr"), s == "ph", s == "p/h":
 		return "hour"
 	case strings.Contains(s, "day") || strings.Contains(s, "daily"):
 		return "day"

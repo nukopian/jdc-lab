@@ -304,3 +304,23 @@ func TestWording(t *testing.T) {
 		t.Errorf("benefits: %+v; boilerplate %q", ben, kind(cs, Boilerplate).Text)
 	}
 }
+
+// Faults found in the wash-up: a work pattern with a word or two after
+// it is no line of facts, unless the line is laid out as a list of them.
+func TestFactLineWashUp(t *testing.T) {
+	for line, want := range map[string]bool{
+		"Contract administration": false,
+		"Remote team":             false,
+		"Temporary staff":         false,
+		"Leeds | Permanent":       true,
+		"Permanent":               true,
+	} {
+		if got := factLine(line, facts.Find(line)); got != want {
+			t.Errorf("factLine(%q) = %t, want %t", line, got, want)
+		}
+	}
+	// A block of text that starts with a line break keeps its first line.
+	if got := block("\n x\ny", "      "); !strings.Contains(got, "x") {
+		t.Errorf("block lost text: %q", got)
+	}
+}

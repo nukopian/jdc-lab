@@ -34,7 +34,7 @@ the representation that suits it:
   location, contract type and working pattern.
 - **Taxonomy links** for skills and occupations.
 - **Embeddings** only for the prose that carries meaning for search:
-  the summary, the responsibilities and the requirements.
+  the summary, the role, the responsibilities and the requirements.
 
 The rule throughout is to use the cheapest technique that is accurate
 enough. Rules and grammars come first, then taxonomies, then
@@ -44,12 +44,13 @@ embeddings, and a large language model only where those fall short.
 
 - **A pipeline, by rules alone.** It splits each ad into the blocks a
   reader sees, finds its headings and fields, divides it into sections
-  (summary, responsibilities, requirements, benefits and the rest), and
+  (summary, role, responsibilities, requirements, benefits and the
+  rest), and
   finds the boilerplate that ads repeat whatever the job. Grammars read
   the facts ads state, pay, hours, work pattern, schedule and postcode,
   as values. `chunk` shows any ad's chunks, saying what to embed, what
   becomes metadata, and what placed each, and each
-  run shows 20 ads in their sections, the same in every run, to read by
+  run shows 20 ads in their chunks, the same in every run, to read by
   eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
   what it measured, and how to improve it.
 - **Measured on two samples** of 2,000 and 5,000 ads, from different
@@ -61,8 +62,7 @@ embeddings, and a large language model only where those fall short.
   search can improve while embedding less. A third of ads state a working pattern, such as
   "Monday to Friday, 9am–5pm": a fact for metadata, not embedding.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: now, finishing the chunker, with requirements and
-  responsibilities placed by their wording, the title split off, and
+  and why: now, finishing the chunker, with the title split off, and
   pages showing ads before and after; then boilerplate's verdict made
   right both ways.
 - **Retrieval** has had a first test: with job titles as queries, an

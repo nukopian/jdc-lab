@@ -71,6 +71,9 @@ func TestOf(t *testing.T) {
 		{"As a Shift Engineer, you will:", Responsibilities},
 		{"Shift Manager - About the Role", Role},
 		{"Tasks", Responsibilities},
+		// A longer phrase wins over the two in it: duties, not what's
+		// required.
+		{"Duties required", Responsibilities},
 		{"Candidates will also require:", Requirements},
 		{"What's in it for me?", Benefits},
 		// From the second sample.

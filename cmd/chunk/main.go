@@ -9,7 +9,11 @@
 // An AD is an ad's ID in the run's ads, or a file of an ad's HTML, or "-"
 // for HTML on standard input; -title gives a file's title, which the
 // chunker uses to find the ad repeating it. Boilerplate is what the run's
-// boilerplate/repeated.tsv says it is, so run the pipeline first. It
+// boilerplate/repeated.tsv says it is, so run the pipeline first. That's
+// quicker than reading every ad again, as the boilerplate stage does, but
+// it misses what that stage finds with the ad's own title and place
+// taken out, or as a near-copy: the view, which reads every ad, finds
+// those too, so its chunks can gather more boilerplate than these. It
 // prints each ad's chunks as text to read; with -json as one JSON object
 // a line, for programs; or with -yaml as a YAML document each, for
 // people, each chunk's text a block of its lines.
@@ -69,14 +73,7 @@ func main() {
 			log.Fatal(err)
 		}
 		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
-		whole := 0
-		for _, s := range ss {
-			whole += chunk.Tokens(s.Heading)
-			for _, p := range s.Parts {
-				whole += chunk.Tokens(p.Text)
-			}
-		}
-		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, whole)
+		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, chunk.Whole(ss))
 		if *asYAML {
 			fmt.Fprintln(w, "---")
 			if err := c.WriteYAML(w); err != nil {

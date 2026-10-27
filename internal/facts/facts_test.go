@@ -50,3 +50,25 @@ func TestFindLabelledPay(t *testing.T) {
 		t.Errorf("got %s", got)
 	}
 }
+
+// Faults found in the wash-up.
+func TestFindWashUp(t *testing.T) {
+	tests := []struct{ line, want string }{
+		// The k of a range's top figure is the bottom's too.
+		{"£25-28k per annum", `pay "£25-28k per annum" map[currency:GBP max:28000 min:25000 period:year]`},
+		{"£25 - 28k", `pay "£25 - 28k" map[currency:GBP max:28000 min:25000]`},
+		// Hours a day aren't hours a week; hours with no period say so.
+		{"12 hours per day", `hours "12 hours per day" map[per_day:12]`},
+		{"Guaranteed 40 hours", `hours "40 hours" map[hours:40]`},
+		// A bare h is hours only with a period: "24h support" isn't.
+		{"24h support", ""},
+		// More ways to write an hourly rate.
+		{"£12.50/hr", `pay "£12.50/hr" map[currency:GBP min:12.5 period:hour]`},
+		{"£14 per hr", `pay "£14 per hr" map[currency:GBP min:14 period:hour]`},
+	}
+	for _, tt := range tests {
+		if got := show(Find(tt.line)); got != tt.want {
+			t.Errorf("Find(%q):\n got %s\nwant %s", tt.line, got, tt.want)
+		}
+	}
+}

@@ -190,7 +190,7 @@ returns them as **parts**:
 | Role | How it's recognised | Example |
 |---|---|---|
 | `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day (a bare range of hours, such as 8-5, only beside a range of days); no pattern of work ("4 on 4 off", or days or nights beside a range of days) unless it ends in `:`; not ending in `.` | "**Key Responsibilities**" |
-| `field` | "Label: value" or "Label \| value", where the label is a known one | "Hours: 40 per week" |
+| `field` | "Label: value", "Label \| value" or "Label - value", where the label is a known one | "Hours: 40 per week" |
 | `repeat` | only the ad's title or location again | "**Delivery Driver**" at the top |
 | `text` | everything else | |
 
@@ -387,7 +387,7 @@ section it's in, and its verdict.
 
 The figures say how much moved, not what a change did to real ads, and
 reading ads is how most faults are found. So each run also writes
-`view/ads.md`: 20 of the sample's ads in their chunked form, in
+`view/ads.md`: 20 of the run's ads in their chunked form, in
 Markdown, to read in an editor's preview or as text, exactly as `chunk`
 makes them (see [Chunking an ad](#chunking-an-ad)): each chunk with its
 kind, heading, use, size and what placed it, its lines, a list's items
@@ -402,13 +402,13 @@ one with text in no section or out of order (below), each where none of
 the others shown is one already. A change to the pipeline can change
 those four, but never the sixteen, nor any ad's place among them.
 
-It also checks every ad of the sample, comparing the letters and digits
+It also checks every ad of the run, comparing the letters and digits
 of what its HTML shows with those of its sections. Text in no section
 should never happen. Text out of the ad's order does, in 20 ads of the
 three samples: a list item that holds a list or paragraphs of its own
 comes out after the blocks that follow it, so its text lands under the
 wrong heading. The view shows where, for each ad it has, and the
-summary counts both over the sample.
+summary counts both over the run.
 
 ## Chunking an ad
 
@@ -430,8 +430,8 @@ The text is to read at a glance, JSON (`-json`, a line an ad) is for
 programs, and YAML (`-yaml`, a document an ad) is for people who want
 the structure too: each chunk's text is a block of its lines.
 
-The summary, responsibilities, requirements and desirable chunks are
-embedded; details are metadata, with their fields; benefits, company,
+The summary, role, responsibilities, requirements and desirable chunks
+are embedded; details are metadata, with their fields; benefits, company,
 apply and legal are left out. Text found as boilerplate leaves the
 embedded chunks for a **boilerplate** chunk of its own, at the end,
 left out, each line with the section it came from: the verdict takes
@@ -443,10 +443,15 @@ heading is mapping still to do; its fields become a details chunk.
 Each ad totals its tokens, its embedded tokens and its unclassified
 ones (the unmapped text), so the last shows what's left to map. The
 chunks come in a fixed order: summary, role, responsibilities and
-requirements first, then the rest as the ad has them, and the
-boilerplate last. Boilerplate is what the run's
+requirements first, then the rest in the ad's order, the chunks of
+lines placed by their wording and of lines of facts after its own, and
+the boilerplate last. Boilerplate is what the run's
 `boilerplate/repeated.tsv` says, so a run comes first (`-run` chooses
-which, `data/runs/latest` by default). What placed a chunk is the
+which, `data/runs/latest` by default). That's quicker than reading
+every ad again, but the table has only texts as written, so `chunk`
+misses boilerplate the stage finds with the ad's own title or place
+taken out, or as a near-copy; the view, which reads every ad, finds
+those too, and so can gather more. What placed a chunk is the
 heading and the phrase in it that won, with any phrases of other kinds
 it outranked, or the rule (`it starts "why"`), or that nothing came
 before it, so a wrong kind points at the line of `headings.txt` to
@@ -480,19 +485,23 @@ in Raku's grammar syntax, so a rule reads much as the text it matches:
 | Fact | Reads | Values |
 |---|---|---|
 | pay | "£45k - £55,000 per annum", "£12.71ph", "50,000pa"; a bare figure after a pay label, "Pay Rate - 13.10" | `min`, `max`, `currency`, `period` |
-| hours | "40hrs pw", "37.5 hours per week" | `per_week` |
+| hours | "40hrs pw", "37.5 hours per week", "12 hours per day", "40 hours" | `per_week`, `per_day`, or `hours` with no period |
 | pattern | "Full-time", "Permanent", "Temp to perm", "Hybrid", from a word list of canonical values | `value` |
 | schedule | "Monday to Friday, 8am - 5pm", "Mon-Fri 07:00-15:30", "M-F 8-4", "4 on 4 off" | `days`, `times`, `rota` |
 | location | a UK postcode, "NE8 1AQ" | `postcode` |
 
 A figure is pay only with a currency sign or a period ("5 years" isn't),
-a bare range of hours a time only after a range of days. The chunker
+and in a range, "£25-28k", the top figure's k is the bottom's too; a
+bare "h" is hours only with a period after it ("24h support" isn't); a
+bare range of hours is a time only after a range of days. The chunker
 takes a **line of facts** out of an embedded chunk, or an unmapped
 section, into a details chunk of its own, with each fact and its
 values: a line with a postcode in it, of at most 30 words; or one that
 starts with a fact, in its first three words, of at most 25 words, not
 a sentence or a question, and, if its only facts are work patterns,
-with at most two other words. A details chunk keeps its lines, and
+which sentences use too, nothing else, or at most two other words set
+apart by "|", "," or "/": "Leeds | Permanent" is a line of facts,
+"Contract administration" isn't. A details chunk keeps its lines, and
 gains the facts read from them. A known field label followed by " - "
 is a field, as one followed by a colon is.
 
@@ -720,15 +729,15 @@ with no section but the summary, 4%.
 | role | 8% | 8% |
 | responsibilities | 18% | 2% |
 | requirements | 20% | 11% |
-| desirable | 2% | 8% |
-| benefits | 12% | 37% |
+| desirable | 2% | 7% |
+| benefits | 13% | 38% |
 | company | 3% | 50% |
 | apply | 3% | 56% |
 | legal | 1% | 83% |
 | details | 2% | 18% |
 | unmapped | 12% | 25% |
 
-Boilerplate is 17.6% of the text, and template for the job 3.1%; with
+Boilerplate is 17.6% of the text, and template for the job 3.2%; with
 the company, apply and legal text that isn't boilerplate, about a fifth
 of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching
@@ -754,7 +763,7 @@ by word for word matching, the third 15.1% (idea 12 on the roadmap).
 | Rule order as ranking | Which kind wins is data too, changed by moving a line. |
 | "Why" headings are benefits | They pitch the job to the reader, whatever words follow "why". |
 | Unmapped and details sections | So what's left to map shows, and the job's terms are kept together for grammars. |
-| "The role" is summary | What follows is usually an overview; to revisit with more evidence. |
+| Role apart from summary | What the job is, under "About the role", isn't the ad's opening or its introductions; both are embedded, but apart. |
 | Title groups for advertisers | The ads don't say who placed them; different jobs is what makes text boilerplate. |
 | Ties go to template | Keeping job text in an embedding is the safer mistake. |
 

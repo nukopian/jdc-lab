@@ -294,7 +294,6 @@ func (b *builder) add(block Block) {
 	b.blocks = append(b.blocks, block)
 }
 
-// finish ends whatever is open at the end of the HTML.
 // bulleted makes each run of two or more paragraphs or lines that open
 // with the same bullet a list, each an item: ads lay lists out so as
 // often as with list tags.
@@ -320,6 +319,7 @@ func bulleted(bs []Block) []Block {
 	return out
 }
 
+// finish ends whatever is open at the end of the HTML.
 func (b *builder) finish() {
 	if b.inItem || b.list > 0 {
 		b.endItem()
@@ -407,7 +407,7 @@ func (p *piece) take() (Item, bool) {
 	it := Item{Text: text, Cues: Cues{Added: added, Bullet: clean.Bullet(p.text.String())}}
 	it.Cues.Bold = p.bold && !p.plain
 	if p.bold && p.plain && p.leadDone {
-		it.Cues.BoldLead = clean.Text(p.lead.String())
+		it.Cues.BoldLead, it.Text = clean.Lead(p.lead.String(), text)
 	}
 	ok := visible(text)
 	*p = piece{}
