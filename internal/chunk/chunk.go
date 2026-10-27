@@ -87,7 +87,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 					lines = append(lines, line(p))
 					continue
 				}
-				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, line(p)))
+				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, p.Text))
 				unmapped += Tokens(p.Text)
 			}
 			if len(d.Fields) > 0 {
@@ -104,7 +104,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		}
 		for _, p := range s.Parts {
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
-				gathered = append(gathered, string(s.Kind)+": "+line(p))
+				gathered = append(gathered, string(s.Kind)+": "+p.Text) // the gathered lines are a list
 				continue
 			}
 			if p.Role == headings.Field {

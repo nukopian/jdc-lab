@@ -1,7 +1,7 @@
 // Command view writes a cross-section of a sample's ads in their chunked
 // form, for reading by eye (see internal/view): about 20 ads, the same in
-// every run, each with its sections, fields, repeats and boilerplate
-// marked, and the text no heading placed. Ads whose HTML is the same as
+// every run, each as the chunker (internal/chunk) makes it, so the view
+// and the chunk command show the same thing. Ads whose HTML is the same as
 // an earlier one's are left out.
 //
 // It writes OUTDIR/ads.md, and prints a summary: how the ads were chosen,
@@ -25,6 +25,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/boilerplate"
+	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
 	"github.com/nukopian/jdc-lab/internal/view"
@@ -50,24 +51,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// verdict says what boilerplate found the texts of an ad to be.
-	verdict := func(a ads.Ad) func(string) view.Verdict {
+	// isBoilerplate says whether a text of an ad is boilerplate.
+	isBoilerplate := func(a ads.Ad) func(string) bool {
 		src := boilerplate.SourceOf(a)
-		return func(text string) view.Verdict {
-			switch {
-			case !ix.Repeated(src, text):
-				return view.Own
-			case ix.Boilerplate(src, text):
-				return view.Boilerplate
-			}
-			return view.Template
-		}
+		return func(text string) bool { return ix.Boilerplate(src, text) }
 	}
 	cs := make([]view.Candidate, len(all))
 	lost := make([]view.Lost, len(all))
 	missing, moved := 0, 0
 	for i, c := range all {
-		cs[i] = candidate(c, verdict(c.ad))
+		cs[i] = candidate(c, isBoilerplate(c.ad))
 		switch lost[i] = view.Missing(c.ad.HTML, c.ss); {
 		case lost[i].Moved:
 			moved++
@@ -79,7 +72,7 @@ func main() {
 	picked := view.Pick(cs, shown)
 
 	path := filepath.Join(dir, "ads.md")
-	if err := write(path, all, picked, verdict, lost); err != nil {
+	if err := write(path, all, picked, isBoilerplate, lost); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%d ads (%d duplicates left out); %d shown in %s\n\n", len(all), dups, len(picked), path)
@@ -131,7 +124,7 @@ func read(source string) (all []chunked, ix boilerplate.Index, dups int, err err
 }
 
 // candidate says what makes an ad worth showing.
-func candidate(c chunked, verdict func(string) view.Verdict) view.Candidate {
+func candidate(c chunked, isBoilerplate func(string) bool) view.Candidate {
 	can := view.Candidate{ID: c.ad.ID, NoHeading: true}
 	chars, boiler := 0, 0
 	for _, s := range c.ss {
@@ -146,7 +139,7 @@ func candidate(c chunked, verdict func(string) view.Verdict) view.Candidate {
 				continue
 			}
 			chars += len(p.Text)
-			if verdict(p.Text) == view.Boilerplate {
+			if isBoilerplate(p.Text) {
 				boiler += len(p.Text)
 			}
 		}
@@ -156,7 +149,7 @@ func candidate(c chunked, verdict func(string) view.Verdict) view.Candidate {
 }
 
 // write writes the picked ads to path, in the order picked.
-func write(path string, all []chunked, picked []int, verdict func(ads.Ad) func(string) view.Verdict, lost []view.Lost) (err error) {
+func write(path string, all []chunked, picked []int, isBoilerplate func(ads.Ad) func(string) bool, lost []view.Lost) (err error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
@@ -172,7 +165,16 @@ func write(path string, all []chunked, picked []int, verdict func(ads.Ad) func(s
 	w := bufio.NewWriter(f)
 	fmt.Fprintf(w, "# %d ads in their sections\n\n", len(picked))
 	for _, i := range picked {
-		if err := view.Render(w, all[i].ad, all[i].ss, verdict(all[i].ad), lost[i]); err != nil {
+		a := all[i].ad
+		whole := 0
+		for _, s := range all[i].ss {
+			whole += chunk.Tokens(s.Heading)
+			for _, p := range s.Parts {
+				whole += chunk.Tokens(p.Text)
+			}
+		}
+		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(all[i].ss, isBoilerplate(a))}, whole)
+		if err := view.Render(w, a, c, lost[i]); err != nil {
 			return err
 		}
 	}

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
+	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
@@ -73,6 +74,7 @@ func TestRender(t *testing.T) {
 		{Kind: sections.Summary, Parts: []headings.Part{
 			{Role: headings.Repeat, Text: "Driver"},
 			{Role: headings.Text, Text: "We deliver *fast*."},
+			{Role: headings.Text, Text: "We are an equal opportunities employer."},
 		}},
 		{Kind: sections.Details, Heading: "Details", Parts: []headings.Part{
 			{Role: headings.Field, Text: "Salary: £30,000", Key: "salary", Value: "£30,000"},
@@ -80,55 +82,47 @@ func TestRender(t *testing.T) {
 			{Role: headings.Text, Text: "Weekends off", Item: true},
 			{Role: headings.Text, Text: "Start soon."},
 		}},
-		{Kind: sections.Unmapped, Heading: "Our depots"},
-		{Kind: sections.Apply, Heading: "How to apply", ByName: true, Parts: []headings.Part{
-			{Role: headings.Text, Text: "We are an equal opportunities employer."},
-			{Role: headings.Text, Text: "Apply by Friday."},
-		}},
 	}
-	verdict := func(text string) Verdict {
-		switch text {
-		case "We are an equal opportunities employer.":
-			return Boilerplate
-		case "Apply by Friday.":
-			return Template
-		}
-		return Own
-	}
+	boiler := func(s string) bool { return s == "We are an equal opportunities employer." }
+	c := chunk.Totalled(chunk.Ad{ID: ad.ID, Title: ad.Title, Chunks: chunk.Of(ss, boiler)}, 30)
 	var b strings.Builder
-	if err := Render(&b, ad, ss, verdict, Lost{}); err != nil {
+	if err := Render(&b, ad, c, Lost{}); err != nil {
 		t.Fatal(err)
 	}
 	got := b.String()
 	for _, want := range []string{
 		"## Driver · 7\n\nLeeds\n\n",
-		"### summary · no heading, placed by default\n\n*repeat* Driver\n\nWe deliver \\*fast\\*.\n\n",
-		"### details · “Details”\n\n*field* Salary: £30,000\n\n- \\- Days only\n- Weekends off\n\nStart soon.\n\n",
-		"### unmapped · “Our depots” · no kind known\n\n*(nothing under it)*\n\n",
-		"### apply · “How to apply” · a plain line naming it\n\n",
-		"> *boilerplate* We are an equal opportunities employer.\n\n",
-		"> *template* Apply by Friday.\n\n",
+		"*about 30 tokens: 5 embedded (16%), 0 unclassified (0%)*\n\n",
+		"### summary · embed · 5 tokens\n\n*placed by nothing before it: summary by default*\n\nDriver\n\nWe deliver \\*fast\\*.\n\n",
+		"### details · “Details” · metadata · ",
+		"Salary: £30,000\n\n- \\- Days only\n- Weekends off\n\nStart soon.\n\n",
+		"### boilerplate · leave out · ",
+		"- summary: We are an equal opportunities employer.\n",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("Render's output lacks %q; it was:\n%s", want, got)
 		}
 	}
+	if strings.Contains(got, "\nDetails\n") {
+		t.Error("a chunk's heading is shown twice")
+	}
 	if strings.Contains(got, "not in any section") {
 		t.Error("nothing is missing, but Render says something is")
 	}
-	b.Reset()
-	if err := Render(&b, ad, ss, verdict, Lost{Context: "…lost words…"}); err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(b.String(), "### not in any section\n\n…lost words…\n\n") {
-		t.Errorf("Render doesn't show what's missing:\n%s", b.String())
-	}
-	b.Reset()
-	if err := Render(&b, ad, ss, verdict, Lost{Context: "…moved words…", Moved: true}); err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(b.String(), "### out of the ad's order\n\n…moved words…\n\n") {
-		t.Errorf("Render doesn't show what moved:\n%s", b.String())
+	for _, tt := range []struct {
+		lost Lost
+		want string
+	}{
+		{Lost{Context: "…lost words…"}, "### not in any section\n\n…lost words…\n\n"},
+		{Lost{Context: "…moved words…", Moved: true}, "### out of the ad's order\n\n…moved words…\n\n"},
+	} {
+		b.Reset()
+		if err := Render(&b, ad, c, tt.lost); err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(b.String(), tt.want) {
+			t.Errorf("Render lacks %q:\n%s", tt.want, b.String())
+		}
 	}
 }
 

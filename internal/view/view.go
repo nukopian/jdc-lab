@@ -1,8 +1,7 @@
-// Package view shows ads in their chunked form, for reading by eye: each
-// section with its kind and heading, its fields, repeats and list items,
-// and the text found as boilerplate or a template marked where it sits.
-// It also shows what no heading placed (the opening that's summary only
-// because nothing headed it, and unmapped sections), and any of an ad's
+// Package view shows ads in their chunked form, for reading by eye, as the
+// chunker makes them (internal/chunk): each chunk with its kind and
+// heading, what's done with it, its size and what placed it, its lines,
+// and the boilerplate gathered at the end. It also shows any of an ad's
 // text that's in no section at all, or out of the ad's order.
 //
 // The ads shown are chosen by a fixed hash of their IDs, so that every
@@ -22,7 +21,7 @@ import (
 	"golang.org/x/net/html"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
-	"github.com/nukopian/jdc-lab/internal/headings"
+	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
 
@@ -99,49 +98,55 @@ func rank(id string) uint64 {
 	return h.Sum64()
 }
 
-// A Verdict says what boilerplate found a text to be.
-type Verdict int
-
-const (
-	// Own is text of the ad's own.
-	Own Verdict = iota
-	// Boilerplate is text ads repeat whatever the job.
-	Boilerplate
-	// Template is text repeated across ads for similar jobs.
-	Template
-)
-
-// Render writes an ad and its sections to w as Markdown. verdict says
-// what each text part is; lost is what Missing found, shown at the end
-// when there is some.
-func Render(w io.Writer, ad ads.Ad, ss []sections.Section, verdict func(string) Verdict, lost Lost) error {
+// Render writes an ad's chunks to w as Markdown, as the chunker made them
+// (internal/chunk): each with its kind, heading, use, tokens and what
+// placed it, then its lines, a list's items as a list. lost is what
+// Missing found, shown at the end when there is some.
+func Render(w io.Writer, ad ads.Ad, c chunk.Ad, lost Lost) error {
 	var b strings.Builder
 	fmt.Fprintf(&b, "## %s · %s\n\n", escape(ad.Title), ad.ID)
 	if ls := slices.Compact(ad.Locations()); len(ls) > 0 {
 		fmt.Fprintf(&b, "%s\n\n", escape(strings.Join(ls, " · ")))
 	}
-	for _, s := range ss {
-		b.WriteString("### " + string(s.Kind))
-		switch {
-		case s.Heading == "":
-			b.WriteString(" · no heading, placed by default")
-		case s.Kind == sections.Unmapped:
-			fmt.Fprintf(&b, " · “%s” · no kind known", escape(s.Heading))
-		case s.ByName:
-			fmt.Fprintf(&b, " · “%s” · a plain line naming it", escape(s.Heading))
-		default:
-			fmt.Fprintf(&b, " · “%s”", escape(s.Heading))
+	share := func(n int) int {
+		if c.Tokens == 0 {
+			return 0
 		}
-		b.WriteString("\n\n")
-		if len(s.Parts) == 0 {
+		return 100 * n / c.Tokens
+	}
+	fmt.Fprintf(&b, "*about %d tokens: %d embedded (%d%%), %d unclassified (%d%%)*\n\n",
+		c.Tokens, c.Embedded, share(c.Embedded), c.Unclassified, share(c.Unclassified))
+	for _, ch := range c.Chunks {
+		b.WriteString("### " + string(ch.Kind))
+		if ch.Heading != "" {
+			fmt.Fprintf(&b, " · “%s”", escape(ch.Heading))
+		}
+		fmt.Fprintf(&b, " · %s · %d tokens\n\n*placed by %s*\n\n", ch.Use, ch.Tokens, escape(ch.PlacedBy))
+		lines := strings.Split(ch.Text, "\n")
+		if ch.Heading != "" && len(lines) > 0 && lines[0] == ch.Heading {
+			lines = lines[1:] // the heading is the chunk's own heading, above
+		}
+		if len(lines) == 0 || lines[0] == "" && len(lines) == 1 {
 			b.WriteString("*(nothing under it)*\n\n")
 		}
-		for i, p := range s.Parts {
-			b.WriteString(part(p, verdict))
-			// A list's items run together, and a blank line ends it.
-			if p.Item && (i+1 == len(s.Parts) || !s.Parts[i+1].Item) {
-				b.WriteString("\n")
+		inList := false
+		for _, line := range lines {
+			// The boilerplate chunk's lines are a list of what was
+			// gathered; elsewhere a list's items start "- ".
+			item := ch.Kind == chunk.Boilerplate || strings.HasPrefix(line, "- ")
+			if item {
+				b.WriteString("- " + escape(strings.TrimPrefix(line, "- ")) + "\n")
+				inList = true
+				continue
 			}
+			if inList {
+				b.WriteString("\n") // a blank line ends the list
+				inList = false
+			}
+			b.WriteString(escape(line) + "\n\n")
+		}
+		if inList {
+			b.WriteString("\n")
 		}
 	}
 	switch {
@@ -152,32 +157,6 @@ func Render(w io.Writer, ad ads.Ad, ss []sections.Section, verdict func(string) 
 	}
 	_, err := io.WriteString(w, b.String())
 	return err
-}
-
-// part renders one part as a line of Markdown.
-func part(p headings.Part, verdict func(string) Verdict) string {
-	text := escape(p.Text)
-	switch p.Role {
-	case headings.Field:
-		text = "*field* " + text
-	case headings.Repeat:
-		text = "*repeat* " + text
-	case headings.Heading:
-		text = "*heading* " + text // as a section's first part, it heads nothing
-	}
-	quote := ""
-	if p.Role == headings.Text {
-		switch verdict(p.Text) {
-		case Boilerplate:
-			text, quote = "*boilerplate* "+text, "> "
-		case Template:
-			text, quote = "*template* "+text, "> "
-		}
-	}
-	if p.Item {
-		return quote + "- " + text + "\n"
-	}
-	return quote + text + "\n\n"
 }
 
 // escaper keeps an ad's own text from being read as Markdown.

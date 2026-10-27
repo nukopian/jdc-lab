@@ -387,11 +387,10 @@ section it's in, and its verdict.
 The figures say how much moved, not what a change did to real ads, and
 reading ads is how most faults are found. So each run also writes
 `view/ads.md`: 20 of the sample's ads in their chunked form, in
-Markdown, to read in an editor's preview or as text. Each section has
-its kind and heading, and says when no heading placed it (the opening
-before any heading, which is summary by default) or when its heading is
-of no known kind. Fields and repeats are marked, and so is the text
-found as boilerplate or a template, where it sits.
+Markdown, to read in an editor's preview or as text, exactly as `chunk`
+makes them (see [Chunking an ad](#chunking-an-ad)): each chunk with its
+kind, heading, use, size and what placed it, its lines, a list's items
+as a list, and the boilerplate gathered at the end.
 
 The ads are chosen by a fixed hash of their IDs, and written in its
 order, so a diff of two runs' views shows what a change did, ad by ad.

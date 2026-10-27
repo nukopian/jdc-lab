@@ -131,6 +131,12 @@ say how to run it.
   summary falls to 17% of the text, and ads with only a summary to 4%.
   Of 30 of the rarer lines checked, one was wrong ("Duties required"
   went to requirements).
+- **The view shows the chunker's chunks** (Iain, 2026-10-27): it had
+  marked boilerplate in every section, benefits included, where `chunk`
+  keeps it in sections not embedded and gathers the rest, so the two
+  showed one ad two ways. `view.Render` now lays out `chunk.Of`'s chunks,
+  with the ad's totals; the view keeps its choice of ads and its check
+  for text lost or moved.
 - **Chunks in a fixed order** (Iain, 2026-10-27): summary, role,
   responsibilities and requirements first, in that order, then the
   rest as the ad has them, and the boilerplate last.

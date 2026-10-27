@@ -132,7 +132,7 @@ func TestBoilerplateGathered(t *testing.T) {
 	ss := []sections.Section{
 		{Kind: sections.Benefits, Heading: "Perks", Parts: []headings.Part{text("A virtual GP."), text("A pension plan.")}},
 		{Kind: sections.Requirements, Heading: "You'll need", Parts: []headings.Part{text("A licence."), text("A pension plan.")}},
-		{Kind: sections.Summary, Parts: []headings.Part{text("We hire drivers."), text("A pension plan.")}},
+		{Kind: sections.Summary, Parts: []headings.Part{text("We hire drivers."), {Role: headings.Text, Text: "A pension plan.", Item: true}}},
 	}
 	cs := Of(ss, func(s string) bool { return s == "A pension plan." })
 	if len(cs) != 4 {
