@@ -306,9 +306,15 @@ starts an `unmapped` section: so the text under it counts as unmapped,
 rather than hiding in the section before, and unmapped's share of the
 text measures what's left to map.
 
-**A plain line** with no cue starts a section only if it's exactly a
-kind's phrase: `<p>Responsibilities</p>`, not "Our responsibilities to
-you".
+**A plain line** with no cue starts a section if it's exactly a
+kind's phrase, as `<p>Responsibilities</p>` is, or if it's short (up to
+`MaxListWords`, 6 words), not a sentence, has a kind's phrase in it, and
+a list follows it: a sub-heading such as "Highly Desirable" or
+"Essential Experience & Qualifications" among the requirements, or "Key
+Skills". "Our responsibilities to you" with no list after it stays text.
+The rule took 4,111 more lines as headings on the three samples; of a
+sample of 30 of the rarer ones, one was wrong ("Duties required",
+requirements by "required", over "duty").
 
 `cmd/sections` writes each ad's sections to `ads.jsonl` (a section
 started by a plain line is marked `by_name`), and three tables
@@ -659,24 +665,24 @@ and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
 **Headings.** 89% of ads have at least one heading. Headings of a known
-kind are 77% of heading uses; ads with every heading known, 53%; ads
-with no section but the summary, 5%.
+kind are 77% of heading uses; ads with every heading known, 54%; ads
+with no section but the summary, 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
 
 | Section | Of the text | Of it, boilerplate |
 |---|---:|---:|
-| summary | 19% | 11% |
-| role | 9% | 8% |
-| responsibilities | 16% | 2% |
-| requirements | 20% | 12% |
+| summary | 17% | 11% |
+| role | 8% | 8% |
+| responsibilities | 18% | 2% |
+| requirements | 20% | 11% |
 | desirable | 2% | 8% |
 | benefits | 12% | 37% |
-| company | 3% | 49% |
+| company | 3% | 50% |
 | apply | 3% | 56% |
 | legal | 1% | 83% |
-| details | 2% | 20% |
-| unmapped | 13% | 25% |
+| details | 2% | 18% |
+| unmapped | 12% | 25% |
 
 Boilerplate is 17.6% of the text, and template for the job 3.1%; with
 the company, apply and legal text that isn't boilerplate, about a fifth

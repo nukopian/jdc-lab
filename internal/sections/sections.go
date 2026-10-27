@@ -195,11 +195,16 @@ type Section struct {
 // heading are the summary. A heading of no known kind starts an Unmapped
 // section, even a sub-heading such as "Software Development" among the
 // requirements, so that what's left to map shows; a line of text that is
-// exactly a section's name, with no cue, starts that section.
+// exactly a section's name, with no cue, starts that section, as does a
+// short one with a kind's phrase in it before a list (see beforeList).
 func Divide(parts []headings.Part) []Section {
 	sections := []Section{{Kind: Summary}}
-	for _, p := range parts {
-		if kind, ok := starts(p); ok {
+	for i, p := range parts {
+		kind, ok := starts(p)
+		if !ok && i+1 < len(parts) && parts[i+1].Item {
+			kind, ok = beforeList(p)
+		}
+		if ok {
 			byName := p.Role != headings.Heading
 			sections = append(sections, Section{Kind: kind, Heading: p.Text, ByName: byName})
 			continue
@@ -211,6 +216,25 @@ func Divide(parts []headings.Part) []Section {
 		sections = sections[1:]
 	}
 	return sections
+}
+
+// MaxListWords is the most words a plain line before a list has to be
+// taken as the list's heading: a sub-heading such as "Highly Desirable".
+const MaxListWords = 6
+
+// beforeList reports whether p, a plain line followed by a list, heads
+// it: a short line, not a sentence, with a phrase of a kind of section,
+// as "Essential Experience & Qualifications" is.
+func beforeList(p headings.Part) (Kind, bool) {
+	text := strings.TrimSpace(p.Text)
+	if p.Role != headings.Text || p.Item || strings.HasSuffix(text, ".") {
+		return "", false
+	}
+	key := headings.Key(text)
+	if len(strings.Fields(key)) > MaxListWords || len(All(key)) == 0 {
+		return "", false
+	}
+	return Of(key)
 }
 
 // starts reports whether p starts a section, and of what kind.

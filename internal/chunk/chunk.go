@@ -179,7 +179,10 @@ func placedBy(s sections.Section) string {
 	case s.Heading == "":
 		return "nothing before it: summary by default"
 	case s.ByName:
-		return fmt.Sprintf("the line %q: exactly a section's name", s.Heading)
+		if _, ok := sections.Named(headings.Key(s.Heading)); ok {
+			return fmt.Sprintf("the line %q: exactly a section's name", s.Heading)
+		}
+		return fmt.Sprintf("the line %q, before a list: %s", s.Heading, sections.Explain(headings.Key(s.Heading)))
 	}
 	return fmt.Sprintf("the heading %q: %s", s.Heading, sections.Explain(headings.Key(s.Heading)))
 }

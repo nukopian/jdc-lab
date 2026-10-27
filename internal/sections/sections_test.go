@@ -211,3 +211,35 @@ func TestExplain(t *testing.T) {
 		}
 	}
 }
+
+// A short plain line with a section's phrase, followed by a list, starts
+// that section: a sub-heading such as "Highly Desirable" among the
+// requirements, or "Key Skills". Not followed by a list, or longer than a
+// heading's six words, or a sentence, it's text.
+func TestDivideLineBeforeAList(t *testing.T) {
+	html := `<p><strong>What We're Looking For</strong></p>` +
+		`<p>Essential Experience &amp; Qualifications</p><ul><li>Five years in post</li></ul>` +
+		`<p>Highly Desirable</p><ul><li>Higher Education</li></ul>` +
+		`<p>Desirable but not essential.</p><ul><li>A van</li></ul>` +
+		`<p>Key Skills</p><ul><li>Excel</li></ul>` +
+		`<p>Further desirable things we would love you to have</p><ul><li>A boat</li></ul>` +
+		`<p>Desirable</p><p>Not a list after it, but the line's a section's name.</p>`
+	var got []string
+	for _, s := range Divide(headings.Read(blocks.Split(html), "Manager")) {
+		line := fmt.Sprintf("%s %q:", s.Kind, s.Heading)
+		for _, p := range s.Parts {
+			line += fmt.Sprintf(" %s(%s)", p.Role, p.Text)
+		}
+		got = append(got, line)
+	}
+	want := []string{
+		`requirements "What We're Looking For":`,
+		`requirements "Essential Experience & Qualifications": text(Five years in post)`,
+		`desirable "Highly Desirable": text(Higher Education) text(Desirable but not essential.) text(A van)`,
+		`requirements "Key Skills": text(Excel) text(Further desirable things we would love you to have) text(A boat)`,
+		`desirable "Desirable": text(Not a list after it, but the line's a section's name.)`,
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("\n got: %q\nwant: %q", got, want)
+	}
+}

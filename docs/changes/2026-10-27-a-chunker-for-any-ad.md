@@ -122,6 +122,15 @@ say how to run it.
   boilerplate counts as describing the job, so its verdicts are as
   before.
 - **List items** are "- " entries in a chunk's text.
+- **Sub-headings before lists** (Iain, 2026-10-27): a short plain line,
+  not a sentence, with a kind's phrase, before a list, starts that
+  kind's section, so "Highly Desirable" and "Essential Experience &
+  Qualifications" split the requirements, and "Key Skills" joins them.
+  That's roadmap 6's plan. On the three samples, 4,111 more lines start
+  sections; responsibilities are found in 60% of ads, from 53%; the
+  summary falls to 17% of the text, and ads with only a summary to 4%.
+  Of 30 of the rarer lines checked, one was wrong ("Duties required"
+  went to requirements).
 - **Chunks in a fixed order** (Iain, 2026-10-27): summary, role,
   responsibilities and requirements first, in that order, then the
   rest as the ad has them, and the boilerplate last.

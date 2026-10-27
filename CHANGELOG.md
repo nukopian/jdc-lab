@@ -12,6 +12,11 @@ has the steps).
 
 ## Unreleased
 
+- A short plain line with a section's phrase, before a list, starts
+  that section: sub-headings such as "Highly Desirable", "Essential
+  Experience & Qualifications" and "Key Skills". On the three samples,
+  4,111 more lines start sections, responsibilities are found in 60%
+  of ads, from 53%, and the summary falls to 17% of the text.
 - Role is a kind of section of its own: what the job is, under "About
   the role", "Job description" and the like, apart from the summary,
   the ad's opening and its introductions. On the three samples, role
