@@ -25,7 +25,9 @@ has the steps).
 - Bold times of day, such as "- 2pm to 10pm" or "Monday to Friday,
   8:00am - 5:00pm", are no longer headings: 500 of 95,174 heading uses
   across the three samples, each of which had started a section of its
-  own, most of them unmapped (roadmap 2;
+  own, most of them unmapped. A bare range of hours, such as "8-5",
+  counts as a time beside a range of days, M-F among them, and
+  "9-5pm" implies am (roadmap 2;
   [record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md)).
 
 ## v0.3.5 (2026-10-27)

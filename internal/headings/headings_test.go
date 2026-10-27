@@ -156,6 +156,24 @@ func TestRead(t *testing.T) {
 				`text "08:00 starts"`, `text "Monday to Friday - 8.30-3.30"`},
 		},
 		{
+			// A bare range of hours, "8-5", is a time only beside a range of
+			// days, which M-F is too; with pm after it, am is implied.
+			"bold bare hours beside days are no headings",
+			`<p><b>Monday - Friday 8-5</b></p><p><b>M-F 8-4</b></p><p><b>Mon–Thu 7–3:30</b></p>` +
+				`<p><b>9-5pm</b></p><p><b>8-5 Monday - Friday</b></p>`,
+			[]string{`text "Monday - Friday 8-5"`, `text "M-F 8-4"`, `text "Mon–Thu 7–3:30"`,
+				`text "9-5pm"`, `text "8-5 Monday - Friday"`},
+		},
+		{
+			"bold bare ranges without days are headings",
+			`<p><b>Ages 5-11</b></p><p><b>Monday to Friday, 2-3 days in the office</b></p>` +
+				`<p><b>Mon-Sun, 10-12 hr shifts</b></p><p><b>Sunday to Thursday, 4-5 nights</b></p>`,
+			[]string{`heading "Ages 5-11" key="ages 5 11"`,
+				`heading "Monday to Friday, 2-3 days in the office" key="monday to friday 2 3 days in the office"`,
+				`heading "Mon-Sun, 10-12 hr shifts" key="mon sun 10 12 hr shifts"`,
+				`heading "Sunday to Thursday, 4-5 nights" key="sunday to thursday 4 5 nights"`},
+		},
+		{
 			// A figure with a point is a time only with am or pm, or in a
 			// range: 37.50 is hours, not half past.
 			"bold figures with a point aren't times",

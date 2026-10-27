@@ -53,6 +53,13 @@ The item was in Now from the roadmap's start, and its work was done on
   ("17:00"), or a range of hh.mm ("8.30-3.30"); a figure with a point
   and nothing more ("37.50") is not, as it's more often pay or hours.
   `TestRead` has a case for times, and one for figures that aren't.
+  After it shipped, still unreleased, the times took three cues from
+  how ads write working patterns. A bare range of hours, such as
+  "8-5", is a time beside a range of days, before or after it, as in
+  "Monday - Friday 8-5"; alone, as in "Ages 5-11", it isn't. M-F counts as
+  a range of days: in the ads, beside a time or pay, it always is one. With pm on the second
+  figure, as in "9-5pm", am is implied. A count stays a count whatever
+  is beside it: "2-3 days", "10-12 hr shifts", "4-5 nights".
 - **Measurements:** runs `before` and `after`, compared. Across all
   three samples, heading uses fell from 95,174 to 94,674: 500 uses of
   365 headings, 326 of them unmapped. The other 39 had been mapped to
@@ -65,8 +72,19 @@ The item was in Now from the roadmap's start, and its work was done on
   second sample, ads with every heading known rose from 51% to 52%,
   and PIPELINE's What it measured has the new figures.
 - **Tried and reverted:** nothing.
+- **The cues, measured:** runs before and after them, compared. One
+  heading went, "Monday - Friday 9-5", in one ad: bold headings with a
+  bare range of hours are rare. In the ads' text, where a later
+  grammar for working patterns will look (roadmap 7), bare ranges
+  beside a range of days are 144 uses in 120 ads, "9-5pm" with am
+  implied 108 uses in 96 ads, and M-F beside a time or pay 11 uses in
+  8 ads.
 - **What's left:** the 39 details lines would be better read as
   fields, a label and its value, but a dash isn't a field's separator,
   as a colon or bar is. Pay written without a currency sign ("Pay Rate
   – 13.10", in 25 ads) still passes as a heading. Neither is on the
-  roadmap yet.
+  roadmap yet. Three bold shift times with bare ranges and no range of
+  days beside them still pass as headings, once each: "Shifts (6-2 /
+  2-10)", "Continental Day Shift 6-6" and "6-6 shifts". "Shift" beside a
+  bare range would catch them; they're left for the grammar for working
+  patterns (roadmap 7), which has to read them as facts anyway.

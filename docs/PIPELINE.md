@@ -169,7 +169,7 @@ returns them as **parts**:
 
 | Role | How it's recognised | Example |
 |---|---|---|
-| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day; not ending in `.` | "**Key Responsibilities**" |
+| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day (a bare range of hours, such as 8-5, only beside a range of days); not ending in `.` | "**Key Responsibilities**" |
 | `field` | "Label: value" or "Label \| value", where the label is a known one | "Hours: 40 per week" |
 | `repeat` | only the ad's title or location again | "**Delivery Driver**" at the top |
 | `text` | everything else | |
@@ -456,7 +456,7 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | The wrong kind won | Move the winning kind's rule below the right one's, or make the phrase longer | `headings.txt` |
 | A plain line wrongly taken by name | Make the phrase longer, or drop it | `headings.txt` |
 | A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
-| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `money`, `times`); add a case to `TestRead` | `internal/headings/headings.go` |
+| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `money`, `times`, `hours`, `days`); add a case to `TestRead` | `internal/headings/headings.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
 | A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
 | An advertiser's name as a heading | Nothing: it stays unmapped, and its text is found as boilerplate | |

@@ -211,6 +211,32 @@ var money = regexp.MustCompile(`[£$€]|\d{3,}`)
 // "8.30-3.30": "37.50 hours" is a figure.
 var times = regexp.MustCompile(`(?i)\b\d{1,2}([:.]\d{2})? ?[ap]m\b|\b\d{1,2}:\d{2}\b|\b\d{1,2}\.\d{2} *(-|–|—|to) *\d{1,2}\.\d{2}\b`)
 
+// days matches a range of days: "Monday to Friday", "Mon–Thu", "M-F".
+var days = regexp.MustCompile(`(?i)\b(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.? *(-|–|—|to) *(mon|tue|wed|thu|fri|sat|sun)[a-z]*\b|\bM *[-–] *F\b`)
+
+// hours matches a bare range of hours, "8-5" or "7.30-4", which is a time
+// only beside a range of days: alone, "Ages 5-11" is no time. "2-3 days"
+// or "10-12 hr shifts" is a count, whatever's beside it.
+var hours = regexp.MustCompile(`(?i)\b([01]?\d|2[0-3])([:.]\d{2})? *(-|–|—|to) *([01]?\d|2[0-3])([:.]\d{2})?\b( *(hours?|hrs?|days?|nights?|weeks?|months?|years?|yrs|sessions?|mins?|minutes|%))?`)
+
+// hasTimes reports whether text holds a time of day: one of times, or a
+// bare range of hours beside a range of days, as in "Monday - Friday 8-5"
+// or "M-F 8-4".
+func hasTimes(text string) bool {
+	if times.MatchString(text) {
+		return true
+	}
+	if !days.MatchString(text) {
+		return false
+	}
+	for _, m := range hours.FindAllStringSubmatch(text, -1) {
+		if m[6] == "" { // not followed by a unit, so not a count
+			return true
+		}
+	}
+	return false
+}
+
 // conjunctions join what comes before them to what comes after: "OR" alone
 // in bold, between two lists of requirements, is no heading.
 var conjunctions = map[string]bool{"and": true, "or": true, "either": true, "nor": true, "but": true, "plus": true}
@@ -234,7 +260,7 @@ func headingShaped(text, key string, most int) bool {
 	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > most || money.MatchString(text) || times.MatchString(text) {
+	if len(strings.Fields(key)) > most || money.MatchString(text) || hasTimes(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })
