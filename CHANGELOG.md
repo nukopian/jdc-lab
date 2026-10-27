@@ -29,6 +29,15 @@ has the steps).
   counts as a time beside a range of days, M-F among them, and
   "9-5pm" implies am (roadmap 2;
   [record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md)).
+- Bold patterns of work are no longer headings either: a rota ("4 on 4
+  off") or days or nights beside a range of days ("Monday - Friday
+  (Days)"), unless it ends in a colon and heads what follows. Taken
+  for headings, they started unmapped sections that swallowed the
+  location, the pay or the opening summary under them. Headings about
+  shifts ("Shifts Available:", "Night Shift", "Rotation:") now start
+  details sections, not unmapped ones. Across the three samples,
+  headings of a known kind rise from 76% to 77% of uses, and ads with
+  every heading known from 53% to 54%.
 
 ## v0.3.5 (2026-10-27)
 

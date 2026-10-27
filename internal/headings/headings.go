@@ -219,6 +219,37 @@ var days = regexp.MustCompile(`(?i)\b(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.? *(-|
 // or "10-12 hr shifts" is a count, whatever's beside it.
 var hours = regexp.MustCompile(`(?i)\b([01]?\d|2[0-3])([:.]\d{2})? *(-|–|—|to) *([01]?\d|2[0-3])([:.]\d{2})?\b( *(hours?|hrs?|days?|nights?|weeks?|months?|years?|yrs|sessions?|mins?|minutes|%))?`)
 
+// rota matches days on and off: "4 on 4 off", "4on 3off", "4 days on, 4
+// days off".
+var rota = regexp.MustCompile(`(?i)\b\d+ *((day|night)s? *)?on\b[ ,/&]*\d+ *((day|night)s? *)?off\b`)
+
+// shiftWord matches days or nights, and a figure before them: "2-3 days" is
+// a count, not the day shift.
+var shiftWord = regexp.MustCompile(`(?i)(\d *)?\b(days|nights)\b`)
+
+// hasPattern reports whether text states a pattern of work, which is a
+// fact, as a time is: a rota, or days or nights beside a range of days, as
+// in "Monday - Friday (Days)". "Night Shift" alone names a shift, and heads
+// its hours, as a pattern ending in a colon heads what follows: "You will
+// work a 4 on 4 off shift pattern:".
+func hasPattern(text string) bool {
+	if endsAsLabel(text) {
+		return false
+	}
+	if rota.MatchString(text) {
+		return true
+	}
+	if !days.MatchString(text) {
+		return false
+	}
+	for _, m := range shiftWord.FindAllStringSubmatch(text, -1) {
+		if m[1] == "" {
+			return true
+		}
+	}
+	return false
+}
+
 // hasTimes reports whether text holds a time of day: one of times, or a
 // bare range of hours beside a range of days, as in "Monday - Friday 8-5"
 // or "M-F 8-4".
@@ -255,12 +286,13 @@ func onlyConjunctions(key string) bool {
 
 // headingShaped reports whether text, with its key, could be a heading:
 // some letters, a word that isn't a conjunction, at most most words, no
-// money, long figures or times, and not ending as a sentence does.
+// money, long figures, times or patterns of work, and not ending as a
+// sentence does.
 func headingShaped(text, key string, most int) bool {
 	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > most || money.MatchString(text) || hasTimes(text) {
+	if len(strings.Fields(key)) > most || money.MatchString(text) || hasTimes(text) || hasPattern(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })

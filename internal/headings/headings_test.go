@@ -165,6 +165,27 @@ func TestRead(t *testing.T) {
 				`text "9-5pm"`, `text "8-5 Monday - Friday"`},
 		},
 		{
+			// A rota, or days or nights beside a range of days, is a pattern
+			// of work, a fact as a time is.
+			"bold shift patterns are no headings",
+			`<p><b>4 on 4 off (days)</b></p><p><b>4on 3off</b></p><p><b>4 days on, 4 days off</b></p>` +
+				`<p><b>Monday - Friday (Days)</b></p><p><b>Mon- Fri Nights</b></p>`,
+			[]string{`text "4 on 4 off (days)"`, `text "4on 3off"`, `text "4 days on, 4 days off"`,
+				`text "Monday - Friday (Days)"`, `text "Mon- Fri Nights"`},
+		},
+		{
+			// Alone, a shift's name heads its own hours; with a figure,
+			// "days" is a count; and a pattern ending in a colon heads
+			// what follows.
+			"bold shift names are headings",
+			`<p><b>Night Shift</b></p><p><b>Days:</b></p><p><b>Shift Pattern</b></p>` +
+				`<p><b>You will work a 4 on 4 off shift pattern:</b></p><p><b>Monday to Friday Nights:</b></p>`,
+			[]string{`heading "Night Shift" key="night shift"`, `heading "Days:" key="days"`,
+				`heading "Shift Pattern" key="shift pattern"`,
+				`heading "You will work a 4 on 4 off shift pattern:" key="you will work a 4 on 4 off shift pattern"`,
+				`heading "Monday to Friday Nights:" key="monday to friday nights"`},
+		},
+		{
 			"bold bare ranges without days are headings",
 			`<p><b>Ages 5-11</b></p><p><b>Monday to Friday, 2-3 days in the office</b></p>` +
 				`<p><b>Mon-Sun, 10-12 hr shifts</b></p><p><b>Sunday to Thursday, 4-5 nights</b></p>`,
