@@ -21,13 +21,16 @@ import (
 // A Kind is a kind of section.
 type Kind string
 
-// The kinds of section. Summary is what comes before the first heading, as
-// well as what headings such as "The role" start. Details holds the job's
+// The kinds of section. Summary is what comes before the first heading, the
+// ad's opening, as well as what headings such as "Overview" and "The
+// opportunity" start. Role is what the job is, under headings such as
+// "About the role" and "Job description". Details holds the job's
 // terms, such as its hours and contract, under headings like "Job details"
 // or a field's label. Unmapped is what a heading of no known kind starts:
 // its share of the text is how much is left to find phrases for.
 const (
 	Summary          Kind = "summary"
+	Role             Kind = "role"
 	Responsibilities Kind = "responsibilities"
 	Requirements     Kind = "requirements"
 	Desirable        Kind = "desirable"
@@ -41,7 +44,7 @@ const (
 
 // Kinds are all the kinds, in the order ads tend to have them.
 var Kinds = []Kind{
-	Summary, Responsibilities, Requirements, Desirable, Benefits,
+	Summary, Role, Responsibilities, Requirements, Desirable, Benefits,
 	Company, Apply, Legal, Details, Unmapped,
 }
 

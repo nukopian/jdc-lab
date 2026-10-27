@@ -64,7 +64,7 @@ func TextsOf(id string, ss []sections.Section, boilerplate func(string) bool) Te
 		switch s.Kind {
 		case sections.Responsibilities, sections.Requirements, sections.Desirable:
 			core = append(core, mine...)
-		case sections.Summary:
+		case sections.Summary, sections.Role: // as the summary was, before role had a kind of its own
 			summary = append(summary, mine...)
 		}
 		if kept > 0 {

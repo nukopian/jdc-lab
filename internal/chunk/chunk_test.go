@@ -169,3 +169,12 @@ func TestListItems(t *testing.T) {
 		t.Errorf("tokens: got %d, want %d", c.Tokens, want)
 	}
 }
+
+// The role, what the job is, is embedded, as the summary is.
+func TestRoleEmbedded(t *testing.T) {
+	c := Of([]sections.Section{{Kind: sections.Role, Heading: "About the role", Parts: []headings.Part{text("You will drive.")}}},
+		func(string) bool { return false })[0]
+	if c.Use != Embed {
+		t.Errorf("got %s, want embed", c.Use)
+	}
+}

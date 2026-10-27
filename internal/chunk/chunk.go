@@ -3,8 +3,8 @@
 // do with it (embed it, keep it as metadata, or leave it out), about how
 // many tokens it is, and what placed it in its section.
 //
-// The sections that say what the job is are embedded: the summary,
-// responsibilities, requirements and desirable. Details are metadata;
+// The sections that say what the job is are embedded: the summary, the
+// role, responsibilities, requirements and desirable. Details are metadata;
 // benefits, company, apply and legal are left out; and unmapped ones,
 // whose kind isn't known, aren't embedded: they're what's left to map. An unmapped section's text goes to the boilerplate chunk,
 // under its heading, and its fields to a details chunk.
@@ -146,7 +146,7 @@ func Tokens(text string) int {
 // use says what's done with a section of kind.
 func use(kind sections.Kind) string {
 	switch kind {
-	case sections.Summary, sections.Responsibilities, sections.Requirements, sections.Desirable:
+	case sections.Summary, sections.Role, sections.Responsibilities, sections.Requirements, sections.Desirable:
 		return Embed
 	case sections.Details:
 		return Metadata

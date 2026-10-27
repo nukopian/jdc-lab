@@ -12,6 +12,10 @@ has the steps).
 
 ## Unreleased
 
+- Role is a kind of section of its own: what the job is, under "About
+  the role", "Job description" and the like, apart from the summary,
+  the ad's opening and its introductions. On the three samples, role
+  is 9% of the text, and the summary falls from 28% to 19%.
 - An ad's text is cleaned for every stage after blocks, the ad kept as
   received: a symbol that opens a line and stands for one thing becomes
   its English label when a value follows ("📍 Leeds" is "Location:

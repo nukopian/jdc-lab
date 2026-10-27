@@ -239,7 +239,8 @@ section of its **kind**:
 
 | Kind | Holds | Example headings |
 |---|---|---|
-| `summary` | what comes first, and role overviews | "The role", "The opportunity" |
+| `summary` | the ad's opening, and introductions | "Overview", "The opportunity" |
+| `role` | what the job is | "About the role", "Job description" |
 | `responsibilities` | what the job involves | "What you'll be doing", "Main duties" |
 | `requirements` | what the job needs | "About you", "Essential criteria" |
 | `desirable` | what would help | "Desirable", "Nice to have" |
@@ -662,7 +663,8 @@ with no section but the summary, 5%.
 
 | Section | Of the text | Of it, boilerplate |
 |---|---:|---:|
-| summary | 28% | 10% |
+| summary | 19% | 11% |
+| role | 9% | 8% |
 | responsibilities | 16% | 2% |
 | requirements | 20% | 12% |
 | desirable | 2% | 8% |

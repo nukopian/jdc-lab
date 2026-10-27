@@ -113,6 +113,15 @@ say how to run it.
   the location and pay under its title stay as fields, and its
   introduction, under "Ongoing opportunity", goes to the boilerplate
   chunk until that heading is mapped.
+- **Role is a kind of its own** (Iain, 2026-10-27): what the job is,
+  under "About the role", "The role", "Job description" and the like,
+  apart from the summary, the ad's opening and its introductions
+  ("Overview", "The opportunity"). Both are embedded. On the three
+  samples, role is in 40% of ads and 9% of the text, and the summary
+  falls from 28% of the text to 19%. Role isn't yet among the sections
+  boilerplate counts as describing the job, so its verdicts are as
+  before.
+- **List items** are "- " entries in a chunk's text.
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go
