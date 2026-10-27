@@ -176,6 +176,31 @@ An idea is a numbered heading, the date it was added, and a line or
 two on what and why. Each wash-up prunes them: each is kept, promoted
 to Later or Next with its number, or dropped.
 
+### 8. Skills and occupations as taxonomy links
+
+Added 2026-10-25, to Ideas 2026-10-27. Link the skills and occupations
+an ad names to the existing taxonomies, so they're filtered on, not
+embedded.
+
+### 9. A fair test of embedding models
+
+Added 2026-10-25, to Ideas 2026-10-27. Rerun the first comparison of
+`BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2` fairly, with E5's
+prefixes and many sections, beside other small local models.
+
+### 10. Does it make search better?
+
+Added 2026-10-25, to Ideas 2026-10-27. Measure retrieval: a first slice,
+with job titles as queries, is in its
+[record](docs/changes/2026-10-27-a-first-retrieval-test.md); judged
+queries, a check of boilerplate's verdict, metadata and a managed
+service are still to come.
+
+### 11. Embeddings from Go
+
+Added 2026-10-25, to Ideas 2026-10-27. Run the chosen model from Go
+with ONNX Runtime, so nothing in the pipeline needs a Python service.
+
 ### 12. Boilerplate thresholds scaled to a sample's size
 
 Added 2026-10-27. Boilerplate's thresholds are counts of title groups,
@@ -207,28 +232,3 @@ Added 2026-10-27. When a list item holds a list or paragraphs of its
 own, `internal/blocks` puts its text after the blocks that follow it,
 so it lands under the wrong heading: 20 ads of the three samples, which
 `cmd/view` counts and shows.
-
-### 8. Skills and occupations as taxonomy links
-
-Added 2026-10-25, to Ideas 2026-10-27. Link the skills and occupations
-an ad names to the existing taxonomies, so they're filtered on, not
-embedded.
-
-### 9. A fair test of embedding models
-
-Added 2026-10-25, to Ideas 2026-10-27. Rerun the first comparison of
-`BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2` fairly, with E5's
-prefixes and many sections, beside other small local models.
-
-### 10. Does it make search better?
-
-Added 2026-10-25, to Ideas 2026-10-27. Measure retrieval: a first slice,
-with job titles as queries, is in its
-[record](docs/changes/2026-10-27-a-first-retrieval-test.md); judged
-queries, a check of boilerplate's verdict, metadata and a managed
-service are still to come.
-
-### 11. Embeddings from Go
-
-Added 2026-10-25, to Ideas 2026-10-27. Run the chosen model from Go
-with ONNX Runtime, so nothing in the pipeline needs a Python service.
