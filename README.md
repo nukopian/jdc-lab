@@ -60,6 +60,11 @@ embeddings, and a large language model only where those fall short.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
   and why: first the pipeline's known gaps, then grammars for the facts
   in the details sections, and a fair test of embeddings.
+- **Retrieval** has had a first test: with job titles as queries, an
+  ad without its boilerplate is found as well as the whole ad, for 16%
+  fewer tokens, and the summary alone nearly as well, for a quarter of
+  them. Titles are a narrow test, and whether boilerplate's verdict is
+  right is still to be checked, so nothing is dropped yet.
 - **Embeddings** have had a first look: two small local models,
   `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`, compared at
   matching section headings to section types. BGE separated the types

@@ -378,6 +378,12 @@ func groups(titles []string) int {
 	return len(gs)
 }
 
+// SimilarTitles reports whether two titles are of the same job, as
+// boilerplate groups them: see similar.
+func SimilarTitles(a, b string) bool {
+	return similar(headings.Key(a), headings.Key(b))
+}
+
 // similar reports whether two title keys are titles of the same job: the
 // words of one are all in the other, or they share at least half their
 // words between them. A title with no words is like no other.

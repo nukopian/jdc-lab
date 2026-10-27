@@ -69,6 +69,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Does it make search better? A first test](2026-10-27-a-first-retrieval-test.md)
+  (roadmap 10), shipped, unreleased
 - [Find near-duplicate boilerplate](2026-10-27-find-near-duplicate-boilerplate.md)
   (roadmap 3), shipped, unreleased
 - [A readable view of chunked ads](2026-10-27-a-readable-view-of-chunked-ads.md)

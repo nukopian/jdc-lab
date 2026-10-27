@@ -382,6 +382,32 @@ comes out after the blocks that follow it, so its text lands under the
 wrong heading. The view shows where, for each ad it has, and the
 summary counts both over the sample.
 
+## Testing retrieval
+
+**Package** `internal/retrieval`, **programs** `cmd/retrieval-set`
+and `python/bin/retrieval_eval.py`.
+
+A first test of whether representing an ad by its parts finds it
+better. `cmd/retrieval-set` takes 5,000 of a run's ads, by a fixed hash
+of their IDs, and writes, for each, the text each representation would
+embed: the whole ad; the ad without its boilerplate; the sections that
+describe the job; the summary; and each section, a vector each. Its
+queries are the 50 commonest groups of similar titles, each written as
+its commonest title, and an ad is relevant to one if its title is
+similar to it. The title field is left out of every representation.
+The Python program embeds them with `BAAI/bge-base-en-v1.5`, ranks the
+ads for each query, and writes `report.txt`:
+
+```
+go run ./cmd/retrieval-set data/runs/latest/ads.jsonl data/runs/latest/retrieval
+python python/bin/retrieval_eval.py data/runs/latest/retrieval
+```
+
+Embedding takes about 20 minutes on a Mac's GPU. What it showed, and what it
+can't, are in its
+[record](changes/2026-10-27-a-first-retrieval-test.md): a job title is
+a narrow query.
+
 ## Improving it
 
 Each program leaves tables in `data/` that say where its stage falls

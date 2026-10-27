@@ -12,6 +12,16 @@ has the steps).
 
 ## Unreleased
 
+- A first test of retrieval: `cmd/retrieval-set` builds it from a run,
+  5,000 ads with the texts each representation embeds and 50 job
+  titles as queries, and `python/bin/retrieval_eval.py` scores it with
+  BGE. For finding ads for a job by its title, the whole ad and the ad
+  without boilerplate score the same (precision at 10 0.82), for 16%
+  fewer tokens; the summary alone 0.77, a vector for each section 0.78,
+  and the sections that describe the job alone 0.61. Titles are a
+  narrow test: it can't show whether boilerplate's verdict is right
+  (roadmap 10;
+  [record](docs/changes/2026-10-27-a-first-retrieval-test.md)).
 - Boilerplate is found when it isn't word for word the same: with the
   ad's own title or place written in, as placeholders, or, in texts of
   20 words or more, with a few words changed, by their runs of five

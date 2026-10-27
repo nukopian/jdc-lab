@@ -231,3 +231,10 @@ func TestNearDuplicatesAfterAdd(t *testing.T) {
 		t.Errorf("the group's texts are in %d sections, want 3", g.elsewhere)
 	}
 }
+
+// SimilarTitles compares titles as written, by their keys.
+func TestSimilarTitles(t *testing.T) {
+	if !SimilarTitles("SEN Teacher", "Teacher:") || SimilarTitles("Crane Operator", "Forklift Driver") {
+		t.Error("SimilarTitles doesn't compare titles by their keys")
+	}
+}

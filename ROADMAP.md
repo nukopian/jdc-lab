@@ -44,6 +44,20 @@ Nothing at the moment: the next to start comes from Next.
 
 ## Next
 
+### 10. Does it make search better?
+
+**Serves:** search
+
+Measure retrieval, not only structure: a set of queries with the ads
+that should answer them, and a comparison of one embedding per ad with
+embeddings of its chosen sections, with and without metadata to filter
+on, and against a managed embedding service. This is what answers the
+lab's question.
+
+A first slice has shipped: job titles as queries, local
+representations only ([record](docs/changes/2026-10-27-a-first-retrieval-test.md)).
+The rest, judged queries beyond titles first, is still to come.
+
 ### 4. Catch footers filed under requirements
 
 **Serves:** structure, embeddings
@@ -171,16 +185,6 @@ Rerun the first comparison of `BAAI/bge-base-en-v1.5` and
 prefixes E5 is trained with, on many headings and sections rather than
 one, and with other small local models beside them. Separation between
 kinds matters more than the scores themselves.
-
-### 10. Does it make search better?
-
-**Serves:** search
-
-Measure retrieval, not only structure: a set of queries with the ads
-that should answer them, and a comparison of one embedding per ad with
-embeddings of its chosen sections, with and without metadata to filter
-on, and against a managed embedding service. This is what answers the
-lab's question.
 
 ### 11. Embeddings from Go
 
