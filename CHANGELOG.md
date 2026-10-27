@@ -27,6 +27,10 @@ Match paths checked against the grammars
 - `readme-pdf.sh` refuses the CHANGELOG and change records by their full
   path, so `changes/x.md` given from `docs/` no longer gets a PDF, as
   scalar's wash-up found in its copy of the script.
+- golang.org/x/net v0.62.0, for GO-2026-6860: its HTML parser took
+  quadratic time joining text nodes, so an ad with many of them could
+  stall `blocks`, the view or the pages. CI's govulncheck found it
+  before the release. The pipeline's output is unchanged.
 
 ## v0.5.0 (2026-10-27)
 
