@@ -4,7 +4,9 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestChanged(t *testing.T) {
@@ -97,5 +99,41 @@ func TestSamples(t *testing.T) {
 	}
 	if !slices.Equal(got, want) {
 		t.Errorf("Samples = %q, want %q", got, want)
+	}
+}
+
+func TestSampleAds(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "ads.jsonl")
+	if err := os.WriteFile(path, []byte("{}\n{}\n{}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if n, err := (Sample{Name: "ads", Path: path}).Ads(); err != nil || n != 3 {
+		t.Errorf("got %d, %v; want 3 ads", n, err)
+	}
+}
+
+func TestTimings(t *testing.T) {
+	ts := []Timing{
+		{Sample: "ads-20261024", Stage: "blocks", Ads: 2000, Wall: 500 * time.Millisecond, CPU: 750 * time.Millisecond, PeakRSS: 40 << 20},
+		// A stage too quick to time gives no rate, not a division by zero.
+		{Sample: "ads-20261024", Stage: "sections", Ads: 2000},
+	}
+	var tsv, table strings.Builder
+	if err := WriteTimingsTSV(&tsv, ts); err != nil {
+		t.Fatal(err)
+	}
+	want := "sample\tstage\tads\twall_s\tcpu_s\tads_per_s\tpeak_mb\n" +
+		"ads-20261024\tblocks\t2000\t0.500\t0.750\t4000\t40\n" +
+		"ads-20261024\tsections\t2000\t0.000\t0.000\t0\t0\n"
+	if tsv.String() != want {
+		t.Errorf("TSV:\ngot  %q\nwant %q", tsv.String(), want)
+	}
+	if err := WriteTimings(&table, ts); err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"ads/s", "ads-20261024  blocks", "0.50s", "4000", "40 MB"} {
+		if !strings.Contains(table.String(), want) {
+			t.Errorf("table lacks %q; it was:\n%s", want, table.String())
+		}
 	}
 }

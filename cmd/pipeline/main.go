@@ -6,9 +6,11 @@
 //	pipeline run RUN
 //
 // runs cmd/blocks, cmd/heading-counts, cmd/sections and cmd/boilerplate on
-// each sample, with go run, so the code as it stands is what runs. Each
+// each sample, built afresh, so the code as it stands is what runs. Each
 // stage's tables go in data/runs/RUN/SAMPLE/STAGE/ and its summary in
 // data/runs/RUN/SAMPLE/STAGE.txt. A run of the same name is replaced.
+// It ends with how long each stage took on each sample, and how much
+// memory it used, which it also keeps in data/runs/RUN/timings.tsv.
 //
 //	pipeline compare BEFORE AFTER
 //
@@ -30,9 +32,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/nukopian/jdc-lab/internal/runs"
 )
@@ -97,12 +101,24 @@ func run(name string) error {
 		samples = append(samples, all)
 	}
 
+	// The stages are built once, so that their timings leave out the
+	// compiling that go run would do.
+	bin, err := build()
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(bin)
+
 	// The samples run at once, each in a goroutine, its stages in turn;
-	// errors.Join gathers what went wrong in any of them.
+	// errors.Join gathers what went wrong in any of them. Each sample is
+	// one process at a time, so on a machine with a processor for each,
+	// they barely slow each other.
+	start := time.Now()
 	var wg sync.WaitGroup
 	errs := make([]error, len(samples))
+	timings := make([][]runs.Timing, len(samples))
 	for i, s := range samples {
-		wg.Go(func() { errs[i] = stage(s, filepath.Join(dir, s.Name)) })
+		wg.Go(func() { timings[i], errs[i] = stage(bin, s, filepath.Join(dir, s.Name)) })
 	}
 	wg.Wait()
 	if err := errors.Join(errs...); err != nil {
@@ -111,32 +127,81 @@ func run(name string) error {
 	for _, s := range samples {
 		fmt.Printf("%-16s %s\n", s.Name, filepath.Join(dir, s.Name))
 	}
-	return nil
-}
 
-// stage runs each stage on one sample, into dir.
-func stage(s runs.Sample, dir string) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	all := slices.Concat(timings...)
+	fmt.Println()
+	if err := runs.WriteTimings(os.Stdout, all); err != nil {
 		return err
 	}
+	fmt.Printf("\n%d samples in %.1fs, on %d processors\n", len(samples), time.Since(start).Seconds(), runtime.NumCPU())
+	tsv, err := os.Create(filepath.Join(dir, "timings.tsv"))
+	if err != nil {
+		return err
+	}
+	if err := runs.WriteTimingsTSV(tsv, all); err != nil {
+		tsv.Close()
+		return err
+	}
+	return tsv.Close()
+}
+
+// build builds the stages' programs into a new temporary folder, and
+// returns it.
+func build() (string, error) {
+	bin, err := os.MkdirTemp("", "pipeline-")
+	if err != nil {
+		return "", err
+	}
+	args := []string{"build", "-o", bin + string(filepath.Separator)}
+	for _, st := range stages {
+		args = append(args, "./cmd/"+st.program)
+	}
+	cmd := exec.Command("go", args...)
+	var stderr strings.Builder
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		os.RemoveAll(bin)
+		return "", fmt.Errorf("pipeline: building the stages: %v\n%s", err, stderr.String())
+	}
+	return bin, nil
+}
+
+// stage runs each stage, built in bin, on one sample, into dir, and
+// returns how each ran.
+func stage(bin string, s runs.Sample, dir string) ([]runs.Timing, error) {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return nil, err
+	}
+	ads, err := s.Ads()
+	if err != nil {
+		return nil, err
+	}
+	var timings []runs.Timing
 	for _, st := range stages {
 		summary, err := os.Create(filepath.Join(dir, st.dir+".txt"))
 		if err != nil {
-			return err
+			return nil, err
 		}
-		cmd := exec.Command("go", "run", "./cmd/"+st.program, s.Path, filepath.Join(dir, st.dir))
+		cmd := exec.Command(filepath.Join(bin, st.program), s.Path, filepath.Join(dir, st.dir))
 		cmd.Stdout = summary
 		var stderr strings.Builder
 		cmd.Stderr = &stderr
+		start := time.Now()
 		err = cmd.Run()
+		wall := time.Since(start)
 		if cerr := summary.Close(); err == nil {
 			err = cerr
 		}
 		if err != nil {
-			return fmt.Errorf("%s on %s: %v\n%s", st.program, s.Name, err, stderr.String())
+			return nil, fmt.Errorf("%s on %s: %v\n%s", st.program, s.Name, err, stderr.String())
 		}
+		ps := cmd.ProcessState
+		timings = append(timings, runs.Timing{
+			Sample: s.Name, Stage: st.program, Ads: ads, Wall: wall,
+			CPU: ps.UserTime() + ps.SystemTime(), PeakRSS: peakRSS(ps),
+		})
 	}
-	return nil
+	return timings, nil
 }
 
 // combine writes every sample into one file, as the sample named all.

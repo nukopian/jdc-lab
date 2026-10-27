@@ -17,6 +17,11 @@ has the steps).
   as they are, and Go's decoder refused the whole export. They now
   come through to the JSON Lines unchanged; earlier exports convert
   exactly as before.
+- `pipeline run` ends with how each stage ran on each sample: its time
+  on the clock and on the processors, ads per second, and peak memory,
+  kept too in the run's `timings.tsv`. It builds the stages once,
+  instead of with `go run` each time, so the timings leave out
+  compiling.
 
 ## v0.3.5 (2026-10-27)
 

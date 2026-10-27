@@ -67,6 +67,25 @@ for that sample, and `data/runs/now/ads-20261025/sections.txt` its
 summary. A run of the same name is replaced, and
 `data/runs/now/all/` has the samples together.
 
+It builds the stages first, so the code as it stands is what runs, and
+ends with how each stage ran on each sample, also kept in
+`data/runs/now/timings.tsv`:
+
+```
+sample        stage               ads      wall       cpu    ads/s      peak
+all           sections          28000     6.75s     7.66s     4147    206 MB
+all           boilerplate       28000     9.99s    11.56s     2804    671 MB
+```
+
+`wall` is the time on the clock, `cpu` the time on the processors (more
+than `wall` when a stage uses several), and `peak` the most memory the
+stage held at once (on macOS and Linux; 0 elsewhere). The samples run at
+the same time, one stage each, so a machine with fewer processors than
+samples gives slower figures. The rate rises with a sample's size, as
+each stage has a fixed cost to start. `compare` leaves the timings out,
+as they move a little on every run: compare two runs' `timings.tsv` by
+hand.
+
 Each stage's program can also be run alone, on one sample, into any
 folder:
 

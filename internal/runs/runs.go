@@ -1,16 +1,22 @@
 // Package runs compares two runs of the pipeline over the same samples of
 // ads, as cmd/pipeline keeps them: how each stage's summary moved, and
-// which headings a change mapped or unmapped.
+// which headings a change mapped or unmapped. It also writes how long each
+// stage took.
 package runs
 
 import (
+	"bytes"
 	"cmp"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
+	"text/tabwriter"
+	"time"
 )
 
 // A Sample is a file of ads, as JSON Lines, named after the file.
@@ -29,6 +35,60 @@ func Samples(dir string) ([]Sample, error) {
 		samples[i] = Sample{Name: strings.TrimSuffix(filepath.Base(p), ".jsonl"), Path: p}
 	}
 	return samples, nil
+}
+
+// Ads returns how many ads the sample has: its lines.
+func (s Sample) Ads() (int, error) {
+	data, err := os.ReadFile(s.Path)
+	if err != nil {
+		return 0, err
+	}
+	return bytes.Count(data, []byte("\n")), nil
+}
+
+// A Timing is how one stage ran on one sample: its time on the clock
+// (Wall), its time on the processors (CPU, which is more than Wall when it
+// uses several), and the most memory it held at once, in bytes.
+type Timing struct {
+	Sample, Stage string
+	Ads           int
+	Wall, CPU     time.Duration
+	PeakRSS       int64
+}
+
+// rate returns the ads per second, or 0 for a stage too quick to time.
+func (t Timing) rate() float64 {
+	if t.Wall <= 0 {
+		return 0
+	}
+	return float64(t.Ads) / t.Wall.Seconds()
+}
+
+// WriteTimings writes the timings to w as a table for reading: the names
+// aligned left, and the figures, of fixed widths, right.
+func WriteTimings(w io.Writer, ts []Timing) error {
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(tw, "sample\tstage\t    ads\t    wall\t     cpu\t  ads/s\t    peak")
+	for _, t := range ts {
+		fmt.Fprintf(tw, "%s\t%s\t%7d\t%7.2fs\t%7.2fs\t%7.0f\t%5d MB\n",
+			t.Sample, t.Stage, t.Ads, t.Wall.Seconds(), t.CPU.Seconds(), t.rate(), t.PeakRSS>>20)
+	}
+	return tw.Flush()
+}
+
+// WriteTimingsTSV writes the timings to w as tab-separated values, for jq,
+// awk or a notebook: seconds and megabytes, with a header.
+func WriteTimingsTSV(w io.Writer, ts []Timing) error {
+	if _, err := fmt.Fprintln(w, "sample\tstage\tads\twall_s\tcpu_s\tads_per_s\tpeak_mb"); err != nil {
+		return err
+	}
+	for _, t := range ts {
+		if _, err := fmt.Fprintf(w, "%s\t%s\t%d\t%.3f\t%.3f\t%.0f\t%d\n",
+			t.Sample, t.Stage, t.Ads, t.Wall.Seconds(), t.CPU.Seconds(), t.rate(), t.PeakRSS>>20); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // A Change is a line of a summary as it was and as it is: Before is empty
