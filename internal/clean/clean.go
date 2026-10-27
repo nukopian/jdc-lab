@@ -92,6 +92,9 @@ func Text(s string) string {
 // apply?" stay as they are. added is what was added, for comparing the
 // line with what the ad had. A line in bold, a heading's, takes Text.
 func Line(s string) (text, added string) {
+	if mark, rest := asciiBullet(s); mark != "" {
+		s = rest // "*Servicing…" and "- Full-time…" lose their bullet
+	}
 	text = Text(s)
 	label := opening(s)
 	if label == "" || text == "" || labelled(text) || strings.ContainsAny(text[len(text)-1:], ":?!") || !fits(label, text) {
@@ -167,6 +170,12 @@ func opening(s string) string {
 // Lines in a row that open with the same bullet are a list. It's "" for
 // a line that opens with none.
 func Bullet(s string) string {
+	if mark, rest := asciiBullet(s); mark != "" {
+		if Text(rest) == "" || strings.HasSuffix(strings.TrimSpace(rest), mark) {
+			return ""
+		}
+		return mark
+	}
 	s = strings.TrimLeftFunc(s, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.Cf, r) })
 	r, size := utf8.DecodeRuneInString(s)
 	if size == 0 || !gone(r) || variation(r) {
@@ -180,6 +189,24 @@ func Bullet(s string) string {
 		return ""
 	}
 	return string(r)
+}
+
+// asciiBullet returns the plain-text bullet a line opens with, past any
+// spaces and invisible characters, and the line after it: "*", or "-"
+// before a space or a letter, so "-5 degrees" keeps its minus. It's ""
+// for a line that opens with neither.
+func asciiBullet(s string) (mark, rest string) {
+	s = strings.TrimLeftFunc(s, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.Cf, r) })
+	switch {
+	case strings.HasPrefix(s, "*") && !strings.HasPrefix(s, "**"):
+		return "*", s[1:]
+	case strings.HasPrefix(s, "-"):
+		next, _ := utf8.DecodeRuneInString(s[1:])
+		if next == ' ' || unicode.IsLetter(next) {
+			return "-", s[1:]
+		}
+	}
+	return "", s
 }
 
 // variation reports whether r is a variation selector, or the keycap

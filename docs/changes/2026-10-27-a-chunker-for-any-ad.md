@@ -206,3 +206,8 @@ say how to run it.
   its reference doesn't say that a capture inside a text capture
   (`$<k>=[ … ]`) belongs to the enclosing rule, which took two tries
   to find.
+- **Plain-text bullets** (Iain, 2026-10-27): a line that opens with `*`,
+  or with `-` before a space or a letter, loses the mark, and lines in a
+  row with it are a list, as with symbols. On the three samples, 29,666
+  more list items, in 5,221 more lists; ads with only a summary fall
+  from 1,048 to 1,011.

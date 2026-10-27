@@ -154,6 +154,11 @@ func TestSplit(t *testing.T) {
 				`paragraph "Hiring now"`, `paragraph "Apply today"`},
 		},
 		{
+			"lines opening with an asterisk or a dash are a list",
+			`<p>*Servicing<br>*Home based</p><p>- Full-time</p><p>- Long term</p>`,
+			[]string{"list", `  "Servicing"`, `  "Home based"`, "list", `  "Full-time"`, `  "Long term"`},
+		},
+		{
 			"paragraphs opening with the same symbol are a list too",
 			`<p>✨ One</p><p>✨ Two</p><p>Then text.</p>`,
 			[]string{"list", `  "One"`, `  "Two"`, `paragraph "Then text."`},
@@ -188,7 +193,7 @@ Benefits:
 - Pension
 
 `,
-			[]string{`line "The role"`, `line "We build things."`, `line "Benefits:"`, `line "- Pension"`},
+			[]string{`line "The role"`, `line "We build things."`, `line "Benefits:"`, `line "Pension"`},
 		},
 		{
 			"plain text: one line on its own is a paragraph",

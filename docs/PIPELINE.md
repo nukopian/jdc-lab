@@ -151,6 +151,7 @@ English:
 |---|---|---|
 | A symbol that opens a line, stands for one thing, and is followed by a value of it | its English label, unless the line has one, is bold, or ends as a heading does (`:` `?` `!`) | "📍 Leeds" → "Location: Leeds", a field; also 💷 💰 Pay, ⏰ 🕒 ⏱ Hours, 📞 Contact, 📧 Email; but "💷 What We Offer" keeps no label |
 | Lines in a row that open with the same symbol, not ending with it | a list, each an item | "✅ Weekly pay" and "✅ Free parking" on lines of their own → two items |
+| A line that opens with `*`, or with `-` before a space or a letter | the same: the mark goes, and lines in a row with it are a list | "*Home based" → "Home based"; "-5 degrees" keeps its minus |
 | Other emoji and pictographs, and symbols used as bullets | nothing: when in doubt, a symbol goes | "✅ Long term work" → "Long term work"; "📢 Hiring now 📢" → "Hiring now" |
 | Invisible and control characters, Word's bullet, the replacement character | nothing | |
 | Odd spaces, such as the no-break space | a plain space | |

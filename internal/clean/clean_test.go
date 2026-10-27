@@ -28,6 +28,10 @@ func TestText(t *testing.T) {
 
 func TestLine(t *testing.T) {
 	tests := []struct{ in, text, added string }{
+		// A leading "*" or "- " is a bullet, and goes; one later stays.
+		{"*Servicing, Installation and Maintenance", "Servicing, Installation and Maintenance", ""},
+		{"- Full-time teaching position.", "Full-time teaching position.", ""},
+		{"£30,000* (Ts & Cs apply)", "£30,000* (Ts & Cs apply)", ""},
 		{"📍 Leeds, West Yorkshire", "Location: Leeds, West Yorkshire", "Location: "},
 		{"💷 £30,000 per annum", "Pay: £30,000 per annum", "Pay: "},
 		{"💰Competitive salary", "Pay: Competitive salary", "Pay: "},
@@ -66,13 +70,18 @@ func TestLine(t *testing.T) {
 
 func TestBullet(t *testing.T) {
 	for in, want := range map[string]string{
-		"✅ Long term work":         "✅",
-		"  ✔️ Weekly pay":          "✔",
-		"• A point":                "•",
-		"📢 Calling all teachers 📢": "", // the same symbol at its end: decoration
-		"Plain text":               "",
-		"📍 Leeds":                  "📍",
-		"✅":                        "", // nothing after it
+		"*Servicing and maintenance":    "*",
+		"* Home based":                  "*",
+		"- Full-time teaching position": "-",
+		"-5 degrees at night":           "", // a minus, not a bullet
+		"£30,000*":                      "",
+		"✅ Long term work":              "✅",
+		"  ✔️ Weekly pay":               "✔",
+		"• A point":                     "•",
+		"📢 Calling all teachers 📢":      "", // the same symbol at its end: decoration
+		"Plain text":                    "",
+		"📍 Leeds":                       "📍",
+		"✅":                             "", // nothing after it
 	} {
 		if got := Bullet(in); got != want {
 			t.Errorf("Bullet(%q) = %q, want %q", in, got, want)
