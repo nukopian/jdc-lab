@@ -12,6 +12,24 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.5.0 (2026-10-27)
+
+A chunker for any ad
+
+`chunk` chunks any ad as an embedding job would take it: each chunk
+with its kind, whether it's embedded, kept as metadata or left out, its
+size, and what placed it, down to the phrase; as text, JSON, YAML, or
+web pages of ads before and after. On the way, the ad's text is
+cleaned, role is a section of its own, sub-headings before lists are
+found, grammars read the facts ads state and place lines by their
+wording, the title is split off the line it runs into, boilerplate is
+found when it isn't word for word the same, and retrieval has a first
+test. By the chunker, 57.5% of an ad's tokens are embedded. Runs now
+cover the samples together, in two groups, a change to how the lab is
+worked on, so a minor release.
+
 - `chunk -pages FILE` writes web pages of the ads FILE lists, each as
   posted beside its chunks, coloured by what's done with them, with
   their size, what placed them, their fields and facts, and a bar of

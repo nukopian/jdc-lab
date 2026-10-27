@@ -1,6 +1,6 @@
 # Does it make search better? A first test
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.5.0
 
 **Origin:** roadmap 10, a first slice
 

@@ -70,15 +70,15 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [A chunker for any ad](2026-10-27-a-chunker-for-any-ad.md)
-  (roadmap 18), shipped, unreleased
+  (roadmap 18), shipped in v0.5.0
 - [Facts from the details, by grammar](2026-10-27-facts-from-the-details.md)
-  (roadmap 7), shipped, unreleased
+  (roadmap 7), shipped in v0.5.0
 - [Does it make search better? A first test](2026-10-27-a-first-retrieval-test.md)
-  (roadmap 10), shipped, unreleased
+  (roadmap 10), shipped in v0.5.0
 - [Find near-duplicate boilerplate](2026-10-27-find-near-duplicate-boilerplate.md)
-  (roadmap 3), shipped, unreleased
+  (roadmap 3), shipped in v0.5.0
 - [A readable view of chunked ads](2026-10-27-a-readable-view-of-chunked-ads.md)
-  (roadmap 16), shipped, unreleased
+  (roadmap 16), shipped in v0.5.0
 - [Try grammar's Overlap in sections.All, then take up grammar v0.3.2](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md),
   shipped in v0.3.5
 - [Take up grammar v0.3.1, and read headings.txt with MapOnly](2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md),

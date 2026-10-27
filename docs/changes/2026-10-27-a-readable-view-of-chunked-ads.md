@@ -1,6 +1,6 @@
 # A readable view of chunked ads
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.5.0
 
 **Origin:** roadmap 16
 
