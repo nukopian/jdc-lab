@@ -69,6 +69,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Try grammar's Overlap in sections.All, then take up grammar v0.3.2](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md),
+  shipped, unreleased
 - [Take up grammar v0.3.1, and read headings.txt with MapOnly](2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md),
   shipped, unreleased
 - [Take up grammar v0.3.0 and scalar v0.6.0](2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md),

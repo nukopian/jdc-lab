@@ -111,9 +111,12 @@ func Of(key string) (Kind, bool) {
 // they come in it, each once: more than one means the heading's words
 // disagree, and Of chose between them.
 func All(key string) []Kind {
-	// A phrase list's canonical values are always strings, so ToAll can't
-	// fail here.
-	made, _ := grammar.ToAll[Kind](finder.FindAll(key))
+	// With Outermost, a phrase that starts inside another is found too, as
+	// "you will need" is in "in this role you will need"; one wholly
+	// inside a longer one is left out, as "profile" is in "company
+	// profile", or it would outrank the phrase it's part of. A phrase
+	// list's canonical values are always strings, so ToAll can't fail.
+	made, _ := grammar.ToAll[Kind](finder.FindAll(key, grammar.Outermost()))
 	var kinds []Kind
 	for _, k := range made {
 		if !slices.Contains(kinds, k) {

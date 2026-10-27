@@ -248,6 +248,14 @@ ranking: desirable, benefits, legal, requirements, responsibilities,
 company, apply, details, summary. So "Desirable skills" is desirable, not
 requirements, and "What our client offers" benefits, not company.
 
+**Phrases that overlap all count.** In "To succeed in this role, you will
+need:", both "in this role you will" (responsibilities) and "you will
+need" (requirements) are found, so requirements wins; read only left to
+right, the first would have hidden the second. A phrase wholly inside a
+longer one doesn't count: "Company Profile" is company, though
+"profile" alone is requirements. grammar's `Outermost` option finds
+them so.
+
 **With no phrase**, a heading starting "about" is company ("About" and a
 company's name), and one that's a field's label is details. Any other starts an `unmapped` section: so the text
 under it counts as unmapped, rather than hiding in the section before,
@@ -494,7 +502,7 @@ section but the summary, 5% and 4%.
 | | **1024** | **1025** | **all** | **1024** | **1025** | **all** |
 | summary | 28% | 28% | 28% | 6% | 7% | 7% |
 | responsibilities | 16% | 17% | 16% | 0% | 1% | 1% |
-| requirements | 19% | 20% | 20% | 7% | 7% | 9% |
+| requirements | 19% | 20% | 20% | 7% | 7% | 8% |
 | desirable | 2% | 2% | 2% | 3% | 4% | 4% |
 | benefits | 13% | 12% | 12% | 32% | 30% | 33% |
 | company | 5% | 3% | 3% | 46% | 28% | 39% |

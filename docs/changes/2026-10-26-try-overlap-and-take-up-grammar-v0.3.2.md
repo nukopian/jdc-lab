@@ -1,5 +1,14 @@
+# Try grammar's Overlap in sections.All, then take up grammar v0.3.2
 
-## Try grammar's Overlap in sections.All, before it's released
+**Status:** shipped, unreleased
+
+**Origin:** a TODO task from grammar's session (grammar da7bc9b9cdc732bbed40f74bf56f312d654d3c02)
+
+**Started:** 2026-10-26, in fde7e7b253eeae9a53361c598a82e5eccae9d248
+
+**Finished:** 2026-10-27
+
+## The plan
 
 **From:** grammar's session, 2026-10-26 (grammar da7bc9b9cdc732bbed40f74bf56f312d654d3c02)
 **Waiting on:** nothing: it's on grammar's `develop`, which the lab's `go.work` joins
@@ -73,3 +82,33 @@ takes the match's positions, so it's done on the matches before
 **How to check it's done:** grammar's task says the lab has tried it,
 and the lab's sections use `Overlap` with nested matches dropped, its
 output read and explained.
+
+## What happened
+
+- **Outcome:** done. `sections.All` finds phrases with
+  `finder.FindAll(key, grammar.Outermost())`: overlapping phrases all
+  count, and one wholly inside a longer one doesn't. `go.mod` names
+  grammar v0.3.2; scalar stays at v0.6.0. `GOWORK=off go test ./...`
+  and `scripts/test-all.sh` pass, and `TestAll` covers both cases ("In
+  this role you will need" gives responsibilities and requirements;
+  "Company Profile" gives company only).
+- **Changes from the plan:** the trial ran the whole pipeline on both
+  samples rather than `cmd/sections` on one. It first used the lab's
+  own helper to drop nested matches, with `Overlap()`; that friction
+  became grammar's idea 14, which grammar built as `Outermost()` and
+  released in the same version, so the helper went before anything was
+  committed. Both of grammar's ideas 13 and 14 came from this lab's
+  use, marked there as dogfooding.
+- **Measurements:** runs `now` (before, with grammar v0.3.1) and
+  `after` (`GOWORK=off`, grammar v0.3.2), compared on both samples and
+  `all`. Exactly six headings, 22 uses, change kind, all rightly, from
+  responsibilities to requirements: "To succeed in this role, you will
+  need the following:" (14 uses), "To join us and be successful in this
+  role you will need:" (4), and four like them. Nothing newly mapped or
+  unmapped, "Company Profile" unchanged, and the only new rows in
+  `disagree.tsv` are those six. Requirements' boilerplate share in
+  `all` goes from 9% to 8%. The trial with the helper and the release
+  with `Outermost` wrote the same `sections/ads.jsonl`, byte for byte.
+- **Tried and reverted:** `Overlap()` alone, which took "Company
+  Profile" to requirements, as "profile" inside it outranked it.
+- **What's left:** nothing.

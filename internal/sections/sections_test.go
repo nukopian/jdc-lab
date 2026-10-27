@@ -102,9 +102,22 @@ func TestOf(t *testing.T) {
 }
 
 func TestAll(t *testing.T) {
-	got := All(headings.Key("About you, and what's on offer"))
-	if want := []Kind{Requirements, Benefits}; !slices.Equal(got, want) {
-		t.Errorf("got %q, want %q", got, want)
+	tests := []struct {
+		heading string
+		want    []Kind
+	}{
+		{"About you, and what's on offer", []Kind{Requirements, Benefits}},
+		// Phrases that overlap both count: "in this role you will", and
+		// "you will need" past its end.
+		{"In this role you will need", []Kind{Responsibilities, Requirements}},
+		// A phrase wholly inside a longer one doesn't: "profile" is
+		// requirements, but here it's part of "company profile".
+		{"Company Profile", []Kind{Company}},
+	}
+	for _, tt := range tests {
+		if got := All(headings.Key(tt.heading)); !slices.Equal(got, tt.want) {
+			t.Errorf("All(%q) = %q, want %q", tt.heading, got, tt.want)
+		}
 	}
 }
 

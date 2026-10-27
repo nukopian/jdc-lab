@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+- grammar v0.3.2, with `Overlap` and `Outermost`, both suggested from
+  the lab's use: phrases in a heading that overlap now all count, so
+  "To succeed in this role, you will need:" is requirements rather than
+  responsibilities (six headings, 22 uses), while one wholly inside a
+  longer one still doesn't, so "Company Profile" stays company
+  ([record](docs/changes/2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md)).
 - grammar v0.3.1, whose `MapOnly` option reads a rule written
   `phrases => kind` without making the kind a phrase, as the lab asked
   for legal's rule. `internal/sections` now uses it, in place of reading
