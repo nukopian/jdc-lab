@@ -122,6 +122,9 @@ say how to run it.
   boilerplate counts as describing the job, so its verdicts are as
   before.
 - **List items** are "- " entries in a chunk's text.
+- **Chunks in a fixed order** (Iain, 2026-10-27): summary, role,
+  responsibilities and requirements first, in that order, then the
+  rest as the ad has them, and the boilerplate last.
 - **Afterwards,** still unreleased: `-yaml` writes each ad as a YAML
   document, for people, each chunk's text a block of its lines, where
   JSON is for programs. The lab writes its own YAML, as the usual Go

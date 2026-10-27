@@ -138,13 +138,13 @@ func TestBoilerplateGathered(t *testing.T) {
 	if len(cs) != 4 {
 		t.Fatalf("got %d chunks, want 3 and one of boilerplate", len(cs))
 	}
-	if got := cs[0].Text; got != "Perks\nA virtual GP.\nA pension plan." {
+	if got := kind(cs, sections.Benefits).Text; got != "Perks\nA virtual GP.\nA pension plan." {
 		t.Errorf("benefits: %q; want every line kept", got)
 	}
-	if got := cs[1].Text; got != "You'll need\nA licence." {
+	if got := kind(cs, sections.Requirements).Text; got != "You'll need\nA licence." {
 		t.Errorf("requirements: %q; want the boilerplate gone", got)
 	}
-	if got := cs[3].Text; got != "requirements: A pension plan.\nsummary: A pension plan." {
+	if got := kind(cs, Boilerplate).Text; got != "requirements: A pension plan.\nsummary: A pension plan." {
 		t.Errorf("boilerplate: %q; want each line with where it was", got)
 	}
 	// No boilerplate, no chunk of it.
@@ -177,4 +177,35 @@ func TestRoleEmbedded(t *testing.T) {
 	if c.Use != Embed {
 		t.Errorf("got %s, want embed", c.Use)
 	}
+}
+
+// Summary, role, responsibilities and requirements come first, in that
+// order; the rest after, in the ad's order; the boilerplate last.
+func TestOrder(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Requirements, Heading: "You'll need", Parts: []headings.Part{text("A licence.")}},
+		{Kind: sections.Benefits, Heading: "Perks", Parts: []headings.Part{text("A pension.")}},
+		{Kind: sections.Role, Heading: "The role", Parts: []headings.Part{text("Driving."), text("We are an agency.")}},
+		{Kind: sections.Company, Heading: "About us", Parts: []headings.Part{text("A firm.")}},
+		{Kind: sections.Summary, Parts: []headings.Part{text("Hiring now.")}},
+		{Kind: sections.Requirements, Heading: "Also", Parts: []headings.Part{text("A van.")}},
+	}
+	var got []string
+	for _, c := range Of(ss, func(s string) bool { return s == "We are an agency." }) {
+		got = append(got, string(c.Kind)+" "+c.Heading)
+	}
+	want := []string{"summary ", "role The role", "requirements You'll need", "requirements Also", "benefits Perks", "company About us", "boilerplate "}
+	if strings.Join(got, "|") != strings.Join(want, "|") {
+		t.Errorf("got  %q\nwant %q", got, want)
+	}
+}
+
+// kind returns the first chunk of kind k.
+func kind(cs []Chunk, k sections.Kind) Chunk {
+	for _, c := range cs {
+		if c.Kind == k {
+			return c
+		}
+	}
+	return Chunk{}
 }

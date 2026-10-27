@@ -435,7 +435,10 @@ advertiser's standard perks are still a list of benefits. The text of
 an unmapped section goes there too, under its heading, as an unmapped
 heading is mapping still to do; its fields become a details chunk.
 Each ad totals its tokens, its embedded tokens and its unclassified
-ones (the unmapped text), so the last shows what's left to map. Boilerplate is what the run's
+ones (the unmapped text), so the last shows what's left to map. The
+chunks come in a fixed order: summary, role, responsibilities and
+requirements first, then the rest as the ad has them, and the
+boilerplate last. Boilerplate is what the run's
 `boilerplate/repeated.tsv` says, so a run comes first (`-run` chooses
 which, `data/runs/latest` by default). What placed a chunk is the
 heading and the phrase in it that won, with any phrases of other kinds

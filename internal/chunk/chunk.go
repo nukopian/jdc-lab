@@ -16,10 +16,15 @@
 // accuracy and attention to detail"), and this is where they show. Other
 // chunks keep theirs, as part of what they say: an advertiser's
 // standard perks are still a list of benefits.
+//
+// The chunks come with what says what the job is first: the summary, the
+// role, responsibilities and requirements, in that order; then the rest,
+// as the ad has them; and the boilerplate last.
 package chunk
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -111,6 +116,9 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		c.Tokens = Tokens(c.Text)
 		cs = append(cs, c)
 	}
+	// What says what the job is comes first, in that order; the rest
+	// keep the ad's order, and the boilerplate comes last.
+	slices.SortStableFunc(cs, func(a, b Chunk) int { return first(a.Kind) - first(b.Kind) })
 	if len(gathered) > 0 {
 		text := strings.Join(gathered, "\n")
 		cs = append(cs, Chunk{
@@ -119,6 +127,17 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		})
 	}
 	return cs
+}
+
+// firsts are the kinds of chunk that come first, in this order.
+var firsts = []sections.Kind{sections.Summary, sections.Role, sections.Responsibilities, sections.Requirements}
+
+// first returns a chunk's place among the firsts, or after them.
+func first(k sections.Kind) int {
+	if i := slices.Index(firsts, k); i >= 0 {
+		return i
+	}
+	return len(firsts)
 }
 
 // line returns a part's text as a line of a chunk: an item of a list as
