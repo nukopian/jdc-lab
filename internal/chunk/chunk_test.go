@@ -57,11 +57,27 @@ func TestOf(t *testing.T) {
 	}
 }
 
+// An unmapped section goes to the boilerplate chunk, each line with its
+// heading, and counts as unclassified; its fields stay, as details.
 func TestOfUnmapped(t *testing.T) {
-	ss := []sections.Section{{Kind: sections.Unmapped, Heading: "Our depots", Parts: []headings.Part{text("Leeds and York.")}}}
-	c := Of(ss, func(string) bool { return false })[0]
-	if c.Use != Unclassified || !strings.Contains(c.PlacedBy, "no phrase in headings.txt") {
-		t.Errorf("got %s, %q; want an unmapped section unclassified, not embedded, saying no phrase placed it", c.Use, c.PlacedBy)
+	ss := []sections.Section{{Kind: sections.Unmapped, Heading: "Our depots", Parts: []headings.Part{
+		text("Leeds and York."),
+		{Role: headings.Field, Text: "Pay: £16.50 per hour", Key: "pay", Value: "£16.50 per hour", Added: "Pay: "},
+	}}}
+	cs := Of(ss, func(string) bool { return false })
+	if len(cs) != 2 {
+		t.Fatalf("got %d chunks, want details and boilerplate: %+v", len(cs), cs)
+	}
+	d, b := cs[0], cs[1]
+	if d.Kind != sections.Details || d.Use != Metadata || len(d.Fields) != 1 || d.Fields[0].Value != "£16.50 per hour" ||
+		!strings.Contains(d.PlacedBy, "unmapped") {
+		t.Errorf("the fields: %+v; want a details chunk of the unmapped section's fields", d)
+	}
+	if b.Kind != Boilerplate || b.Text != `unmapped "Our depots": Leeds and York.` || b.Unmapped != Tokens("Leeds and York.") {
+		t.Errorf("the boilerplate: %+v; want the unmapped text, with its heading, counted", b)
+	}
+	if a := Totalled(Ad{Chunks: cs}, 20); a.Unclassified != b.Unmapped || a.Embedded != 0 {
+		t.Errorf("totals: %+v", a)
 	}
 }
 

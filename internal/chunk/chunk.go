@@ -7,8 +7,10 @@
 // The sections that say what the job is are embedded: the summary,
 // responsibilities, requirements and desirable. Details are metadata;
 // benefits, company, apply and legal are left out; and unmapped ones,
-// whose kind isn't known, are unclassified, not embedded: they're what's
-// left to map. Text found as boilerplate leaves the embedded chunks for
+// whose kind isn't known, aren't embedded: they're what's left to map. An unmapped section's text goes to the boilerplate chunk,
+// under its heading, and its fields to a details chunk.
+//
+// Text found as boilerplate leaves the embedded chunks for
 // one chunk of its own, at the end, left out but there to see, each line
 // with the section it came from: the verdict catches advertisers'
 // footers, but also job lines common to many ads ("high levels of
@@ -53,6 +55,9 @@ type Chunk struct {
 	// Text is the chunk's heading and text, a line each.
 	Text   string  `json:"text" yaml:"text"`
 	Fields []Field `json:"fields,omitempty" yaml:"fields,omitempty"`
+	// Unmapped is how many of the boilerplate chunk's tokens are text of
+	// unmapped sections: what's left to map.
+	Unmapped int `json:"unmapped_tokens,omitempty" yaml:"unmapped_tokens,omitempty"`
 	// Tokens is about how many tokens Text is: four for every three
 	// words, as models' tokenizers make of English.
 	Tokens int `json:"tokens" yaml:"tokens"`
@@ -62,8 +67,31 @@ type Chunk struct {
 // part was found to be boilerplate.
 func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	var cs []Chunk
-	var gathered []string // the boilerplate of the embedded chunks
+	var gathered []string // the boilerplate of the embedded chunks, and the unmapped text
+	unmapped := 0         // the unmapped text's tokens
 	for _, s := range ss {
+		if s.Kind == sections.Unmapped {
+			// Unmapped text goes to the boilerplate, under its heading, and
+			// its fields stay, as details.
+			d := Chunk{Kind: sections.Details, Use: Metadata, Heading: s.Heading,
+				PlacedBy: fmt.Sprintf("the fields under the unmapped heading %q", s.Heading)}
+			var lines []string
+			for _, p := range s.Parts {
+				if p.Role == headings.Field {
+					d.Fields = append(d.Fields, Field{Label: p.Key, Value: p.Value})
+					lines = append(lines, p.Text)
+					continue
+				}
+				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, p.Text))
+				unmapped += Tokens(p.Text)
+			}
+			if len(d.Fields) > 0 {
+				d.Text = strings.Join(lines, "\n")
+				d.Tokens = Tokens(d.Text)
+				cs = append(cs, d)
+			}
+			continue
+		}
 		c := Chunk{Kind: s.Kind, Heading: s.Heading, PlacedBy: placedBy(s), Use: use(s.Kind)}
 		var lines []string
 		if s.Heading != "" {
@@ -86,8 +114,8 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	if len(gathered) > 0 {
 		text := strings.Join(gathered, "\n")
 		cs = append(cs, Chunk{
-			Kind: Boilerplate, Use: LeaveOut, Text: text, Tokens: Tokens(text),
-			PlacedBy: "found as boilerplate in the chunks above: in ads for five groups of titles or more, or more often outside the sections about the job",
+			Kind: Boilerplate, Use: LeaveOut, Text: text, Tokens: Tokens(text), Unmapped: unmapped,
+			PlacedBy: "found as boilerplate in the chunks above (in ads for five groups of titles or more, or more often outside the sections about the job), or under a heading of no known kind",
 		})
 	}
 	return cs

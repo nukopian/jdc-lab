@@ -23,7 +23,8 @@ type Ad struct {
 }
 
 // Totalled returns a with its totals: tokens, the whole ad's, and its
-// chunks' embedded and unclassified.
+// chunks' embedded and unclassified: unmapped text, in the boilerplate
+// chunk.
 func Totalled(a Ad, tokens int) Ad {
 	a.Tokens, a.Embedded, a.Unclassified = tokens, 0, 0
 	for _, c := range a.Chunks {
@@ -33,6 +34,7 @@ func Totalled(a Ad, tokens int) Ad {
 		case Unclassified:
 			a.Unclassified += c.Tokens
 		}
+		a.Unclassified += c.Unmapped
 	}
 	return a
 }
@@ -50,7 +52,11 @@ func (a Ad) WriteYAML(w io.Writer) error {
 		if c.Heading != "" {
 			fmt.Fprintf(&b, "    heading: %s\n", scalar(c.Heading))
 		}
-		fmt.Fprintf(&b, "    use: %s\n    tokens: %d\n    placed_by: %s\n", scalar(c.Use), c.Tokens, scalar(c.PlacedBy))
+		fmt.Fprintf(&b, "    use: %s\n    tokens: %d\n", scalar(c.Use), c.Tokens)
+		if c.Unmapped > 0 {
+			fmt.Fprintf(&b, "    unmapped_tokens: %d\n", c.Unmapped)
+		}
+		fmt.Fprintf(&b, "    placed_by: %s\n", scalar(c.PlacedBy))
 		fmt.Fprintf(&b, "    text: %s\n", block(c.Text, "      "))
 		if len(c.Fields) > 0 {
 			b.WriteString("    fields:\n")
