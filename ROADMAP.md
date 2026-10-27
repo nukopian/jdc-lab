@@ -176,7 +176,7 @@ Added 2026-10-27. The headings the pages of ads before and after show
 unmapped ("We are seeking:", "School Information"), the headings after
 a first one not found, and "Why …?" taking in the pay: on the three
 samples, 12% of the text is still under headings of no known kind, in
-43% of ads.
+44% of ads.
 
 ### 22. One set of grammars for facts and headings
 

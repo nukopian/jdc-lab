@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 
 	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/chunk"
@@ -27,7 +28,6 @@ var files embed.FS
 
 var templates = template.Must(template.New("").Funcs(template.FuncMap{
 	"lines": lines,
-	"pct":   pct,
 	"class": class,
 }).ParseFS(files, "page.html", "index.html"))
 
@@ -64,13 +64,15 @@ func shares(c chunk.Ad) Shares {
 
 // Write writes a's page to w; title names the set of pages it's in.
 func Write(w io.Writer, a Ad, title string) error {
+	s := shares(a.Chunks)
 	return templates.ExecuteTemplate(w, "page.html", struct {
 		Ad
 		Title  string
 		Posted template.HTML
 		Shares Shares
+		Pct    [4]int
 		All    int
-	}{a, title, Posted(a.Ad.HTML), shares(a.Chunks), total(shares(a.Chunks))})
+	}{a, title, Posted(a.Ad.HTML), s, percents(s), total(s)})
 }
 
 // An Entry is a line of the index: an ad, and the file of its page.
@@ -83,13 +85,11 @@ type Entry struct {
 func WriteIndex(w io.Writer, title string, es []Entry) error {
 	type row struct {
 		Entry
-		Shares Shares
-		All    int
+		Pct [4]int
 	}
 	rows := make([]row, len(es))
 	for i, e := range es {
-		s := shares(e.Chunks)
-		rows[i] = row{e, s, total(s)}
+		rows[i] = row{e, percents(shares(e.Chunks))}
 	}
 	return templates.ExecuteTemplate(w, "index.html", struct {
 		Title string
@@ -108,45 +108,48 @@ var keep = map[string]bool{
 	"td": true, "th": true, "div": true, "span": true, "hr": true, "blockquote": true,
 }
 
+// dropped are the tags an ad loses with everything in them: what runs,
+// styles, or isn't shown as text.
+var dropped = map[string]bool{
+	"script": true, "style": true, "noscript": true, "iframe": true, "textarea": true, "xmp": true,
+	"title": true, "template": true, "svg": true, "math": true, "noembed": true, "object": true,
+}
+
 // Posted returns an ad's HTML cut down to the tags in keep, with no
-// attributes, and without scripts and styles or anything in them: safe
-// to put in a page as it is.
+// attributes, and without scripts, styles and the like or anything in
+// them: safe to put in a page as it is. It's parsed as a browser would,
+// and written back from the parse, so every tag it keeps is closed, and
+// none closes what's outside it.
 func Posted(src string) template.HTML {
+	body := &html.Node{Type: html.ElementNode, Data: "body", DataAtom: atom.Body}
+	nodes, err := html.ParseFragment(strings.NewReader(src), body)
+	if err != nil {
+		return template.HTML(html.EscapeString(src))
+	}
 	var b strings.Builder
-	skip := 0 // how many scripts or styles we're inside
-	z := html.NewTokenizer(strings.NewReader(src))
-	for {
-		tt := z.Next()
-		if tt == html.ErrorToken {
-			return template.HTML(b.String())
+	var write func(n *html.Node)
+	write = func(n *html.Node) {
+		switch {
+		case n.Type == html.TextNode:
+			b.WriteString(html.EscapeString(n.Data))
+			return
+		case n.Type != html.ElementNode || dropped[n.Data]:
+			return
 		}
-		name, _ := z.TagName()
-		tag := string(name)
-		switch tt {
-		case html.StartTagToken, html.SelfClosingTagToken:
-			if tag == "script" || tag == "style" {
-				if tt == html.StartTagToken {
-					skip++
-				}
-				continue
-			}
-			if skip == 0 && keep[tag] {
-				b.WriteString("<" + tag + ">")
-			}
-		case html.EndTagToken:
-			if tag == "script" || tag == "style" {
-				skip = max(skip-1, 0)
-				continue
-			}
-			if skip == 0 && keep[tag] && tag != "br" && tag != "hr" {
-				b.WriteString("</" + tag + ">")
-			}
-		case html.TextToken:
-			if skip == 0 {
-				b.WriteString(html.EscapeString(string(z.Text())))
-			}
+		if keep[n.Data] {
+			b.WriteString("<" + n.Data + ">")
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			write(c)
+		}
+		if keep[n.Data] && n.Data != "br" && n.Data != "hr" {
+			b.WriteString("</" + n.Data + ">")
 		}
 	}
+	for _, n := range nodes {
+		write(n)
+	}
+	return template.HTML(b.String())
 }
 
 // A line is a line of a chunk's text: a list's item, or not, and for the
@@ -183,12 +186,33 @@ func lines(ch chunk.Chunk) []line {
 	return out
 }
 
-// pct returns n as a share of all, in whole percent.
-func pct(n, all int) int {
+// percents returns each of s's shares of their total, in whole percent,
+// rounded so that they add up to 100: the largest remainders round up.
+func percents(s Shares) [4]int {
+	ns := [4]int{s.Embed, s.Metadata, s.LeaveOut, s.Boilerplate}
+	all := total(s)
+	var ps [4]int
 	if all == 0 {
-		return 0
+		return ps
 	}
-	return (100*n + all/2) / all
+	left := 100
+	rem := make([]int, 4)
+	for i, n := range ns {
+		ps[i] = 100 * n / all
+		left -= ps[i]
+		rem[i] = 100 * n % all
+	}
+	for ; left > 0; left-- {
+		top := 0
+		for i := range rem {
+			if rem[i] > rem[top] {
+				top = i
+			}
+		}
+		ps[top]++
+		rem[top] = -1
+	}
+	return ps
 }
 
 // class returns the CSS class for a chunk: its use, or boilerplate.

@@ -198,8 +198,12 @@ type Section struct {
 // exactly a section's name, with no cue, starts that section, as does a
 // short one with a kind's phrase in it before a list (see beforeList).
 func Divide(parts []headings.Part) []Section {
+	parts = Joined(parts)
 	sections := []Section{{Kind: Summary}}
 	for i, p := range parts {
+		if Subtitle(parts, i) {
+			p.Role, p.Key = headings.Text, ""
+		}
 		kind, ok := starts(p)
 		if !ok && i+1 < len(parts) && parts[i+1].Item {
 			kind, ok = beforeList(p)
@@ -208,9 +212,6 @@ func Divide(parts []headings.Part) []Section {
 			byName := p.Role != headings.Heading
 			sections = append(sections, Section{Kind: kind, Heading: p.Text, ByName: byName})
 			continue
-		}
-		if Subtitle(p) {
-			p.Role, p.Key = headings.Text, ""
 		}
 		last := &sections[len(sections)-1]
 		last.Parts = append(last.Parts, p)
@@ -240,11 +241,33 @@ func beforeList(p headings.Part) (Kind, bool) {
 	return Of(key)
 }
 
-// Subtitle reports whether p is the ad's subtitle: a heading of no known
-// kind that the ad's title ran into, "Oldham" of "Head Chef - Oldham".
-// It's no heading, but text, in the section it's in.
-func Subtitle(p headings.Part) bool {
-	if p.Role != headings.Heading || !p.AfterTitle {
+// Joined returns parts with each title made longer joined back into one
+// heading: "Head Chef Manager", not "Head Chef" and "Manager", a heading
+// of no known kind after only a space (see headings.Part's Whole).
+func Joined(parts []headings.Part) []headings.Part {
+	var out []headings.Part
+	for _, p := range parts {
+		if _, known := Of(p.Key); p.Whole != "" && p.Role == headings.Heading && !known &&
+			len(out) > 0 && out[len(out)-1].Role == headings.Repeat {
+			out[len(out)-1] = headings.Part{Role: headings.Heading, Text: p.Whole, Key: headings.Key(p.Whole)}
+			continue
+		}
+		out = append(out, p)
+	}
+	return out
+}
+
+// Subtitle reports whether parts[i] is the ad's subtitle: a heading of no
+// known kind that the ad's title ran into, "Oldham" of "Head Chef -
+// Oldham". It's no heading, but text, in the section it's in. A label
+// after the title, ending in a colon ("You:") or over a list, is a
+// heading still.
+func Subtitle(parts []headings.Part, i int) bool {
+	p := parts[i]
+	if p.Role != headings.Heading || !p.AfterTitle || strings.HasSuffix(strings.TrimSpace(p.Text), ":") {
+		return false
+	}
+	if i+1 < len(parts) && parts[i+1].Item {
 		return false
 	}
 	_, ok := Of(p.Key)
@@ -257,9 +280,6 @@ func starts(p headings.Part) (Kind, bool) {
 	case p.Role == headings.Heading:
 		if kind, ok := Of(p.Key); ok {
 			return kind, true
-		}
-		if Subtitle(p) {
-			return "", false
 		}
 		return Unmapped, true
 	case p.Role == headings.Text && !p.Item:

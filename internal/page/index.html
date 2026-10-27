@@ -15,12 +15,12 @@
 <main style="display: block">
 <table class="index">
   <tr><th>Ad</th><th>Why it's here</th><th>Tokens</th><th>Where they go</th></tr>
-  {{range $r := .Rows}}
+  {{range .Rows}}
   <tr>
     <td><a href="{{.File}}">{{.Ad.Ad.Title}}</a><br><span class="meta">{{.Ad.Ad.ID}}</span></td>
     <td>{{.Why}}</td>
-    <td class="tokens">{{.Chunks.Tokens}}<br><span class="meta">{{pct .Shares.Embed .All}}% embedded</span></td>
-    <td><div class="bar">{{with .Shares}}<span class="embed" style="width: {{pct .Embed $r.All}}%"></span><span class="metadata" style="width: {{pct .Metadata $r.All}}%"></span><span class="leave-out" style="width: {{pct .LeaveOut $r.All}}%"></span><span class="boilerplate" style="width: {{pct .Boilerplate $r.All}}%"></span>{{end}}</div></td>
+    <td class="tokens">{{.Chunks.Tokens}}<br><span class="meta">{{index .Pct 0}}% embedded</span></td>
+    <td>{{template "bar" .}}</td>
   </tr>
   {{end}}
 </table>

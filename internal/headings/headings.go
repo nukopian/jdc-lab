@@ -68,6 +68,9 @@ type Part struct {
 	// AfterTitle is true for what followed the ad's title in its block,
 	// the title split off as a repeat: "Oldham" of "Head Chef - Oldham".
 	AfterTitle bool `json:"after_title,omitempty"`
+	// Whole is the block it was split from, when only a space ended the
+	// title: "Head Chef Manager" of "Manager".
+	Whole string `json:"whole,omitempty"`
 }
 
 // MaxWords is the most words a heading has. Longer bold text is a bold
@@ -188,10 +191,14 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 // a field; a heading, the block having been one with the title too
 // ("General Foreman Responsibilities:"); or, after a mark that ends the
 // title, a short line that isn't a sentence ("General Foreman
-// (Permanent)"). A block that goes on as a sentence, or with the title
-// made plural or longer ("General Foreman / Site Manager"), isn't split.
+// (Permanent)", "General Foreman - 12 Month Contract"), as text. A block
+// that goes on as a sentence, or with the title made plural or longer
+// ("General Foreman / Site Manager"), isn't split; nor is a label that
+// cleaning added. With only a space after the title, the rest's parts
+// keep the whole block, as a heading of no known kind there is the title
+// made longer ("Head Chef Manager"), which sections reads whole.
 func afterTitle(text string, cues blocks.Cues, title string, repeats map[string]bool) ([]Part, bool) {
-	if title == "" || len(text) <= len(title) || !strings.EqualFold(text[:len(title)], title) {
+	if title == "" || cues.Added != "" || len(text) <= len(title) || !strings.EqualFold(text[:len(title)], title) {
 		return nil, false
 	}
 	head, after := text[:len(title)], text[len(title):]
@@ -202,6 +209,8 @@ func afterTitle(text string, cues blocks.Cues, title string, repeats map[string]
 	if rest == "" {
 		return nil, false
 	}
+	first, _ := utf8.DecodeRuneInString(rest)
+	marked := first == '(' || strings.ContainsAny(after[:len(after)-len(rest)], "-|:,")
 	// The rest has a bold lead only if it's left once the title is off.
 	restCues := cues
 	restCues.BoldLead = strings.TrimLeft(strings.TrimPrefix(cues.BoldLead, head), " -|:,")
@@ -209,7 +218,9 @@ func afterTitle(text string, cues blocks.Cues, title string, repeats map[string]
 		restCues.BoldLead = ""
 	}
 	ps := block(rest, restCues, repeats)
-	first, _ := utf8.DecodeRuneInString(rest)
+	if ps[0].Role == Heading && len(ps) == 1 && marked && (first == '(' || unicode.IsDigit(first)) {
+		ps = []Part{{Role: Text, Text: rest}} // what the title is, in brackets or by figures
+	}
 	switch ps[0].Role {
 	case Heading:
 		whole := block(text, cues, repeats)
@@ -217,14 +228,16 @@ func afterTitle(text string, cues blocks.Cues, title string, repeats map[string]
 			return nil, false
 		}
 	case Text:
-		marked := first == '(' || strings.ContainsAny(after[:len(after)-len(rest)], "-|:,")
-		sentence := strings.Contains(rest, ". ") || strings.HasSuffix(rest, ".")
+		sentence := strings.Contains(rest, ". ") || strings.HasSuffix(rest, ".") || unicode.IsLower(first)
 		if !marked || sentence || len(strings.Fields(rest)) > MaxWords {
 			return nil, false
 		}
 	}
 	for i := range ps {
 		ps[i].AfterTitle = true
+		if !marked {
+			ps[i].Whole = text
+		}
 	}
 	return append([]Part{{Role: Repeat, Text: head}}, ps...), true
 }

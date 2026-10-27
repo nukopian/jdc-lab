@@ -268,3 +268,28 @@ func TestDivideSubtitle(t *testing.T) {
 		t.Errorf("\n got: %q\nwant: %q", got, want)
 	}
 }
+
+// Found in the wash-up: the title made longer by a word isn't split, and
+// a label after the title, ending in a colon or over a list, is a
+// heading, not a subtitle.
+func TestDivideNotSubtitle(t *testing.T) {
+	html := `<p><b>Head Chef Manager</b></p><p>We cook.</p>` +
+		`<p><b>Head Chef - Position Remuneration</b></p><ul><li>£30,000</li></ul>` +
+		`<p><b>Head Chef - You:</b></p><p>Can cook.</p>`
+	var got []string
+	for _, s := range Divide(headings.Read(blocks.Split(html), "Head Chef")) {
+		line := fmt.Sprintf("%s %q:", s.Kind, s.Heading)
+		for _, p := range s.Parts {
+			line += fmt.Sprintf(" %s(%s)", p.Role, p.Text)
+		}
+		got = append(got, line)
+	}
+	want := []string{
+		`unmapped "Head Chef Manager": text(We cook.) repeat(Head Chef)`,
+		`unmapped "Position Remuneration": text(£30,000) repeat(Head Chef)`,
+		`unmapped "You:": text(Can cook.)`,
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("\n got: %q\nwant: %q", got, want)
+	}
+}

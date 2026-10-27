@@ -64,7 +64,10 @@ func main() {
 	pages := flag.String("pages", "", "write the ads this file lists as pages, beside it")
 	flag.Parse()
 	if *pages == "" && flag.NArg() == 0 {
-		log.Fatal("usage: chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...")
+		log.Fatal("usage: chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...\n       chunk -pages FILE [-run DIR]")
+	}
+	if *pages != "" && (flag.NArg() > 0 || *asJSON || *asYAML || *title != "") {
+		log.Fatal("chunk: -pages takes the ads from its file, with -run only")
 	}
 	if *asJSON && *asYAML {
 		log.Fatal("chunk: -json or -yaml, not both")
@@ -147,8 +150,15 @@ func writePages(list, run string, chunked func(ads.Ad) chunk.Ad) error {
 			continue
 		}
 		id, reason, _ := strings.Cut(l, "\t")
-		ids = append(ids, strings.TrimSpace(id))
-		why[strings.TrimSpace(id)] = strings.TrimSpace(reason)
+		id = strings.TrimSpace(id)
+		if _, dup := why[id]; dup {
+			return fmt.Errorf("chunk: %s: %s is listed twice", list, id)
+		}
+		if id != filepath.Base(id) || strings.HasPrefix(id, ".") || strings.Contains(id, " ") {
+			return fmt.Errorf("chunk: %s: %q isn't an ad's ID; is a tab missing after it?", list, id)
+		}
+		ids = append(ids, id)
+		why[id] = strings.TrimSpace(reason)
 	}
 	found := map[string]ads.Ad{}
 	for a, err := range ads.File(filepath.Join(run, "ads.jsonl")) {

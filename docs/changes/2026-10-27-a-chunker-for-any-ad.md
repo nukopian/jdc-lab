@@ -81,13 +81,13 @@ say how to run it.
   |---|---:|---:|
   | list items | 395,650 | 458,083 |
   | fields | 36,258 | 38,134 |
-  | distinct headings | 25,299 | 23,310 |
+  | distinct headings | 25,299 | 23,125 |
   | lines starting a section by name | 14,262 | 18,831 |
   | heading uses of a known kind | 77% | 78% |
-  | ads with every heading known | 53% | 57% |
+  | ads with every heading known | 53% | 56% |
   | ads with only a summary | 5% | 4% |
   | ads with a responsibilities section | 53% | 60% |
-  | ads with an unmapped section | 47% | 43% |
+  | ads with an unmapped section | 47% | 44% |
   | the summary, of all text | 28% | 18% |
   | the role, of all text | (none) | 8% |
   | unmapped, of all text | 13% | 12% |
@@ -318,4 +318,18 @@ say how to run it.
   than the chunks showed, and were rewritten. 20's Done when, the
   pages showing the chunker's current output from `chunk` itself, is
   met: a rerun rebuilds them.
-
+- **The wash-up after closing** (an independent review of the title
+  split and the pages, each finding reproduced by a failing test, then
+  fixed): the title was split off a title made longer ("Head Chef
+  Manager", the reverted second try's fault, only half undone), off a
+  sentence after a comma, and off a label cleaning added; a label over
+  a list, or ending in a colon ("You:"), was taken for a subtitle; a
+  bold title in brackets stayed whole where a plain one split. On the
+  pages, `Posted` filtered tags without balancing them, so 9 ads left a
+  tag open that ran on into the chunks beside them; it now parses the
+  ad as a browser does and writes the parse back. Shares rounded each
+  on its own could add up to more than 100%. Against the close: 4,947
+  titles split off, from 4,749; ads with every heading known 56%, from
+  57%, and ads with an unmapped section 44%, from 43%, as wrong splits
+  are undone; the token split is as it was. The measurements above are
+  as of the wash-up.

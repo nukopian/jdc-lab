@@ -13,6 +13,13 @@
   <p class="meta">{{.Ad.Ad.ID}}{{range .Ad.Ad.Locations}} · {{.}}{{end}}</p>
   {{with .Why}}<p class="why">{{.}}</p>{{end}}
   {{template "bar" .}}
+  <p class="legend">
+    the whole ad, about {{.Chunks.Tokens}} tokens; its chunks, about {{.All}}:
+    <span class="key embed"></span>embedded {{.Shares.Embed}} ({{index .Pct 0}}%)
+    <span class="key metadata"></span>metadata {{.Shares.Metadata}} ({{index .Pct 1}}%)
+    <span class="key leave-out"></span>left out {{.Shares.LeaveOut}} ({{index .Pct 2}}%)
+    <span class="key boilerplate"></span>boilerplate {{.Shares.Boilerplate}} ({{index .Pct 3}}%)
+  </p>
 </header>
 <main>
   <section class="posted">
@@ -40,6 +47,8 @@
       </table>
       {{end}}
     </article>
+    {{else}}
+    <p class="empty">(no chunks)</p>
     {{end}}
   </section>
 </main>
@@ -47,17 +56,8 @@
 </html>
 {{define "bar"}}
 <div class="bar" role="img" aria-label="where the ad's tokens go">
-  {{with .Shares}}
-  <span class="embed" style="width: {{pct .Embed $.All}}%"></span><span class="metadata" style="width: {{pct .Metadata $.All}}%"></span><span class="leave-out" style="width: {{pct .LeaveOut $.All}}%"></span><span class="boilerplate" style="width: {{pct .Boilerplate $.All}}%"></span>
-  {{end}}
+  <span class="embed" style="width: {{index .Pct 0}}%"></span><span class="metadata" style="width: {{index .Pct 1}}%"></span><span class="leave-out" style="width: {{index .Pct 2}}%"></span><span class="boilerplate" style="width: {{index .Pct 3}}%"></span>
 </div>
-<p class="legend">
-  the whole ad, about {{.Chunks.Tokens}} tokens; its chunks:
-  <span class="key embed"></span>embedded {{.Shares.Embed}} ({{pct .Shares.Embed .All}}%)
-  <span class="key metadata"></span>metadata {{.Shares.Metadata}} ({{pct .Shares.Metadata .All}}%)
-  <span class="key leave-out"></span>left out {{.Shares.LeaveOut}} ({{pct .Shares.LeaveOut .All}}%)
-  <span class="key boilerplate"></span>boilerplate {{.Shares.Boilerplate}} ({{pct .Shares.Boilerplate .All}}%)
-</p>
 {{end}}
 {{define "style"}}
 <style>
@@ -112,7 +112,7 @@ main { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24p
 .text p { margin: 6px 0; }
 .text p.item { padding-left: 16px; text-indent: -12px; }
 .text p.item::before { content: "– "; color: var(--muted); }
-.text p.empty { color: var(--muted); font-style: italic; }
+.text p.empty, section p.empty { color: var(--muted); font-style: italic; }
 td.tokens { white-space: nowrap; }
 .from { font-size: 12px; color: var(--boilerplate); }
 table.fields, table.facts { border-collapse: collapse; margin-top: 10px; font-size: 13px; width: 100%; }

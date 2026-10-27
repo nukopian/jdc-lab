@@ -202,10 +202,14 @@ A few rules refine this:
   repeat, and the rest read as it would be alone, when the rest is a
   field, or a heading, the line having been one with the title too
   ("**General Foreman Responsibilities:**"), or, after a mark that ends
-  the title (a dash, bar, colon, comma or opening bracket), a short line that isn't
-  a sentence ("Electrician (Permanent)", "Support Worker - Hull £12.93
-  ph"). A line that goes on as a sentence, or with the title made
-  plural or longer ("Panel Beater / Panel Technician"), stays whole.
+  the title (a dash, bar, colon, comma or opening bracket), a short
+  line that isn't a sentence and doesn't open in lower case, as text
+  ("Electrician (Permanent)", "Support Worker - Hull £12.93 ph"). A
+  line that goes on as a sentence, or with the title made plural or
+  longer ("Panel Beater / Panel Technician"), stays whole, as does a
+  label cleaning added. After only a space, a heading of no known kind
+  is the title made longer ("Head Chef Manager"): sections joins it
+  back into one heading.
 - **A field's label written as a heading,** with a short value (up to
   `MaxValueWords`, 15) on the next line, is joined into one field:
   "**Working Hours**", then "Monday to Friday".
@@ -262,9 +266,11 @@ section of its **kind**:
 
 A heading of no known kind that the ad's title ran into is the ad's
 **subtitle**, "Oldham" of "Head Chef - Oldham": text in the section
-it's in, and not counted as a heading. Before, the whole line was an
-unmapped heading, and everything under it, sometimes the whole ad, was
-unmapped too.
+it's in, and not counted as a heading by `cmd/sections` (the headings
+stage, which knows no kinds, still counts it). Before, the whole line
+was an unmapped heading, and everything under it, sometimes the whole
+ad, was unmapped too. A label after the title, ending in a colon
+("You:") or over a list, is a heading still.
 
 **The phrases are data.**
 [`internal/sections/headings.txt`](../internal/sections/headings.txt)
@@ -751,7 +757,7 @@ and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
 **Headings.** 89% of ads have at least one heading. Headings of a known
-kind are 78% of heading uses; ads with every heading known, 57%; ads
+kind are 78% of heading uses; ads with every heading known, 56%; ads
 with no section but the summary, 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
@@ -765,7 +771,7 @@ with no section but the summary, 4%.
 | desirable | 2% | 7% |
 | benefits | 13% | 38% |
 | company | 3% | 50% |
-| apply | 3% | 57% |
+| apply | 3% | 56% |
 | legal | 1% | 83% |
 | details | 2% | 18% |
 | unmapped | 12% | 26% |

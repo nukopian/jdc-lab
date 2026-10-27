@@ -332,6 +332,15 @@ func TestReadTitleRunOn(t *testing.T) {
 			[]string{`text "General Foreman required for a busy firm in Leeds."`}},
 		{`<p><b>General Foreman / Site Manager</b></p>`,
 			[]string{`heading "General Foreman / Site Manager" key="general foreman / site manager"`}},
+		// Found in the wash-up: a bold rest in brackets, or opening with a
+		// figure, is text after the title, as a plain one is.
+		{`<p><b>General Foreman (Permanent)</b></p>`,
+			[]string{`repeat "General Foreman"`, `text "(Permanent)"`}},
+		{`<p><b>General Foreman - 12 Month Contract</b></p>`,
+			[]string{`repeat "General Foreman"`, `text "12 Month Contract"`}},
+		// A sentence going on after a comma isn't split.
+		{`<p>General Foreman, we need you to run our sites</p>`,
+			[]string{`text "General Foreman, we need you to run our sites"`}},
 		// A bold line too long for a heading stays text, though the rest is short enough.
 		{`<p><b>General Foreman Opportunity with the Civil Works Alliance, Supporting the Project</b></p>`,
 			[]string{`text "General Foreman Opportunity with the Civil Works Alliance, Supporting the Project"`}},
@@ -347,5 +356,13 @@ func TestReadTitleRunOn(t *testing.T) {
 		if !slices.Equal(got, tt.want) {
 			t.Errorf("Read(%q)\n got: %q\nwant: %q", tt.html, got, tt.want)
 		}
+	}
+}
+
+// A label cleaning added isn't the ad's own, so it's never its title.
+func TestReadTitleNotAdded(t *testing.T) {
+	got := show(Read(blocks.Split("<p>\U0001F4CD Leeds</p>"), "Location"))
+	if want := []string{`field "Location: Leeds" key="location" value="Leeds"`}; !slices.Equal(got, want) {
+		t.Errorf("got %q, want %q", got, want)
 	}
 }

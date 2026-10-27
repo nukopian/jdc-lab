@@ -28,10 +28,16 @@ has the steps).
   ph" the title, then a line of facts. A heading of no known kind after
   the title, "Oldham" of "Head Chef - Oldham", is the ad's subtitle,
   text in its section, not an unmapped heading over what follows. On
-  the three samples, 4,749 titles are split off; distinct headings fall
-  from 24,735 to 23,310; ads with every heading known rise from 54% to
-  57%, and ads with an unmapped section fall from 46% to 43% (roadmap
-  18, was idea 15).
+  the three samples, 4,947 titles are split off; distinct headings fall
+  from 24,735 to 23,125; ads with every heading known rise from 54% to
+  56%, and ads with an unmapped section fall from 46% to 44% (roadmap
+  18, was idea 15). Its wash-up found the title split off a title made
+  longer ("Head Chef Manager"), a sentence after a comma, and a label
+  cleaning added; labels over lists ("You:") taken for subtitles; bold
+  titles in brackets left whole where plain ones split; and, on the
+  pages, an ad's unclosed tags spilling into the rest of the page, in
+  9 ads, and shares adding up to more than 100%. Each is fixed, with a
+  test.
 - Faults found in the wash-up, each now with a test:
   - A bold lead in emphasis marks, "\*Recommend a friend\*", was read
     twice: its line lost the opening mark as a bullet, so the lead no

@@ -111,7 +111,7 @@ func run(source, dir string) (t tally, err error) {
 		if !d.First(ad) {
 			continue
 		}
-		parts := headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...)
+		parts := sections.Joined(headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...))
 		ss := sections.Divide(parts)
 		t.add(ad.ID, parts, ss)
 		if err := enc.Encode(record{ID: ad.ID, Sections: ss}); err != nil {
@@ -125,8 +125,8 @@ func run(source, dir string) (t tally, err error) {
 func (t *tally) add(id string, parts []headings.Part, ss []sections.Section) {
 	t.ads++
 	all := true
-	for _, p := range parts {
-		if p.Role != headings.Heading || sections.Subtitle(p) {
+	for i, p := range parts {
+		if p.Role != headings.Heading || sections.Subtitle(parts, i) {
 			continue
 		}
 		t.uses++

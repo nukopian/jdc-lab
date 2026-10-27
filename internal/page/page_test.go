@@ -36,7 +36,7 @@ func TestWrite(t *testing.T) {
 	for _, want := range []string{
 		`We &lt;deliver&gt; parcels.`, // the chunk's text, escaped
 		`<span class="from">summary</span> Apply now`,
-		`embedded 12 (60%)`, `boilerplate 8 (40%)`,
+		`embedded 12 (60%)`, `boilerplate 8 (40%)`, `its chunks, about 20:`,
 		`<div class="ad"><p>We deliver</p></div>`,
 		`a short ad`,
 	} {
@@ -50,5 +50,16 @@ func TestWrite(t *testing.T) {
 	}
 	if !strings.Contains(b.String(), `<a href="1.html">Driver</a>`) || !strings.Contains(b.String(), "width: 60%") {
 		t.Errorf("index lacks the ad's link or its bar:\n%s", b.String())
+	}
+}
+
+// Shares are rounded so they add up to 100.
+func TestPercents(t *testing.T) {
+	got := percents(Shares{1, 1, 3, 3})
+	if sum := got[0] + got[1] + got[2] + got[3]; sum != 100 {
+		t.Errorf("percents = %v, adding up to %d", got, sum)
+	}
+	if got := percents(Shares{}); got != [4]int{} {
+		t.Errorf("percents of nothing = %v", got)
 	}
 }
