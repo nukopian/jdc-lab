@@ -1,0 +1,32 @@
+# The openings that say what a line is, where no heading placed it.
+#
+# Synonym rules, as headings.txt has: phrases => the kind of section a
+# line that opens with one belongs in. A phrase is found only at the start
+# of a line, past any bullet or figure ("33 days holiday"), as whole
+# words, in any case. The longest phrase wins, so "you'll have" is a
+# requirement and "you'll get" a benefit, though "you'll" alone is
+# neither: "You'll be…" can be either.
+
+experience of, experience in, experience with, experience working,
+	previous experience, proven experience, proven, must have, you must have,
+	you will have, you'll have, ability to, able to, knowledge of,
+	understanding of, qualified, a qualification in, minimum,
+	full uk driving licence, full uk driving license, uk driving licence,
+	driving licence, driving license, a full driving licence,
+	valid driving licence, enhanced dbs, the right to work => requirements
+
+responsible for, you will be responsible for, duties include,
+	carry out, carrying out, manage, managing, lead, deliver, delivering,
+	ensure, ensuring, oversee, overseeing, conduct, conducting, prepare,
+	preparing, maintain, maintaining, monitor, monitoring, coordinate,
+	coordinating, assist with, assisting with, undertake, liaise with,
+	liaising with => responsibilities
+
+free parking, on site parking, pension, company pension, pension scheme,
+	days holiday, days annual leave, annual leave, holiday allowance,
+	annual bonus, bonus scheme, private healthcare, private medical,
+	healthcare, life assurance, life insurance, cycle to work,
+	employee discounts, employee assistance, company sick pay, sick pay,
+	company car, company van, you'll get, you will get, you will receive,
+	you'll receive, you'll have the opportunity,
+	you will have the opportunity => benefits

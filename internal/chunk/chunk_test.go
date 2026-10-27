@@ -267,3 +267,40 @@ func TestFactLine(t *testing.T) {
 		}
 	}
 }
+
+// Lines of a summary, and a role's list items, that say by their opening
+// what they are go to a chunk of that kind; a role's prose stays.
+func TestWording(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{
+			text("Join our team as a Project Manager."),
+			{Role: headings.Text, Text: "Driving License essential", Item: true},
+			{Role: headings.Text, Text: "Free parking", Item: true},
+		}},
+		{Kind: sections.Role, Heading: "About the Role", Parts: []headings.Part{
+			text("You'll take ownership of a diverse portfolio of projects."),
+			text("Lead the estates team in delivering projects."),
+			{Role: headings.Text, Text: "Conduct site surveys.", Item: true},
+			{Role: headings.Text, Text: "Manage tender exercises.", Item: true},
+		}},
+	}
+	cs := Of(ss, func(s string) bool { return s == "Free parking" })
+	if got := kind(cs, sections.Summary).Text; got != "Join our team as a Project Manager." {
+		t.Errorf("summary: %q", got)
+	}
+	if got := kind(cs, sections.Role).Text; got != "About the Role\nYou'll take ownership of a diverse portfolio of projects.\nLead the estates team in delivering projects." {
+		t.Errorf("role: %q; want its prose kept", got)
+	}
+	req, resp, ben := kind(cs, sections.Requirements), kind(cs, sections.Responsibilities), kind(cs, sections.Benefits)
+	if req.Text != "- Driving License essential" || !strings.Contains(req.PlacedBy, `"Driving License"`) || req.Use != Embed {
+		t.Errorf("requirements: %+v", req)
+	}
+	if resp.Text != "- Conduct site surveys.\n- Manage tender exercises." || !strings.Contains(resp.PlacedBy, "wording") {
+		t.Errorf("responsibilities: %+v", resp)
+	}
+	// Placed by its wording before the boilerplate check: a benefit, not
+	// boilerplate.
+	if ben.Text != "- Free parking" || kind(cs, Boilerplate).Text != "" {
+		t.Errorf("benefits: %+v; boilerplate %q", ben, kind(cs, Boilerplate).Text)
+	}
+}

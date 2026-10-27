@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+- Lines placed by their wording: a summary's lines and a role's list
+  items that open as requirements ("Experience of…", "Must have…"),
+  responsibilities ("Conduct…", "Responsible for…") or benefits ("Free
+  parking", "33 days holiday") go to a chunk of that kind, read by a
+  grammar over `internal/wording/openings.txt`. On the three samples,
+  8,524 lines move, in 13% of ads (roadmap 18, was 19).
 - Facts read by grammar: pay, hours, work pattern, schedule and a UK
   postcode, each with its values, `internal/facts` having a grammar
   for each. `chunk` takes lines of facts out of the chunks that would

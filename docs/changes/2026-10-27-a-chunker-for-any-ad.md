@@ -184,3 +184,25 @@ say how to run it.
   list is its plan, and meets its Done when (more headings found, a
   sample checked by eye, one of 30 wrong; tests cover it). It leaves
   the roadmap, with its row in PIPELINE.md's Known gaps.
+- **Lines placed by their wording** (was roadmap 19): `internal/wording`
+  reads a line's opening, with a grammar over the openings in
+  `openings.txt` ("experience of", "must have", "conduct", "free
+  parking"), and the chunker moves a summary's lines and a role's list
+  items that open so into a chunk of that kind, before boilerplate is
+  gathered. On the three samples, 8,524 lines move, in 13% of ads:
+  6,996 to responsibilities, 1,083 to requirements, 445 to benefits.
+  Of tokens, the summary falls from 17.5% to 17.0% and the role from
+  7.6% to 7.1%, and responsibilities rise from 15.8% to 16.6%; most of
+  what moves is a role's lists of duties. Of 40 lines checked by eye,
+  one was wrong ("You'll have the opportunity to…" as a requirement),
+  so "you'll have the opportunity" became a benefit's opening. "You
+  will" and "you'll" alone aren't openings, as they open requirements,
+  duties and benefits alike, nor are "build" and "drive", which
+  summaries use in pitches. 19's Done when asked for the share of
+  summary text there by default, 61% when it was written: the opening
+  before any heading is now 10.6% of all text, the summary as a whole
+  17%.
+- **Grammar:** one point of friction passed back, as grammar's idea 15:
+  its reference doesn't say that a capture inside a text capture
+  (`$<k>=[ … ]`) belongs to the enclosing rule, which took two tries
+  to find.

@@ -31,6 +31,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/facts"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/wording"
 )
 
 // Boilerplate is the kind of the chunk of an ad's boilerplate.
@@ -76,9 +77,33 @@ type Chunk struct {
 // part was found to be boilerplate.
 func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	var cs []Chunk
-	var gathered []string // the boilerplate of the embedded chunks, and the unmapped text
-	unmapped := 0         // the unmapped text's tokens
-	var found Chunk       // the lines of facts taken from the chunks
+	var gathered []string                // the boilerplate of the embedded chunks, and the unmapped text
+	unmapped := 0                        // the unmapped text's tokens
+	var found Chunk                      // the lines of facts taken from the chunks
+	worded := map[sections.Kind]*Chunk{} // lines placed by their wording, by kind
+	var wordedKinds []sections.Kind      // in the order first found
+	takeWording := func(s sections.Section, p headings.Part) bool {
+		// Only a summary's lines, and a role's list items: a role's own
+		// prose says what the job is, and stays.
+		if p.Role != headings.Text || !(s.Kind == sections.Summary || s.Kind == sections.Role && p.Item) {
+			return false
+		}
+		kind, phrase, ok := wording.Of(p.Text)
+		if !ok {
+			return false
+		}
+		w := worded[kind]
+		if w == nil {
+			w = &Chunk{Kind: kind, Use: use(kind)}
+			worded[kind] = w
+			wordedKinds = append(wordedKinds, kind)
+		}
+		w.Text += "\n" + line(p)
+		if q := fmt.Sprintf("%q", phrase); !strings.Contains(w.PlacedBy, q) {
+			w.PlacedBy += ", " + q
+		}
+		return true
+	}
 	takeFacts := func(p headings.Part) bool {
 		if p.Role != headings.Text {
 			return false
@@ -123,7 +148,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			lines = append(lines, s.Heading)
 		}
 		for _, p := range s.Parts {
-			if c.Use == Embed && takeFacts(p) {
+			if c.Use == Embed && (takeFacts(p) || takeWording(s, p)) {
 				continue
 			}
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
@@ -143,6 +168,13 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			}
 		}
 		cs = append(cs, c)
+	}
+	for _, k := range wordedKinds {
+		w := worded[k]
+		w.Text = strings.TrimPrefix(w.Text, "\n")
+		w.Tokens = Tokens(w.Text)
+		w.PlacedBy = "lines placed by their wording (openings.txt): " + strings.TrimPrefix(w.PlacedBy, ", ")
+		cs = append(cs, *w)
 	}
 	if found.Text != "" {
 		found.Kind, found.Use = sections.Details, Metadata

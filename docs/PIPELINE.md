@@ -451,6 +451,23 @@ it outranked, or the rule (`it starts "why"`), or that nothing came
 before it, so a wrong kind points at the line of `headings.txt` to
 change.
 
+### Lines placed by their wording
+
+**Package** `internal/wording`.
+
+A line no heading placed can say by its opening what it is: "Experience
+of…" or "Must have…" is a requirement, "Conduct site surveys…" or
+"Responsible for…" a responsibility, "Free parking" or "33 days
+holiday" a benefit. The openings are data, in
+`internal/wording/openings.txt`, in the rule format `headings.txt`
+uses, read by a grammar: a word list found only at a line's start, the
+longest opening winning, so "you'll have" is a requirement and "you'll
+have the opportunity" a benefit. The chunker applies them to a
+summary's lines and a role's list items, a role's own prose staying,
+before boilerplate is gathered, and puts each line in a chunk of its
+kind, saying which openings placed it. On the three samples, 8,524
+lines move, in 13% of ads; of 40 checked by eye, one was wrong.
+
 ### Facts
 
 **Package** `internal/facts`.
