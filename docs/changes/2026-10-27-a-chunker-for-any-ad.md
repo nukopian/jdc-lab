@@ -1,12 +1,10 @@
 # A chunker for any ad
 
-**Status:** shipped, unreleased
+**Status:** in progress
 
 **Origin:** roadmap 18
 
 **Started:** 2026-10-27, in 4b2db1d612d6ac23271a366060c1752d39c0bb5f
-
-**Finished:** 2026-10-27
 
 ## The plan
 
@@ -50,7 +48,12 @@ say how to run it.
 
 ## What happened
 
-- **Outcome:** done. `go run ./cmd/chunk ID` prints an ad's chunks in
+- **The item stays open** (2026-10-27): it's the near-term aim,
+  chunking shown working with grammars, and roadmap 7 (facts), 19
+  (lines placed by their wording) and 20 (pages of ads before and
+  after) build on it; it's done when 20's pages show it. What follows
+  is its first increment.
+- **First increment:** done. `go run ./cmd/chunk ID` prints an ad's chunks in
   half a second, as text or, with `-json`, a line of JSON an embedding
   job can take; it chunks a file of HTML too. Each chunk says what
   placed it, down to the phrase: on the first ad tried, "Part-Time

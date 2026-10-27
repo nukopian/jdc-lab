@@ -18,7 +18,8 @@ has the steps).
   down to the phrase in `headings.txt` and any it outranked. Given an
   ID in a run's ads, a file of HTML or standard input; text to read,
   JSON with `-json` for programs, or YAML with `-yaml` for people,
-  each chunk's text a block of its lines (roadmap 18;
+  each chunk's text a block of its lines (roadmap 18, a first
+  increment;
   [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md)).
 - A first test of retrieval: `cmd/retrieval-set` builds it from a run,
   5,000 ads with the texts each representation embeds and 50 job

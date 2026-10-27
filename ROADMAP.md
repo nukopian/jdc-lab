@@ -40,6 +40,18 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
+### 18. A chunker for any ad
+
+**Serves:** structure, embeddings
+
+The near-term aim: chunking shown working, with grammars. One ad in,
+its chunks out, each with its kind, whether it's worth embedding, its
+size, and what placed it there, down to the grammar's phrase. The first
+increment is in place (`chunk`, as text, JSON or YAML); 7, 19 and 20
+build on it, and it's done when 20's pages show it. The plan, and how
+it's going, are in its
+[record](docs/changes/2026-10-27-a-chunker-for-any-ad.md).
+
 ### 7. Facts from the details
 
 **Serves:** metadata, structure
