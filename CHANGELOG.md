@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+- `chunk -pages FILE` writes web pages of the ads FILE lists, each as
+  posted beside its chunks, coloured by what's done with them, with
+  their size, what placed them, their fields and facts, and a bar of
+  where the ad's tokens go; and an index, with why each ad is there.
+  A dozen, showing where chunking does well and badly, are kept in the
+  private data store (roadmap 18, was 20).
 - The ad's title run into the rest of its line is split off, as a
   repeat: "General Foreman Responsibilities:" is the title, then the
   heading; "Electrician (Permanent)" and "Support Worker - Hull £12.93

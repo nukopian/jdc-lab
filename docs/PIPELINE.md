@@ -438,6 +438,7 @@ go run ./cmd/chunk 225682916
 go run ./cmd/chunk -json 225682916
 go run ./cmd/chunk -yaml 225682916
 go run ./cmd/chunk -title "Driver" ad.html
+go run ./cmd/chunk -pages data/pages/ads.tsv
 ```
 
 The text is to read at a glance, JSON (`-json`, a line an ad) is for
@@ -518,6 +519,24 @@ apart by "|", "," or "/": "Leeds | Permanent" is a line of facts,
 "Contract administration" isn't. A details chunk keeps its lines, and
 gains the facts read from them. A known field label followed by " - "
 is a field, as one followed by a colon is.
+
+### Pages before and after
+
+**Package** `internal/page`, **program** `cmd/chunk -pages`.
+
+For showing what chunking does to an ad, to people who don't read YAML,
+`chunk -pages FILE` writes web pages: each ad as posted beside its
+chunks, each chunk coloured by what's done with it (embedded, metadata,
+left out, or gathered as boilerplate), with its kind, size, what placed
+it, and its fields and facts, under a bar of where the ad's tokens go;
+and an index of them all. FILE lists the ads, an ID, a tab and why it's
+there a line, and the pages go beside it. As `chunk` writes them, a
+rerun shows the chunker as it stands. The ad as posted is cut down to
+the tags that lay text out, with no attributes, scripts or styles, and
+the pages are written with `html/template`, which escapes everything
+else. They show ads, so they live in the private data store, in
+`data/pages/`: a dozen chosen to show where chunking does well and
+where badly.
 
 ## Testing retrieval
 

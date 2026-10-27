@@ -232,3 +232,21 @@ say how to run it.
   30 splits checked by eye, all took the title off rightly. Among the
   headings that moved, "Cover Supervisor work is ideal for:" leaves
   "work is ideal for:", a weak heading, as the whole was.
+- **Pages before and after** (was roadmap 20): `chunk -pages FILE`
+  writes each ad FILE lists as a web page, the ad as posted beside its
+  chunks, coloured by use, with what placed each and the facts read,
+  and a bar of where its tokens go, with an index. The ad's HTML is cut
+  down to the tags that lay text out, and everything else escaped by
+  `html/template`. A dozen ads, picked from all three samples by what
+  they show and then read, are in the private data store: six done
+  well (headings to eight kinds; requirements split by sub-heading;
+  duties and requirements placed by wording; the title split off; pay,
+  hours, pattern and schedules read as facts) and six done badly (one
+  heading swallowing the ad; no headings at all; headings still to
+  map, leaving 88% of an ad unmapped; a "Why …?" heading taking in the
+  pay; job lines taken as boilerplate, roadmap 4). The notes were
+  checked against the chunks: six of the first drafts claimed more
+  than the chunks showed, and were rewritten. 20's Done when, the
+  pages showing the chunker's current output from `chunk` itself, is
+  met: a rerun rebuilds them.
+

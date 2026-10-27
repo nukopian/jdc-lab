@@ -49,7 +49,8 @@ embeddings, and a large language model only where those fall short.
   finds the boilerplate that ads repeat whatever the job. Grammars read
   the facts ads state, pay, hours, work pattern, schedule and postcode,
   as values. `chunk` shows any ad's chunks, saying what to embed, what
-  becomes metadata, and what placed each, and each
+  becomes metadata, and what placed each, as text, data, or web pages
+  of ads before and after, and each
   run shows 20 ads in their chunks, the same in every run, to read by
   eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
   what it measured, and how to improve it.

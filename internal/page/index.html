@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}}</title>
+{{template "style"}}
+</head>
+<body>
+<header>
+  <h1>{{.Title}}</h1>
+  <p class="meta">Each ad as posted, beside its chunks: what's embedded, what's kept as metadata, what's left out, and what's gathered as boilerplate, with what placed each.</p>
+  <p class="legend"><span class="key embed"></span>embedded <span class="key metadata"></span>metadata <span class="key leave-out"></span>left out <span class="key boilerplate"></span>boilerplate</p>
+</header>
+<main style="display: block">
+<table class="index">
+  <tr><th>Ad</th><th>Why it's here</th><th>Tokens</th><th>Where they go</th></tr>
+  {{range $r := .Rows}}
+  <tr>
+    <td><a href="{{.File}}">{{.Ad.Ad.Title}}</a><br><span class="meta">{{.Ad.Ad.ID}}</span></td>
+    <td>{{.Why}}</td>
+    <td class="tokens">{{.Chunks.Tokens}}<br><span class="meta">{{pct .Shares.Embed .All}}% embedded</span></td>
+    <td><div class="bar">{{with .Shares}}<span class="embed" style="width: {{pct .Embed $r.All}}%"></span><span class="metadata" style="width: {{pct .Metadata $r.All}}%"></span><span class="leave-out" style="width: {{pct .LeaveOut $r.All}}%"></span><span class="boilerplate" style="width: {{pct .Boilerplate $r.All}}%"></span>{{end}}</div></td>
+  </tr>
+  {{end}}
+</table>
+</main>
+</body>
+</html>

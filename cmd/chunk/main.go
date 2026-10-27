@@ -5,6 +5,7 @@
 // unmapped text are gathered in a chunk of their own.
 //
 //	chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...
+//	chunk -pages FILE [-run DIR]
 //
 // An AD is an ad's ID in the run's ads, or a file of an ad's HTML, or "-"
 // for HTML on standard input; -title gives a file's title, which the
@@ -18,11 +19,18 @@
 // a line, for programs; or with -yaml as a YAML document each, for
 // people, each chunk's text a block of its lines.
 //
+// With -pages, it writes the ads FILE lists as web pages, each ad as
+// posted beside its chunks (see internal/page), into FILE's folder: a
+// page for each, ID.html, and index.html, listing them. Each line of
+// FILE is an ad's ID, a tab, and why it's there; a line starting "#" is
+// a comment.
+//
 // From the lab's folder:
 //
 //	go run ./cmd/chunk 225682916
 //	go run ./cmd/chunk -yaml 225682916
 //	go run ./cmd/chunk -json -title "Driver" ad.html
+//	go run ./cmd/chunk -pages data/pages/ads.tsv
 //
 // or, once installed with `go install ./cmd/...`, just chunk.
 package main
@@ -43,6 +51,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
+	"github.com/nukopian/jdc-lab/internal/page"
 	"github.com/nukopian/jdc-lab/internal/sections"
 )
 
@@ -52,8 +61,9 @@ func main() {
 	asYAML := flag.Bool("yaml", false, "write each ad as a YAML document")
 	run := flag.String("run", "data/runs/latest", "the run whose ads and boilerplate to use")
 	title := flag.String("title", "", "the title of an ad given as HTML")
+	pages := flag.String("pages", "", "write the ads this file lists as pages, beside it")
 	flag.Parse()
-	if flag.NArg() == 0 {
+	if *pages == "" && flag.NArg() == 0 {
 		log.Fatal("usage: chunk [-json | -yaml] [-run DIR] [-title TITLE] AD...")
 	}
 	if *asJSON && *asYAML {
@@ -64,6 +74,16 @@ func main() {
 		log.Fatal(err)
 	}
 	isBoilerplate := func(s string) bool { return boiler[headings.Key(s)] }
+	chunked := func(a ads.Ad) chunk.Ad {
+		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
+		return chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, chunk.Whole(ss))
+	}
+	if *pages != "" {
+		if err := writePages(*pages, *run, chunked); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
@@ -72,8 +92,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
-		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, chunk.Whole(ss))
+		c := chunked(a)
 		if *asYAML {
 			fmt.Fprintln(w, "---")
 			if err := c.WriteYAML(w); err != nil {
@@ -112,6 +131,73 @@ func find(arg, run, title string) (ads.Ad, error) {
 		}
 	}
 	return ads.Ad{}, fmt.Errorf("chunk: %s: no such file, nor an ad of that ID in %s", arg, run)
+}
+
+// writePages writes the ads the file at list names as pages, beside it,
+// with an index.
+func writePages(list, run string, chunked func(ads.Ad) chunk.Ad) error {
+	b, err := os.ReadFile(list)
+	if err != nil {
+		return err
+	}
+	why := map[string]string{}
+	var ids []string
+	for _, l := range strings.Split(string(b), "\n") {
+		if l = strings.TrimSpace(l); l == "" || strings.HasPrefix(l, "#") {
+			continue
+		}
+		id, reason, _ := strings.Cut(l, "\t")
+		ids = append(ids, strings.TrimSpace(id))
+		why[strings.TrimSpace(id)] = strings.TrimSpace(reason)
+	}
+	found := map[string]ads.Ad{}
+	for a, err := range ads.File(filepath.Join(run, "ads.jsonl")) {
+		if err != nil {
+			return err
+		}
+		if _, ok := why[a.ID]; ok {
+			if _, seen := found[a.ID]; !seen {
+				found[a.ID] = a
+			}
+		}
+	}
+	const title = "Job ads before and after chunking"
+	dir := filepath.Dir(list)
+	var es []page.Entry
+	for _, id := range ids {
+		a, ok := found[id]
+		if !ok {
+			return fmt.Errorf("chunk: %s: no ad of that ID in %s", id, run)
+		}
+		e := page.Entry{Ad: page.Ad{Ad: a, Chunks: chunked(a), Why: why[id]}, File: id + ".html"}
+		if err := writeFile(filepath.Join(dir, e.File), func(w io.Writer) error { return page.Write(w, e.Ad, title) }); err != nil {
+			return err
+		}
+		es = append(es, e)
+	}
+	if err := writeFile(filepath.Join(dir, "index.html"), func(w io.Writer) error { return page.WriteIndex(w, title, es) }); err != nil {
+		return err
+	}
+	fmt.Printf("%d pages and their index written to %s\n", len(es), dir)
+	return nil
+}
+
+// writeFile creates the file at path, and has write fill it.
+func writeFile(path string, write func(io.Writer) error) (err error) {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+	}()
+	w := bufio.NewWriter(f)
+	if err := write(w); err != nil {
+		return err
+	}
+	return w.Flush()
 }
 
 // readBoilerplate reads a repeated.tsv, and returns the keys of the texts

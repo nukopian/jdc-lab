@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Ad.Ad.Title}} · {{.Ad.Ad.ID}}</title>
+{{template "style"}}
+</head>
+<body>
+<header>
+  <p class="crumb"><a href="index.html">{{.Title}}</a></p>
+  <h1>{{.Ad.Ad.Title}}</h1>
+  <p class="meta">{{.Ad.Ad.ID}}{{range .Ad.Ad.Locations}} · {{.}}{{end}}</p>
+  {{with .Why}}<p class="why">{{.}}</p>{{end}}
+  {{template "bar" .}}
+</header>
+<main>
+  <section class="posted">
+    <h2>As posted</h2>
+    <div class="ad">{{.Posted}}</div>
+  </section>
+  <section class="chunks">
+    <h2>As chunks</h2>
+    {{range .Chunks.Chunks}}
+    <article class="chunk {{class .}}">
+      <h3><span class="kind">{{.Kind}}</span>{{with .Heading}} <span class="heading">“{{.}}”</span>{{end}}</h3>
+      <p class="use">{{.Use}} · about {{.Tokens}} tokens</p>
+      <p class="placed">placed by {{.PlacedBy}}</p>
+      <div class="text">
+        {{range lines .}}{{if .Item}}<p class="item">{{with .From}}<span class="from">{{.}}</span> {{end}}{{.Text}}</p>{{else}}<p>{{.Text}}</p>{{end}}{{else}}<p class="empty">(nothing under it)</p>{{end}}
+      </div>
+      {{with .Fields}}
+      <table class="fields"><caption>fields</caption>
+        {{range .}}<tr><th>{{.Label}}</th><td>{{.Value}}</td></tr>{{end}}
+      </table>
+      {{end}}
+      {{with .Facts}}
+      <table class="facts"><caption>facts, read by grammar</caption>
+        {{range .}}<tr><th>{{.Kind}}</th><td>{{.Text}}</td><td class="values">{{range $k, $v := .Values}}<span>{{$k}}: {{$v}}</span> {{end}}</td></tr>{{end}}
+      </table>
+      {{end}}
+    </article>
+    {{end}}
+  </section>
+</main>
+</body>
+</html>
+{{define "bar"}}
+<div class="bar" role="img" aria-label="where the ad's tokens go">
+  {{with .Shares}}
+  <span class="embed" style="width: {{pct .Embed $.All}}%"></span><span class="metadata" style="width: {{pct .Metadata $.All}}%"></span><span class="leave-out" style="width: {{pct .LeaveOut $.All}}%"></span><span class="boilerplate" style="width: {{pct .Boilerplate $.All}}%"></span>
+  {{end}}
+</div>
+<p class="legend">
+  the whole ad, about {{.Chunks.Tokens}} tokens; its chunks:
+  <span class="key embed"></span>embedded {{.Shares.Embed}} ({{pct .Shares.Embed .All}}%)
+  <span class="key metadata"></span>metadata {{.Shares.Metadata}} ({{pct .Shares.Metadata .All}}%)
+  <span class="key leave-out"></span>left out {{.Shares.LeaveOut}} ({{pct .Shares.LeaveOut .All}}%)
+  <span class="key boilerplate"></span>boilerplate {{.Shares.Boilerplate}} ({{pct .Shares.Boilerplate .All}}%)
+</p>
+{{end}}
+{{define "style"}}
+<style>
+:root {
+  --bg: #fbfaf7; --fg: #1d1d1b; --muted: #66645e; --line: #dcd9d0; --card: #ffffff;
+  --embed: #2f7d4f; --embed-bg: #e8f3ec;
+  --metadata: #2b6cb0; --metadata-bg: #e7f0fa;
+  --leave-out: #8a8780; --leave-out-bg: #f0efeb;
+  --boilerplate: #b7791f; --boilerplate-bg: #fbf1e1;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181a; --fg: #e9e7e2; --muted: #a29f97; --line: #3a3936; --card: #222224;
+    --embed: #5fbf86; --embed-bg: #1d2f24;
+    --metadata: #6aa6e8; --metadata-bg: #1c2836;
+    --leave-out: #9a978f; --leave-out-bg: #2a2a2b;
+    --boilerplate: #e0a54a; --boilerplate-bg: #352a18;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px 16px 48px; background: var(--bg); color: var(--fg);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+header, main { max-width: 1400px; margin: 0 auto; }
+a { color: var(--metadata); }
+h1 { margin: 4px 0; font-size: 24px; }
+h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+.crumb, .meta, .why, .legend, .use, .placed { color: var(--muted); margin: 4px 0; }
+.why { color: var(--fg); font-style: italic; }
+.bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 16px 0 6px; background: var(--line); }
+.bar span.embed, .key.embed { background: var(--embed); }
+.bar span.metadata, .key.metadata { background: var(--metadata); }
+.bar span.leave-out, .key.leave-out { background: var(--leave-out); }
+.bar span.boilerplate, .key.boilerplate { background: var(--boilerplate); }
+.key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; }
+main { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+.ad { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; overflow-wrap: anywhere; }
+.ad table { border-collapse: collapse; }
+.chunk { background: var(--card); border: 1px solid var(--line); border-left: 5px solid; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; overflow-wrap: anywhere; }
+.chunk.embed { border-left-color: var(--embed); }
+.chunk.metadata { border-left-color: var(--metadata); }
+.chunk.leave-out { border-left-color: var(--leave-out); }
+.chunk.boilerplate { border-left-color: var(--boilerplate); background: var(--boilerplate-bg); }
+.chunk h3 { margin: 0; font-size: 16px; }
+.chunk .kind { text-transform: capitalize; }
+.chunk .heading { font-weight: normal; color: var(--muted); }
+.chunk.embed .use { color: var(--embed); }
+.chunk.metadata .use { color: var(--metadata); }
+.chunk.boilerplate .use { color: var(--boilerplate); }
+.placed { font-size: 13px; }
+.text p { margin: 6px 0; }
+.text p.item { padding-left: 16px; text-indent: -12px; }
+.text p.item::before { content: "– "; color: var(--muted); }
+.text p.empty { color: var(--muted); font-style: italic; }
+td.tokens { white-space: nowrap; }
+.from { font-size: 12px; color: var(--boilerplate); }
+table.fields, table.facts { border-collapse: collapse; margin-top: 10px; font-size: 13px; width: 100%; }
+caption { text-align: left; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding-bottom: 2px; }
+th, td { text-align: left; vertical-align: top; padding: 3px 8px 3px 0; border-top: 1px solid var(--line); }
+td.values span { display: inline-block; background: var(--metadata-bg); border-radius: 4px; padding: 0 5px; margin: 1px 2px 1px 0; }
+table.index { border-collapse: collapse; width: 100%; margin-top: 16px; }
+table.index td, table.index th { padding: 8px 10px 8px 0; }
+table.index .bar { margin: 4px 0; width: 160px; height: 10px; }
+</style>
+{{end}}
