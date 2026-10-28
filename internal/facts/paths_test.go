@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/nukopian/grammar"
+
+	"github.com/nukopian/jdc-lab/internal/grammars"
 )
 
 // TestPaths checks that every path Find reads from a match is one its
@@ -16,13 +18,13 @@ func TestPaths(t *testing.T) {
 		g     *grammar.Grammar
 		paths []string
 	}{
-		{"pay", pay, []string{"~", "from", "cur", "cur[0].~", "min", "max", "min.k", "max.k", "upto",
+		{"pay", grammars.Pay, []string{"~", "from", "cur", "cur[0].~", "min", "max", "min.k", "max.k", "upto",
 			"period", "period.~", "min.num.~", "max.num.~"}},
-		{"hours", hours, []string{"~", "from", "num.~", "per.week", "per.day"}},
-		{"pattern", pattern, []string{"~", "from", "made"}},
-		{"schedule", schedule, []string{"~", "from", "days", "days.mf", "days.first.~", "days.last.~",
+		{"hours", grammars.Hours, []string{"~", "from", "num.~", "per.week", "per.day"}},
+		{"pattern", grammars.Pattern, []string{"~", "from", "made"}},
+		{"schedule", grammars.Schedule, []string{"~", "from", "days", "days.mf", "days.first.~", "days.last.~",
 			"times", "times.a.~", "times.b.~", "rota", "rota.~"}},
-		{"postcode", postcode, []string{"~", "from"}},
+		{"postcode", grammars.Postcode, []string{"~", "from"}},
 	}
 	for _, tt := range tests {
 		for _, p := range tt.paths {

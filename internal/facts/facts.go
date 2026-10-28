@@ -3,9 +3,9 @@
 // each with its values. "50,000pa + excellent bonus" is pay of 50,000 a
 // year, "Mon-Fri 07:00-15:30" a schedule, "NE8 1AQ" a location.
 //
-// Each fact has a grammar of its own, written in Raku's grammar syntax,
-// which reads much as the text it matches; Find runs them all over a
-// line. A fact found means the line holds one, not that the line is only
+// Each fact has a grammar of its own, in internal/grammars, written in
+// Raku's grammar syntax, which reads much as the text it matches; Find
+// runs them all over a line. A fact found means the line holds one, not that the line is only
 // facts: whether it is, the chunker decides.
 package facts
 
@@ -20,6 +20,7 @@ import (
 	"github.com/nukopian/grammar"
 	"github.com/nukopian/scalar"
 
+	"github.com/nukopian/jdc-lab/internal/grammars"
 	"github.com/nukopian/jdc-lab/internal/headings"
 )
 
@@ -33,86 +34,10 @@ type Fact struct {
 	From int `json:"-" yaml:"-"`
 }
 
-// pay is a figure of money: with a currency sign, or a period, or both,
-// as one or a range, "up to" it, or not. A figure with neither isn't
-// pay ("5 years"), though Find takes one after a pay label.
-var pay = grammar.MustCompile(`
-grammar Pay {
-    token TOP    { [ $<upto>=[ :i up \s+ to ] \s+ ]? <cur>? \s? <min=amount>
-                   [ <.sep> <cur>? \s? <max=amount> ]? <period>? }
-    token cur    { '£' | '$' | '€' }
-    token amount { <num> [ $<k>=[ :i k ] >> ]? }
-    token num    { \d+ [ ',' \d ** 3 ]* [ '.' \d+ ]? }
-    token sep    { \s* [ '-' | :i to ] \s* }
-    token period { \s* :i [ 'p.a.' | 'p/a' | pa | per \s+ annum | per \s+ year | a \s+ year | annually
-                          | per \s+ hour | per \s+ hr | an \s+ hour | 'p/hr' | 'p/h' | '/hr' | '/hour' | phr | ph | hourly
-                          | per \s+ day | a \s+ day | daily
-                          | per \s+ week | a \s+ week | weekly
-                          | per \s+ month | a \s+ month | monthly ] >> }
-}`)
-
-// hours is hours of work: "40hrs pw", "37.5 hours per week", "12 hours
-// per day", "40 hours". A bare "h" is hours only with a period after it,
-// as "24h support" isn't.
-var hours = grammar.MustCompile(`
-grammar Hours {
-    token TOP  { <num> \s* :i [ [ hours | hrs | hr ] >> [ \s* <per> ]? | h >> \s* <per> ] }
-    token num  { \d+ [ '.' \d+ ]? }
-    token per  { <week> | <day> }
-    token week { :i [ per \s+ week | pw | 'p/w' | a \s+ week | weekly ] >> }
-    token day  { :i [ per \s+ day | a \s+ day | daily | per \s+ shift ] >> }
-}`)
-
-// patterns are the work patterns and arrangements, each rule its
-// canonical value first, then what ads write for it.
-var patterns = func() *grammar.WordList {
-	l := grammar.NewWordList("patterns", grammar.FoldCase(), grammar.LooseSpacing(), grammar.WholeWords())
-	if err := l.AddRules(`
-permanent, perm, permanent position, permanent role
-temporary, temp, temporary role, temporary position
-temp to perm, temp-to-perm, temporary to permanent
-contract, fixed term, fixed-term, fixed term contract, ftc
-full time, full-time
-part time, part-time
-hybrid, hybrid working
-remote, fully remote, work from home, wfh
-office based, office-based, site based, site-based
-`); err != nil {
-		panic(err)
-	}
-	return l
-}()
-
-var pattern = grammar.MustCompile(`grammar Pattern { token TOP { @patterns } }`, patterns)
-
-// schedule is days and times of work: a range of days, with times or
-// not, a range of times on its own, or a rota. A bare range of hours,
-// "8-4", is a time only after a range of days.
-var schedule = grammar.MustCompile(`
-grammar Schedule {
-    token TOP   { <days> [ \s* ','? \s* <times> ]? | <times=clocks> | <rota> }
-    token day   { :i [ monday | tuesday | wednesday | thursday | friday | saturday | sunday
-                     | mon | tues | tue | weds | wed | thurs | thur | thu | fri | sat | sun ] >> '.'? }
-    token to    { \s* [ '-' | :i to | :i till | :i until ] \s* }
-    token days  { <first=day> <.to> <last=day> | $<mf>=[ M \s? '-' \s? F ] >> }
-    token times { <a=time> <.to> <b=time> }
-    token time  { \d ** 1..2 [ <[:.]> \d ** 2 ]? [ \s? :i [ am | pm ] >> ]? }
-    token clock { \d ** 1..2 [ <[:.]> \d ** 2 ]? \s? :i [ am | pm ] >> | \d ** 1..2 ':' \d ** 2 }
-    token clocks { <a=clock> <.to> <b=time> }
-    token rota  { \d+ \s* [ :i [ days? | nights? ] \s* ]? :i on [ \s* <[,/&-]> ]? \s*
-                  \d+ \s* [ :i [ days? | nights? ] \s* ]? :i off >> }
-}`)
-
-// postcode is a UK postcode, as a location: "NE8 1AQ".
-var postcode = grammar.MustCompile(`
-grammar Postcode {
-    token TOP { << <[A..Z]> ** 1..2 \d [ <[A..Z]> | \d ]? \s* \d <[A..Z]> ** 2 >> }
-}`)
-
 // Find returns the facts in line, in the order they come in it.
 func Find(line string) []Fact {
 	var fs []Fact
-	for _, m := range all(pay, line) {
+	for _, m := range all(grammars.Pay, line) {
 		if f, ok := payOf(m); ok {
 			fs = append(fs, f)
 		}
@@ -122,7 +47,7 @@ func Find(line string) []Fact {
 			fs = append(fs, f)
 		}
 	}
-	for _, m := range all(hours, line) {
+	for _, m := range all(grammars.Hours, line) {
 		n := number(m.At("num.~").Str())
 		v := map[string]string{"hours": n} // with no period, just hours
 		switch {
@@ -133,14 +58,14 @@ func Find(line string) []Fact {
 		}
 		fs = append(fs, fact("hours", m, v))
 	}
-	for _, m := range all(pattern, line) {
+	for _, m := range all(grammars.Pattern, line) {
 		// The word list's canonical value is the match's made.
 		fs = append(fs, fact("pattern", m, map[string]string{"value": m.At("made").Str()}))
 	}
-	for _, m := range all(schedule, line) {
+	for _, m := range all(grammars.Schedule, line) {
 		fs = append(fs, fact("schedule", m, scheduleOf(m)))
 	}
-	for _, m := range all(postcode, line) {
+	for _, m := range all(grammars.Postcode, line) {
 		fs = append(fs, fact("location", m, map[string]string{"postcode": m.At("~").Str()}))
 	}
 	slices.SortStableFunc(fs, func(a, b Fact) int { return cmp.Compare(a.From, b.From) })

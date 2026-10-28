@@ -40,16 +40,6 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 22. One set of grammars for facts and headings
-
-**Serves:** structure, metadata
-
-The grammars for facts move to a package that `headings` and `facts`
-both use, so that a line holding pay, a time or a rota is told by one
-set of rules, not by regexes in one and grammars in the other. The plan
-is in its
-[record](docs/changes/2026-10-28-one-set-of-grammars-for-facts-and-headings.md).
-
 ### 21. Map what's left
 
 **Serves:** structure, embeddings

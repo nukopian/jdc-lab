@@ -66,9 +66,8 @@ embeddings, and a large language model only where those fall short.
   tokens: the rest is facts, the employer's pitch, notices, and text
   under headings still to map.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why. Under way: one set of grammars for facts and headings, and
-  the headings still unmapped given a kind, with an educated guess for
-  the rest. After
+  and why. Under way: the headings still unmapped given a kind, with an
+  educated guess for the rest. After
   them: boilerplate's verdict made right both ways, and walls of text
   split into sentences.
 - **Retrieval** has had a first test: with job titles as queries, an

@@ -16,8 +16,11 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/nukopian/grammar"
+
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/clean"
+	"github.com/nukopian/jdc-lab/internal/grammars"
 )
 
 // A Role is what a Part is.
@@ -287,75 +290,59 @@ func field(text string) (Part, bool) {
 	return Part{}, false
 }
 
-// money matches what headings don't have, money and long figures:
-// "£30,000 per annum" in bold is pay, and "Ref 225682916" a reference.
-var money = regexp.MustCompile(`[£$€]|\d{3,}`)
-
-// times matches a time of day, which a heading doesn't have either: "- 2pm
-// to 10pm" or "Monday to Friday, 8:00am - 5:00pm" in bold is when the work
-// is. A figure with a point is a time only with am or pm, or in a range, as
-// "8.30-3.30": "37.50 hours" is a figure.
-var times = regexp.MustCompile(`(?i)\b\d{1,2}([:.]\d{2})? ?[ap]m\b|\b\d{1,2}:\d{2}\b|\b\d{1,2}\.\d{2} *(-|–|—|to) *\d{1,2}\.\d{2}\b`)
-
-// day is a day's name, whole or cut short: "Monday", "Thurs", "Fri.", but
-// not "Monmouth".
-const day = `(mon|monday|tue|tues|tuesday|wed|weds|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday|sun|sunday)\b\.?`
-
-// days matches a range of days: "Monday to Friday", "Mon–Thu", "M-F".
-var days = regexp.MustCompile(`(?i)\b` + day + ` *(-|–|—|to|till?|until) *` + day + `|\bM *[-–] *F\b`)
-
-// hours matches a bare range of hours, "8-5" or "7.30-4", which is a time
-// only beside a range of days: alone, "Ages 5-11" is no time. "2-3 days"
-// or "10-12 hr shifts" is a count, whatever's beside it, but a range that
-// runs back round the clock, as "7-3 Days" does, is hours.
-var hours = regexp.MustCompile(`(?i)\b([01]?\d|2[0-3])([:.]\d{2})? *(-|–|—|to|till?|until) *([01]?\d|2[0-3])([:.]\d{2})?\b( *((hours?|hrs?|days?|nights?|weeks?|months?|years?|yrs|sessions?|mins?|minutes)\b|%))?`)
-
-// rota matches days on and off: "4 on 4 off", "4ON4OFF", "4 on - 4 off",
-// "4 days on, 4 days off".
-var rota = regexp.MustCompile(`(?i)\b\d+ *((day|night)s? *)?on[ ,/&–-]*\d+ *((day|night)s? *)?off\b`)
-
-// shiftWord matches days or nights, and a figure before them: "2-3 days" is
-// a count, not the day shift.
-var shiftWord = regexp.MustCompile(`(?i)(\d *)?\b(days|nights)\b`)
+// hasMoney reports whether text holds what headings don't have, money
+// or a long figure: "£30,000 per annum" in bold is pay, and "Ref
+// 225682916" a reference.
+func hasMoney(text string) bool {
+	return grammars.Pay.Find(text, grammar.Rule("cur")).Defined() || grammars.Figure.Find(text).Defined()
+}
 
 // hasPattern reports whether text states a pattern of work, which is a
 // fact, as a time is: a rota, or days or nights beside a range of days, as
 // in "Monday - Friday (Days)". "Night Shift" alone names a shift, and heads
 // its hours, as a pattern ending in a colon heads what follows: "You will
-// work a 4 on 4 off shift pattern:".
+// work a 4 on 4 off shift pattern:". "2-3 days" is a count, not the day
+// shift.
 func hasPattern(text string) bool {
 	if endsAsLabel(text) {
 		return false
 	}
-	if rota.MatchString(text) {
+	if grammars.Schedule.Find(text, grammar.Rule("rota")).Defined() {
 		return true
 	}
-	if !days.MatchString(text) {
+	if !grammars.Schedule.Find(text, grammar.Rule("days")).Defined() {
 		return false
 	}
-	for _, m := range shiftWord.FindAllStringSubmatch(text, -1) {
-		if m[1] == "" {
+	for _, m := range grammars.Schedule.FindAll(text, grammar.Rule("shift")).Items() {
+		if !m.At("count").Defined() {
 			return true
 		}
 	}
 	return false
 }
 
-// hasTimes reports whether text holds a time of day: one of times, or a
-// bare range of hours beside a range of days, as in "Monday - Friday 8-5"
-// or "M-F 8-4". Unlike a pattern, a time ending in a colon is still no
-// heading.
+// hasTimes reports whether text holds a time of day, which a heading
+// doesn't have either: "- 2pm to 10pm" or "Monday to Friday, 8:00am -
+// 5:00pm" in bold is when the work is. A figure with a point is a time
+// only with am or pm, or in a range, as "8.30-3.30": "37.50 hours" is a
+// figure. A bare range of hours, "8-5" or "7.30-4", is a time only beside
+// a range of days, as in "Monday - Friday 8-5" or "M-F 8-4": alone,
+// "Ages 5-11" is no time. "2-3 days" or "10-12 hr shifts" is a count,
+// whatever's beside it, but a range that runs back round the clock, as
+// "7-3 Days" does, is hours. Unlike a pattern, a time ending in a colon
+// is still no heading.
 func hasTimes(text string) bool {
-	if times.MatchString(text) {
+	if grammars.Schedule.Find(text, grammar.Rule("clock")).Defined() ||
+		grammars.Schedule.Find(text, grammar.Rule("points")).Defined() {
 		return true
 	}
-	if !days.MatchString(text) {
+	if !grammars.Schedule.Find(text, grammar.Rule("days")).Defined() {
 		return false
 	}
-	for _, m := range hours.FindAllStringSubmatch(text, -1) {
-		from, _ := strconv.Atoi(m[1])
-		to, _ := strconv.Atoi(m[4])
-		if m[6] == "" || from >= to { // no unit, or round the clock: not a count
+	for _, m := range grammars.Schedule.FindAll(text, grammar.Rule("span")).Items() {
+		from, _ := strconv.Atoi(m.At("a.h.~").Str())
+		to, _ := strconv.Atoi(m.At("b.h.~").Str())
+		if !m.At("unit").Defined() || from >= to { // no unit, or round the clock: not a count
 			return true
 		}
 	}
@@ -386,7 +373,7 @@ func headingShaped(text, key string, most int) bool {
 	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > most || money.MatchString(text) || hasTimes(text) || hasPattern(text) {
+	if len(strings.Fields(key)) > most || hasMoney(text) || hasTimes(text) || hasPattern(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })

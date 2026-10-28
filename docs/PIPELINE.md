@@ -502,11 +502,13 @@ lines move, in 13% of ads; of 40 checked by eye, one was wrong.
 
 ### Facts
 
-**Package** `internal/facts`.
+**Package** `internal/facts`, its grammars in `internal/grammars`.
 
 The facts ads state in lines of their own are read by grammars, with
 [grammar](https://github.com/nukopian/grammar), one for each kind, each
-in Raku's grammar syntax, so a rule reads much as the text it matches:
+in Raku's grammar syntax, so a rule reads much as the text it matches.
+Headings use the same grammars to keep facts out (see the heading role
+above), so that a line is a time, or a rota, by one set of rules:
 
 | Fact | Reads | Values |
 |---|---|---|
@@ -519,7 +521,9 @@ in Raku's grammar syntax, so a rule reads much as the text it matches:
 A figure is pay only with a currency sign or a period ("5 years" isn't),
 and in a range, "£25-28k", the top figure's k is the bottom's too; a
 bare "h" is hours only with a period after it ("24h support" isn't); a
-bare range of hours is a time only after a range of days. The chunker
+bare range of hours is a time only after a range of days; and a time
+starts at a figure that isn't inside another, so "Friday7:00am" is a
+time, but "745am" none, rather than "45am". The chunker
 takes a **line of facts** out of an embedded chunk, or an unmapped
 section, into a details chunk of its own, with each fact and its
 values: a line with a postcode in it, of at most 30 words; or one that
@@ -696,7 +700,7 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | The wrong kind won | Move the winning kind's rule below the right one's, or make the phrase longer | `headings.txt` |
 | A plain line wrongly taken by name | Make the phrase longer, or drop it | `headings.txt` |
 | A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
-| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `money`, `times`, `hours`, `days`, `rota`); add a case to `TestRead` | `internal/headings/headings.go` |
+| Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `hasMoney`, `hasTimes`, `hasPattern`), or the grammars' rules they use (`clock`, `points`, `span`, `days`, `rota`, `shift`, `Figure`); add a case to `TestRead` | `internal/headings/headings.go`, `internal/grammars/grammars.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
 | A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
 | An advertiser's name as a heading | Nothing: it stays unmapped, and its text is found as boilerplate | |
