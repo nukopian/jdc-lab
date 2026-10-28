@@ -26,6 +26,10 @@ has the steps).
   times are no longer read from inside a figure ("45am-5pm" from
   "745am-5pm"), and "til" joins a range; 15 fewer of 103,015 facts
   (roadmap 22; [record](docs/changes/2026-10-28-one-set-of-grammars-for-facts-and-headings.md)).
+- Pay reads more periods: "p.h.", "pw", "p/w", "p.w." and "pcm", each
+  named as its period, and "p.a.", which was in the grammar but never
+  matched: a form ending in a point can't be followed by a word
+  boundary, so its rule now stands apart.
 
 ## v0.5.1 (2026-10-27)
 

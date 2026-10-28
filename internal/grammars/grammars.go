@@ -18,11 +18,13 @@ grammar Pay {
     token amount { <num> [ $<k>=[ :i k ] >> ]? }
     token num    { \d+ [ ',' \d ** 3 ]* [ '.' \d+ ]? }
     token sep    { \s* [ '-' | :i to ] \s* }
-    token period { \s* :i [ 'p.a.' | 'p/a' | pa | per \s+ annum | per \s+ year | a \s+ year | annually
-                          | per \s+ hour | per \s+ hr | an \s+ hour | 'p/hr' | 'p/h' | '/hr' | '/hour' | phr | ph | hourly
-                          | per \s+ day | a \s+ day | daily
-                          | per \s+ week | a \s+ week | weekly
-                          | per \s+ month | a \s+ month | monthly ] >> }
+    # The dotted forms end in a point, not a letter, so >> isn't for them.
+    token period { \s* :i [ 'p.a.' | 'p.h.' | 'p.w.'
+                          | [ 'p/a' | pa | per \s+ annum | per \s+ year | a \s+ year | annually
+                            | per \s+ hour | per \s+ hr | an \s+ hour | 'p/hr' | 'p/h' | '/hr' | '/hour' | phr | ph | hourly
+                            | per \s+ day | a \s+ day | daily
+                            | pw | 'p/w' | per \s+ week | a \s+ week | weekly
+                            | pcm | per \s+ month | a \s+ month | monthly ] >> ] }
 }`)
 
 // Hours is hours of work: "40hrs pw", "37.5 hours per week", "12 hours

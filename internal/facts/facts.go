@@ -135,13 +135,13 @@ func number(s string) string {
 func periodOf(s string) string {
 	s = strings.ToLower(strings.TrimSpace(s))
 	switch {
-	case strings.Contains(s, "hour"), strings.HasSuffix(s, "hr"), s == "ph", s == "p/h":
+	case strings.Contains(s, "hour"), strings.HasSuffix(s, "hr"), s == "ph", s == "p/h", s == "p.h.":
 		return "hour"
 	case strings.Contains(s, "day") || strings.Contains(s, "daily"):
 		return "day"
-	case strings.Contains(s, "week"):
+	case strings.Contains(s, "week"), s == "pw", s == "p/w", s == "p.w.":
 		return "week"
-	case strings.Contains(s, "month"):
+	case strings.Contains(s, "month"), s == "pcm":
 		return "month"
 	}
 	return "year"
