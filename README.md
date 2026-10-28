@@ -67,9 +67,8 @@ embeddings, and a large language model only where those fall short.
   under headings still to map.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
   and why. Under way: the headings still unmapped given a kind, with an
-  educated guess for the rest. After
-  them: boilerplate's verdict made right both ways, and walls of text
-  split into sentences.
+  educated guess for the rest. After that: boilerplate's verdict made
+  right both ways, and walls of text split into sentences.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of
