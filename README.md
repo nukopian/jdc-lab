@@ -68,7 +68,7 @@ embeddings, and a large language model only where those fall short.
   educated guess, mostly as the summary, and right for about four
   sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: boilerplate's verdict made right both ways comes next, then
+  and why. Under way: boilerplate's verdict made right both ways. Next:
   walls of text split into sentences.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
