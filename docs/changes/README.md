@@ -70,13 +70,13 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Make boilerplate's verdict right](2026-10-28-make-boilerplates-verdict-right.md)
-  (roadmap 4), shipped, unreleased
+  (roadmap 4), shipped in v0.5.2
 - [Keep a list item's own blocks in the ad's order](2026-10-28-a-list-items-own-blocks-in-order.md)
-  (roadmap 17), shipped, unreleased
+  (roadmap 17), shipped in v0.5.2
 - [One set of grammars for facts and headings](2026-10-28-one-set-of-grammars-for-facts-and-headings.md)
-  (roadmap 22), shipped, unreleased
+  (roadmap 22), shipped in v0.5.2
 - [Map what's left](2026-10-28-map-whats-left.md)
-  (roadmap 21), shipped, unreleased
+  (roadmap 21), shipped in v0.5.2
 - [Check the paths read from grammar matches with CheckPath](2026-10-27-check-match-paths-with-checkpath.md),
   shipped in v0.5.1
 - [A chunker for any ad](2026-10-27-a-chunker-for-any-ad.md)

@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.5.2 (2026-10-28)
+
+Text in its place: lists in order, unmapped text guessed, boilerplate right both ways
+
 - Boilerplate's verdict is right more often both ways. Footers filed
   under requirements, found mostly in the repeated text that ends their
   ads and talking as footers do, are boilerplate; job lines common to

@@ -1,6 +1,6 @@
 # Keep a list item's own blocks in the ad's order
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.5.2
 
 **Origin:** roadmap 17
 

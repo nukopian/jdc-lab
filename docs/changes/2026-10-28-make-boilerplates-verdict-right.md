@@ -1,6 +1,6 @@
 # Make boilerplate's verdict right
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.5.2
 
 **Origin:** roadmap 4
 

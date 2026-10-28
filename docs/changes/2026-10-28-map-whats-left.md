@@ -1,6 +1,6 @@
 # Map what's left
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.5.2
 
 **Origin:** roadmap 21
 
