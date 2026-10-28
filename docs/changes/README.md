@@ -69,6 +69,12 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Keep a list item's own blocks in the ad's order](2026-10-28-a-list-items-own-blocks-in-order.md)
+  (roadmap 17), in progress
+- [One set of grammars for facts and headings](2026-10-28-one-set-of-grammars-for-facts-and-headings.md)
+  (roadmap 22), in progress
+- [Map what's left](2026-10-28-map-whats-left.md)
+  (roadmap 21), in progress
 - [Check the paths read from grammar matches with CheckPath](2026-10-27-check-match-paths-with-checkpath.md),
   shipped in v0.5.1
 - [A chunker for any ad](2026-10-27-a-chunker-for-any-ad.md)

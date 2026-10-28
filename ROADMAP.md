@@ -40,7 +40,35 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment.
+### 17. Keep a list item's own blocks in the ad's order
+
+**Serves:** structure
+
+A list item holding paragraphs or a list of its own comes out after the
+blocks that follow it, under the wrong heading: 20 ads of the three
+samples. Among them is the ad on the pages whose pay lands under
+"Why …?". The plan is in its
+[record](docs/changes/2026-10-28-a-list-items-own-blocks-in-order.md).
+
+### 22. One set of grammars for facts and headings
+
+**Serves:** structure, metadata
+
+The grammars for facts move to a package that `headings` and `facts`
+both use, so that a line holding pay, a time or a rota is told by one
+set of rules, not by regexes in one and grammars in the other. The plan
+is in its
+[record](docs/changes/2026-10-28-one-set-of-grammars-for-facts-and-headings.md).
+
+### 21. Map what's left
+
+**Serves:** structure, embeddings
+
+The headings of no known kind with the most text under them get a kind,
+and what's still unmapped after that is placed by an educated guess, from
+its wording and where it stands, rather than being left out whole: 12% of
+the text, in 44% of ads, on the three samples. The plan is in its
+[record](docs/changes/2026-10-28-map-whats-left.md).
 
 ## Next
 
@@ -162,26 +190,3 @@ Added 2026-10-27. Boilerplate's thresholds are counts of title groups,
 which more ads pass more easily, so its share rises as each batch is
 added (12.5% of text on 5,000 ads, 15.1% on 21,000, by word for word
 matching): figures from before and after a new batch don't compare.
-
-### 17. Keep a list item's own blocks in the ad's order
-
-Added 2026-10-27. When a list item holds a list or paragraphs of its
-own, `internal/blocks` puts its text after the blocks that follow it,
-so it lands under the wrong heading: 20 ads of the three samples, which
-`cmd/view` counts and shows.
-
-### 21. Map what's left
-
-Added 2026-10-27. The headings the pages of ads before and after show
-unmapped ("We are seeking:", "School Information"), the headings after
-a first one not found, and "Why …?" taking in the pay: on the three
-samples, 12% of the text is still under headings of no known kind, in
-44% of ads.
-
-### 22. One set of grammars for facts and headings
-
-Added 2026-10-27. `internal/headings` keeps pay, times, day ranges and
-rotas out of headings with regexes that repeat what `internal/facts`'
-grammars read, as `facts` imports `headings` and can't be imported
-back. With the grammars in a package both use, a line is a time or a
-rota by one rule, not two that can drift apart.
