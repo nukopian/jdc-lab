@@ -55,20 +55,21 @@ embeddings, and a large language model only where those fall short.
   eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
   what it measured, and how to improve it.
 - **Measured on two samples** of 2,000 and 5,000 ads, from different
-  kinds of job, and checked on a third of 21,000. 89% of ads have
-  headings, and about three in four heading uses are recognised by
+  kinds of job, and checked on a third of 21,000. 88% of ads have
+  headings, and about four in five heading uses are recognised by
   rule, on all three. About a fifth of an ad is boilerplate, found
   even with a few words changed, or company, application and legal
   text, that probably needn't be embedded: a first answer to whether
   search can improve while embedding less. A third of ads state a
   working pattern, such as "Monday to Friday, 9am–5pm": a fact for
-  metadata, not embedding. Chunked, an ad's embedded text is 57% of its
-  tokens: the rest is facts, the employer's pitch, notices, and text
-  under headings still to map.
+  metadata, not embedding. Chunked, an ad's embedded text is 66% of its
+  tokens: the rest is facts, the employer's pitch, notices and
+  boilerplate. Text under a heading of no known kind is placed by an
+  educated guess, mostly as the summary, and right for about four
+  sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why. Under way: the headings still unmapped given a kind, with an
-  educated guess for the rest. After that: boilerplate's verdict made
-  right both ways, and walls of text split into sentences.
+  and why: boilerplate's verdict made right both ways comes next, then
+  walls of text split into sentences.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

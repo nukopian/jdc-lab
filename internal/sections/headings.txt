@@ -34,13 +34,17 @@ benefits, benefit, perk, offer, offering, what's on offer, on offer,
 	what is in it for you, what you can expect,
 	why work for us, why work with us, why choose us, why apply,
 	training, training and development, salary & benefits,
-	what you'll receive, you'll receive, you will receive
+	what you'll receive, you'll receive, you will receive, what's available,
+	overtime, holiday entitlement, annual leave, allowance, career growth,
+	career progression, stand out, pension, holiday
 
 equal opportunity, equal opportunities, diversity, inclusion,
 	equality, safeguarding, dbs, sponsorship, no sponsorship available,
 	right to work, gdpr, privacy, data protection, disclaimer,
 	uk applicants only, rehabilitation of offenders, disability confident,
-	reasonable adjustments, adjustments, legal information, the legal bit => legal
+	reasonable adjustments, adjustments, legal information, the legal bit,
+	our commitment, important notice, your data, disclosure,
+	recruitment agencies, safer recruitment => legal
 
 requirements, requirement, what we're looking for, what we are looking for,
 	who we're looking for, who we are looking for, we're looking for, looking for,
@@ -53,7 +57,10 @@ requirements, requirement, what we're looking for, what we are looking for,
 	candidate requirements, knowledge, competencies, attributes,
 	someone who, anyone who, require, required, you should be,
 	who thrives here, candidate who, candidates who, teacher who, teachers who,
-	what you need, must have, what we need, qualities, licence, certification, eligible
+	what you need, must have, what we need, qualities, licence, certification, eligible,
+	suitable candidate, perfect candidate, right candidate, candidate background,
+	will have, should have, your background, what you bring,
+	would like from you, applicants must, likely to have, what will you need
 
 responsibilities, responsibility, duty, main duties, key duties, duties required,
 	what you'll be doing, what you will be doing, what you'll do, what you will do,
@@ -61,6 +68,7 @@ responsibilities, responsibility, duty, main duties, key duties, duties required
 	your role, role responsibilities, day to day, day in the life, your day,
 	accountabilities, accountability, key tasks, task, your week,
 	in this role you will, your role will include, your role will involve,
+	what will you do, what's involved, responsible for, will include, will involve, the work,
 	what to expect,
 	you will, you'll
 
@@ -70,12 +78,13 @@ company, about us, about the company, about the client, about our client,
 	about the business, about the team, the team, your new company,
 	company overview, company profile, our story, our values, our mission,
 	our culture, who are we, about the employer, the employer,
-	the business, our business, the school
+	the business, our business, the school, school information, the setting, school setting
 
 apply, how to apply, apply now, apply today, application, applications,
 	interested, next steps, what's next, what happens next, get in touch,
 	contact, contact us, what you need to do now, for more information,
-	ready to apply, interview, interviews, recruitment process
+	ready to apply, interview, interviews, recruitment process,
+	your recruitment, what next, what happens now, before applying, footnote, meet your consultant
 
 details, job details, role details, position details, contract details,
 	vacancy details, key details, the details, job information, key information,
@@ -83,12 +92,13 @@ details, job details, role details, position details, contract details,
 	contract, duration, shifts, shift times, shift timings, shift details,
 	shift options, shift and schedule, day shift, night shift, early shift,
 	late shift, afternoon shift, morning shift, twilight shift, am shift,
-	pm shift, rota, rotation, nights
+	pm shift, rota, rotation, nights, immediate start, asap start, working conditions, payment,
+	ote
 
 the role, about the role, role overview, job overview, your new role,
 	the job, about the job, the position, about the position, job description,
 	description, role purpose, purpose of the role, job purpose, purpose of job,
-	main purpose => role
+	main purpose, purpose => role
 
 summary, the opportunity, about the opportunity, overview, job summary,
 	role summary, introduction

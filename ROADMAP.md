@@ -40,15 +40,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 21. Map what's left
-
-**Serves:** structure, embeddings
-
-The headings of no known kind with the most text under them get a kind,
-and what's still unmapped after that is placed by an educated guess, from
-its wording and where it stands, rather than being left out whole: 12% of
-the text, in 44% of ads, on the three samples. The plan is in its
-[record](docs/changes/2026-10-28-map-whats-left.md).
+Nothing at the moment.
 
 ## Next
 

@@ -196,7 +196,7 @@ returns them as **parts**:
 
 | Role | How it's recognised | Example |
 |---|---|---|
-| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day (a bare range of hours, such as 8-5, only beside a range of days); no pattern of work ("4 on 4 off", or days or nights beside a range of days) unless it ends in `:`; not ending in `.` | "**Key Responsibilities**" |
+| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day (a bare range of hours, such as 8-5, only beside a range of days); no pattern of work ("4 on 4 off", or days or nights beside a range of days), nor only facts ("Permanent | Full-time", "Monday - Friday"), unless it ends in `:`; no contact details an export took out ("(phone number removed)"); not ending in `.` | "**Key Responsibilities**" |
 | `field` | "Label: value", "Label \| value" or "Label - value", where the label is a known one | "Hours: 40 per week" |
 | `repeat` | only the ad's title or location again | "**Delivery Driver**" at the top |
 | `text` | everything else | |
@@ -463,11 +463,31 @@ embedded chunks for a **boilerplate** chunk of its own, at the end,
 left out, each line with the section it came from: the verdict takes
 in job lines common to many ads as well as advertisers' footers, and
 this is where to see them. Other chunks keep theirs, so an
-advertiser's standard perks are still a list of benefits. The text of
-an unmapped section goes there too, under its heading, as an unmapped
-heading is mapping still to do; its fields become a details chunk.
-Each ad totals its tokens, its embedded tokens and its unclassified
-ones (the unmapped text), so the last shows what's left to map. The
+advertiser's standard perks are still a list of benefits.
+
+An **unmapped** section, under a heading of no known kind, is placed by
+a **guess**, from what's already known about its text, and its chunk
+says what placed it:
+
+| Evidence | Placed as | Example |
+|---|---|---|
+| At least half its lines open as one kind's do (`openings.txt`) | that kind | "guessed requirements: 3 of its 6 lines open as requirements do" |
+| Most of its lines are boilerplate | left out | an agency's standard footer |
+| Its heading speaks for the advertiser: "we", "our", "us", or it opens "who are" or "join" | left out | "Who are Acme?" |
+| It comes after the ad's apply or legal text | left out | |
+| A heading ending in a colon, over a line or two of at most 15 words | details | "IR35 Status:" over "Inside IR35" |
+| Nothing else | the summary | a job title used as a heading, over the job's pitch |
+
+Text left out goes to the boilerplate chunk, under its heading, with
+why (`unmapped "Agency:" (after applying): …`); its fields become a
+details chunk. The summary as the default is a choice: read by eye,
+most unmapped text is about the job (its pitch, duties and
+requirements in words `openings.txt` hasn't), and four samples of 50
+guesses put 39 to 43 of each where a reader would; the misses are
+mostly the employer's culture, perks and notices, under headings no
+rule covers, now embedded. Each ad totals its tokens, its embedded
+tokens and its unclassified ones (the unmapped text left out), so the
+last shows what's left to map. The
 chunks come in a fixed order: summary, role, responsibilities and
 requirements first, then the rest in the ad's order, the chunks of
 lines placed by their wording and of lines of facts after its own, and
@@ -703,8 +723,9 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `hasMoney`, `hasTimes`, `hasPattern`), or the grammars' rules they use (`clock`, `points`, `span`, `days`, `rota`, `shift`, `Figure`); add a case to `TestRead` | `internal/headings/headings.go`, `internal/grammars/grammars.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
 | A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
-| An advertiser's name as a heading | Nothing: it stays unmapped, and its text is found as boilerplate | |
-| A heading that introduces mixed things | Nothing: unmapped is its right place | |
+| An advertiser's name as a heading | Nothing: it stays unmapped, and the guess places its text: as boilerplate, mostly | |
+| A heading that introduces mixed things | Nothing: unmapped is its right place, and the guess places its text | |
+| An unmapped section guessed wrongly | Map its heading, if a phrase will reach others; or change the guess's evidence | `headings.txt`, `internal/chunk/chunk.go` (`guess`) |
 
 "Please note" is an example of the last: `heading-uses` shows it before
 notices about applications, about sites and travel, and about working
@@ -765,8 +786,8 @@ The rules were tuned on the first sample, checked on the second
 and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
-**Headings.** 89% of ads have at least one heading. Headings of a known
-kind are 78% of heading uses; ads with every heading known, 56%; ads
+**Headings.** 88% of ads have at least one heading. Headings of a known
+kind are 81% of heading uses; ads with every heading known, 62%; ads
 with no section but the summary, 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
@@ -776,16 +797,16 @@ with no section but the summary, 4%.
 | summary | 18% | 11% |
 | role | 8% | 8% |
 | responsibilities | 18% | 2% |
-| requirements | 20% | 11% |
+| requirements | 21% | 11% |
 | desirable | 2% | 7% |
 | benefits | 13% | 38% |
 | company | 3% | 50% |
-| apply | 3% | 57% |
-| legal | 1% | 83% |
-| details | 2% | 18% |
-| unmapped | 12% | 26% |
+| apply | 3% | 58% |
+| legal | 1% | 84% |
+| details | 2% | 17% |
+| unmapped | 10% | 25% |
 
-Boilerplate is 17.6% of the text, and template for the job 3.2%; with
+Boilerplate is 17.5% of the text, and template for the job 3.3%; with
 the company, apply and legal text that isn't boilerplate, about a fifth
 of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching
@@ -794,10 +815,12 @@ written in, or a few words changed, is most of the rest
 ([record](changes/2026-10-27-find-near-duplicate-boilerplate.md)).
 
 **Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
-by the index): 57.5% of an ad's tokens are embedded, 3.0% kept as
-metadata, 20.3% left out (benefits, company, apply, legal), and 19.2%
-gathered in the boilerplate chunk, 10.7 points of it text under
-unmapped headings, mapping still to do. Facts are read in 34% of ads.
+by the index): 66.1% of an ad's tokens are embedded, 3.1% kept as
+metadata, 21.2% left out (benefits, company, apply, legal), and 9.6%
+gathered in the boilerplate chunk, 2.9 points of it text under
+unmapped headings the guess left out. Of the unmapped text, 6.4 points
+of an ad's tokens are placed by the guess, nearly all as the summary.
+Facts are read in 35% of ads.
 
 Boilerplate's thresholds are counts of title groups, which a larger
 sample passes more easily, so boilerplate figures from samples of

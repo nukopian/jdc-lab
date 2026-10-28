@@ -11,12 +11,14 @@ package headings
 
 import (
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/nukopian/grammar"
+	"github.com/nukopian/scalar"
 
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/clean"
@@ -102,9 +104,9 @@ func init() {
 		"contract length", "length of contract", "duration", "term",
 		"start", "start date", "starting", "closing date", "deadline", "interview date",
 		"job title", "job role", "position", "role", "reference", "ref", "job reference",
-		"reports to",
+		"reports to", "reporting to", "responsible to", "reference number",
 		"sector", "industry", "department", "employer", "client", "consultant",
-		"contact", "email", "keywords",
+		"contact", "email", "keywords", "key words",
 	} {
 		fieldLabels[label] = true
 	}
@@ -349,6 +351,49 @@ func hasTimes(text string) bool {
 	return false
 }
 
+// removed are what an export puts in place of contact details it takes
+// out: a heading has none, as it has no phone number or web address.
+var removed = []string{"(phone number removed)", "(url removed)"}
+
+// hasRemoved reports whether text holds one of removed, as "Call (phone
+// number removed)" does.
+func hasRemoved(text string) bool {
+	return slices.ContainsFunc(removed, func(r string) bool { return strings.Contains(text, r) })
+}
+
+// onlyFacts reports whether text is nothing but facts, and what joins
+// them: "Permanent | Full-time" or "Monday - Friday" in bold is a line of
+// facts, not a heading. Ending in a colon, it heads what follows, as
+// "Monday - Friday:" heads its hours. Pay counts with a currency or a
+// period, as internal/facts reads it.
+func onlyFacts(text string) bool {
+	if endsAsLabel(text) {
+		return false
+	}
+	left := []rune(text)
+	cut := func(g *grammar.Grammar, keep func(m *scalar.SV) bool) {
+		for _, m := range g.FindAll(text, grammar.Outermost()).Items() {
+			if keep != nil && !keep(m) {
+				continue
+			}
+			from, to := int(m.At("from").Int()), int(m.At("to").Int())
+			for i := from; i < to && i < len(left); i++ {
+				left[i] = ' '
+			}
+		}
+	}
+	cut(grammars.Pattern, nil)
+	cut(grammars.Schedule, nil)
+	cut(grammars.Hours, nil)
+	cut(grammars.Pay, func(m *scalar.SV) bool {
+		return len(m.At("cur").AV().Items()) > 0 || m.At("period").Defined()
+	})
+	if string(left) == text {
+		return false // no facts at all
+	}
+	return !strings.ContainsFunc(string(left), func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) })
+}
+
 // conjunctions join what comes before them to what comes after: "OR" alone
 // in bold, between two lists of requirements, is no heading.
 var conjunctions = map[string]bool{"and": true, "or": true, "either": true, "nor": true, "but": true, "plus": true}
@@ -373,7 +418,7 @@ func headingShaped(text, key string, most int) bool {
 	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > most || hasMoney(text) || hasTimes(text) || hasPattern(text) {
+	if len(strings.Fields(key)) > most || hasMoney(text) || hasTimes(text) || hasPattern(text) || onlyFacts(text) || hasRemoved(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })

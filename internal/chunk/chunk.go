@@ -5,10 +5,11 @@
 //
 // The sections that say what the job is are embedded: the summary, the
 // role, responsibilities, requirements and desirable. Details are metadata;
-// benefits, company, apply and legal are left out; and unmapped ones,
-// whose kind isn't known, aren't embedded: they're what's left to map. An
-// unmapped section's text goes to the boilerplate chunk, under its
-// heading, and its fields to a details chunk.
+// benefits, company, apply and legal are left out. An unmapped section,
+// whose heading has no known kind, is placed by a guess (see guess): by
+// its lines' wording, or as the summary; or, when it's boilerplate, the
+// advertiser's or after the apply text, its text goes to the boilerplate
+// chunk, under its heading, and its fields to a details chunk.
 //
 // Text found as boilerplate leaves the embedded chunks for
 // one chunk of its own, at the end, left out but there to see, each line
@@ -25,7 +26,9 @@
 package chunk
 
 import (
+	"cmp"
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 	"unicode"
@@ -118,10 +121,19 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		found.Facts = append(found.Facts, placeless(fs)...)
 		return true
 	}
-	for _, s := range ss {
+	for i, s := range ss {
+		placed := ""
 		if s.Kind == sections.Unmapped {
-			// Unmapped text goes to the boilerplate, under its heading, and
-			// its fields stay, as details.
+			if kind, why := guess(ss, i, boilerplate); kind != "" {
+				s.Kind, placed = kind, why
+			} else {
+				placed = why
+			}
+		}
+		if s.Kind == sections.Unmapped {
+			// Unmapped text the guess can't place goes to the boilerplate,
+			// under its heading, with why it's left out; its fields stay, as
+			// details.
 			d := Chunk{Kind: sections.Details, Use: Metadata, Heading: s.Heading,
 				PlacedBy: fmt.Sprintf("the fields under the unmapped heading %q", s.Heading)}
 			var lines []string
@@ -134,7 +146,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 				if takeFacts(p) {
 					continue
 				}
-				gathered = append(gathered, fmt.Sprintf("unmapped %q: %s", s.Heading, p.Text))
+				gathered = append(gathered, fmt.Sprintf("unmapped %q (%s): %s", s.Heading, placed, p.Text))
 				unmapped += Tokens(p.Text)
 			}
 			if len(d.Fields) > 0 {
@@ -144,7 +156,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			}
 			continue
 		}
-		c := Chunk{Kind: s.Kind, Heading: s.Heading, PlacedBy: placedBy(s), Use: use(s.Kind)}
+		c := Chunk{Kind: s.Kind, Heading: s.Heading, PlacedBy: cmp.Or(placed, placedBy(s)), Use: use(s.Kind)}
 		var lines []string
 		if s.Heading != "" {
 			lines = append(lines, s.Heading)
@@ -308,6 +320,94 @@ func use(kind sections.Kind) string {
 }
 
 // placedBy says what gave a section its kind.
+// guess places ss[i], an unmapped section, by what it says, rather than
+// leaving all of it out. When at least half its lines open as one kind's
+// do (see internal/wording), it's that kind, and why says so: "guessed
+// requirements: 5 of its 7 lines open as requirements do". It's left
+// out, kind "", when most of its lines are boilerplate, its heading
+// speaks for the advertiser ("we", "our"), or it comes after the ad's
+// apply or legal text, and why says which. A label over a short value is
+// details. Otherwise it's the summary.
+func guess(ss []sections.Section, i int, boilerplate func(string) bool) (kind sections.Kind, why string) {
+	s := ss[i]
+	counts := map[sections.Kind]int{}
+	phrases := map[sections.Kind][]string{}
+	lines, repeated := 0, 0
+	for _, p := range s.Parts {
+		if p.Role != headings.Text || factLine(p.Text, facts.Find(p.Text)) {
+			continue
+		}
+		lines++
+		if boilerplate(p.Text) {
+			repeated++
+		}
+		if k, phrase, ok := wording.Of(p.Text); ok {
+			counts[k]++
+			if q := fmt.Sprintf("%q", phrase); !slices.Contains(phrases[k], q) && len(phrases[k]) < 3 {
+				phrases[k] = append(phrases[k], q)
+			}
+		}
+	}
+	var best sections.Kind
+	for _, k := range slices.Sorted(maps.Keys(counts)) {
+		if counts[k] > counts[best] {
+			best = k
+		}
+	}
+	if lines > 0 && 2*counts[best] >= lines && 2*repeated < lines {
+		return best, fmt.Sprintf("guessed %s: %d of its %d lines open as %s do (%s)",
+			best, counts[best], lines, best, strings.Join(phrases[best], ", "))
+	}
+	switch {
+	case lines > 0 && 2*repeated >= lines:
+		return "", "mostly boilerplate"
+	case speaksForAdvertiser(s.Heading):
+		return "", "the advertiser's"
+	case slices.ContainsFunc(ss[:i], func(t sections.Section) bool { return t.Kind == sections.Apply || t.Kind == sections.Legal }):
+		return "", "after applying"
+	case lines == 0:
+		return "", "no text" // only fields or facts, which have places of their own
+	case labelled(s):
+		return sections.Details, "guessed details: a label, with a short value under it"
+	}
+	// Read by eye, most of what's left is about the job: its pitch,
+	// duties and requirements in words openings.txt doesn't have.
+	return sections.Summary, "guessed summary: nothing says it isn't about the job"
+}
+
+// advertiserWords are the words of a heading that speaks for the
+// advertiser: "We're the AA", "Our Commitment", "Why choose us?";
+// advertiserOpenings, how one opens: "Who are Acme?", "Join Acme".
+var (
+	advertiserWords    = map[string]bool{"we": true, "we're": true, "we've": true, "our": true, "us": true}
+	advertiserOpenings = []string{"who are ", "join "}
+)
+
+func speaksForAdvertiser(heading string) bool {
+	key := headings.Key(heading)
+	return slices.ContainsFunc(strings.Fields(key), func(w string) bool { return advertiserWords[w] }) ||
+		slices.ContainsFunc(advertiserOpenings, func(o string) bool { return strings.HasPrefix(key, o) })
+}
+
+// MaxLabelledWords is the most words under a heading ending in a colon
+// for the section to be a label and its value: "IR35 Status:" over
+// "Inside IR35".
+const MaxLabelledWords = 15
+
+// labelled reports whether s is a label and its value, split by the
+// markup: a heading ending in a colon, over a line or two of at most
+// MaxLabelledWords words in all.
+func labelled(s sections.Section) bool {
+	if !strings.HasSuffix(strings.TrimSpace(s.Heading), ":") || len(s.Parts) == 0 || len(s.Parts) > 2 {
+		return false
+	}
+	words := 0
+	for _, p := range s.Parts {
+		words += len(strings.Fields(p.Text))
+	}
+	return words <= MaxLabelledWords
+}
+
 func placedBy(s sections.Section) string {
 	switch {
 	case s.Heading == "":

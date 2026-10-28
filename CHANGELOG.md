@@ -26,6 +26,17 @@ has the steps).
   times are no longer read from inside a figure ("45am-5pm" from
   "745am-5pm"), and "til" joins a range; 15 fewer of 103,015 facts
   (roadmap 22; [record](docs/changes/2026-10-28-one-set-of-grammars-for-facts-and-headings.md)).
+- Text under headings of no known kind is placed by an educated guess
+  rather than left out whole: by its lines' wording, as boilerplate,
+  the advertiser's or after the apply text, as details for a label and
+  its value, and otherwise as the summary. The heaviest of those
+  headings are mapped, and bold lines of facts alone, or with removed
+  contact details, are no longer headings. Embedded tokens rise from
+  57.5% to 66.1%; headings of a known kind from 78% to 81% of uses. The
+  guess is right for about four sections in five, short of the plan's
+  nine in ten, and the unmapped text is 9.8% of the text, short of its
+  9%: the record says why
+  (roadmap 21; [record](docs/changes/2026-10-28-map-whats-left.md)).
 - Pay reads more periods: "p.h.", "pw", "p/w", "p.w." and "pcm", each
   named as its period, and "p.a.", which was in the grammar but never
   matched: a form ending in a point can't be followed by a word

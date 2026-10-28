@@ -194,6 +194,20 @@ func TestRead(t *testing.T) {
 				`heading "Monday to Friday Nights:" key="monday to friday nights"`},
 		},
 		{
+			"a line with contact details an export took out is no heading",
+			`<p><b>(phone number removed)</b></p><p><b>Call (phone number removed) and ask for Sam</b></p>` +
+				`<p><b>(url removed)</b></p>`,
+			[]string{`text "(phone number removed)"`, `text "Call (phone number removed) and ask for Sam"`,
+				`text "(url removed)"`},
+		},
+		{
+			"bold lines of facts alone are text, unless they end in a colon",
+			`<p><b>Permanent | Full-time</b></p><p><b>Monday - Friday</b></p><p><b>£30,000 per annum</b></p>` +
+				`<p><b>Monday - Friday:</b></p><p><b>Permanent Roles</b></p>`,
+			[]string{`text "Permanent | Full-time"`, `text "Monday - Friday"`, `text "£30,000 per annum"`,
+				`heading "Monday - Friday:" key="monday friday"`, `heading "Permanent Roles" key="permanent roles"`},
+		},
+		{
 			"bold bare ranges without days are headings",
 			`<p><b>Ages 5-11</b></p><p><b>Monday to Friday, 2-3 days in the office</b></p>` +
 				`<p><b>Mon-Sun, 10-12 hr shifts</b></p><p><b>Sunday to Thursday, 4-5 nights</b></p>` +
@@ -207,11 +221,14 @@ func TestRead(t *testing.T) {
 		},
 		{
 			// A figure with a point is a time only with am or pm, or in a
-			// range: 37.50 is hours, not half past.
+			// range: 37.50 is hours, not half past. Hours alone are a line
+			// of facts, though; with more, the line is a heading still.
 			"bold figures with a point aren't times",
-			`<p><b>37.50 hours per week</b></p><p><b>Top 10 reasons to join</b></p>`,
-			[]string{`heading "37.50 hours per week" key="37 50 hours per week"`,
-				`heading "Top 10 reasons to join" key="top 10 reasons to join"`},
+			`<p><b>37.50 hours per week</b></p><p><b>Top 10 reasons to join</b></p>` +
+				`<p><b>37.50 hours per week, flexible</b></p>`,
+			[]string{`text "37.50 hours per week"`,
+				`heading "Top 10 reasons to join" key="top 10 reasons to join"`,
+				`heading "37.50 hours per week, flexible" key="37 50 hours per week flexible"`},
 		},
 		{
 			"a bold question, and a trailing ellipsis, are headings",

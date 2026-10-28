@@ -58,8 +58,9 @@ func TestOf(t *testing.T) {
 	}
 }
 
-// An unmapped section goes to the boilerplate chunk, each line with its
-// heading, and counts as unclassified; its fields stay, as details.
+// An unmapped section the guess can't place goes to the boilerplate
+// chunk, each line with its heading and why it's left out, and counts as
+// unclassified; its fields stay, as details.
 func TestOfUnmapped(t *testing.T) {
 	ss := []sections.Section{{Kind: sections.Unmapped, Heading: "Our depots", Parts: []headings.Part{
 		text("Leeds and York."),
@@ -74,7 +75,7 @@ func TestOfUnmapped(t *testing.T) {
 		!strings.Contains(d.PlacedBy, "unmapped") {
 		t.Errorf("the fields: %+v; want a details chunk of the unmapped section's fields", d)
 	}
-	if b.Kind != Boilerplate || b.Text != `unmapped "Our depots": Leeds and York.` || b.Unmapped != Tokens("Leeds and York.") {
+	if b.Kind != Boilerplate || b.Text != `unmapped "Our depots" (the advertiser's): Leeds and York.` || b.Unmapped != Tokens("Leeds and York.") {
 		t.Errorf("the boilerplate: %+v; want the unmapped text, with its heading, counted", b)
 	}
 	if a := Totalled(Ad{Chunks: cs}, 20); a.Unclassified != b.Unmapped || a.Embedded != 0 {
@@ -322,5 +323,50 @@ func TestFactLineWashUp(t *testing.T) {
 	// A block of text that starts with a line break keeps its first line.
 	if got := block("\n x\ny", "      "); !strings.Contains(got, "x") {
 		t.Errorf("block lost text: %q", got)
+	}
+}
+
+// The guess places an unmapped section by its lines' wording, or says
+// why it's left out.
+func TestGuess(t *testing.T) {
+	never := func(string) bool { return false }
+	always := func(string) bool { return true }
+	duties := sections.Section{Kind: sections.Unmapped, Heading: "Your Background:", Parts: []headings.Part{
+		text("Experience of working in a care setting"), text("You'll have a full UK licence"), text("Team player"),
+	}}
+	tests := []struct {
+		name        string
+		ss          []sections.Section
+		boilerplate func(string) bool
+		kind        sections.Kind
+		why         string
+	}{
+		{"by wording", []sections.Section{duties}, never, sections.Requirements,
+			`guessed requirements: 2 of its 3 lines open as requirements do ("Experience of", "You'll have")`},
+		{"mostly boilerplate", []sections.Section{duties}, always, "", "mostly boilerplate"},
+		{"the advertiser's", []sections.Section{{Kind: sections.Unmapped, Heading: "We're the AA",
+			Parts: []headings.Part{text("A household name.")}}}, never, "", "the advertiser's"},
+		{"after applying", []sections.Section{{Kind: sections.Apply, Heading: "How to apply"},
+			{Kind: sections.Unmapped, Heading: "Agency:", Parts: []headings.Part{text("A note.")}}}, never, "", "after applying"},
+		{"otherwise the summary", []sections.Section{{Kind: sections.Unmapped, Heading: "Junior Estimator",
+			Parts: []headings.Part{text("Are you looking to build a career in estimating?")}}}, never,
+			sections.Summary, "guessed summary: nothing says it isn't about the job"},
+		{"a label and its value", []sections.Section{{Kind: sections.Unmapped, Heading: "IR35 Status:",
+			Parts: []headings.Part{text("Inside IR35")}}}, never, sections.Details, "guessed details: a label, with a short value under it"},
+		{"who are", []sections.Section{{Kind: sections.Unmapped, Heading: "Who are Acme?",
+			Parts: []headings.Part{text("A household name.")}}}, never, "", "the advertiser's"},
+		{"no text", []sections.Section{{Kind: sections.Unmapped, Heading: "Terms",
+			Parts: []headings.Part{{Role: headings.Field, Text: "Pay: £16.50", Key: "pay", Value: "£16.50"}}}}, never, "", "no text"},
+	}
+	for _, tt := range tests {
+		kind, why := guess(tt.ss, len(tt.ss)-1, tt.boilerplate)
+		if kind != tt.kind || why != tt.why {
+			t.Errorf("%s: got %q, %q; want %q, %q", tt.name, kind, why, tt.kind, tt.why)
+		}
+	}
+	// A guessed section is a chunk of its kind, embedded, saying why.
+	cs := Of([]sections.Section{duties}, never)
+	if len(cs) != 1 || cs[0].Kind != sections.Requirements || cs[0].Use != Embed || !strings.HasPrefix(cs[0].PlacedBy, "guessed") {
+		t.Errorf("the chunks: %+v; want one guessed requirements chunk", cs)
 	}
 }
