@@ -40,16 +40,6 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 17. Keep a list item's own blocks in the ad's order
-
-**Serves:** structure
-
-A list item holding paragraphs or a list of its own comes out after the
-blocks that follow it, under the wrong heading: 20 ads of the three
-samples. Among them is the ad on the pages whose pay lands under
-"Why …?". The plan is in its
-[record](docs/changes/2026-10-28-a-list-items-own-blocks-in-order.md).
-
 ### 22. One set of grammars for facts and headings
 
 **Serves:** structure, metadata

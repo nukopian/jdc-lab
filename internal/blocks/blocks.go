@@ -181,18 +181,17 @@ func (b *builder) start(tag atom.Atom) {
 		}
 		b.heading++
 	case tag == atom.Li:
-		switch {
-		case b.inItem || b.list > 0:
+		if b.inItem {
 			b.endItem() // the item before, if its </li> was left out
-		default:
-			b.endBlock() // the text before a bare <li>
+		} else {
+			b.endBlock() // the text before a bare <li>, or between items
 		}
 		b.inItem = true
 	case tag == atom.Ul || tag == atom.Ol:
 		if b.inItem {
 			b.endItem() // the outer item's own text, before its sublist
-		} else if b.list == 0 {
-			b.endBlock()
+		} else {
+			b.endBlock() // the text before the list, in an item's own or not
 		}
 		b.list++
 	case breaks(tag):
@@ -218,14 +217,21 @@ func (b *builder) end(tag atom.Atom) {
 		}
 		b.heading = max(b.heading-1, 0)
 	case tag == atom.Li:
-		if b.inItem || b.list > 0 { // else a stray </li>, which ends nothing
+		switch {
+		case b.inItem:
 			b.endItem()
-		}
+		case b.list > 0: // the outer item's own text, after its sublist
+			b.endBlock()
+		} // else a stray </li>, which ends nothing
 	case tag == atom.Ul || tag == atom.Ol:
 		if b.list == 0 {
 			break // a stray </ul>, which ends nothing
 		}
-		b.endItem()
+		if b.inItem {
+			b.endItem()
+		} else {
+			b.endBlock() // text in the list, in no item
+		}
 		b.list--
 		if b.list == 0 {
 			b.endList()
@@ -286,11 +292,12 @@ func (b *builder) endList() {
 	}
 }
 
-// add adds a block, after any list of bare <li>s that came before it.
+// add adds a block, after the items gathered before it, so that the
+// ad's order is kept: inside a list too, as when an item holds
+// paragraphs or headings of its own, and the items after it start a
+// new list.
 func (b *builder) add(block Block) {
-	if b.list == 0 {
-		b.endList()
-	}
+	b.endList()
 	b.blocks = append(b.blocks, block)
 }
 
@@ -321,7 +328,7 @@ func bulleted(bs []Block) []Block {
 
 // finish ends whatever is open at the end of the HTML.
 func (b *builder) finish() {
-	if b.inItem || b.list > 0 {
+	if b.inItem {
 		b.endItem()
 	}
 	b.endBlock()

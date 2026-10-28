@@ -12,7 +12,13 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Text inside list items stays in the ad's order. Where an ad put
+  paragraphs, headings or further lists inside a list item, up to the
+  whole ad in one, some of it came out after the blocks that followed
+  it, under the wrong heading: in 20 ads of the three samples, pay under
+  "Why ...?" and left out as benefits, and requirements gone from their
+  own heading. Now none
+  (roadmap 17; [record](docs/changes/2026-10-28-a-list-items-own-blocks-in-order.md)).
 
 ## v0.5.1 (2026-10-27)
 

@@ -168,6 +168,13 @@ symbols are about 1,150 of them.
 | `bold_lead` | it starts with bold text: `Salary:` in "**Salary:** £30,000" |
 | `added` | the English label cleaning added: `Location: ` for "📍 Leeds" |
 
+**Lists.** A list item is one item, whatever it holds: a `<p>` or a
+`<br>` inside it is only a space, and a sublist's items join its list.
+But some ads put paragraphs, headings and further lists inside an item,
+up to the whole ad in one. Text there, outside any item of its own, is
+a block of its own, where it stands, and ends the list before it, so
+that nothing comes out of the ad's order.
+
 It decides nothing. Whether a bold block is a heading is the next stage's
 call, which keeps the HTML parsing apart from the judgement, so either
 can change without the other.
@@ -424,11 +431,9 @@ those four, but never the sixteen, nor any ad's place among them.
 
 It also checks every ad of the run, comparing the letters and digits
 of what its HTML shows with those of its sections. Text in no section
-should never happen. Text out of the ad's order does, in 20 ads of the
-three samples: a list item that holds a list or paragraphs of its own
-comes out after the blocks that follow it, so its text lands under the
-wrong heading. The view shows where, for each ad it has, and the
-summary counts both over the run.
+should never happen, nor should text out of the ad's order, and neither
+does on the three samples. The view shows where, for each ad it has,
+and the summary counts both over the run.
 
 ## Chunking an ad
 
@@ -771,7 +776,7 @@ with no section but the summary, 4%.
 | desirable | 2% | 7% |
 | benefits | 13% | 38% |
 | company | 3% | 50% |
-| apply | 3% | 56% |
+| apply | 3% | 57% |
 | legal | 1% | 83% |
 | details | 2% | 18% |
 | unmapped | 12% | 26% |
@@ -825,7 +830,6 @@ and the figures in [What it measured](#what-it-measured) are updated.
 |---|---|---|
 | [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
 | [Boilerplate's verdict](../ROADMAP.md#4-make-boilerplates-verdict-right) | Footers filed under requirements count as template and are embedded; job lines common to many ads count as boilerplate | Their place at the end of the ad; their wording as requirements or duties |
-| [Text out of order](../ROADMAP.md#17-keep-a-list-items-own-blocks-in-the-ads-order) | A list item holding a list or paragraphs of its own comes out after the blocks that follow it, under the wrong heading (20 ads) | Emit an item's own blocks where they stand |
 
 ## Words used here
 

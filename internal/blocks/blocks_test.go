@@ -241,6 +241,25 @@ now.</p>`,
 			[]string{`paragraph "Intro"`, `paragraph "More"`, `paragraph "Outro"`},
 		},
 		{
+			"an item's own paragraph after its sublist, in the ad's order",
+			`<ul><li>Shifts<ul><li>Days</li></ul><p>Rota to follow</p></li><li>Pay</li></ul>`,
+			[]string{"list", `  "Shifts"`, `  "Days"`, `paragraph "Rota to follow"`, "list", `  "Pay"`},
+		},
+		{
+			"the whole ad in one item, headings and all, in the ad's order",
+			`<ul><li><ul><li>£30,000</li></ul><p>Intro</p><p><strong>Benefits</strong></p><ul><li>Leave</li></ul>` +
+				`<p><strong>Why us?</strong></p><p>Pitch</p></li></ul>`,
+			[]string{"list", `  "£30,000"`, `paragraph "Intro"`, `paragraph "Benefits" bold`, "list", `  "Leave"`,
+				`paragraph "Why us?" bold`, `paragraph "Pitch"`},
+		},
+		{
+			"text between an item's sublists is a block of its own, in the ad's order",
+			`<ul><li><ul><li>Duties</li></ul> <br><strong>You will have:</strong> <br><ul><li>Experience</li></ul>` +
+				`<strong>And:</strong><ul><li>Licence</li></ul></li></ul>`,
+			[]string{"list", `  "Duties"`, `paragraph "You will have:" bold`, "list", `  "Experience"`,
+				`paragraph "And:" bold`, "list", `  "Licence"`},
+		},
+		{
 			"a heading tag inside an item stays in the item",
 			`<ul><li>Intro <h3>Head</h3> more</li></ul>`,
 			[]string{"list", `  "Intro Head more"`},
