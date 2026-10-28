@@ -189,8 +189,13 @@ onnx-demo
 ```
 
 `go run ./cmd/onnx-demo` builds and runs a program without keeping it.
-Avoid a bare `go build` inside `cmd/<tool>/`: it leaves the binary
-beside the code. `.gitignore` hides it, but it's clutter.
+Avoid a bare `go build ./cmd/<tool>` (or `go build` inside
+`cmd/<tool>/`): it leaves the binary in the folder it's run from.
+To check that everything compiles, `go build ./...` keeps nothing.
+`.gitignore` hides a stray binary at the root or in a program's
+folder, by ignoring every file there without an extension, so a new
+root file without one (cpanfile is the only one) must be added to its
+exceptions.
 
 A package that reads a grammar's matches lists every path it reads, as
 `m.At("per.week")` does, in its `paths_test.go`, which checks each with

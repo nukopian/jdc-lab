@@ -1,3 +1,16 @@
+# Go binaries left where they don't belong by a bare `go build`, at the
+# root or in a program's folder: there, only files with an extension, and
+# folders, are the lab's (and cpanfile). This comes first, so the rules
+# below still ignore what they name among those. Add any new root file
+# without an extension here.
+/*
+!/*.*
+!/*/
+!/cpanfile
+/cmd/*/*
+!/cmd/*/*.*
+!/cmd/*/*/
+
 # Values that are yours alone, read by .envrc
 .env
 
@@ -12,7 +25,7 @@ CLAUDE.md
 
 # Go
 # Binaries: built into bin/ at the root (not python/bin or perl/bin, which
-# hold programs), or beside the code by a bare `go build`
+# hold programs)
 /bin/
 *.exe
 *.exe~

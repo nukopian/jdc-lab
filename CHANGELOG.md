@@ -12,7 +12,11 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- A 9 MB build of `chunk`, left at the root by a bare
+  `go build ./cmd/chunk` and committed with everything else in v0.5.0,
+  is gone. `.gitignore` claimed to hide such builds but didn't; it now
+  ignores any file without an extension at the root or in a program's
+  folder, and MAINTAINING says to check with `go build ./...`.
 
 ## v0.5.2 (2026-10-28)
 
