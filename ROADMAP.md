@@ -114,7 +114,10 @@ service are still to come.
 ### 11. Embeddings from Go
 
 Added 2026-10-25, to Ideas 2026-10-27. Run the chosen model from Go
-with ONNX Runtime, so nothing in the pipeline needs a Python service.
+with ONNX Runtime, so nothing in the pipeline needs a Python service. Go
+does the tokenizing, pooling (CLS or mean, as the model expects) and
+normalising, so the vectors suit an Elasticsearch `dense_vector` field
+with `dot_product`, and quantised (`int8_hnsw`) to cut its memory.
 
 ### 12. Boilerplate thresholds scaled to the ads' number
 
