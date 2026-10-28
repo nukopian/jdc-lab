@@ -480,14 +480,16 @@ advertiser's standard perks are still a list of benefits.
 
 An **unmapped** section, under a heading of no known kind, is placed by
 a **guess**, from what's already known about its text, and its chunk
-says what placed it:
+says what placed it. The evidence is weighed in this order, the first
+that holds placing it:
 
 | Evidence | Placed as | Example |
 |---|---|---|
-| At least half its lines open as one kind's do (`openings.txt`) | that kind | "guessed requirements: 3 of its 6 lines open as requirements do" |
-| Most of its lines are boilerplate | left out | an agency's standard footer |
+| At least half its lines open as one kind's do (`openings.txt`), and fewer than half are boilerplate | that kind | "guessed requirements: 3 of its 6 lines open as requirements do" |
+| At least half its lines are boilerplate | left out | an agency's standard footer |
 | Its heading speaks for the advertiser: "we", "our", "us", or it opens "who are" or "join" | left out | "Who are Acme?" |
 | It comes after the ad's apply or legal text | left out | |
+| It has no lines of text, only fields or facts | left out (its fields and facts are details) | |
 | A heading ending in a colon, over a line or two of at most 15 words | details | "IR35 Status:" over "Inside IR35" |
 | Nothing else | the summary | a job title used as a heading, over the job's pitch |
 
@@ -829,7 +831,7 @@ written in, or a few words changed, is most of the rest
 
 **Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
 by the index): 65.6% of an ad's tokens are embedded, 3.1% kept as
-metadata, 21.2% left out (benefits, company, apply, legal), and 10.2%
+metadata, 21.2% left out (benefits, company, apply, legal), and 10.1%
 gathered in the boilerplate chunk, 2.8 points of it text under
 unmapped headings the guess left out. Of the unmapped text, 6.3 points
 of an ad's tokens are placed by the guess, nearly all as the summary.

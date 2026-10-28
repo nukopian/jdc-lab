@@ -319,15 +319,16 @@ func use(kind sections.Kind) string {
 	return LeaveOut
 }
 
-// placedBy says what gave a section its kind.
 // guess places ss[i], an unmapped section, by what it says, rather than
-// leaving all of it out. When at least half its lines open as one kind's
-// do (see internal/wording), it's that kind, and why says so: "guessed
-// requirements: 5 of its 7 lines open as requirements do". It's left
-// out, kind "", when most of its lines are boilerplate, its heading
-// speaks for the advertiser ("we", "our"), or it comes after the ad's
-// apply or legal text, and why says which. A label over a short value is
-// details. Otherwise it's the summary.
+// leaving all of it out. The evidence is weighed in this order. When at
+// least half its lines open as one kind's do (see internal/wording), and
+// fewer than half are boilerplate, it's that kind, and why says so:
+// "guessed requirements: 5 of its 7 lines open as requirements do"; the
+// first kind by name wins a tie. It's left out, kind "", when at least
+// half its lines are boilerplate, its heading speaks for the advertiser
+// ("we", "our"), or it comes after the ad's apply or legal text, or when
+// it has no lines of text, only fields or facts; and why says which. A
+// label over a short value is details. Otherwise it's the summary.
 func guess(ss []sections.Section, i int, boilerplate func(string) bool) (kind sections.Kind, why string) {
 	s := ss[i]
 	counts := map[sections.Kind]int{}
@@ -408,6 +409,7 @@ func labelled(s sections.Section) bool {
 	return words <= MaxLabelledWords
 }
 
+// placedBy says what gave a section its kind.
 func placedBy(s sections.Section) string {
 	switch {
 	case s.Heading == "":

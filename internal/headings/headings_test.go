@@ -203,9 +203,12 @@ func TestRead(t *testing.T) {
 		{
 			"bold lines of facts alone are text, unless they end in a colon",
 			`<p><b>Permanent | Full-time</b></p><p><b>Monday - Friday</b></p><p><b>£30,000 per annum</b></p>` +
-				`<p><b>Monday - Friday:</b></p><p><b>Permanent Roles</b></p>`,
+				`<p><b>Monday - Friday:</b></p><p><b>Permanent Roles</b></p>` +
+				// A field's label is a heading still, though it names a pattern.
+				`<p><b>Hybrid Working</b></p>`,
 			[]string{`text "Permanent | Full-time"`, `text "Monday - Friday"`, `text "£30,000 per annum"`,
-				`heading "Monday - Friday:" key="monday friday"`, `heading "Permanent Roles" key="permanent roles"`},
+				`heading "Monday - Friday:" key="monday friday"`, `heading "Permanent Roles" key="permanent roles"`,
+				`heading "Hybrid Working" key="hybrid working"`},
 		},
 		{
 			"bold bare ranges without days are headings",

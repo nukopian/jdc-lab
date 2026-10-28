@@ -47,6 +47,13 @@ has the steps).
   nine in ten, and the unmapped text is 9.8% of the text, short of its
   9%: the record says why
   (roadmap 21; [record](docs/changes/2026-10-28-map-whats-left.md)).
+- A wash-up before the release found a regression from roadmap 21: a
+  field's label naming a work pattern, "Hybrid Working" in bold, was
+  taken for a line of facts and lost as a heading, so its text ran into
+  the section before. It's a heading again (16 heading uses). It also
+  found "We are seeking:" headings, over the job's requirements, left
+  out as the advertiser's, now requirements (16 headings), and two tests
+  of the boilerplate verdict that passed without the code they named.
 - Pay reads more periods: "p.h.", "pw", "p/w", "p.w." and "pcm", each
   named as its period, and "p.a.", which was in the grammar but never
   matched: a form ending in a point can't be followed by a word

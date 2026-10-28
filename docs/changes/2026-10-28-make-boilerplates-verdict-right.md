@@ -94,3 +94,10 @@ cover it, and PIPELINE.md's figures are updated.
 - **What's left:** a duty or requirement with "our" or "we" in it, at
   the end of an advertiser's ads, is taken for a footer ("Utilise our
   CRM system…"); footers with none of the footer words stay templates.
+- **The wash-up before the release:** the footer test's job line had no
+  footer word, so it passed with the job-line exemption taken out, and
+  nothing tested the ending counts summed over texts alike; both are
+  tested now, each test failing without its code. Of templates opening
+  with the new openings and holding a footer word, 26 texts, 7,681
+  characters, all but one are job lines; the one is an agency whose
+  name opens "Supporting".

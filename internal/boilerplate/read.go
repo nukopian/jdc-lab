@@ -29,13 +29,7 @@ func Read(path string) (all []Divided, ix Index, dups int, err error) {
 		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
 		src := SourceOf(a)
 		for _, s := range ss {
-			var texts []string
-			for _, p := range s.Parts {
-				if p.Role == headings.Text {
-					texts = append(texts, p.Text)
-				}
-			}
-			ix.Add(src, s.Kind, texts...)
+			ix.Add(src, s.Kind, Texts([]sections.Section{s})...)
 		}
 		all = append(all, Divided{a, ss})
 	}

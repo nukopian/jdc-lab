@@ -358,16 +358,18 @@ var removed = []string{"(phone number removed)", "(url removed)"}
 // hasRemoved reports whether text holds one of removed, as "Call (phone
 // number removed)" does.
 func hasRemoved(text string) bool {
+	text = strings.ToLower(text)
 	return slices.ContainsFunc(removed, func(r string) bool { return strings.Contains(text, r) })
 }
 
-// onlyFacts reports whether text is nothing but facts, and what joins
-// them: "Permanent | Full-time" or "Monday - Friday" in bold is a line of
-// facts, not a heading. Ending in a colon, it heads what follows, as
-// "Monday - Friday:" heads its hours. Pay counts with a currency or a
-// period, as internal/facts reads it.
+// onlyFacts reports whether text is nothing but work patterns,
+// schedules, hours and pay, and what joins them: "Permanent | Full-time"
+// or "Monday - Friday" in bold is a line of facts, not a heading. Ending
+// in a colon, it heads what follows, as "Monday - Friday:" heads its
+// hours, and a field's label ("Hybrid Working") heads its value. Pay
+// counts with a currency or a period, as internal/facts reads it.
 func onlyFacts(text string) bool {
-	if endsAsLabel(text) {
+	if endsAsLabel(text) || fieldLabels[Key(text)] {
 		return false
 	}
 	left := []rune(text)

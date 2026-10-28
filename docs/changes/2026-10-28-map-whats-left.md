@@ -154,3 +154,14 @@ chunker shows what placed every guess.
   verbs ("Teach", "Provide") that would place more duties by wording
   than as summary; advertisers' names need a general rule, perhaps
   the boilerplate verdict on their heading across ads.
+- **The wash-up before the release** (an independent review, each finding
+  reproduced by a failing test, then fixed): a field's label that names
+  a work pattern, "Hybrid Working" in bold, had become text, as
+  `onlyFacts` took it for a line of facts, so its section ran into the
+  one before; it's a heading again (16 heading uses). "We are seeking:"
+  headed requirements, but its "we" had the guess leave them out as the
+  advertiser's; it's now a requirements phrase, as "we're looking for"
+  is (16 headings), and "someone who" a requirements opening. The
+  guess's doc and PIPELINE's table now say the evidence is weighed in
+  order, that "at least half" is meant where they said "most", and that
+  a section of fields alone is left out; `hasRemoved` ignores case.

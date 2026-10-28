@@ -23,6 +23,7 @@ func TestOf(t *testing.T) {
 		{"In return for the above you can expect to receive:", Benefits},
 		{"Essential Criteria", Requirements},
 		{"What We're Looking For", Requirements},
+		{"We are seeking:", Requirements},
 		{"About You", Requirements},
 		{"Desirable skills", Desirable},
 		{"Skills & Experience", Requirements},

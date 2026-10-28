@@ -19,6 +19,7 @@ func TestOf(t *testing.T) {
 		{"Lead lifecycle and M&E projects from concept to completion.", sections.Responsibilities, "Lead"},
 		{"Conduct site surveys and develop scopes of work.", sections.Responsibilities, "Conduct"},
 		{"Responsible for a team of five", sections.Responsibilities, "Responsible for"},
+		{"Someone who is ambitious, determined and respectful.", sections.Requirements, "Someone who"},
 		{"Free parking", sections.Benefits, "Free parking"},
 		{"33 days holiday including bank holidays", sections.Benefits, "33 days holiday"},
 		{"You'll get a company van", sections.Benefits, "You'll get"},

@@ -142,7 +142,8 @@ func TestWidespreadIsBoilerplate(t *testing.T) {
 func TestFootersAtTheEnd(t *testing.T) {
 	const (
 		footer = "Acme Recruitment is acting as an employment agency in relation to this vacancy."
-		job    = "Experience of working in a busy warehouse environment with a forklift licence."
+		// A footer word ("our") in a job line doesn't make it a footer.
+		job    = "Experience of working with our clients in a busy warehouse with a forklift licence."
 		own    = "This line is the advertiser's own, written for this one ad and no other."
 		middle = "Our client is a well established firm with a fine reputation in the region."
 	)
@@ -289,5 +290,30 @@ func TestNearDuplicatesAfterAdd(t *testing.T) {
 func TestSimilarTitles(t *testing.T) {
 	if !SimilarTitles("SEN Teacher", "Teacher:") || SimilarTitles("Crane Operator", "Forklift Driver") {
 		t.Error("SimilarTitles doesn't compare titles by their keys")
+	}
+}
+
+// Long footers changed in a word or two from ad to ad are one text, and
+// it's the group's ending runs that count: each one alone is in one ad.
+func TestFootersAlikeAtTheEnd(t *testing.T) {
+	footer := func(name string) string {
+		return name + " Recruitment is acting as an employment agency in relation to this vacancy and will contact" +
+			" shortlisted applicants within five working days of the closing date for applications to the role"
+	}
+	const own = "This line is the advertiser's own, written for this one ad and no other."
+	var ix Index
+	srcs := []Source{{Title: "Chef"}, {Title: "Crane Operator"}, {Title: "Nurse"}}
+	names := []string{"Acme", "Apex", "Atlas"}
+	for i, src := range srcs {
+		ix.Add(src, sections.Requirements, own+" "+src.Title, footer(names[i]))
+	}
+	if ix.Boilerplate(srcs[0], footer(names[0])) {
+		t.Fatal("before Ends: a footer filed under requirements is a template still")
+	}
+	for i, src := range srcs {
+		ix.Ends(src, own+" "+src.Title, footer(names[i]))
+	}
+	if !ix.Boilerplate(srcs[0], footer(names[0])) {
+		t.Error("a long footer, alike in its ads' ending runs: Boilerplate = false, want true")
 	}
 }
