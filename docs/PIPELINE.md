@@ -394,15 +394,29 @@ worth keeping. So a repeated text is:
 - a **template** for the job if it's found at least as often in the
   sections that describe the job (responsibilities, requirements,
   desirable) as outside them;
-- **boilerplate** if it's found more often outside them, or if it's under
-  `Widespread` (5) groups or more, wherever it is.
+- **boilerplate** if it's found more often outside them; or if it's found
+  mostly in the run of repeated texts that ends its ads, and talks as a
+  footer does, whatever its section; or if it's under `Widespread` (5)
+  groups or more;
+
+but never by the last two if it's phrased as a job's requirement or
+duty is, by its opening in `openings.txt` ("Ability to", "Experience
+of", "Liaise with"), and, for the widespread rule, found mostly in the
+sections that describe the job.
 
 The verdict belongs to the text, over every ad it's in, so a heading
-misfiled in one ad doesn't change it. The widespread rule catches
-footers, which often come after an ad's last heading and so land under
-its requirements, and lines such as "Able to work as part of a team",
-which, though about the job, are in so many jobs that they say nothing of
-any: as with a common word in a search index.
+misfiled in one ad doesn't change it. Footers, an agency's notices or an
+equal opportunities statement, often come after an ad's last heading,
+so they land under its requirements and look like templates: where they
+stand gives them away. The **ending run** of an ad is its texts from the
+last back to the first that isn't repeated, passing over those too
+short to count (`Ends`). A footer **talks as one** with a word of
+applying, getting in touch, the agency or its notices, "we", "our" or
+"us" (`FooterLine`): an advertiser's list of requirements can run to
+the end of its ads too, but seldom has any. And "Ability to work
+independently and as part of a team", in ads for 176 groups of titles,
+is a job line still: it says little of any one job, but it is about the
+job.
 
 `cmd/boilerplate` writes `repeated.tsv`: every repeated text, with its
 groups (by the key that finds the most), ads, characters, the kinds of
@@ -460,9 +474,8 @@ The summary, role, responsibilities, requirements and desirable chunks
 are embedded; details are metadata, with their fields; benefits, company,
 apply and legal are left out. Text found as boilerplate leaves the
 embedded chunks for a **boilerplate** chunk of its own, at the end,
-left out, each line with the section it came from: the verdict takes
-in job lines common to many ads as well as advertisers' footers, and
-this is where to see them. Other chunks keep theirs, so an
+left out, each line with the section it came from: this is where to
+see what the verdict takes, and whether it's right. Other chunks keep theirs, so an
 advertiser's standard perks are still a list of benefits.
 
 An **unmapped** section, under a heading of no known kind, is placed by
@@ -722,7 +735,7 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
 | Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `hasMoney`, `hasTimes`, `hasPattern`), or the grammars' rules they use (`clock`, `points`, `span`, `days`, `rota`, `shift`, `Figure`); add a case to `TestRead` | `internal/headings/headings.go`, `internal/grammars/grammars.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
-| A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`) or the rule | `internal/boilerplate/boilerplate.go` |
+| A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`), `footerWords`, or the rule; a job line taken for a footer may want an opening | `internal/boilerplate/boilerplate.go`, `internal/wording/openings.txt` |
 | An advertiser's name as a heading | Nothing: it stays unmapped, and the guess places its text: as boilerplate, mostly | |
 | A heading that introduces mixed things | Nothing: unmapped is its right place, and the guess places its text | |
 | An unmapped section guessed wrongly | Map its heading, if a phrase will reach others; or change the guess's evidence | `headings.txt`, `internal/chunk/chunk.go` (`guess`) |
@@ -797,16 +810,16 @@ with no section but the summary, 4%.
 | summary | 18% | 11% |
 | role | 8% | 8% |
 | responsibilities | 18% | 2% |
-| requirements | 21% | 11% |
-| desirable | 2% | 7% |
+| requirements | 21% | 14% |
+| desirable | 2% | 8% |
 | benefits | 13% | 38% |
 | company | 3% | 50% |
 | apply | 3% | 58% |
 | legal | 1% | 84% |
-| details | 2% | 17% |
+| details | 2% | 18% |
 | unmapped | 10% | 25% |
 
-Boilerplate is 17.5% of the text, and template for the job 3.3%; with
+Boilerplate is 18.2% of the text, and template for the job 2.6%; with
 the company, apply and legal text that isn't boilerplate, about a fifth
 of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching
@@ -815,10 +828,10 @@ written in, or a few words changed, is most of the rest
 ([record](changes/2026-10-27-find-near-duplicate-boilerplate.md)).
 
 **Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
-by the index): 66.1% of an ad's tokens are embedded, 3.1% kept as
-metadata, 21.2% left out (benefits, company, apply, legal), and 9.6%
-gathered in the boilerplate chunk, 2.9 points of it text under
-unmapped headings the guess left out. Of the unmapped text, 6.4 points
+by the index): 65.6% of an ad's tokens are embedded, 3.1% kept as
+metadata, 21.2% left out (benefits, company, apply, legal), and 10.2%
+gathered in the boilerplate chunk, 2.8 points of it text under
+unmapped headings the guess left out. Of the unmapped text, 6.3 points
 of an ad's tokens are placed by the guess, nearly all as the summary.
 Facts are read in 35% of ads.
 
@@ -856,7 +869,6 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Gap | Effect | Likely fix |
 |---|---|---|
 | [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
-| [Boilerplate's verdict](../ROADMAP.md#4-make-boilerplates-verdict-right) | Footers filed under requirements count as template and are embedded; job lines common to many ads count as boilerplate | Their place at the end of the ad; their wording as requirements or duties |
 
 ## Words used here
 

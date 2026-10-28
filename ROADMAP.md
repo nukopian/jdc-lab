@@ -40,15 +40,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 4. Make boilerplate's verdict right
-
-**Serves:** structure, embeddings
-
-Footers with no heading of their own, filed under requirements, are
-embedded as if about the job, and job lines common to many ads are
-taken out as boilerplate. Both ways the verdict is wrong, and 21's
-guess now leans on it. The plan is in its
-[record](docs/changes/2026-10-28-make-boilerplates-verdict-right.md).
+Nothing at the moment.
 
 ## Next
 

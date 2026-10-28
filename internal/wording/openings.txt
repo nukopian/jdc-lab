@@ -13,14 +13,29 @@ experience of, experience in, experience with, experience working,
 	understanding of, qualified, a qualification in, minimum,
 	full uk driving licence, full uk driving license, uk driving licence,
 	driving licence, driving license, a full driving licence,
-	valid driving licence, enhanced dbs, the right to work => requirements
+	valid driving licence, enhanced dbs, the right to work,
+	the ability to, an ability to, good knowledge, excellent communication,
+	excellent organisational, excellent attention, excellent knowledge,
+	excellent written, excellent verbal, excellent interpersonal,
+	excellent customer, strong understanding, strong knowledge,
+	strong communication, strong organisational, strong experience,
+	a strong understanding, a strong background, a strong track record,
+	high level of accuracy, a high level of accuracy, high levels of accuracy,
+	background in, a background in,
+	experienced, self-motivated, someone with, demonstrable, confident,
+	willing to, must be, attention to detail => requirements
 
 responsible for, you will be responsible for, duties include,
 	carry out, carrying out, manage, managing, lead, deliver, delivering,
 	ensure, ensuring, oversee, overseeing, conduct, conducting, prepare,
 	preparing, maintain, maintaining, monitor, monitoring, coordinate,
 	coordinating, assist with, assisting with, undertake, liaise with,
-	liaising with => responsibilities
+	liaising with, produce, producing, negotiate, negotiating, respond to,
+	responding to, act as, provide, providing, support, supporting,
+	develop, developing, review, reviewing, work closely, working closely,
+	identify, identifying, plan, planning, operate,
+	operating, handle, handling, install, installing,
+	inspect, inspecting, repair, repairing => responsibilities
 
 free parking, on site parking, pension, company pension, pension scheme,
 	days holiday, days annual leave, annual leave, holiday allowance,

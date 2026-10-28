@@ -1,10 +1,12 @@
 # Make boilerplate's verdict right
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 4
 
 **Started:** 2026-10-28, in e6226efeb90802722c14b59348f81a525fc3abca
+
+**Finished:** 2026-10-28
 
 ## The plan
 
@@ -47,3 +49,48 @@ sample of the newly flipped texts is checked by eye both ways, tests
 cover it, and PIPELINE.md's figures are updated.
 
 ## What happened
+
+- **Outcome:** done. Footers are boilerplate and common job lines
+  aren't, as samples checked by eye both ways show; tests cover both
+  rules, and PIPELINE.md's figures are updated.
+- **Measured first,** as 18's figures came after the plan: of 40 lines
+  the verdict took from embedded sections, 18 (45%) were about the job,
+  so "about half" held; of 40 templates in an ad's ending run of
+  repeated text, 26 (65%) were footers, the other 14 an advertiser's
+  requirements running to the end of its ads.
+- **Changes from the plan:**
+  - The end run alone wasn't enough: with the wording guard only, 17 of
+    30 texts newly taken as boilerplate were job lines, as the
+    openings knew too few. So a footer must also talk as one, with a
+    word of applying, getting in touch, the agency, its notices, "we",
+    "our" or "us" (`FooterLine`, `footerWords`).
+  - Step 2 needed `openings.txt` to know far more job lines: it caught
+    about one in five of the job lines sampled. It gained the common
+    openings of requirements ("The ability to", "Strong
+    understanding", "Background in", "Experienced") and duties
+    ("Provide", "Support", "Review", "Act as"). Checked on 3,000 lines
+    from benefits, company, apply and legal sections: "Excellent",
+    "Strong" and "High level of" alone opened perks, "Teach",
+    "Teaching" and "Assist" agencies' names, so they went, or were
+    narrowed to the skills they open.
+  - The index learns the ending runs in a second pass (`Ends`, called
+    by `Read`), once every ad is in, as which texts are repeated isn't
+    known before.
+- **Measurements**, the three samples, `claude/before` to
+  `claude/after`: boilerplate 17.5% to 18.2% of the text, template for
+  the job 3.3% to 2.6%; requirements' boilerplate share 11% to 14%;
+  1,141 texts newly boilerplate, 153 newly templates. Read by eye, 28
+  of 30 of the first were footers, notices or the advertiser's pitch
+  (the two misses had "our" in a duty or a requirement), and 30 of 30
+  of the second job lines. Afterwards, of 40 lines taken from embedded
+  sections, about 9 were about the job (from 18); of 40 templates
+  ending ads, about 8 were footers (from 26), from 1,457 such
+  templates (3,363 before). Chunks: embedded 66.1% to 65.6% of tokens,
+  the boilerplate chunk 9.6% to 10.2%; 21's guess places 0.65 points
+  as duties, from 0.29, with the wider openings.
+- **Tried and reverted:** the end run with only the wording guard,
+  above; "excellent", "strong", "high level of", "teach", "teaching"
+  and "assist" as openings.
+- **What's left:** a duty or requirement with "our" or "we" in it, at
+  the end of an advertiser's ads, is taken for a footer ("Utilise our
+  CRM system…"); footers with none of the footer words stay templates.

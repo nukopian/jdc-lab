@@ -70,7 +70,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Make boilerplate's verdict right](2026-10-28-make-boilerplates-verdict-right.md)
-  (roadmap 4), in progress
+  (roadmap 4), shipped, unreleased
 - [Keep a list item's own blocks in the ad's order](2026-10-28-a-list-items-own-blocks-in-order.md)
   (roadmap 17), shipped, unreleased
 - [One set of grammars for facts and headings](2026-10-28-one-set-of-grammars-for-facts-and-headings.md)

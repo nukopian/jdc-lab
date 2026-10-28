@@ -107,15 +107,68 @@ func TestBoilerplate(t *testing.T) {
 	}
 }
 
+// Text in Widespread groups of titles is boilerplate wherever it's
+// found, unless it's phrased as a job's requirement or duty and found
+// mostly in the sections that describe the job.
 func TestWidespreadIsBoilerplate(t *testing.T) {
-	const teamwork = "Able to work effectively as part of a team and on your own initiative."
+	const (
+		notice   = "All candidates will be required to complete our standard vetting checks before starting."
+		teamwork = "Able to work effectively as part of a team and on your own initiative."
+	)
 	var ix Index
 	jobs := []string{"Chef", "Crane Operator", "Teaching Assistant", "Nurse", "Accountant"}
 	for i, job := range jobs {
-		ix.Add(Source{Title: job}, sections.Requirements, teamwork)
-		if got, want := ix.Boilerplate(Source{}, teamwork), i+1 >= Widespread; got != want {
-			t.Errorf("in %d jobs' requirements: Boilerplate = %t, want %t", i+1, got, want)
+		ix.Add(Source{Title: job}, sections.Requirements, notice, teamwork)
+		if got, want := ix.Boilerplate(Source{}, notice), i+1 >= Widespread; got != want {
+			t.Errorf("a notice in %d jobs' requirements: Boilerplate = %t, want %t", i+1, got, want)
 		}
+		if ix.Boilerplate(Source{}, teamwork) {
+			t.Errorf("a job line in %d jobs' requirements: Boilerplate = true, want false", i+1)
+		}
+	}
+	// Found mostly outside the sections about the job, it's boilerplate.
+	for _, job := range jobs {
+		ix.Add(Source{Title: job}, sections.Benefits, teamwork)
+		ix.Add(Source{Title: job}, sections.Company, teamwork)
+	}
+	if !ix.Boilerplate(Source{}, teamwork) {
+		t.Error("a job line mostly outside the job's sections: Boilerplate = false, want true")
+	}
+}
+
+// A repeated text found mostly in the run of repeated texts that ends its
+// ads is boilerplate, whatever its section, unless it's phrased as a job
+// line; one that's followed by text of the ad's own is a template still.
+func TestFootersAtTheEnd(t *testing.T) {
+	const (
+		footer = "Acme Recruitment is acting as an employment agency in relation to this vacancy."
+		job    = "Experience of working in a busy warehouse environment with a forklift licence."
+		own    = "This line is the advertiser's own, written for this one ad and no other."
+		middle = "Our client is a well established firm with a fine reputation in the region."
+	)
+	var ix Index
+	ads := []struct {
+		src   Source
+		texts []string
+	}{
+		{Source{Title: "Chef"}, []string{own + " Chef", middle, own + " Chef again", job, footer}},
+		{Source{Title: "Crane Operator"}, []string{own + " Crane", middle, own + " Crane again", job, footer}},
+	}
+	for _, a := range ads {
+		ix.Add(a.src, sections.Requirements, a.texts...)
+	}
+	for _, a := range ads {
+		ix.Ends(a.src, a.texts...)
+	}
+	src := ads[0].src
+	if !ix.Boilerplate(src, footer) {
+		t.Error("a footer at the end of its ads, under requirements: Boilerplate = false, want true")
+	}
+	if ix.Boilerplate(src, job) {
+		t.Error("a job line at the end of its ads: Boilerplate = true, want false")
+	}
+	if ix.Boilerplate(src, middle) || !ix.Template(src, middle) {
+		t.Error("a repeated text followed by the ad's own: want a template, not boilerplate")
 	}
 }
 

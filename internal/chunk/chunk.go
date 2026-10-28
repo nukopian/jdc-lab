@@ -204,7 +204,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		text := strings.Join(gathered, "\n")
 		cs = append(cs, Chunk{
 			Kind: Boilerplate, Use: LeaveOut, Text: text, Tokens: Tokens(text), Unmapped: unmapped,
-			PlacedBy: "found as boilerplate in the chunks above (in ads for five groups of titles or more, or more often outside the sections about the job), or under a heading of no known kind",
+			PlacedBy: "found as boilerplate in the chunks above (more often outside the sections about the job, in the footers that end ads, or in ads for five groups of titles or more), or under a heading of no known kind the guess left out",
 		})
 	}
 	return cs

@@ -12,6 +12,16 @@ has the steps).
 
 ## Unreleased
 
+- Boilerplate's verdict is right more often both ways. Footers filed
+  under requirements, found mostly in the repeated text that ends their
+  ads and talking as footers do, are boilerplate; job lines common to
+  many ads, phrased as requirements or duties, aren't. Of the lines the
+  verdict takes from embedded sections, about the job fell from 45% to
+  about 22% of a sample; of the templates ending ads, footers from 65%
+  to about 20%. Boilerplate is 18.2% of the text, from 17.5%.
+  `openings.txt` knows many more job lines' openings, which 21's guess
+  uses too
+  (roadmap 4; [record](docs/changes/2026-10-28-make-boilerplates-verdict-right.md)).
 - Text inside list items stays in the ad's order. Where an ad put
   paragraphs, headings or further lists inside a list item, up to the
   whole ad in one, some of it came out after the blocks that followed

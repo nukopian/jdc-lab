@@ -18,13 +18,18 @@
 // boilerplate. The verdict is the text's, over all the ads it's in, so a
 // heading filed under the wrong kind in one ad doesn't change it.
 //
-// Text under Widespread groups of titles or more is boilerplate wherever
-// it's found. Footers, such as an agency's equal opportunities notice,
-// often come after an ad's last heading, which is usually its
-// requirements, and so are filed under it. And a line such as "Able to
-// work as part of a team", though about the job, is in so many jobs that
-// it says nothing of any of them: as with a common word in a search
-// index, being everywhere is what makes it worth little.
+// Footers, such as an agency's equal opportunities notice, often come
+// after an ad's last heading, which is usually its requirements, and so
+// are filed under it. So where a text stands counts too: one found
+// mostly in the run of repeated texts that ends its ads, and talks as a
+// footer does (of applying, the agency, "we" and "our"), is boilerplate,
+// whatever its section, unless it's phrased as a job's requirement or
+// duty is (see internal/wording): an advertiser's list of requirements
+// can run to the end of its ads too. Text under Widespread
+// groups of titles or more is boilerplate wherever it's found, unless
+// it's phrased so and found mostly in the sections that describe the
+// job: "Able to work as part of a team" is about the job, however many
+// ads say it.
 //
 // Standard text isn't always word for word the same. Agencies write each
 // ad's own title and place into it ("we're recruiting a Chef in Leeds"),
@@ -43,6 +48,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/wording"
 )
 
 // MinWords is the fewest words a repeated text has to count: shorter ones,
@@ -132,13 +138,18 @@ type Index struct {
 	// first asked for, and forgotten when a text is added.
 	alike  map[string]string
 	groups map[string]int
+	// endsAdded is true when Ends has counted texts since the groups of
+	// texts alike were made, so they're to be made again.
+	endsAdded bool
 }
 
 // text is what's known of a text: the distinct title keys of its ads,
-// and its times in sections that describe the job, and in others.
+// its times in sections that describe the job, and in others, and its
+// times in the run of repeated texts that ends an ad.
 type text struct {
 	titles               []string
 	describes, elsewhere int
+	atEnd                int
 }
 
 // Add records texts from a section of kind, in an ad from src.
@@ -180,6 +191,32 @@ func (ix *Index) record(key, title string, kind sections.Kind) {
 	} else {
 		x.elsewhere++
 	}
+}
+
+// Ends records which of an ad's texts, all of them in order, are in the
+// run of repeated texts that ends it: from the last, back to the first
+// that isn't repeated, passing over those too short to count. Call it for
+// each ad, once every ad has been added.
+func (ix *Index) Ends(src Source, texts ...string) {
+	for i := len(texts) - 1; i >= 0; i-- {
+		k := headings.Key(texts[i])
+		if len(strings.Fields(k)) < MinWords {
+			continue
+		}
+		if !ix.Repeated(src, texts[i]) {
+			break
+		}
+		keys := []string{k}
+		if tk := src.template(k); tk != k {
+			keys = append(keys, tk)
+		}
+		for _, key := range keys {
+			if x := ix.texts[key]; x != nil {
+				x.atEnd++
+			}
+		}
+	}
+	ix.endsAdded = true
 }
 
 // keys returns the keys a text from src is known by: its own, its
@@ -232,17 +269,59 @@ func (ix *Index) Repeated(src Source, s string) bool {
 }
 
 // Boilerplate reports whether a text from src is boilerplate, by any of
-// its keys: under Widespread groups of titles or more, or repeated and
-// found more often outside the sections that describe the job than in
-// them.
+// its keys: repeated and found more often outside the sections that
+// describe the job than in them; or, unless it's phrased as a job's
+// requirement or duty, repeated, found mostly in the runs of repeated
+// text that end its ads (see Ends), and talking as a footer does (see
+// FooterLine); or under Widespread groups of titles
+// or more, unless it's phrased so and found mostly in the sections that
+// describe the job.
 func (ix *Index) Boilerplate(src Source, s string) bool {
+	if ix.endsAdded { // the groups of texts alike are to count the ends too
+		ix.alike, ix.groups, ix.endsAdded = nil, nil, false
+	}
+	job := JobLine(s)
 	for _, k := range ix.keys(src, s) {
 		n := ix.groupsOf(k)
-		if n >= Widespread || n >= MinGroups && ix.texts[k].elsewhere > ix.texts[k].describes {
+		if n < MinGroups {
+			continue
+		}
+		x := ix.texts[k]
+		switch {
+		case x.elsewhere > x.describes,
+			!job && 2*x.atEnd > x.describes+x.elsewhere && FooterLine(s),
+			n >= Widespread && !(job && x.describes >= x.elsewhere):
 			return true
 		}
 	}
 	return false
+}
+
+// footerWords are words that footers use and job lines don't: about
+// applying and getting in touch, the advertiser and its notices.
+var footerWords = map[string]bool{
+	"apply": true, "applying": true, "application": true, "applications": true, "applicants": true,
+	"contact": true, "call": true, "cv": true, "email": true, "touch": true, "interested": true, "please": true,
+	"agency": true, "business": true, "recruitment": true, "consultancy": true, "consultant": true,
+	"vacancy": true, "vacancies": true, "employer": true, "opportunities": true,
+	"we": true, "we're": true, "our": true, "us": true,
+	"privacy": true, "safeguarding": true, "ir35": true, "umbrella": true,
+}
+
+// FooterLine reports whether s talks as a footer does, with one of
+// footerWords: "Interested? Call Jamie at Acme", "Acme is acting as an
+// employment agency". An advertiser's list of requirements, which can run
+// to the end of its ads as footers do, seldom has any.
+func FooterLine(s string) bool {
+	return slices.ContainsFunc(strings.Fields(headings.Key(s)), func(w string) bool { return footerWords[w] })
+}
+
+// JobLine reports whether s is phrased as a job's requirement or duty
+// is, by its opening (see internal/wording): "Ability to work as part of
+// a team", "Liaise with site teams".
+func JobLine(s string) bool {
+	k, _, ok := wording.Of(s)
+	return ok && (k == sections.Requirements || k == sections.Responsibilities)
 }
 
 // Template reports whether a text from src is a template for the job:
@@ -318,6 +397,7 @@ func (ix *Index) findAlike() {
 		}
 		x.describes += y.describes
 		x.elsewhere += y.elsewhere
+		x.atEnd += y.atEnd
 	}
 }
 
