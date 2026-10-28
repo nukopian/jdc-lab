@@ -89,3 +89,6 @@ guessed, at least 45 are placed as a reader would place them; and the
 chunker shows what placed every guess.
 
 ## What happened
+
+- **The list with no heading** (2026-10-28), named in What's known as
+  a different change, is idea 23.

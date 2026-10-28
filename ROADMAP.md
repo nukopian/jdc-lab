@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 23.
+number: 24.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -190,3 +190,11 @@ Added 2026-10-27. Boilerplate's thresholds are counts of title groups,
 which more ads pass more easily, so its share rises as each batch is
 added (12.5% of text on 5,000 ads, 15.1% on 21,000, by word for word
 matching): figures from before and after a new batch don't compare.
+
+### 23. Split a list with no heading by its wording
+
+Added 2026-10-28. A list that follows a headed one, with no heading of
+its own, lands under the heading before it, even when its lines read as
+another kind: requirements under "Responsibilities:", embedded as
+duties. The openings that already place a line's wording as duties or
+requirements could split such a list off, as a section of its own.
