@@ -89,6 +89,18 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   - a wall's sentences become Lines, as a `<br>` makes, so later stages
     need learn nothing new, and a run-in heading a Line of its own with
     the cue `run_in`. A wall is then printed a sentence to a line.
+- **A second sign of a run-in heading** (Iain): a capital "The", "A"
+  or "An" with no stop before it starts a sentence, and the title-case
+  run before it, back to the last sentence's end, is a title over what
+  follows ("Required Attributes and Experience The ideal Commercial
+  Manager will have …"), whether or not `headings.txt` knows it.
+  Counted in the walls: on its own the capital article misleads, as 78
+  of them, in 72 walls, are mid-sentence names ("We are The …"); with a
+  title-case run of up to six words before it, not opening with a word
+  such as "As" or "At" ("As A Support Worker you will …" is 23 of 36),
+  about 8 walls have one, besides the 5 with a known phrase. So a
+  run-in heading is either a known heading phrase at a sentence's
+  start, before a capital, or such a run before a capital article.
 - **Seen in the walls, beyond this plan:** a prose wall's sentences run
   from company to duties ("Duties will include …") to requirements
   ("You will have …") to pay, and `wording`'s openings could place each
