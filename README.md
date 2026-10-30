@@ -68,7 +68,8 @@ embeddings, and a large language model only where those fall short.
   educated guess, mostly as the summary, and right for about four
   sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why. Under way: walls of text split into sentences.
+  and why. Under way: keeping the layout an ad's text implies. Next:
+  walls of text split into sentences.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

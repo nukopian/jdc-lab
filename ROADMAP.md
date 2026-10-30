@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 24.
+number: 27.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -40,18 +40,29 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
+### 24. Keep the layout an ad's text implies
+
+**Serves:** structure
+
+Blocks reads an ad with any layout tag as a browser shows it, so
+newlines its author meant as layout are folded into the text, with the
+headings and fields on them, and breaks inside list items run the
+item's lines together. Tags left open can swallow or mislabel what
+follows. The plan is in its
+[record](docs/changes/2026-10-30-keep-the-layout-an-ads-text-implies.md).
+
+## Next
+
 ### 5. Split walls of text into sentences
 
 **Serves:** structure
 
-Some ads are a wall of text, with headings run into the prose and
-bullets flattened into phrases, so nothing in a wall is found as a
-heading, and boilerplate inside it isn't found either. The plan is in
-its [record](docs/changes/2026-10-30-split-walls-of-text-into-sentences.md).
+**Waiting on:** 24
 
-## Next
-
-Nothing at the moment.
+Started, then paused: many walls turned out to be layout folded by
+blocks, which 24 keeps, so what's left of them is measured once 24 lands.
+The plan, and what was found, are in its
+[record](docs/changes/2026-10-30-split-walls-of-text-into-sentences.md).
 
 ## Later
 
@@ -106,3 +117,16 @@ its own, lands under the heading before it, even when its lines read as
 another kind: requirements under "Responsibilities:", embedded as
 duties. The openings that already place a line's wording as duties or
 requirements could split such a list off, as a section of its own.
+
+### 25. Split inline lists into items
+
+Added 2026-10-30. Some ads run a list along one line, its items between
+bullet symbols ("Free parking • Pension • 25 days' holiday"). Cleaning
+drops the symbols, so the list is embedded as one line of text: the
+symbols could split it into items instead. 49 ads in the samples.
+
+### 26. Italic as a cue, like bold
+
+Added 2026-10-30. Blocks records a paragraph all in bold, but not one
+all in `<em>` or `<i>`, though ads set headings ("You'll also need to:")
+and notices in italic too. 470 ads in the samples have one.

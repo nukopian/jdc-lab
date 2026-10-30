@@ -185,7 +185,8 @@ with no newlines at all stays one paragraph: splitting it needs
 sentences, a later stage.
 
 On the sample, no ad uses heading tags: headings are bold paragraphs, or
-lines ending with a colon. 80 ads have a paragraph over 1,500 characters.
+lines ending with a colon. 3 ads have a paragraph over 1,500 characters
+(of the three samples' 28,000, 17).
 
 ## 3. Headings: what each block is
 
@@ -870,7 +871,10 @@ and the figures in [What it measured](#what-it-measured) are updated.
 
 | Gap | Effect | Likely fix |
 |---|---|---|
-| [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
+| [Layout folded](../ROADMAP.md#24-keep-the-layout-an-ads-text-implies) | In an ad with any layout tag, newlines meant as layout are read as spaces, so headings and fields on them join the text around them; a `<br>` or `<p>` in a list item runs its lines together; tags left open can swallow or mislabel what follows | Read newlines as plain text's are, keep a list item's lines apart, and let an opening tag end what's left open |
+| [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them, once layout is kept |
+| [Inline lists](../ROADMAP.md#25-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
+| [Italic not a cue](../ROADMAP.md#26-italic-as-a-cue-like-bold) | Headings and notices set in italic carry no cue, as bold ones do | Record italic as blocks records bold |
 
 ## Words used here
 

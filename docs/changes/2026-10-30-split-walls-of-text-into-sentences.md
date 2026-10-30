@@ -51,3 +51,15 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   characters), 2 of the second's (59 over 800) and 12 of the third's
   (300 over 800). Walls are rarer than planned for, but the longest
   still hold headings run into them.
+- **Many walls are folded layout, so the item waits on roadmap 24.**
+  Of the six paragraphs with a heading run in after a sentence's end,
+  five have it so in the ad's HTML. But looking for them showed that
+  blocks folds an ad's newlines into spaces whenever the ad has any
+  layout tag, as a browser would, and about 869 ads in the samples have
+  newlines that look like layout folded so, headings and fields with
+  them. Three ads have headings laid out by newlines and folded into a
+  wall: one is a plain-text ad with a tagged footer, which makes blocks
+  read all of it as HTML. Splitting sentences would patch that at the
+  wrong stage, so keeping the layout became roadmap 24, and this item
+  went back to Next, to be measured again on what's left once 24 lands.
+  Nothing of it was built.
