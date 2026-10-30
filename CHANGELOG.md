@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+- grammar v0.4.1, which gives a rule whose only text-matching part is
+  one word list, beside lookarounds, the list's value: the work pattern
+  grammar is one rule again, its lookahead beside its word list, where
+  it had needed a rule of its own for the list. Its facts and every
+  stage's output are unchanged. The fix was tested here before grammar
+  committed it.
 - The company's text, the employer's own words, goes with the summary,
   embedded, under its heading, where it had been left out: Iain found
   the two work well together. Its standard half, as boilerplate, goes

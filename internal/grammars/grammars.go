@@ -63,13 +63,12 @@ office based, office-based, site based, site-based
 }()
 
 // Pattern is a work pattern or arrangement, its canonical value as the
-// made of its word: "Perm" is permanent. "Contract" as a field's label
+// match's made: "Perm" is permanent. "Contract" as a field's label
 // states nothing: before a colon, or "type", "length" or "duration", as
 // in "Contract: Permanent" or "Contract type: Temp to Perm". Other words
 // before a colon are values: "Part-Time: 25 hours per week".
 var Pattern = grammar.MustCompile(`grammar Pattern {
-    token TOP  { <!before :i contract \s* [ ':' | :i [ type | length | duration ] >> ]> <word> }
-    token word { @patterns }
+    token TOP { <!before :i contract \s* [ ':' | :i [ type | length | duration ] >> ]> @patterns }
 }`, patterns)
 
 // Schedule is days and times of work: a range of days, with times or
