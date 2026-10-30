@@ -44,7 +44,24 @@ Nothing at the moment.
 
 ## Next
 
-Nothing at the moment.
+### 28. Bold labels on benefit lines aren't headings
+
+**Serves:** structure
+
+**What:** read a bold label that opens a line of a list set as lines
+("**Retail discounts** - Save at 200+ brands"), and a bold line among
+such lines, as lines of the list, not headings.
+
+**Why:** each label is read as a heading of no known kind, starting a
+section of one line, which the guess places as summary; and since an
+ad's chunks of each kind are one, those lines are embedded with the
+summary, benefits taken for what the job is. 6 headings in the samples,
+from lists roadmap 24 split out of their items.
+
+**Done when** the labels in the samples' such lists are lines of their
+lists, with no heading of their own; tests cover the shapes with
+made-up text; a run against the one before shows nothing else moved;
+and PIPELINE.md says how headings reads them.
 
 ## Later
 
@@ -124,12 +141,3 @@ is mapped (about 56 lines in the samples open with another). The
 other way, a mapped emoji used as decoration gets a label it shouldn't
 ("📞 Participate in an on-call rota" would be a contact): a label could
 wait for text that reads as a value of it.
-
-### 28. Bold labels on benefit lines aren't headings
-
-Added 2026-10-30. A benefits list set as lines, each opening with a bold
-label ("**Retail discounts** - Save at 200+ brands"), or one bold line
-among them, has its labels read as headings of no known kind, each
-starting a section of one line. Headings could read a bold lead
-followed by " - ", amid lines like it, as a line of the list. 6 headings
-in the samples, since roadmap 24 split such lists out of their items.
