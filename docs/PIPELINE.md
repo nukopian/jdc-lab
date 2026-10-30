@@ -168,12 +168,15 @@ symbols are about 1,150 of them.
 | `bold_lead` | it starts with bold text: `Salary:` in "**Salary:** £30,000" |
 | `added` | the English label cleaning added: `Location: ` for "📍 Leeds" |
 
-**Lists.** A list item is one item, whatever it holds: a `<p>` or a
-`<br>` inside it is only a space, and a sublist's items join its list.
-But some ads put paragraphs, headings and further lists inside an item,
-up to the whole ad in one. Text there, outside any item of its own, is
-a block of its own, where it stands, and ends the list before it, so
-that nothing comes out of the ad's order.
+**Lists.** A list item is one piece of text, and a sublist's items join
+its list. But ads run headings, fields and footers into their items,
+the last item most of all, and some put paragraphs, headings and further
+lists inside one, up to the whole ad. So an item ends at a `<br>`, `<p>`
+or `<div>` after its text, and the text after it in the `<li>` is lines
+or paragraphs of their own; so is text outside any item of its own. Each
+stands where it is, and ends the list before it, so that nothing comes
+out of the ad's order. An item that really is two lines (`Days<br>Nights`)
+is split too: the price of finding what's run into the others.
 
 It decides nothing. Whether a bold block is a heading is the next stage's
 call, which keeps the HTML parsing apart from the judgement, so either

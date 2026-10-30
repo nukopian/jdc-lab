@@ -189,9 +189,12 @@ func (b *builder) start(tag atom.Atom) {
 	case tag == atom.Strong || tag == atom.B:
 		b.bold++
 	case tag == atom.Br:
-		if b.inItem || b.heading > 0 {
-			b.piece.write(" ", false) // an item or heading stays one piece
-		} else {
+		switch {
+		case b.heading > 0:
+			b.piece.write(" ", false) // a heading stays one piece
+		case b.inItem:
+			b.leaveItem()
+		default:
 			b.endLine()
 		}
 	case isHeading(tag):
@@ -262,14 +265,28 @@ func (b *builder) end(tag atom.Atom) {
 	}
 }
 
-// boundary handles a tag that ends a block, such as <p> or </div>. Inside a
-// list item it's only a space, so "<li><p>Drive</p></li>" stays one item.
+// boundary handles a tag that ends a block, such as <p> or </div>.
 func (b *builder) boundary() {
 	if b.inItem {
-		b.piece.write(" ", false)
+		b.leaveItem()
 	} else {
 		b.endBlock()
 	}
+}
+
+// leaveItem handles a <br>, or a tag that ends a block, inside a list item.
+// Before the item's text it's only a space, so "<li><p>Drive</p></li>"
+// stays one item. After it, the item ends there, and the text after it in
+// the <li> is blocks of its own, in the ad's order: ads run headings,
+// fields and footers into a list's items, its last most of all ("Drive
+// safely<br>Skills and Experience"), and as part of an item they'd go
+// unseen.
+func (b *builder) leaveItem() {
+	if !visible(b.piece.text.String()) {
+		b.piece.write(" ", false)
+		return
+	}
+	b.endItem()
 }
 
 // endLine ends the current piece at a <br>, keeping it as one of the

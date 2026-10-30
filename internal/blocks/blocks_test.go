@@ -103,9 +103,9 @@ func TestSplit(t *testing.T) {
 			[]string{"list", `  "One"`, `  "Two"`},
 		},
 		{
-			"a <br> in an item is a space",
+			"a <br> after an item's text ends the item, even where what follows is part of it",
 			`<ul><li>Days<br>Nights</li></ul>`,
-			[]string{"list", `  "Days Nights"`},
+			[]string{"list", `  "Days"`, `paragraph "Nights"`},
 		},
 		{
 			"a bold item",
@@ -317,6 +317,28 @@ Responsibilities
 				`<strong>And:</strong><ul><li>Licence</li></ul></li></ul>`,
 			[]string{"list", `  "Duties"`, `paragraph "You will have:" bold`, "list", `  "Experience"`,
 				`paragraph "And:" bold`, "list", `  "Licence"`},
+		},
+		{
+			"text after a <br> in an item leaves it, each line a block, in the ad's order",
+			`<ul><li>Drive safely<br>Skills and Experience<br>Essential</li><li>Lift</li></ul>`,
+			[]string{"list", `  "Drive safely"`, `line "Skills and Experience"`, `line "Essential"`, "list",
+				`  "Lift"`},
+		},
+		{
+			"paragraphs after an item's text leave it",
+			`<ul><li>One</li><li>Two<p>Next heading</p><p>More text.</p></li><li>Three</li></ul>`,
+			[]string{"list", `  "One"`, `  "Two"`, `paragraph "Next heading"`, `paragraph "More text."`, "list",
+				`  "Three"`},
+		},
+		{
+			"an item's text in its own <p>, or with a <br> after it, stays one item",
+			`<ul><li><p>Drive</p></li><li>Lift<br></li><li> <p>Carry</p> </li></ul>`,
+			[]string{"list", `  "Drive"`, `  "Lift"`, `  "Carry"`},
+		},
+		{
+			"a list never closed doesn't swallow what follows it",
+			`<ul><li>One<li>Two<p>After the list.<p>More text.`,
+			[]string{"list", `  "One"`, `  "Two"`, `paragraph "After the list."`, `paragraph "More text."`},
 		},
 		{
 			"a heading tag inside an item stays in the item",

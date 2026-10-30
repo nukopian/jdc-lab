@@ -21,6 +21,13 @@ has the steps).
   over the three samples, 2,480 more lines, and 42 more heading uses
   found, all of a known kind (roadmap 24;
   [record](docs/changes/2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)).
+- A list item ends at a `<br>`, `<p>` or `<div>` after its text, and
+  what follows in it is lines and paragraphs of their own, so the
+  headings, fields and footers ads run into their last items are found:
+  an employer's "Location:", "Hours:" and closing date, written in the
+  last benefit, are details again. A list never closed no longer takes
+  in the rest of the ad. Over the three samples, 86 more heading uses
+  found (roadmap 24).
 - A 9 MB build of `chunk`, left at the root by a bare
   `go build ./cmd/chunk` and committed with everything else in v0.5.0,
   is gone. `.gitignore` claimed to hide such builds but didn't; it now

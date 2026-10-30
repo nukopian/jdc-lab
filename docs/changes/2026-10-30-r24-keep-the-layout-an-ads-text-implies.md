@@ -111,3 +111,22 @@ re-measured on what's left.
   plain-text ad with a tagged footer, was one summary chunk and now has
   its summary, role, responsibilities and requirements. Walls: ads with
   a paragraph over 800 characters 381 to 375, over 1,500 17 to 16.
+- **List items (step 3).** An item ends at a `<br>`, or a tag that ends
+  a block, after its text, and the rest of the `<li>` is blocks of its
+  own where it stands, as Iain chose; before the item's text, as in
+  `<li><p>Drive</p></li>`, the tag is still only a space. This also
+  fixes the first of the tags left open (step 5): a `<p>` after the
+  last item of a list never closed no longer joins the item. The old
+  test that a `<br>` in an item is a space now says the opposite,
+  `Days<br>Nights` being two blocks: the price of the choice.
+- **Measurements, step 3** (`pipeline compare claude/step2
+  claude/after`, step 2's run kept as `claude/step2`): items 458,112
+  to 459,083, lists 74,642 to 74,970 (an item's trailing text now ends
+  its list); heading uses 91,539 to 91,625, of a known kind 74,509 to
+  74,585; lines starting a section by name 19,089 to 19,105. Six
+  headings are newly unmapped, all from benefits lists set as lines in
+  one item, whose bold labels ("Retail discounts - Save at…") headings
+  takes for headings: a question for headings, left for now. In one ad,
+  the application text, footer and four fields written into the last
+  benefit are lines again, and chunk files them as apply, boilerplate
+  and details.
