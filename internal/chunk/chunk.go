@@ -23,6 +23,9 @@
 // chunks keep theirs, as part of what they say: an advertiser's
 // standard perks are still a list of benefits.
 //
+// An ad's requirements, desirable ones too, are one chunk, each section's
+// heading a line over its own list (see together).
+//
 // The chunks come with what says what the job is first: the title (see
 // AdOf), the summary, the role, responsibilities and requirements, in that
 // order; then the rest
@@ -236,6 +239,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	}
 	// What says what the job is comes first, in that order; the rest
 	// keep the ad's order, and the boilerplate comes last.
+	cs = together(cs)
 	slices.SortStableFunc(cs, func(a, b Chunk) int { return first(a.Kind) - first(b.Kind) })
 	if len(gathered) > 0 {
 		text := strings.Join(gathered, "\n")
@@ -297,6 +301,47 @@ func placeless(fs []facts.Fact) []facts.Fact {
 		fs[i].From = 0
 	}
 	return fs
+}
+
+// together returns cs with an ad's requirements chunks, desirable ones
+// too, made one, where the first of them stands: one list of what the job
+// asks for, each chunk's heading a line over its own lines, and
+// "Desirable" over desirable lines with no heading, so that "Essential"
+// and "Desirable" are its sub-lists. What placed each is said in turn.
+func together(cs []Chunk) []Chunk {
+	at := -1
+	var parts, out []Chunk
+	for _, c := range cs {
+		if c.Use == Embed && (c.Kind == sections.Requirements || c.Kind == sections.Desirable) {
+			if at < 0 {
+				at = len(out)
+				out = append(out, Chunk{})
+			}
+			parts = append(parts, c)
+			continue
+		}
+		out = append(out, c)
+	}
+	if len(parts) < 2 {
+		return cs
+	}
+	r := Chunk{Kind: sections.Requirements, Use: Embed}
+	var texts, placed []string
+	for _, c := range parts {
+		text := c.Text
+		if c.Heading == "" && c.Kind == sections.Desirable {
+			text = "Desirable\n" + text
+		}
+		texts = append(texts, text)
+		placed = append(placed, c.PlacedBy)
+		r.Fields = append(r.Fields, c.Fields...)
+		r.Facts = append(r.Facts, c.Facts...)
+	}
+	r.Text = strings.Join(texts, "\n")
+	r.Tokens = Tokens(r.Text)
+	r.PlacedBy = strings.Join(placed, "; ")
+	out[at] = r
+	return out
 }
 
 // once returns fs with each fact listed once, by its kind and values, and

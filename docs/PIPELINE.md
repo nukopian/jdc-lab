@@ -549,7 +549,11 @@ the structure too: each chunk's text is a block of its lines.
 The ad's **title**, its title field, is a chunk of its own, first and
 embedded: titles embed well alone, and kept apart they don't dilute the
 summary. A title the ad writes again, as a "Job Title:" field, stays
-where it is. The summary, role, responsibilities, requirements and
+where it is. An ad's requirements, desirable ones too, are one chunk,
+where the first of them stands: each section's heading a line over its
+own list, "Desirable" over desirable lines with none, so that
+"Essential" and "Desirable" are its sub-lists, and what placed each said
+in turn. The summary, role, responsibilities, requirements and
 desirable chunks are embedded; details are metadata, with their fields;
 benefits, company, apply and legal are left out. Text found as boilerplate leaves the
 embedded chunks for a **boilerplate** chunk of its own, at the end,

@@ -198,7 +198,8 @@ func TestOrder(t *testing.T) {
 	for _, c := range Of(ss, func(s string) bool { return s == "We are an agency." }) {
 		got = append(got, string(c.Kind)+" "+c.Heading)
 	}
-	want := []string{"summary ", "role The role", "requirements You'll need", "requirements Also", "benefits Perks", "company About us", "boilerplate "}
+	// The two requirements sections are one chunk, its headings lines in it.
+	want := []string{"summary ", "role The role", "requirements ", "benefits Perks", "company About us", "boilerplate "}
 	if strings.Join(got, "|") != strings.Join(want, "|") {
 		t.Errorf("got  %q\nwant %q", got, want)
 	}
@@ -520,5 +521,34 @@ func TestFactsListedOnce(t *testing.T) {
 	}
 	if len(seen) != 2 {
 		t.Errorf("got %d distinct facts, want 2 (full time, Monday to Friday): %v", len(seen), seen)
+	}
+}
+
+// An ad's requirements, desirable ones too, are one chunk: each section's
+// heading a line over its list, "Desirable" where it has none.
+func TestRequirementsOneChunk(t *testing.T) {
+	item := func(s string) headings.Part { return headings.Part{Role: headings.Text, Text: s, Item: true} }
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{text("We make parts for cars."), text("Experience of CNC machines.")}},
+		{Kind: sections.Requirements, Heading: "Essential", Parts: []headings.Part{item("A forklift licence"), item("Two years in a warehouse")}},
+		{Kind: sections.Benefits, Heading: "Benefits", Parts: []headings.Part{text("A pension.")}},
+		{Kind: sections.Desirable, Parts: []headings.Part{item("A first aid certificate")}},
+	}
+	var reqs []Chunk
+	for _, c := range Of(ss, func(string) bool { return false }) {
+		if c.Kind == sections.Requirements || c.Kind == sections.Desirable {
+			reqs = append(reqs, c)
+		}
+	}
+	if len(reqs) != 1 {
+		t.Fatalf("got %d requirements chunks, want 1: %+v", len(reqs), reqs)
+	}
+	r := reqs[0]
+	want := "Essential\n- A forklift licence\n- Two years in a warehouse\nDesirable\n- A first aid certificate\nExperience of CNC machines."
+	if r.Kind != sections.Requirements || r.Use != Embed || r.Text != want {
+		t.Errorf("the requirements: %s, %s,\n%s\nwant:\n%s", r.Kind, r.Use, r.Text, want)
+	}
+	if r.Tokens != Tokens(want) || !strings.Contains(r.PlacedBy, "Essential") || !strings.Contains(r.PlacedBy, "wording") {
+		t.Errorf("the requirements' tokens %d, placed by %q", r.Tokens, r.PlacedBy)
 	}
 }

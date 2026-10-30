@@ -12,6 +12,10 @@ has the steps).
 
 ## Unreleased
 
+- An ad's requirements are one chunk, however many sections it gives
+  them: "Essential", "Desirable" and "Qualifications" are its sub-lists,
+  each under its heading, and requirements placed by their wording join
+  them, where the first of them stands.
 - The ad's title, its title field, is a chunk of its own, first and
   embedded: titles embed well alone, and until now the title was in no
   chunk at all, unless the ad wrote it again. It counts in the ad's
