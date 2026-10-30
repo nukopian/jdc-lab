@@ -546,9 +546,12 @@ The text is to read at a glance, JSON (`-json`, a line an ad) is for
 programs, and YAML (`-yaml`, a document an ad) is for people who want
 the structure too: each chunk's text is a block of its lines.
 
-The summary, role, responsibilities, requirements and desirable chunks
-are embedded; details are metadata, with their fields; benefits, company,
-apply and legal are left out. Text found as boilerplate leaves the
+The ad's **title**, its title field, is a chunk of its own, first and
+embedded: titles embed well alone, and kept apart they don't dilute the
+summary. A title the ad writes again, as a "Job Title:" field, stays
+where it is. The summary, role, responsibilities, requirements and
+desirable chunks are embedded; details are metadata, with their fields;
+benefits, company, apply and legal are left out. Text found as boilerplate leaves the
 embedded chunks for a **boilerplate** chunk of its own, at the end,
 left out, each line with the section it came from: this is where to
 see what the verdict takes, and whether it's right. Other chunks keep theirs, so an
@@ -654,7 +657,10 @@ facts lists it as well, without its text, so no token counts twice:
 every field, with its label and value, and every fact read in a
 section's lines. Not those in the company, apply and legal sections,
 though: there "temporary, contract and permanent roles" are an
-agency's, and "within 48 hours" a reply's. The pages and the view show
+agency's, and "within 48 hours" a reply's. Each fact is listed once, by
+its kind and values: an ad states "Full Time" and "full-time", or its
+pay in a field and in prose, and the values are the same; one the ad's
+own details section lists already isn't listed again. The pages and the view show
 each chunk's fields, and the pages its facts.
 
 ### Pages before and after

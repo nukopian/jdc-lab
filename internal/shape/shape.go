@@ -103,7 +103,7 @@ func Write(w io.Writer, a ads.Ad, boilerplate func(string) bool, stages ...strin
 		if _, err := io.WriteString(w, "\n## chunks: what's embedded, kept as metadata, or left out\n\n"); err != nil {
 			return err
 		}
-		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, boilerplate)}, chunk.Whole(ss))
+		c := chunk.AdOf(a.ID, a.Title, ss, boilerplate)
 		return c.WriteText(w)
 	}
 	_, err := io.WriteString(w, "\n")

@@ -23,8 +23,9 @@
 // chunks keep theirs, as part of what they say: an advertiser's
 // standard perks are still a list of benefits.
 //
-// The chunks come with what says what the job is first: the summary, the
-// role, responsibilities and requirements, in that order; then the rest
+// The chunks come with what says what the job is first: the title (see
+// AdOf), the summary, the role, responsibilities and requirements, in that
+// order; then the rest
 // in the ad's order, the chunks of lines placed by their wording and of
 // lines of facts after its own; and the boilerplate last.
 package chunk
@@ -45,6 +46,9 @@ import (
 
 // Boilerplate is the kind of the chunk of an ad's boilerplate.
 const Boilerplate sections.Kind = "boilerplate"
+
+// Title is the kind of the chunk of an ad's title: its title field.
+const Title sections.Kind = "title"
 
 // What to do with a chunk.
 const (
@@ -80,6 +84,20 @@ type Chunk struct {
 	// Tokens is about how many tokens Text is: four for every three
 	// words, as models' tokenizers make of English.
 	Tokens int `json:"tokens" yaml:"tokens"`
+}
+
+// AdOf returns an ad's chunks, with its totals: its title, the ad's title
+// field, as a chunk of its own, first and embedded, as titles embed well
+// alone; then its sections' chunks (see Of). The title is counted in the
+// ad's tokens. A title written in the ad as well, as a "Job Title:" field,
+// stays where it is.
+func AdOf(id, title string, ss []sections.Section, boilerplate func(string) bool) Ad {
+	var cs []Chunk
+	if title != "" {
+		cs = append(cs, Chunk{Kind: Title, Use: Embed, Text: title, Tokens: Tokens(title), PlacedBy: "the ad's title field"})
+	}
+	cs = append(cs, Of(ss, boilerplate)...)
+	return Totalled(Ad{ID: id, Title: title, Chunks: cs}, Whole(ss)+Tokens(title))
 }
 
 // Of returns an ad's sections as chunks; boilerplate says whether a text
@@ -208,6 +226,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		w.PlacedBy = "lines placed by their wording (openings.txt): " + strings.TrimPrefix(w.PlacedBy, ", ")
 		cs = append(cs, *w)
 	}
+	found.Facts = once(found.Facts, cs)
 	if found.Text != "" || len(found.Fields) > 0 || len(found.Facts) > 0 {
 		found.Kind, found.Use = sections.Details, Metadata
 		found.Text = strings.TrimPrefix(found.Text, "\n")
@@ -278,6 +297,38 @@ func placeless(fs []facts.Fact) []facts.Fact {
 		fs[i].From = 0
 	}
 	return fs
+}
+
+// once returns fs with each fact listed once, by its kind and values, and
+// none the details chunks in cs list already: an ad states its pay, or that
+// the job is full time, in more than one place, and writes it differently
+// ("Full Time", "full-time"), but the values are the same.
+func once(fs []facts.Fact, cs []Chunk) []facts.Fact {
+	key := func(f facts.Fact) string {
+		ks := slices.Sorted(maps.Keys(f.Values))
+		var b strings.Builder
+		b.WriteString(f.Kind)
+		for _, k := range ks {
+			b.WriteString("\x00" + k + "=" + f.Values[k])
+		}
+		return b.String()
+	}
+	seen := map[string]bool{}
+	for _, c := range cs {
+		if c.Kind == sections.Details {
+			for _, f := range c.Facts {
+				seen[key(f)] = true
+			}
+		}
+	}
+	var out []facts.Fact
+	for _, f := range fs {
+		if k := key(f); !seen[k] {
+			seen[k] = true
+			out = append(out, f)
+		}
+	}
+	return out
 }
 
 // aboutTheEmployer reports whether a kind of section is about the employer

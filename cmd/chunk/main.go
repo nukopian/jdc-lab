@@ -81,7 +81,7 @@ func main() {
 	isBoilerplate := func(s string) bool { return boiler[headings.Key(s)] }
 	chunked := func(a ads.Ad) chunk.Ad {
 		ss := sections.Divide(headings.Read(walls.Split(blocks.Split(a.HTML)), a.Title, a.Locations()...))
-		return chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, chunk.Whole(ss))
+		return chunk.AdOf(a.ID, a.Title, ss, isBoilerplate)
 	}
 	if *pages != "" {
 		if err := writePages(*pages, *run, chunked); err != nil {

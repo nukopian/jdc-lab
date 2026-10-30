@@ -12,6 +12,16 @@ has the steps).
 
 ## Unreleased
 
+- The ad's title, its title field, is a chunk of its own, first and
+  embedded: titles embed well alone, and until now the title was in no
+  chunk at all, unless the ad wrote it again. It counts in the ad's
+  tokens. A title written in the ad, as a "Job Title:" field, stays
+  where it is.
+- The details list each fact once, by its kind and values, though an ad
+  states it more than once, or differently ("Full Time", "full-time"),
+  and not again if its own details section lists it. A day's stop is no
+  longer part of a schedule's days, so "Mon. to Fri." and "Monday to
+  Friday." read as their days.
 - The details list every field and fact an ad states, wherever it's
   written, as well as the lines of facts taken there: a field such as
   "Contract type: Permanent" in the summary, a working pattern in the

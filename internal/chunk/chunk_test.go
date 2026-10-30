@@ -1,6 +1,7 @@
 package chunk
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -461,5 +462,63 @@ func TestFactsAboutTheEmployerNotInDetails(t *testing.T) {
 		if c.Kind == sections.Details {
 			t.Errorf("facts about the employer listed in the details: %+v", c.Facts)
 		}
+	}
+}
+
+// AdOf makes an ad's chunks with its title, the ad's title field, as a
+// chunk of its own, first, embedded, and counted in the ad's tokens.
+func TestAdOfTitle(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{
+			{Role: headings.Field, Text: "Job Title: Production Operative", Key: "job title", Value: "Production Operative"},
+			text("We make parts for cars."),
+		}},
+	}
+	a := AdOf("7", "Production Operative", ss, func(string) bool { return false })
+	if len(a.Chunks) == 0 {
+		t.Fatal("no chunks")
+	}
+	c := a.Chunks[0]
+	if c.Kind != Title || c.Use != Embed || c.Text != "Production Operative" || c.Tokens != Tokens("Production Operative") {
+		t.Errorf("the first chunk: %+v; want the title, embedded", c)
+	}
+	if a.Tokens != Whole(ss)+c.Tokens || a.Embedded != c.Tokens+a.Chunks[1].Tokens {
+		t.Errorf("totals: %d tokens, %d embedded; want the title counted in both", a.Tokens, a.Embedded)
+	}
+	if !strings.Contains(a.Chunks[1].Text, "Job Title: Production Operative") {
+		t.Errorf("the summary lost its job title field: %q", a.Chunks[1].Text)
+	}
+	if b := AdOf("8", "", ss, func(string) bool { return false }); b.Chunks[0].Kind == Title {
+		t.Errorf("an ad with no title has a title chunk: %+v", b.Chunks[0])
+	}
+}
+
+// A fact stated more than once is listed in the details once: "Full Time"
+// and "Full-time" are one, and one the ad's own details list already isn't
+// listed again.
+func TestFactsListedOnce(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{
+			text("A Full Time role, Monday to Friday."),
+			text("This is a full-time job in our depot."),
+		}},
+		{Kind: sections.Details, Heading: "Job details", Parts: []headings.Part{text("Monday to Friday")}},
+	}
+	seen := map[string]int{}
+	for _, c := range Of(ss, func(string) bool { return false }) {
+		if c.Kind != sections.Details {
+			continue
+		}
+		for _, f := range c.Facts {
+			seen[f.Kind+fmt.Sprint(f.Values)]++
+		}
+	}
+	for k, n := range seen {
+		if n > 1 {
+			t.Errorf("%s listed %d times in the details", k, n)
+		}
+	}
+	if len(seen) != 2 {
+		t.Errorf("got %d distinct facts, want 2 (full time, Monday to Friday): %v", len(seen), seen)
 	}
 }

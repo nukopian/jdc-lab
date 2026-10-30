@@ -78,3 +78,17 @@ func TestFindWashUp(t *testing.T) {
 		}
 	}
 }
+
+// A day's stop, as in "Mon." or at a sentence's end, isn't part of its
+// value, so the same days state one fact.
+func TestDaysWithoutStops(t *testing.T) {
+	for _, line := range []string{"Monday to Friday.", "Mon. to Fri. 9am-5pm", "Monday to Friday"} {
+		fs := Find(line)
+		if len(fs) == 0 || fs[0].Kind != "schedule" {
+			t.Fatalf("Find(%q) = %+v, want a schedule", line, fs)
+		}
+		if d := fs[0].Values["days"]; d != "Monday-Friday" && d != "Mon-Fri" {
+			t.Errorf("Find(%q) days = %q, want no stops", line, d)
+		}
+	}
+}

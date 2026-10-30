@@ -182,7 +182,9 @@ func scheduleOf(m *scalar.SV) map[string]string {
 	case m.At("days.mf").Defined():
 		v["days"] = "M-F"
 	case m.At("days").Defined():
-		v["days"] = strings.TrimSpace(m.At("days.first.~").Str()) + "-" + strings.TrimSpace(m.At("days.last.~").Str())
+		// A day's stop ("Mon.", "Friday." ending a sentence) isn't its name.
+		day := func(s string) string { return strings.TrimSuffix(strings.TrimSpace(s), ".") }
+		v["days"] = day(m.At("days.first.~").Str()) + "-" + day(m.At("days.last.~").Str())
 	}
 	if m.At("times").Defined() {
 		v["times"] = trim(m.At("times.a.~").Str()) + "-" + trim(m.At("times.b.~").Str())

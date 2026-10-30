@@ -133,7 +133,7 @@ func write(path string, all []boilerplate.Divided, picked []int, isBoilerplate f
 	fmt.Fprintf(w, "# %d ads in their sections\n\n", len(picked))
 	for _, i := range picked {
 		a, ss := all[i].Ad, all[i].Sections
-		c := chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate(a))}, chunk.Whole(ss))
+		c := chunk.AdOf(a.ID, a.Title, ss, isBoilerplate(a))
 		if err := view.Render(w, a, c, lost[i]); err != nil {
 			return err
 		}
