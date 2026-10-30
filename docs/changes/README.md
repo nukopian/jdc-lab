@@ -69,6 +69,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Split walls of text into sentences](2026-10-30-split-walls-of-text-into-sentences.md)
+  (roadmap 5), in progress
 - [Make boilerplate's verdict right](2026-10-28-make-boilerplates-verdict-right.md)
   (roadmap 4), shipped in v0.5.2
 - [Keep a list item's own blocks in the ad's order](2026-10-28-a-list-items-own-blocks-in-order.md)

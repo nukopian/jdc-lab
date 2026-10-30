@@ -40,45 +40,18 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment.
-
-## Next
-
 ### 5. Split walls of text into sentences
 
 **Serves:** structure
 
-**From:** jdc-lab's session, 2026-10-25 (jdc-lab 167f3607190f0a42fe04c3131c4b96545d76c36c)
-**Waiting on:** nothing
+Some ads are a wall of text, with headings run into the prose and
+bullets flattened into phrases, so nothing in a wall is found as a
+heading, and boilerplate inside it isn't found either. The plan is in
+its [record](docs/changes/2026-10-30-split-walls-of-text-into-sentences.md).
 
-**What:** split long paragraphs into sentences, and find the headings
-and bullets run into them.
+## Next
 
-**Why:** some ads are a single wall of text, with headings run into the
-prose ("… every day. What you'll be doing You'll be …") and bullets
-flattened into capitalised phrases with no stops. Blocks keeps a wall as
-one paragraph, so nothing in it is found as a heading, and boilerplate
-sentences inside it aren't found either.
-
-**What's known:** 80 ads have a paragraph over 1,500 characters. A
-heading run into text follows the end of a sentence and comes before a
-capital letter. Flattened bullets are harder: capitalised phrases with
-no full stop between them.
-
-**Steps:**
-
-1. Agree the names first: a package for sentences, and what its pieces
-   are called.
-2. Split paragraphs into sentences with rules (stops, question marks,
-   and the capital that follows), keeping each sentence's text as
-   written.
-3. Find headings inside walls: a known heading phrase (from
-   `headings.txt`) between a sentence's end and a capital letter.
-4. Let boilerplate match sentences as well as blocks.
-
-**Done when** the walls are measured before and after (headings found in
-them, boilerplate found in them), tests cover the splitting with
-made-up text in the shapes seen, and PIPELINE.md has the new stage.
+Nothing at the moment.
 
 ## Later
 
