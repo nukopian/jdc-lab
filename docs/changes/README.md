@@ -72,9 +72,9 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Keep the layout an ad's text implies](2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)
-  (roadmap 24), shipped, unreleased
+  (roadmap 24), shipped in v0.6.0
 - [Split walls of text into sentences](2026-10-30-r5-split-walls-of-text-into-sentences.md)
-  (roadmap 5), shipped, unreleased
+  (roadmap 5), shipped in v0.6.0
 - [Make boilerplate's verdict right](2026-10-28-r4-make-boilerplates-verdict-right.md)
   (roadmap 4), shipped in v0.5.2
 - [Keep a list item's own blocks in the ad's order](2026-10-28-r17-a-list-items-own-blocks-in-order.md)

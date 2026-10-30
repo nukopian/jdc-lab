@@ -1,6 +1,6 @@
 # Split walls of text into sentences
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.6.0
 
 **Origin:** roadmap 5
 

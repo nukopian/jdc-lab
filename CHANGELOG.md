@@ -12,8 +12,14 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.0 (2026-10-30)
+
+An ad in the shape its author gave it
+
 - The wash-up before this release, by an independent review, found
-  four faults in today's work, each now fixed with a test: the bonus
+  four faults in the work since v0.5.2, each now fixed with a test: the bonus
   rule dropped pay before "plus bonus" or "with bonus" (51 ads); a
   company section's lines of facts were taken to the details as the
   job's (33 ads); requirements placed by their wording came under

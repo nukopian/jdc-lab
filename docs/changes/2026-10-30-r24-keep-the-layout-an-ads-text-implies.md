@@ -1,6 +1,6 @@
 # Keep the layout an ad's text implies
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.6.0
 
 **Origin:** roadmap 24
 
