@@ -1,10 +1,12 @@
 # Keep the layout an ad's text implies
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 24
 
 **Started:** 2026-10-30, in 727275d1ac905c0199fcb5726802ab51ae5afb0a
+
+**Finished:** 2026-10-30
 
 ## The plan
 
@@ -79,6 +81,19 @@ re-measured on what's left.
 
 ## What happened
 
+- **Outcome.** Done when is met: each shape in What's known has a test
+  with made-up HTML; the runs before and after are compared below; the
+  ads looked at when planning read as their authors laid them out;
+  PIPELINE.md's blocks stage says how newlines, list items, blank lines
+  and tags left open are read; and roadmap 5's walls are counted again.
+  The gain is mostly in blocks, not yet in headings: over the three
+  samples, from `claude/before` to `claude/step5`, lines 146,756 to
+  149,392, items 458,079 to 459,083, and 69,126 lines and paragraphs
+  with a gap; but heading uses only 91,497 to 91,625, of a known kind
+  74,467 to 74,585 (81% both), lines starting a section by name 19,026
+  to 19,105, and ads with no heading 3,014 to 3,006. Walls hardly moved
+  (ads with a paragraph over 800 characters 381 to 375, over 1,500 17
+  to 16): what's left of them is mostly prose, for roadmap 5.
 - **Names agreed (step 1).** Iain's choices: text after a `<br>` or
   `<p>` inside a list item leaves the item, each line a block of its
   own after the list, as blocks already does for a paragraph inside an
@@ -150,3 +165,9 @@ re-measured on what's left.
   heading tags and use no other block tags, only that moved: 5 fewer
   bold paragraphs, all footers after a forgotten `</strong>`, and one
   more bold lead (`pipeline compare claude/step4 claude/after`).
+- **What's left.** Bold labels on benefit lines set in one item, now
+  lines, are read as headings of no known kind (6 in the samples):
+  [idea 28](../../ROADMAP.md#28-bold-labels-on-benefit-lines-arent-headings).
+  The wall paragraphs left are
+  [roadmap 5](../../ROADMAP.md#5-split-walls-of-text-into-sentences)'s.
+  Inline lists and italic stay ideas 25 and 26. Nothing reads `gap` yet.

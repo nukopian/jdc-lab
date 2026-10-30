@@ -72,7 +72,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Keep the layout an ad's text implies](2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)
-  (roadmap 24), in progress
+  (roadmap 24), shipped, unreleased
 - [Split walls of text into sentences](2026-10-30-r5-split-walls-of-text-into-sentences.md)
   (roadmap 5), in progress
 - [Make boilerplate's verdict right](2026-10-28-r4-make-boilerplates-verdict-right.md)

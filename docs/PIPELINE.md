@@ -813,7 +813,8 @@ next change, run `claude/before` again.
 ## What it measured
 
 On the three samples together, measured on 2026-10-27 with
-`go run ./cmd/pipeline run latest`:
+`go run ./cmd/pipeline run latest`, and again on 2026-10-30, after
+roadmap 24 kept the ads' layout, where it moved a figure here:
 
 | Sample | Ads | Leans towards |
 |---|---:|---|
@@ -838,7 +839,7 @@ with no section but the summary, 4%.
 | summary | 18% | 11% |
 | role | 8% | 8% |
 | responsibilities | 18% | 2% |
-| requirements | 21% | 14% |
+| requirements | 21% | 13% |
 | desirable | 2% | 8% |
 | benefits | 13% | 38% |
 | company | 3% | 50% |
@@ -896,11 +897,11 @@ and the figures in [What it measured](#what-it-measured) are updated.
 
 | Gap | Effect | Likely fix |
 |---|---|---|
-| [Layout folded](../ROADMAP.md#24-keep-the-layout-an-ads-text-implies) | In an ad with any layout tag, newlines meant as layout are read as spaces, so headings and fields on them join the text around them; a `<br>` or `<p>` in a list item runs its lines together; tags left open can swallow or mislabel what follows | Read newlines as plain text's are, keep a list item's lines apart, and let an opening tag end what's left open |
-| [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them, once layout is kept |
+| [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
 | [Inline lists](../ROADMAP.md#25-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
 | [Italic not a cue](../ROADMAP.md#26-italic-as-a-cue-like-bold) | Headings and notices set in italic carry no cue, as bold ones do | Record italic as blocks records bold |
 | [Label emoji lost](../ROADMAP.md#27-keep-what-label-emoji-mean-wherever-they-are) | A label emoji is written as its label only where it opens a line, and some clock faces aren't mapped, so facts set between emoji lose their labels; a decorative one can get a label it shouldn't | Label an emoji wherever it opens a value, map every clock face, and check the value fits the label |
+| [Bold labels taken for headings](../ROADMAP.md#28-bold-labels-on-benefit-lines-arent-headings) | Lines of a benefits list that open with a bold label are read as headings of no known kind | Read a bold lead before " - ", amid lines like it, as a line of the list |
 
 ## Words used here
 

@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 28.
+number: 29.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -40,29 +40,20 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 24. Keep the layout an ad's text implies
-
-**Serves:** structure
-
-Blocks reads an ad with any layout tag as a browser shows it, so
-newlines its author meant as layout are folded into the text, with the
-headings and fields on them, and breaks inside list items run the
-item's lines together. Tags left open can swallow or mislabel what
-follows. The plan is in its
-[record](docs/changes/2026-10-30-r24-keep-the-layout-an-ads-text-implies.md).
-
-## Next
-
 ### 5. Split walls of text into sentences
 
 **Serves:** structure
 
-**Waiting on:** 24
-
-Started, then paused: many walls turned out to be layout folded by
-blocks, which 24 keeps, so what's left of them is measured once 24 lands.
-The plan, and what was found, are in its
+Some ads are a wall of prose, with headings run into it, so nothing in a
+wall is found as a heading, and boilerplate inside it isn't found
+either. With the ads' own layout kept (roadmap 24), 375 ads in the
+samples still have a paragraph over 800 characters. The plan, and what
+was found, are in its
 [record](docs/changes/2026-10-30-r5-split-walls-of-text-into-sentences.md).
+
+## Next
+
+Nothing at the moment.
 
 ## Later
 
@@ -142,3 +133,12 @@ is mapped (about 56 lines in the samples open with another). The
 other way, a mapped emoji used as decoration gets a label it shouldn't
 ("📞 Participate in an on-call rota" would be a contact): a label could
 wait for text that reads as a value of it.
+
+### 28. Bold labels on benefit lines aren't headings
+
+Added 2026-10-30. A benefits list set as lines, each opening with a bold
+label ("**Retail discounts** - Save at 200+ brands"), or one bold line
+among them, has its labels read as headings of no known kind, each
+starting a section of one line. Headings could read a bold lead
+followed by " - ", amid lines like it, as a line of the list. 6 headings
+in the samples, since roadmap 24 split such lists out of their items.

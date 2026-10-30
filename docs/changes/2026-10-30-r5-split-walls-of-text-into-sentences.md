@@ -63,3 +63,9 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   wrong stage, so keeping the layout became roadmap 24, and this item
   went back to Next, to be measured again on what's left once 24 lands.
   Nothing of it was built.
+- **Back in Now, roadmap 24 shipped.** With the ads' layout kept, the
+  walls are counted again: ads with a paragraph over 800 characters
+  381 to 375, over 1,500 17 to 16. Roadmap 24 recovered the headings
+  and fields folded into the text, but few whole walls were folded
+  layout: what's left is prose, which this item's plan is for. Step 1,
+  the names, is next.
