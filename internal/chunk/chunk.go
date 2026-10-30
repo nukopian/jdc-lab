@@ -23,8 +23,9 @@
 // chunks keep theirs, as part of what they say: an advertiser's
 // standard perks are still a list of benefits.
 //
-// An ad's requirements, desirable ones too, are one chunk, each section's
-// heading a line over its own list (see together).
+// An ad's chunks of each kind are one chunk, the desirable joining the
+// requirements, each section's heading a line over its own lines (see
+// together).
 //
 // The chunks come with what says what the job is first: the title (see
 // AdOf), the summary, the role, responsibilities and requirements, in that
@@ -309,44 +310,56 @@ func placeless(fs []facts.Fact) []facts.Fact {
 	return fs
 }
 
-// together returns cs with an ad's requirements chunks, desirable ones
-// too, made one, where the first of them stands: one list of what the job
-// asks for, each chunk's heading a line over its own lines, and
-// "Desirable" over desirable lines with no heading, so that "Essential"
-// and "Desirable" are its sub-lists. What placed each is said in turn.
+// together returns cs with an ad's chunks of each kind made one, where
+// the first of them stands: two summaries, the ad's own details and those
+// gathered from its other sections, the requirements and the desirable
+// (which join the requirements, so that "Essential" and "Desirable" are
+// its sub-lists). Each chunk's heading is a line over its own lines,
+// "Desirable" over desirable lines with none, what placed each is said in
+// turn, and each fact is listed once.
 func together(cs []Chunk) []Chunk {
-	at := -1
-	var parts, out []Chunk
+	group := func(k sections.Kind) sections.Kind {
+		if k == sections.Desirable {
+			return sections.Requirements
+		}
+		return k
+	}
+	parts := map[sections.Kind][]Chunk{}
+	var out []Chunk
 	for _, c := range cs {
-		if c.Use == Embed && (c.Kind == sections.Requirements || c.Kind == sections.Desirable) {
-			if at < 0 {
-				at = len(out)
-				out = append(out, Chunk{})
-			}
-			parts = append(parts, c)
+		g := group(c.Kind)
+		if len(parts[g]) == 0 {
+			out = append(out, Chunk{Kind: g}) // where the first of them stands
+		}
+		parts[g] = append(parts[g], c)
+	}
+	for i, c := range out {
+		ps := parts[c.Kind]
+		if len(ps) == 1 {
+			out[i] = ps[0]
 			continue
 		}
-		out = append(out, c)
-	}
-	if len(parts) < 2 {
-		return cs
-	}
-	r := Chunk{Kind: sections.Requirements, Use: Embed}
-	var texts, placed []string
-	for _, c := range parts {
-		text := c.Text
-		if c.Heading == "" && c.Kind == sections.Desirable {
-			text = "Desirable\n" + text
+		r := Chunk{Kind: c.Kind, Use: ps[0].Use}
+		var texts, placed []string
+		for _, p := range ps {
+			text := p.Text
+			if p.Heading == "" && p.Kind == sections.Desirable {
+				text = "Desirable\n" + text
+			}
+			if text != "" {
+				texts = append(texts, text)
+			}
+			placed = append(placed, p.PlacedBy)
+			r.Fields = append(r.Fields, p.Fields...)
+			r.Facts = append(r.Facts, p.Facts...)
+			r.Unmapped += p.Unmapped
 		}
-		texts = append(texts, text)
-		placed = append(placed, c.PlacedBy)
-		r.Fields = append(r.Fields, c.Fields...)
-		r.Facts = append(r.Facts, c.Facts...)
+		r.Text = strings.Join(texts, "\n")
+		r.Tokens = Tokens(r.Text)
+		r.PlacedBy = strings.Join(placed, "; ")
+		r.Facts = once(r.Facts, nil)
+		out[i] = r
 	}
-	r.Text = strings.Join(texts, "\n")
-	r.Tokens = Tokens(r.Text)
-	r.PlacedBy = strings.Join(placed, "; ")
-	out[at] = r
 	return out
 }
 

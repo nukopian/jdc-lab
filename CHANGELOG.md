@@ -12,10 +12,14 @@ has the steps).
 
 ## Unreleased
 
-- An ad's requirements are one chunk, however many sections it gives
-  them: "Essential", "Desirable" and "Qualifications" are its sub-lists,
-  each under its heading, and requirements placed by their wording join
-  them, where the first of them stands.
+- An ad's chunks of each kind are one chunk, however many sections it
+  gives them, where the first of them stands, each section's heading a
+  line over its own lines: two summaries are one, the ad's own details
+  and those gathered from its other sections are one, and the
+  requirements take in the desirable and those placed by their wording,
+  so that "Essential", "Desirable" and "Qualifications" are their
+  sub-lists. In the 20 ads of a run's view, 7 had a kind twice; none
+  does now.
 - The ad's title, its title field, is a chunk of its own, first and
   embedded: titles embed well alone, and until now the title was in no
   chunk at all, unless the ad wrote it again. It counts in the ad's

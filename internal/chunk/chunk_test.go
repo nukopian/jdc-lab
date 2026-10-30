@@ -236,21 +236,14 @@ func TestFacts(t *testing.T) {
 	if sum.Text != "Join our team as a Project Manager.\nThis is a permanent role working with an estates team across the north." {
 		t.Errorf("summary: %q; want its fact lines gone, the sentence with a fact in it kept", sum.Text)
 	}
-	var facts Chunk
-	for _, c := range cs {
-		if c.Kind == sections.Details && c.Heading == "" {
-			facts = c
-		}
-	}
-	// The sentence kept in the summary has its fact listed too.
-	if facts.Use != Metadata || facts.Text != "- 40hrs pw\n- 50,000pa + excellent bonus and benefits" || len(facts.Facts) != 3 ||
-		facts.Facts[0].Kind != "hours" || facts.Facts[1].Values["min"] != "50000" ||
-		facts.Facts[2].Kind != "pattern" || facts.Facts[2].Values["value"] != "permanent" || !strings.Contains(facts.PlacedBy, "facts") {
-		t.Errorf("the facts: %+v", facts)
-	}
+	// The ad's own details and the lines of facts taken from the summary
+	// are one details chunk, its facts listed once: the sentence kept in
+	// the summary has its fact listed too.
 	d := kind(cs, sections.Details)
-	if d.Heading != "Job details" || len(d.Facts) != 1 || d.Facts[0].Values["period"] != "hour" {
-		t.Errorf("the details: %+v; want its line kept and its pay read", d)
+	if d.Use != Metadata || d.Text != "Job details\nPay: £16.50 per hour\n- 40hrs pw\n- 50,000pa + excellent bonus and benefits" ||
+		len(d.Facts) != 4 || d.Facts[0].Values["period"] != "hour" || d.Facts[1].Kind != "hours" ||
+		d.Facts[2].Values["min"] != "50000" || d.Facts[3].Values["value"] != "permanent" || !strings.Contains(d.PlacedBy, "facts") {
+		t.Errorf("the details: %+v", d)
 	}
 }
 
@@ -562,5 +555,45 @@ func TestRequirementsOneChunk(t *testing.T) {
 	}
 	if r.Tokens != Tokens(want) || !strings.Contains(r.PlacedBy, "Essential") || !strings.Contains(r.PlacedBy, "wording") {
 		t.Errorf("the requirements' tokens %d, placed by %q", r.Tokens, r.PlacedBy)
+	}
+}
+
+// An ad's chunks of one kind are one chunk, wherever its sections are:
+// two summaries are one, and the ad's own details and the details gathered
+// from its other sections are one, each fact in them listed once.
+func TestOneChunkAKind(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{text("We make parts for cars.")}},
+		{Kind: sections.Benefits, Heading: "Benefits", Parts: []headings.Part{text("A pension.")}},
+		{Kind: sections.Summary, Heading: "The company", Parts: []headings.Part{text("We're forty years old."), text("We are a full time team in Leeds, Monday to Friday.")}},
+		{Kind: sections.Details, Heading: "Job details", Parts: []headings.Part{text("Monday to Friday, 8am to 4pm")}},
+	}
+	kinds := map[sections.Kind]int{}
+	var summary, details Chunk
+	for _, c := range Of(ss, func(string) bool { return false }) {
+		kinds[c.Kind]++
+		switch c.Kind {
+		case sections.Summary:
+			summary = c
+		case sections.Details:
+			details = c
+		}
+	}
+	for k, n := range kinds {
+		if n > 1 {
+			t.Errorf("%d %s chunks, want one", n, k)
+		}
+	}
+	if want := "We make parts for cars.\nThe company\nWe're forty years old.\nWe are a full time team in Leeds, Monday to Friday."; summary.Text != want {
+		t.Errorf("the summary:\n%s\nwant:\n%s", summary.Text, want)
+	}
+	seen := map[string]int{}
+	for _, f := range details.Facts {
+		seen[f.Kind+fmt.Sprint(f.Values)]++
+	}
+	for k, n := range seen {
+		if n > 1 {
+			t.Errorf("%s listed %d times in the details", k, n)
+		}
 	}
 }
