@@ -457,7 +457,7 @@ lines that describe the job, such as "Excellent ICT skills", which are
 worth keeping. So a repeated text is:
 
 - a **template** for the job if it's found at least as often in the
-  sections that describe the job (responsibilities, requirements,
+  sections that describe the job (role, responsibilities, requirements,
   desirable) as outside them;
 - **boilerplate** if it's found more often outside them; or if it's found
   mostly in the run of repeated texts that ends its ads, and talks as a
@@ -488,10 +488,11 @@ as it was before it was split: a wall judged boilerplate, by the same
 rules, makes each of its sentences boilerplate too, however short, or
 changed a little from ad to ad. "Acme is a disability-confident
 employer." is too short to count on its own, but not in Acme's footer.
+A sentence repeated enough to be judged on its own keeps its own
+verdict, whatever its wall's.
 A wall repeated whole in the sections that describe the job, as an
 employer's own duties are, stays a template for the job, and its
-sentences with it. Over the samples, 40.3% of the walls' text is
-boilerplate, where judging walls whole only found 39.2%.
+sentences with it.
 
 `cmd/boilerplate` writes `repeated.tsv`: every repeated text, and every
 sentence of a wall judged boilerplate, with its groups (by the key that
@@ -919,7 +920,7 @@ with no section but the summary, 4%.
 | Section | Of the text | Of it, boilerplate |
 |---|---:|---:|
 | summary | 18% | 11% |
-| role | 8% | 8% |
+| role | 8% | 3% |
 | responsibilities | 18% | 2% |
 | requirements | 21% | 13% |
 | desirable | 2% | 8% |
@@ -930,7 +931,7 @@ with no section but the summary, 4%.
 | details | 2% | 18% |
 | unmapped | 10% | 25% |
 
-Boilerplate is 18.3% of the text, and template for the job 2.7%; with
+Boilerplate is 17.8% of the text, and template for the job 3.1%; with
 the company, apply and legal text that isn't boilerplate, about a fifth
 of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching

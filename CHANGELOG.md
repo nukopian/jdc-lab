@@ -12,6 +12,17 @@ has the steps).
 
 ## Unreleased
 
+- Text repeated in a role section, under "The role" or "Job
+  description", is judged as text repeated in the duties and
+  requirements is: about the job, a template for it, not boilerplate.
+  The role was split from the summary after the rule was written, and
+  left out of it: an agency's opening line about the job ("English
+  teacher required for a high-achieving all-girls school…"), and
+  employers' descriptions of the work repeated across their ads, were
+  dropped as boilerplate once walls were split into sentences. A
+  sentence of a wall that can be judged on its own also keeps its own
+  verdict, whatever its wall's. Boilerplate falls from 18.3% of the text
+  to 17.8%, and in the role from 8% to 3%.
 - An ad's chunks of each kind are one chunk, however many sections it
   gives them, where the first of them stands, each section's heading a
   line over its own lines: two summaries are one, the ad's own details

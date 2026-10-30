@@ -348,3 +348,28 @@ func TestWallJudgedWhole(t *testing.T) {
 		t.Errorf("%q, in an employer's duties repeated whole: boilerplate, want a template", duty)
 	}
 }
+
+// A sentence that can be judged on its own, repeated enough to count,
+// keeps its own verdict, whatever its wall's: an agency's opening line
+// about the job, a template in the role, stays one inside a wall judged
+// boilerplate.
+func TestWallSentenceJudgedAlone(t *testing.T) {
+	opening := "English teacher required for a high-achieving school in Central London."
+	notice := "We are an agency acting for the school in all of its recruitment matters today."
+	wall := opening + " " + notice
+	titles := []string{"English Teacher", "Science Technician", "Head of Music"}
+	var ix Index
+	for _, title := range titles {
+		src := Source{Title: title}
+		ix.Add(src, sections.Role, opening)
+		ix.Add(src, sections.Legal, notice)
+		ix.Wall(src, sections.Legal, wall, opening, notice)
+	}
+	src := Source{Title: "English Teacher"}
+	if ix.Boilerplate(src, opening) {
+		t.Errorf("%q, a template for the job on its own: boilerplate through its wall", opening)
+	}
+	if !ix.Boilerplate(src, notice) {
+		t.Errorf("%q: not boilerplate", notice)
+	}
+}

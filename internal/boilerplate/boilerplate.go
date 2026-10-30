@@ -13,7 +13,7 @@
 // Repetition isn't enough on its own. Related jobs from one advertiser
 // share lines that describe the job, such as "Excellent ICT skills", and
 // those are worth keeping. So a repeated text found mostly in the sections
-// that describe the job (responsibilities, requirements, desirable) is a
+// that describe the job (role, responsibilities, requirements, desirable) is a
 // template for the job, and only one found mostly elsewhere is
 // boilerplate. The verdict is the text's, over all the ads it's in, so a
 // heading filed under the wrong kind in one ad doesn't change it.
@@ -199,9 +199,12 @@ func (ix *Index) record(key, title string, kind sections.Kind) {
 // Wall records a wall from an ad from src (see internal/walls) whole, as
 // it was before it was split, in a section of kind, and the lines it was
 // split into. A wall judged boilerplate whole, by the rules a text is
-// judged by, makes each of its lines boilerplate too, however short, or
-// changed a little from ad to ad: "Acme is a disability-confident
-// employer." is too short to count on its own, but not in Acme's footer.
+// judged by, makes those of its lines that can't be judged on their own
+// boilerplate too: too short to count, or changed a little from ad to ad.
+// "Acme is a disability-confident employer." is too short to count on its
+// own, but not in Acme's footer. A line repeated enough to be judged
+// keeps its own verdict: an agency's opening line about the job ("English
+// teacher required for …") stays a template for it.
 // A wall repeated whole in the sections that describe the job, as an
 // employer's own duties are, is a template for the job, and its lines too.
 func (ix *Index) Wall(src Source, kind sections.Kind, wall string, lines ...string) {
@@ -306,6 +309,12 @@ func (ix *Index) Boilerplate(src Source, s string) bool {
 	}
 	if ix.judged(src, s) {
 		return true
+	}
+	// A sentence repeated enough to be judged on its own keeps its own
+	// verdict; only one too short to count, or written in its wall alone,
+	// takes its wall's.
+	if ix.Repeated(src, s) {
+		return false
 	}
 	for _, w := range ix.inWall[headings.Key(s)] {
 		if ix.judged(src, w) {
@@ -473,7 +482,7 @@ func alike(a, b map[uint64]bool) bool {
 // so that text repeated in it is a template for the job, not boilerplate.
 func Describes(kind sections.Kind) bool {
 	switch kind {
-	case sections.Responsibilities, sections.Requirements, sections.Desirable:
+	case sections.Role, sections.Responsibilities, sections.Requirements, sections.Desirable:
 		return true
 	}
 	return false
