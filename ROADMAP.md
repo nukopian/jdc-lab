@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 41.
+number: 42.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -232,3 +232,33 @@ guess. Next: leave out headings that are mostly a name, and let a weak
 nearest neighbour say no kind. `BAAI/bge-base-en-v1.5` took three times
 as long and agreed on 71% of unmapped headings, for no clear gain. A
 section's text, not its heading, is still the part to classify.
+
+### 41. Cheap local ways to place a section, beside a model
+
+Added 2026-10-30. **Size:** L (5), for choosing among them; each taken
+up becomes an item of its own. Ways to place what the rules can't, each
+learning from the rules' own labels, most promising first:
+
+- **Openings mined by kind:** count the first two to four words of the
+  lines in placed sections, and rank each opening by how often it
+  occurs and how consistently it belongs to one kind, to suggest
+  entries for `openings.txt`, as `heading_suggest.py` does for
+  `headings.txt`.
+- **Word counts, not embeddings:** a naive Bayes or logistic regression
+  classifier on words and pairs of words (TF-IDF), in Go: the baseline
+  any model has to beat (40).
+- **Place in the ad:** sections come in a fairly fixed order, so a
+  sequence model (an HMM, decoded with Viterbi) can place an unmapped
+  section by the kinds around it.
+- **Static embeddings:** a model distilled into a table of token
+  vectors (Model2Vec's `minishlab/potion-base-8M`), embedding by lookup
+  and average, without ONNX Runtime; one for the fair test (9).
+- **Names found before embedding:** a capitalised run found in mapped
+  headings such as "Why X" and "About X", or across an advertiser's
+  ads, left out or stripped, to stop `heading_suggest.py` giving names
+  a kind.
+- **Taxonomy hits as evidence:** many skills in a section point to
+  requirements (30), benefit words to benefits.
+- **A judged set of sections:** sections judged by hand, chosen where
+  the ways above disagree most, to measure any of them on text the
+  rules couldn't place.
