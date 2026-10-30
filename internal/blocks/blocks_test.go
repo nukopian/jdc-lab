@@ -26,6 +26,9 @@ func show(blocks []Block) []string {
 		if it.Cues.Added != "" {
 			s += fmt.Sprintf(" added=%q", it.Cues.Added)
 		}
+		if it.Cues.Gap {
+			s += " gap"
+		}
 		return s
 	}
 	for _, b := range blocks {
@@ -193,14 +196,14 @@ Benefits:
 - Pension
 
 `,
-			[]string{`line "The role"`, `line "We build things."`, `line "Benefits:"`, `line "Pension"`},
+			[]string{`line "The role"`, `line "We build things."`, `line "Benefits:" gap`, `line "Pension"`},
 		},
 		{
 			"plain text: one line on its own is a paragraph",
 			`Driver needed.
 
 Apply now.`,
-			[]string{`paragraph "Driver needed."`, `paragraph "Apply now."`},
+			[]string{`paragraph "Driver needed."`, `paragraph "Apply now." gap`},
 		},
 		{
 			"plain text keeps inline tags' cues, across newlines",
@@ -212,7 +215,7 @@ Drive.`,
 		{
 			"plain text with CRLF line ends",
 			"One\r\nTwo\r\n\r\nThree",
-			[]string{`line "One"`, `line "Two"`, `paragraph "Three"`},
+			[]string{`line "One"`, `line "Two"`, `paragraph "Three" gap`},
 		},
 		{
 			"a wall of text stays one paragraph",
@@ -245,7 +248,7 @@ a driver.
 
 The Role
 You'll drive.`,
-			[]string{`paragraph "Leeds"`, `paragraph "We're hiring a driver."`, `line "The Role"`,
+			[]string{`paragraph "Leeds"`, `paragraph "We're hiring a driver."`, `line "The Role" gap`,
 				`line "You'll drive."`},
 		},
 		{
@@ -286,8 +289,19 @@ Responsibilities
 - Teach
 - Mark
 <p>Footer one.<br>Footer two.</p>`,
-			[]string{`line "About the Role"`, `line "We need teachers."`, `line "Responsibilities"`, "list",
+			[]string{`line "About the Role"`, `line "We need teachers."`, `line "Responsibilities" gap`, "list",
 				`  "Teach"`, `  "Mark"`, `line "Footer one."`, `line "Footer two."`},
+		},
+		{
+			"a blank line from <br><br> marks the line after it",
+			`<p>Benefits:<br>Pension<br><br>How to apply<br>&nbsp;<br>Email us<br></p><p>Thanks</p>`,
+			[]string{`line "Benefits:"`, `line "Pension"`, `line "How to apply" gap`, `line "Email us" gap`,
+				`paragraph "Thanks"`},
+		},
+		{
+			"blank lines between paragraphs mark the paragraph after them",
+			`<p>One</p><br><br><p>Two</p><p>Three<br><br></p><p>Four</p>`,
+			[]string{`paragraph "One"`, `paragraph "Two" gap`, `paragraph "Three"`, `paragraph "Four" gap`},
 		},
 		{
 			"stray end tags change nothing",

@@ -167,6 +167,7 @@ symbols are about 1,150 of them.
 | `bold` | all of it was in `<strong>` or `<b>` |
 | `bold_lead` | it starts with bold text: `Salary:` in "**Salary:** £30,000" |
 | `added` | the English label cleaning added: `Location: ` for "📍 Leeds" |
+| `gap` | a blank line came before it: two `<br>`s with nothing between, or a blank line in text laid out by its newlines (not the space every paragraph has); over the three samples, 69,126 lines and paragraphs. Nothing reads it yet |
 
 **Lists.** A list item is one piece of text, and a sublist's items join
 its list. But ads run headings, fields and footers into their items,

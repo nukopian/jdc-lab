@@ -33,6 +33,7 @@ type tally struct {
 	kinds              map[blocks.Kind]int
 	items              int
 	heading, bold, led int
+	gap                int
 }
 
 func main() {
@@ -95,6 +96,9 @@ func (t *tally) add(bs []blocks.Block) {
 		if c.BoldLead != "" {
 			t.led++
 		}
+		if c.Gap {
+			t.gap++
+		}
 	}
 	for _, b := range bs {
 		t.kinds[b.Kind]++
@@ -121,4 +125,5 @@ func (t tally) print(target string) {
 	fmt.Printf("%-10s %6d\n", "heading", t.heading)
 	fmt.Printf("%-10s %6d\n", "bold", t.bold)
 	fmt.Printf("%-10s %6d\n", "bold lead", t.led)
+	fmt.Printf("%-10s %6d\n", "gap", t.gap)
 }

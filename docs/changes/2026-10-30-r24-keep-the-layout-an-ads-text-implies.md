@@ -130,3 +130,12 @@ re-measured on what's left.
   the application text, footer and four fields written into the last
   benefit are lines again, and chunk files them as apply, boilerplate
   and details.
+- **Blank lines (step 4).** The cue `gap` marks the line or paragraph
+  after two `<br>`s with nothing visible between them, in one block, or
+  after a blank line in text laid out by its newlines. A first version
+  also marked a single `<br>` at a block's start, or after a list, which
+  two old tests showed isn't a blank line in the sense meant, so it
+  needs two in a row. The paragraph break every `<p>` has doesn't
+  count, nor does a gap before a list's items. Over the three samples,
+  69,126 lines and paragraphs have it (`pipeline compare claude/step3
+  claude/after`), and nothing else moved, as nothing reads it yet.

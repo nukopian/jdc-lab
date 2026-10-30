@@ -62,6 +62,10 @@ type Cues struct {
 	// Bullet is the symbol it opened with, as a bullet (see
 	// clean.Bullet): lines in a row with the same one are a list.
 	Bullet string `json:"bullet,omitempty"`
+	// Gap is true when a blank line came before it: two <br>s with
+	// nothing between, or a blank line in text laid out by its newlines.
+	// The space every paragraph has from the one before doesn't count.
+	Gap bool `json:"gap,omitempty"`
 }
 
 // An Item is a piece of text with its cues: a list item, or the text of a
@@ -133,11 +137,16 @@ type builder struct {
 
 	plain    bool // src is plain text, laid out by its newlines
 	newlines int  // newlines since the last visible text
+	gap      bool // a blank line came since the last line or block
+	afterBr  bool // a <br> came since the last visible text, in this block
 }
 
 func (b *builder) text(s string) {
 	if b.skip > 0 {
 		return
+	}
+	if visible(s) {
+		b.afterBr = false
 	}
 	if !b.plain && (b.inItem || b.heading > 0) {
 		b.piece.write(s, b.bold > 0) // an item or heading stays one piece
@@ -170,6 +179,7 @@ func (b *builder) text(s string) {
 				b.piece.write(" ", b.bold > 0)
 			case b.newlines > 1:
 				b.endBlock()
+				b.gap = true
 			default:
 				b.endLine()
 			}
@@ -195,7 +205,11 @@ func (b *builder) start(tag atom.Atom) {
 		case b.inItem:
 			b.leaveItem()
 		default:
+			if b.afterBr && !visible(b.piece.text.String()) && b.started() {
+				b.gap = true // a <br> with nothing since the last one
+			}
 			b.endLine()
+			b.afterBr = true
 		}
 	case isHeading(tag):
 		if b.inItem {
@@ -236,6 +250,7 @@ func (b *builder) end(tag atom.Atom) {
 		case b.heading > 0:
 			if it, ok := b.piece.take(); ok {
 				it.Cues.Heading = true
+				it.Cues.Gap, b.gap = b.gap, false
 				b.add(Block{Kind: Paragraph, Text: it.Text, Cues: it.Cues})
 			}
 		}
@@ -293,13 +308,21 @@ func (b *builder) leaveItem() {
 // block's lines.
 func (b *builder) endLine() {
 	if it, ok := b.piece.take(); ok {
+		it.Cues.Gap, b.gap = b.gap, false
 		b.lines = append(b.lines, it)
 	}
+}
+
+// started reports whether any text has been gathered yet, in a line, a
+// block or a list: a blank line before all of it is no gap.
+func (b *builder) started() bool {
+	return len(b.lines) > 0 || len(b.blocks) > 0 || len(b.items) > 0
 }
 
 // endBlock ends the current block: one Paragraph, or a Line for each piece
 // if <br>s split it.
 func (b *builder) endBlock() {
+	b.afterBr = false
 	b.endLine()
 	if len(b.lines) == 0 {
 		return
@@ -318,6 +341,7 @@ func (b *builder) endBlock() {
 func (b *builder) endItem() {
 	if it, ok := b.piece.take(); ok {
 		b.items = append(b.items, it)
+		b.gap = false // a list's items have no gap: it would be the block's after it
 	}
 	b.inItem = false
 }

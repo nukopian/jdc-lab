@@ -28,6 +28,10 @@ has the steps).
   last benefit, are details again. A list never closed no longer takes
   in the rest of the ad. Over the three samples, 86 more heading uses
   found (roadmap 24).
+- Blocks records a blank line before a line or paragraph, as the cue
+  `gap`: two `<br>`s with nothing between, or a blank line in text laid
+  out by its newlines. Nothing decides anything from it yet; it's there
+  for the stages that will (roadmap 24).
 - A 9 MB build of `chunk`, left at the root by a bare
   `go build ./cmd/chunk` and committed with everything else in v0.5.0,
   is gone. `.gitignore` claimed to hide such builds but didn't; it now
