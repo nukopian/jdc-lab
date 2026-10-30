@@ -33,6 +33,8 @@ number: 40.
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
 L is broken into items that aren't, each saying what it was split from.
+Items that can't be done one without another say so ("Moves with:"),
+and move between groups together.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -180,24 +182,24 @@ are competitive. Needs access to one.
 ### 36. The model's tokenizer in Go
 
 Added 2026-10-30, split from 11 (embeddings from Go, added 2026-10-25).
-**Size:** L (5). Tokenize as the chosen model does, in Go, matching
-Python's tokenizer token for token, so nothing in the pipeline needs a
-Python service.
+**Size:** L (5). **Moves with:** 37, 38 and 39. Tokenize as the chosen
+model does, in Go, matching Python's tokenizer token for token, so
+nothing in the pipeline needs a Python service.
 
 ### 37. The model run from Go
 
-Added 2026-10-30, split from 11. **Size:** M (3). Run the chosen model
-with ONNX Runtime from Go, pooling (CLS or mean, as the model expects)
-and normalising its output.
+Added 2026-10-30, split from 11. **Size:** M (3). **Moves with:** 36, 38
+and 39. Run the chosen model with ONNX Runtime from Go, pooling (CLS or
+mean, as the model expects) and normalising its output.
 
 ### 38. Go's vectors held to Python's
 
-Added 2026-10-30, split from 11. **Size:** S (2). Tests that Go's
-vectors match Python's for the same text, within a tolerance, as the
-ONNX demo's scores are held in all three languages.
+Added 2026-10-30, split from 11. **Size:** S (2). **Moves with:** 36, 37
+and 39. Tests that Go's vectors match Python's for the same text, within
+a tolerance, as the ONNX demo's scores are held in all three languages.
 
 ### 39. Vectors ready for a search engine's dense field
 
-Added 2026-10-30, split from 11. **Size:** S (2). Vectors normalised
-for an Elasticsearch `dense_vector` field with `dot_product`, and
-quantised (`int8_hnsw`) to cut its memory.
+Added 2026-10-30, split from 11. **Size:** S (2). **Moves with:** 36, 37
+and 38. Vectors normalised for an Elasticsearch `dense_vector` field
+with `dot_product`, and quantised (`int8_hnsw`) to cut its memory.
