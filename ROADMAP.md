@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 40.
+number: 41.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -203,3 +203,13 @@ a tolerance, as the ONNX demo's scores are held in all three languages.
 Added 2026-10-30, split from 11. **Size:** S (2). **Moves with:** 36, 37
 and 38. Vectors normalised for an Elasticsearch `dense_vector` field
 with `dot_product`, and quantised (`int8_hnsw`) to cut its memory.
+
+### 40. Sections the rules can't place, classified by their text
+
+Added 2026-10-30. **Size:** L (5). A small classifier, trained on the
+sections the rules already place, reads the text under a heading of no
+known kind, and the lines of a list with no heading, and says which
+kind it is, where it's confident; the guess still decides the rest. It
+has to beat the guess's 39 to 43 in 50, on text the rules couldn't
+place. Run from Go, it needs 36 to 38; used offline, to suggest phrases
+for `headings.txt`, it needs none of them.
