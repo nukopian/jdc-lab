@@ -19,8 +19,8 @@ Nothing yet.
 An ad in the shape its author gave it
 
 - The wash-up before this release, by an independent review, found
-  four faults in the work since v0.5.2, each now fixed with a test: the bonus
-  rule dropped pay before "plus bonus" or "with bonus" (51 ads); a
+  four faults in the work since v0.5.2, each now fixed with a test:
+  the bonus rule dropped pay before "plus bonus" or "with bonus" (51 ads); a
   company section's lines of facts were taken to the details as the
   job's (33 ads); requirements placed by their wording came under
   "Desirable" (about 46 ads); and a heading tag left open and ended by
@@ -34,8 +34,8 @@ An ad in the shape its author gave it
   stage's output are unchanged. The fix was tested here before grammar
   committed it.
 - The company's text, the employer's own words, goes with the summary,
-  embedded, under its heading, where it had been left out: Iain found
-  the two work well together. Its standard half, as boilerplate, goes
+  embedded, under its heading, where it had been left out, as the two
+  work well together. Its standard half, as boilerplate, goes
   to the boilerplate chunk, as an embedded chunk's lines are checked.
   Over the samples, embedded text rises from 66.5% of the tokens to
   68.3%, the boilerplate chunk from 9.9% to 11.6%, and what's left out
@@ -49,7 +49,7 @@ An ad in the shape its author gave it
   requirements is: about the job, a template for it, not boilerplate.
   The role was split from the summary after the rule was written, and
   left out of it: an agency's opening line about the job ("English
-  teacher required for a high-achieving all-girls school…"), and
+  teacher required for…"), and
   employers' descriptions of the work repeated across their ads, were
   dropped as boilerplate once walls were split into sentences. A
   sentence of a wall that can be judged on its own also keeps its own
