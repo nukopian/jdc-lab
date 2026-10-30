@@ -80,11 +80,14 @@ func measure(all []boilerplate.Divided, ix *boilerplate.Index) tally {
 				n := len(p.Text)
 				chars += n
 				t.kindChars[s.Kind] += n
-				if !ix.Repeated(src, p.Text) {
+				// A line of a wall repeated whole can be boilerplate
+				// without being repeated on its own.
+				isBoilerplate := ix.Boilerplate(src, p.Text)
+				if !isBoilerplate && !ix.Repeated(src, p.Text) {
 					continue
 				}
 				t.repeated += n
-				if ix.Boilerplate(src, p.Text) {
+				if isBoilerplate {
 					boiler += n
 					t.kindBoiler[s.Kind] += n
 				} else {
@@ -94,7 +97,7 @@ func measure(all []boilerplate.Divided, ix *boilerplate.Index) tally {
 				r := t.repeats[k]
 				if r == nil {
 					r = &repeat{text: p.Text, groups: ix.Groups(src, p.Text), kinds: map[sections.Kind]bool{},
-						boilerplate: ix.Boilerplate(src, p.Text)}
+						boilerplate: isBoilerplate}
 					t.repeats[k] = r
 				}
 				if !seen[k] {

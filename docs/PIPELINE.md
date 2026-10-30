@@ -21,6 +21,7 @@ data/ingestion/extract-DATE.xml   an export, as received
 data/ingestion/ads-DATE.jsonl     a sample: one ad per line: id, title, location, html
         │
         │  internal/blocks         HTML → blocks, with cues      (cmd/blocks)
+        │  internal/walls          walls → a line a sentence     (counted by cmd/blocks)
         │  internal/headings       blocks → parts, with roles    (cmd/heading-counts)
         │  internal/sections       parts → sections, by kind     (cmd/sections)
         │  internal/boilerplate    sections → boilerplate        (cmd/boilerplate)
@@ -169,6 +170,7 @@ symbols are about 1,150 of them.
 | `bold_lead` | it starts with bold text: `Salary:` in "**Salary:** £30,000" |
 | `added` | the English label cleaning added: `Location: ` for "📍 Leeds" |
 | `gap` | a blank line came before it: two `<br>`s with nothing between, or a blank line in text laid out by its newlines (not the space every paragraph has); over the three samples, 69,126 lines and paragraphs. Nothing reads it yet |
+| `run_in` | a heading found run into a wall, split off as a line of its own: set by [Walls](#3-walls-a-sentence-to-a-line), never by blocks |
 
 **Lists.** A list item is one piece of text, and a sublist's items join
 its list. But ads run headings, fields and footers into their items,
@@ -207,14 +209,50 @@ or after a comma, "&" or a word such as "to" that a line can't end with
 ("Welcome to" before a name), is a line wrapped in the source, so it
 stays a space. Over the three samples, that keeps 2,480 more lines than
 reading every newline in a tagged ad as a space. A **wall** of text with
-no newlines at all stays one paragraph: splitting it needs sentences, a
-later stage.
+no newlines at all stays one paragraph here: the next stage,
+[Walls](#3-walls-a-sentence-to-a-line), splits it into sentences.
 
 On the sample, no ad uses heading tags: headings are bold paragraphs, or
 lines ending with a colon. 3 ads have a paragraph over 1,500 characters
 (of the three samples' 28,000, 16).
 
-## 3. Headings: what each block is
+## 3. Walls: a sentence to a line
+
+**Package** `internal/walls`, with `internal/sentences`; counted by
+`cmd/blocks`, shown by `cmd/shape -stage walls`.
+
+Some paragraphs are too long to be one thing: a **wall** of text, over
+400 characters (`walls.MinChars`), written as one block, with headings
+and standard text run into it. Walls splits each into its **sentences**
+(`internal/sentences`: a full stop, question mark or exclamation mark,
+a space and a capital; not after an abbreviation or an initial, as "e.g.
+Sage" or "J. Smith", nor before a lower-case word or a figure), each a
+`line`, as a `<br>` would make it, so the stages after read a wall as
+they read lines.
+
+A **run-in heading** is a heading run into the start of a sentence. It's
+split off as a line of its own, with the cue `run_in`, which headings
+takes as it takes bold:
+
+| Sign | Example |
+|---|---|
+| A known heading phrase (`headings.txt`) ending with ":" or "-", or followed by a capital word that opens a sentence ("The", "We", "As", "Reporting"…) | "… completion. The Role Reporting to the MD …" |
+| A title of two to six words, each capitalised but small words such as "and", not opening with a word such as "As" or "At", followed by a capital "The", "A" or "An" | "Required Attributes and Experience The ideal …" |
+
+A capital alone isn't enough: in "Privacy Shield", "The Team Leader" and
+"You will have CSA accreditations" it goes on with the phrase, or the
+phrase opens a sentence. And a field's label stays with its value:
+"Salary: Depending on experience" is a field.
+
+It's a stage of its own, between blocks and headings, because blocks
+only records what the markup says, and headings can't read the heading
+phrases sections keeps. Every program that reads headings runs it.
+
+Over the three samples, 10,874 walls are split into 35,305 lines, 66 of
+them headings run in, from "The Legal Bit:" to "Required Attributes and
+Experience".
+
+## 4. Headings: what each block is
 
 **Package** `internal/headings`, **program** `cmd/heading-counts`.
 
@@ -276,7 +314,7 @@ does as well, as titles and locations reach it uncleaned. "What You’ll Be Doin
 have the same key. The table of characters it folds includes those these
 ads use, such as Word's bullet and the emoji variation selector.
 
-## 4. Sections: what each heading starts
+## 5. Sections: what each heading starts
 
 **Package** `internal/sections`, **program** `cmd/sections`.
 
@@ -378,7 +416,7 @@ under each), `disagree.tsv` (headings whose phrases point to two kinds,
 and the kind that won), and `named.tsv` (plain lines taken by name).
 [Improving it](#improving-it) has how to use them.
 
-## 5. Boilerplate: what ads repeat whatever the job
+## 6. Boilerplate: what ads repeat whatever the job
 
 **Package** `internal/boilerplate`, **program** `cmd/boilerplate`.
 
@@ -445,11 +483,22 @@ independently and as part of a team", in ads for 176 groups of titles,
 is a job line still: it says little of any one job, but it is about the
 job.
 
-`cmd/boilerplate` writes `repeated.tsv`: every repeated text, with its
-groups (by the key that finds the most), ads, characters, the kinds of
-section it's in, and its verdict.
+**Walls.** A wall's sentences are judged one by one, and the wall whole,
+as it was before it was split: a wall judged boilerplate, by the same
+rules, makes each of its sentences boilerplate too, however short, or
+changed a little from ad to ad. "Acme is a disability-confident
+employer." is too short to count on its own, but not in Acme's footer.
+A wall repeated whole in the sections that describe the job, as an
+employer's own duties are, stays a template for the job, and its
+sentences with it. Over the samples, 40.3% of the walls' text is
+boilerplate, where judging walls whole only found 39.2%.
 
-## 6. View: ads to read
+`cmd/boilerplate` writes `repeated.tsv`: every repeated text, and every
+sentence of a wall judged boilerplate, with its groups (by the key that
+finds the most), ads, characters, the kinds of section it's in, and its
+verdict.
+
+## 7. View: ads to read
 
 **Package** `internal/view`, **program** `cmd/view`.
 
@@ -769,6 +818,7 @@ jq -r '.sections[].parts[]? | select(.role == "text") | .text' $r/sections/ads.j
 | A plain line wrongly taken by name | Make the phrase longer, or drop it | `headings.txt` |
 | A field's label not known | Add it to `fieldLabels`; add a case to `TestRead` | `internal/headings/headings.go` |
 | Text taken for a heading, or a heading missed | Change the rule (`headingShaped`, `MaxWords`, `MaxIntroWords`, `conjunctions`, `hasMoney`, `hasTimes`, `hasPattern`), or the grammars' rules they use (`clock`, `points`, `span`, `days`, `rota`, `shift`, `Figure`); add a case to `TestRead` | `internal/headings/headings.go`, `internal/grammars/grammars.go` |
+| A wall split wrongly, or a heading run into one missed or taken wrongly | Change the rules (`abbreviations`, `phrased`, `opensSentence`, `opener`, `notInTitles`, `MinChars`); add a case to `TestSplit` or `TestRunIn`, with made-up text in the same shape | `internal/sentences/`, `internal/walls/walls.go` |
 | A block split wrongly | Change the splitter; add a case to `TestSplit`, with made-up HTML in the same shape | `internal/blocks/blocks.go` |
 | A boilerplate verdict wrong | Change a threshold (`MinWords`, `MinGroups`, `Widespread`), `footerWords`, or the rule; a job line taken for a footer may want an opening | `internal/boilerplate/boilerplate.go`, `internal/wording/openings.txt` |
 | An advertiser's name as a heading | Nothing: it stays unmapped, and the guess places its text: as boilerplate, mostly | |
@@ -821,7 +871,8 @@ next change, run `claude/before` again.
 
 On the three samples together, measured on 2026-10-27 with
 `go run ./cmd/pipeline run latest`, and again on 2026-10-30, after
-roadmap 24 kept the ads' layout, where it moved a figure here:
+roadmap 24 kept the ads' layout and roadmap 5 split walls into
+sentences, where they moved a figure here:
 
 | Sample | Ads | Leans towards |
 |---|---:|---|
@@ -855,7 +906,7 @@ with no section but the summary, 4%.
 | details | 2% | 18% |
 | unmapped | 10% | 25% |
 
-Boilerplate is 18.2% of the text, and template for the job 2.6%; with
+Boilerplate is 18.3% of the text, and template for the job 2.7%; with
 the company, apply and legal text that isn't boilerplate, about a fifth
 of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching
@@ -904,7 +955,6 @@ and the figures in [What it measured](#what-it-measured) are updated.
 
 | Gap | Effect | Likely fix |
 |---|---|---|
-| [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them |
 | [Inline lists](../ROADMAP.md#25-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
 | [Italic not a cue](../ROADMAP.md#26-italic-as-a-cue-like-bold) | Headings and notices set in italic carry no cue, as bold ones do | Record italic as blocks records bold |
 | [Label emoji lost](../ROADMAP.md#27-keep-what-label-emoji-mean-wherever-they-are) | A label emoji is written as its label only where it opens a line, and some clock faces aren't mapped, so facts set between emoji lose their labels; a decorative one can get a label it shouldn't | Label an emoji wherever it opens a value, map every clock face, and check the value fits the label |
@@ -915,9 +965,12 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Word | Meaning |
 |---|---|
 | block | a paragraph, line or list, as a reader sees it |
-| cue | what the markup says about text: heading tag, bold, bold lead, a gap before it |
+| cue | what the markup says about text: heading tag, bold, bold lead, a gap before it; and run in, from walls |
 | part | a block or list item with its role |
 | role | heading, field, repeat or text |
+| wall | a paragraph or line over 400 characters, split into sentences |
+| sentence | a wall's text up to a stop and a capital, as written |
+| run-in heading | a heading run into the start of a sentence in a wall |
 | key | the normalised form of text, for matching only |
 | section | a heading and what follows it, up to the next |
 | kind | what a section is: summary, requirements and the rest |

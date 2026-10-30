@@ -44,7 +44,8 @@ embeddings, and a large language model only where those fall short.
 
 - **A pipeline, by rules alone.** It splits each ad into the blocks a
   reader sees, as its author laid them out, by newlines as well as tags,
-  finds its headings and fields, divides it into sections
+  splits walls of text into sentences, finds its headings and fields,
+  those run into walls too, divides it into sections
   (summary, role, responsibilities, requirements, benefits and the
   rest), and
   finds the boilerplate that ads repeat whatever the job. Grammars read
@@ -71,7 +72,8 @@ embeddings, and a large language model only where those fall short.
   educated guess, mostly as the summary, and right for about four
   sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why. Under way: walls of text split into sentences.
+  and why: nothing is under way, and its ideas are next to choose
+  from.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

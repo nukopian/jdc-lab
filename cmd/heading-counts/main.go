@@ -27,6 +27,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/headings"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 // counter counts, for each key, the ads it's in and how it's spelt.
@@ -150,7 +151,7 @@ func tally(source string) (heads, fields counter, s summary, err error) {
 		}
 		s.ads++
 
-		parts := headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...)
+		parts := headings.Read(walls.Split(blocks.Split(ad.HTML)), ad.Title, ad.Locations()...)
 		for _, p := range parts {
 			s.roles[p.Role]++
 		}

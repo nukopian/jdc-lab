@@ -54,6 +54,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/page"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 func main() {
@@ -79,7 +80,7 @@ func main() {
 	}
 	isBoilerplate := func(s string) bool { return boiler[headings.Key(s)] }
 	chunked := func(a ads.Ad) chunk.Ad {
-		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
+		ss := sections.Divide(headings.Read(walls.Split(blocks.Split(a.HTML)), a.Title, a.Locations()...))
 		return chunk.Totalled(chunk.Ad{ID: a.ID, Title: a.Title, Chunks: chunk.Of(ss, isBoilerplate)}, chunk.Whole(ss))
 	}
 	if *pages != "" {

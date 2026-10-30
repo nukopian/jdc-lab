@@ -12,6 +12,15 @@ has the steps).
 
 ## Unreleased
 
+- Walls of text, paragraphs over 400 characters, are split into
+  sentences, a line each, so the headings run into them are found
+  ("… completion. The Role Reporting to the MD …", "Required Attributes
+  and Experience The ideal …"), and boilerplate judges a wall's
+  sentences one by one and the wall whole: a short sentence of an agency
+  footer is boilerplate with the rest of it. Over the three samples,
+  10,874 walls, 66 headings run in, and boilerplate 18.2% to 18.3% of
+  the text (roadmap 5;
+  [record](docs/changes/2026-10-30-r5-split-walls-of-text-into-sentences.md)).
 - `shape` shows a job ad at each stage of the pipeline, from its HTML
   as stored to its blocks with their cues, the role headings gives each
   part, its sections and its chunks, so you can judge how it changes

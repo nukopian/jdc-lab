@@ -178,7 +178,9 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 	if (cues.Heading || cues.Bold) && strings.HasSuffix(strings.TrimRightFunc(text, unicode.IsSpace), ":") {
 		most = MaxIntroWords
 	}
-	if headingShaped(text, key, most) && (cues.Heading || cues.Bold || endsAsLabel(text)) {
+	// A heading run into a wall is one: internal/walls found it by its
+	// phrase, or as a title before a sentence.
+	if headingShaped(text, key, most) && (cues.Heading || cues.Bold || cues.RunIn || endsAsLabel(text)) {
 		return []Part{{Role: Heading, Text: text, Key: key}}
 	}
 	// A bold lead that's a heading of its own, run into its text.

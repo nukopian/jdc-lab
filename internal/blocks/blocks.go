@@ -66,6 +66,11 @@ type Cues struct {
 	// nothing between, or a blank line in text laid out by its newlines.
 	// The space every paragraph has from the one before doesn't count.
 	Gap bool `json:"gap,omitempty"`
+	// RunIn is true for a heading internal/walls found run into the text
+	// of a wall, at a sentence's start, and split off as a Line of its own:
+	// "The Role" of "… completion. The Role Reporting to the MD …". Split
+	// never sets it.
+	RunIn bool `json:"run_in,omitempty"`
 }
 
 // An Item is a piece of text with its cues: a list item, or the text of a

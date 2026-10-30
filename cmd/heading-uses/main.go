@@ -25,6 +25,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 // use is one ad's use of the heading.
@@ -60,7 +61,7 @@ func find(source, key string) ([]use, error) {
 		if !d.First(ad) {
 			continue
 		}
-		ss := sections.Divide(headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...))
+		ss := sections.Divide(headings.Read(walls.Split(blocks.Split(ad.HTML)), ad.Title, ad.Locations()...))
 		for i, s := range ss {
 			if s.Heading == "" || headings.Key(s.Heading) != key {
 				continue

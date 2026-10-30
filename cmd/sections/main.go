@@ -39,6 +39,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 // record is one line of ads.jsonl.
@@ -111,7 +112,7 @@ func run(source, dir string) (t tally, err error) {
 		if !d.First(ad) {
 			continue
 		}
-		parts := sections.Joined(headings.Read(blocks.Split(ad.HTML), ad.Title, ad.Locations()...))
+		parts := sections.Joined(headings.Read(walls.Split(blocks.Split(ad.HTML)), ad.Title, ad.Locations()...))
 		ss := sections.Divide(parts)
 		t.add(ad.ID, parts, ss)
 		if err := enc.Encode(record{ID: ad.ID, Sections: ss}); err != nil {

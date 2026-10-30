@@ -1,6 +1,9 @@
 // Command blocks splits each job ad into blocks (see internal/blocks), writes
 // them to OUTDIR/ads.jsonl, one ad per line, and prints a summary: how many
-// blocks of each kind, and how many carry each cue.
+// blocks of each kind, how many carry each cue, and how many are walls,
+// which internal/walls splits into lines for the stages after, with the
+// headings found run into them. The blocks written are as split, before
+// the walls are.
 //
 // From the lab's folder:
 //
@@ -19,6 +22,7 @@ import (
 
 	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/blocks"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 // record is one line of the output.
@@ -34,6 +38,8 @@ type tally struct {
 	items              int
 	heading, bold, led int
 	gap                int
+	walls, wallLines   int
+	runIn              int
 }
 
 func main() {
@@ -101,6 +107,15 @@ func (t *tally) add(bs []blocks.Block) {
 		}
 	}
 	for _, b := range bs {
+		if walls.Is(b) {
+			t.walls++
+			for _, l := range walls.Split([]blocks.Block{b}) {
+				t.wallLines++
+				if l.Cues.RunIn {
+					t.runIn++
+				}
+			}
+		}
 		t.kinds[b.Kind]++
 		cues(b.Cues)
 		for _, it := range b.Items {
@@ -125,5 +140,7 @@ func (t tally) print(target string) {
 	fmt.Printf("%-10s %6d\n", "heading", t.heading)
 	fmt.Printf("%-10s %6d\n", "bold", t.bold)
 	fmt.Printf("%-10s %6d\n", "bold lead", t.led)
-	fmt.Printf("%-10s %6d\n", "gap", t.gap)
+	fmt.Printf("%-10s %6d\n\n", "gap", t.gap)
+	fmt.Printf("walls over %d characters: %d, split into %d lines, %d of them headings run in\n",
+		walls.MinChars, t.walls, t.wallLines, t.runIn)
 }

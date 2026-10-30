@@ -386,3 +386,22 @@ func TestReadTitleNotAdded(t *testing.T) {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }
+
+func TestReadRunIn(t *testing.T) {
+	bs := []blocks.Block{
+		{Kind: blocks.Line, Text: "We're a growing firm."},
+		{Kind: blocks.Line, Text: "Required Attributes and Experience", Cues: blocks.Cues{RunIn: true}},
+		{Kind: blocks.Line, Text: "The ideal person has ten years."},
+		{Kind: blocks.Line, Text: "Required Attributes and Experience"},
+	}
+	parts := Read(bs, "Manager")
+	want := []Role{Text, Heading, Text, Text}
+	for i, p := range parts {
+		if p.Role != want[i] {
+			t.Errorf("part %d %q: role %s, want %s", i, p.Text, p.Role, want[i])
+		}
+	}
+	if parts[1].Key != "required attributes and experience" {
+		t.Errorf("the run-in heading's key = %q", parts[1].Key)
+	}
+}

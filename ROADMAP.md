@@ -40,16 +40,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 5. Split walls of text into sentences
-
-**Serves:** structure
-
-Some ads are a wall of prose, with headings run into it, so nothing in a
-wall is found as a heading, and boilerplate inside it isn't found
-either. With the ads' own layout kept (roadmap 24), 375 ads in the
-samples still have a paragraph over 800 characters. The plan, and what
-was found, are in its
-[record](docs/changes/2026-10-30-r5-split-walls-of-text-into-sentences.md).
+Nothing at the moment.
 
 ## Next
 

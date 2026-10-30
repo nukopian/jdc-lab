@@ -1,14 +1,14 @@
 // Command shape shows job ads in each of the shapes the pipeline gives them
 // (see internal/shape): the HTML as stored, its blocks with their cues, the
-// role headings gives each, its sections and its chunks, one stage after
-// another, so you can judge how an ad changes shape, and where it goes
-// wrong.
+// walls split into sentences, the role headings gives each, its sections
+// and its chunks, one stage after another, so you can judge how an ad
+// changes shape, and where it goes wrong.
 //
 //	shape [-run DIR] [-stage NAME,...] AD...
 //
 // An AD is an ad's ID in the run's ads. -stage shows only the stages named:
-// posted, blocks, headings, sections or chunks. The stages run on the code
-// as it stands; only the chunks' boilerplate comes from the run, from its
+// posted, blocks, walls, headings, sections or chunks. The stages run on
+// the code as it stands; only the chunks' boilerplate comes from the run, from its
 // boilerplate/repeated.tsv, as chunk's does.
 //
 // From the lab's folder:

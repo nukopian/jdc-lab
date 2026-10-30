@@ -1,10 +1,12 @@
 # Split walls of text into sentences
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 5
 
 **Started:** 2026-10-30, in 051e5fee0a24f3d03609757e21679944f75a0ede
+
+**Finished:** 2026-10-30
 
 ## The plan
 
@@ -44,6 +46,17 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
 
 ## What happened
 
+- **Outcome.** Done when is met. The walls are measured before and
+  after (`pipeline compare latest claude/after`, `latest` being the
+  pipeline before walls): 10,874 walls over 400 characters, split into
+  35,305 lines, 66 of them headings run in, read by eye and all right;
+  heading uses 91,625 to 91,691, of a known kind 74,585 to 74,646; ads
+  with no heading 3,006 to 2,996, with only a summary 1,026 to 1,019.
+  Boilerplate in the walls: 39.2% of their text when judged whole only,
+  40.3% judged by sentence and whole; over all text 18.2% to 18.3%, and
+  ads over half boilerplate 2,340 to 2,365. Tests cover the splitting
+  and the run-in headings with made-up text in the shapes seen, and
+  PIPELINE.md has the new stage, Walls.
 - **Fewer walls than the plan says.** Its 80 ads with a paragraph over
   1,500 characters came from the first look at the sample, before
   blocks read a plain-text ad by its newlines. Counted again from
@@ -127,3 +140,37 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   `boilerplate.Verdicts` and `chunk.Ad.WriteText` for both, `chunk`'s
   output checked byte for byte the same for five ads in all three
   formats. Iain chose terminal text over web pages, and the name.
+- **Walls (step 3).** `internal/walls` splits each wall into its
+  sentences, a Line each, between blocks and headings, in every program
+  that reads headings and in `shape` (`-stage walls`); headings takes a
+  line with `run_in` as it takes bold; `cmd/blocks` counts walls and
+  run-in headings. The first run found 139 run-in headings, many wrong:
+  a known phrase followed by any capital took "Privacy" from "Privacy
+  Shield", "The Team" from "The Team Leader", "You will have" from "You
+  will have CSA accreditations", and "Salary:" from its value. So the
+  known phrase needs a colon or dash after it, or a capital word that
+  opens a sentence ("The", "We", "As", "Reporting" …), and a field's
+  label is never split off. Loosened by mistake to any word, it found
+  1,409, nearly all wrong; a test now holds the capital. Where both signs
+  find a heading, the longer wins ("Required" is a phrase, but "Required
+  Attributes and Experience" the title).
+- **Boilerplate (step 4).** Split into sentences, walls cost
+  boilerplate 39,783 characters (18.2% to 18.1%): in 310 agency footers
+  a sentence or two, too short to count (under 8 words) or too varied
+  for near-copy matching (under 20 words), was left in its section. So
+  boilerplate also judges each wall whole, as it was before splitting
+  (`Index.Wall`), and a sentence of a wall judged boilerplate is
+  boilerplate. Two rules were measured, behind a switch since taken out:
+  any wall repeated whole (Iain: "large passages repeated across ads are
+  likely template boilerplate") moved 93,462 characters in sections
+  about the job, among them employers' own duties repeated across their
+  ads; the wall judged whole by the usual rules moved 42,046, nearly all
+  agency footers and notices. Iain chose the second. The boilerplate
+  stage takes longer: 36 to about 50 seconds over the samples.
+- **What's left.** Verdicts are kept by text, not by ad, so one wall
+  judged boilerplate makes a sentence boilerplate wherever it's found:
+  "You'll be enhancing the lives of the people we support …", in 79
+  ads, is one employer's description of the work. Walls aren't counted
+  for the end-of-ad footer rule, only by section and spread. Flattened
+  bullets, run into a wall with no stops, aren't split; the plan named
+  them in its What, but no step did.

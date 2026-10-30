@@ -5,6 +5,7 @@ import (
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 // A Divided is an ad, with its sections.
@@ -26,11 +27,13 @@ func Read(path string) (all []Divided, ix Index, dups int, err error) {
 		if !d.First(a) {
 			continue
 		}
-		ss := sections.Divide(headings.Read(blocks.Split(a.HTML), a.Title, a.Locations()...))
+		bs := blocks.Split(a.HTML)
+		ss := sections.Divide(headings.Read(walls.Split(bs), a.Title, a.Locations()...))
 		src := SourceOf(a)
 		for _, s := range ss {
 			ix.Add(src, s.Kind, Texts([]sections.Section{s})...)
 		}
+		addWalls(&ix, src, bs, ss)
 		all = append(all, Divided{a, ss})
 	}
 	// Where a text stands is known only once every ad is in.
@@ -38,6 +41,33 @@ func Read(path string) (all []Divided, ix Index, dups int, err error) {
 		ix.Ends(SourceOf(a.Ad), Texts(a.Sections)...)
 	}
 	return all, ix, d.Duplicates, nil
+}
+
+// addWalls records an ad's walls whole, with the lines each was split
+// into, each in the section its first line is in (see Index.Wall).
+func addWalls(ix *Index, src Source, bs []blocks.Block, ss []sections.Section) {
+	kindOf := map[string]sections.Kind{}
+	for _, s := range ss {
+		for _, p := range s.Parts {
+			if _, ok := kindOf[p.Text]; !ok {
+				kindOf[p.Text] = s.Kind
+			}
+		}
+	}
+	for _, b := range bs {
+		if !walls.Is(b) {
+			continue
+		}
+		var lines []string
+		kind, found := sections.Summary, false
+		for _, l := range walls.Split([]blocks.Block{b}) {
+			lines = append(lines, l.Text)
+			if k, ok := kindOf[l.Text]; ok && !found {
+				kind, found = k, true
+			}
+		}
+		ix.Wall(src, kind, b.Text, lines...)
+	}
 }
 
 // Texts returns the text parts of sections, in order.

@@ -141,6 +141,9 @@ type Index struct {
 	// endsAdded is true when Ends has counted texts since the groups of
 	// texts alike were made, so they're to be made again.
 	endsAdded bool
+	// inWall maps a line's key to the walls it was split from, each whole
+	// (see Wall).
+	inWall map[string][]string
 }
 
 // text is what's known of a text: the distinct title keys of its ads,
@@ -190,6 +193,27 @@ func (ix *Index) record(key, title string, kind sections.Kind) {
 		x.describes++
 	} else {
 		x.elsewhere++
+	}
+}
+
+// Wall records a wall from an ad from src (see internal/walls) whole, as
+// it was before it was split, in a section of kind, and the lines it was
+// split into. A wall judged boilerplate whole, by the rules a text is
+// judged by, makes each of its lines boilerplate too, however short, or
+// changed a little from ad to ad: "Acme is a disability-confident
+// employer." is too short to count on its own, but not in Acme's footer.
+// A wall repeated whole in the sections that describe the job, as an
+// employer's own duties are, is a template for the job, and its lines too.
+func (ix *Index) Wall(src Source, kind sections.Kind, wall string, lines ...string) {
+	ix.Add(src, kind, wall)
+	if ix.inWall == nil {
+		ix.inWall = map[string][]string{}
+	}
+	for _, l := range lines {
+		k := headings.Key(l)
+		if !slices.Contains(ix.inWall[k], wall) {
+			ix.inWall[k] = append(ix.inWall[k], wall)
+		}
 	}
 }
 
@@ -280,6 +304,20 @@ func (ix *Index) Boilerplate(src Source, s string) bool {
 	if ix.endsAdded { // the groups of texts alike are to count the ends too
 		ix.alike, ix.groups, ix.endsAdded = nil, nil, false
 	}
+	if ix.judged(src, s) {
+		return true
+	}
+	for _, w := range ix.inWall[headings.Key(s)] {
+		if ix.judged(src, w) {
+			return true
+		}
+	}
+	return false
+}
+
+// judged is the verdict on s by its own counts, before its walls are
+// asked: see Boilerplate.
+func (ix *Index) judged(src Source, s string) bool {
 	job := JobLine(s)
 	for _, k := range ix.keys(src, s) {
 		n := ix.groupsOf(k)

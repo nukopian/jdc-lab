@@ -317,3 +317,34 @@ func TestFootersAlikeAtTheEnd(t *testing.T) {
 		t.Error("a long footer, alike in its ads' ending runs: Boilerplate = false, want true")
 	}
 }
+
+func TestWallJudgedWhole(t *testing.T) {
+	short := "Acme is a disability-confident employer."
+	long := "We welcome applications from everyone in every community across the region, whatever their background."
+	footer := short + " " + long
+	duty := "You'll plan the week's rota with the team leader."
+	duties := duty + " " + long
+	titles := []string{"Delivery Driver", "Head Chef", "Staff Nurse"}
+	var ix Index
+	for _, title := range titles {
+		src := Source{Title: title}
+		ix.Add(src, sections.Legal, short, long)
+		ix.Wall(src, sections.Legal, footer, short, long)
+	}
+	src := Source{Title: "Delivery Driver"}
+	for _, s := range []string{short, long} {
+		if !ix.Boilerplate(src, s) {
+			t.Errorf("%q, in a notices wall repeated under 3 groups of titles: not boilerplate", s)
+		}
+	}
+
+	var jobs Index
+	for _, title := range titles {
+		src := Source{Title: title}
+		jobs.Add(src, sections.Responsibilities, duty, long)
+		jobs.Wall(src, sections.Responsibilities, duties, duty, long)
+	}
+	if jobs.Boilerplate(src, duty) {
+		t.Errorf("%q, in an employer's duties repeated whole: boilerplate, want a template", duty)
+	}
+}

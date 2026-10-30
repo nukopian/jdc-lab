@@ -1,6 +1,7 @@
 // Package shape shows a job ad in each of the shapes the pipeline gives it,
 // stage by stage, as text to read: the HTML as posted, its blocks with
-// their cues, the role headings gives each, its sections, and its chunks.
+// their cues, the blocks with its walls split into sentences, the role
+// headings gives each, its sections, and its chunks.
 // Reading one ad down the stages shows where its shape changes, and which
 // stage to look at when it goes wrong.
 //
@@ -19,10 +20,11 @@ import (
 	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/sections"
+	"github.com/nukopian/jdc-lab/internal/walls"
 )
 
 // Stages are the stages Write shows, in the pipeline's order.
-var Stages = []string{"posted", "blocks", "headings", "sections", "chunks"}
+var Stages = []string{"posted", "blocks", "walls", "headings", "sections", "chunks"}
 
 // Write writes the ad at each of the stages named, or at all of them if none
 // is, in the pipeline's order, each under its name. boilerplate says
@@ -36,7 +38,8 @@ func Write(w io.Writer, a ads.Ad, boilerplate func(string) bool, stages ...strin
 	show := func(s string) bool { return len(stages) == 0 || slices.Contains(stages, s) }
 
 	bs := blocks.Split(a.HTML)
-	parts := headings.Read(bs, a.Title, a.Locations()...)
+	ws := walls.Split(bs)
+	parts := headings.Read(ws, a.Title, a.Locations()...)
 	ss := sections.Divide(parts)
 
 	var b strings.Builder
@@ -46,15 +49,18 @@ func Write(w io.Writer, a ads.Ad, boilerplate func(string) bool, stages ...strin
 	}
 	if show("blocks") {
 		fmt.Fprintf(&b, "\n## blocks: %d, as a reader sees them, with their cues\n\n", len(bs))
-		for i, bl := range bs {
-			if bl.Kind == blocks.List {
-				fmt.Fprintf(&b, "%3d list of %d\n", i+1, len(bl.Items))
-				for _, it := range bl.Items {
-					fmt.Fprintf(&b, "      - %s%s\n", it.Text, cues(it.Cues))
-				}
-				continue
+		writeBlocks(&b, bs)
+	}
+	if show("walls") {
+		n := 0
+		for _, bl := range bs {
+			if walls.Is(bl) {
+				n++
 			}
-			fmt.Fprintf(&b, "%3d %-9s %s%s\n", i+1, bl.Kind, bl.Text, cues(bl.Cues))
+		}
+		fmt.Fprintf(&b, "\n## walls: %d over %d characters, split into sentences, a line each\n\n", n, walls.MinChars)
+		if n > 0 {
+			writeBlocks(&b, ws)
 		}
 	}
 	if show("headings") {
@@ -104,6 +110,20 @@ func Write(w io.Writer, a ads.Ad, boilerplate func(string) bool, stages ...strin
 	return err
 }
 
+// writeBlocks writes blocks numbered, a list's items under it.
+func writeBlocks(b *strings.Builder, bs []blocks.Block) {
+	for i, bl := range bs {
+		if bl.Kind == blocks.List {
+			fmt.Fprintf(b, "%3d list of %d\n", i+1, len(bl.Items))
+			for _, it := range bl.Items {
+				fmt.Fprintf(b, "      - %s%s\n", it.Text, cues(it.Cues))
+			}
+			continue
+		}
+		fmt.Fprintf(b, "%3d %-9s %s%s\n", i+1, bl.Kind, bl.Text, cues(bl.Cues))
+	}
+}
+
 // cues writes a block's cues after its text, in brackets: "[bold, gap]".
 func cues(c blocks.Cues) string {
 	var cs []string
@@ -124,6 +144,9 @@ func cues(c blocks.Cues) string {
 	}
 	if c.Gap {
 		cs = append(cs, "gap")
+	}
+	if c.RunIn {
+		cs = append(cs, "run in")
 	}
 	if len(cs) == 0 {
 		return ""
