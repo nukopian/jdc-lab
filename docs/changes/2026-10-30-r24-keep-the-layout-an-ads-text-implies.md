@@ -139,3 +139,14 @@ re-measured on what's left.
   count, nor does a gap before a list's items. Over the three samples,
   69,126 lines and paragraphs have it (`pipeline compare claude/step3
   claude/after`), and nothing else moved, as nothing reads it yet.
+- **Tags left open (step 5).** A `<p>`, list or heading tag ends a
+  heading tag still open, keeping its cue; a heading tag after an
+  item's text leaves the item, as a `<p>` does since step 3 (the old
+  test that it stays in the item now says so); `breaks` covers HTML's
+  other block-level tags. For bold, the plan's "bold ends at a block's
+  end" was narrowed: a browser carries an unclosed `<b>` into the next
+  paragraph, and one ad wraps whole paragraphs in a `<strong>`, so only
+  bold opened inside a `<p>` ends with it. On the samples, which close
+  heading tags and use no other block tags, only that moved: 5 fewer
+  bold paragraphs, all footers after a forgotten `</strong>`, and one
+  more bold lead (`pipeline compare claude/step4 claude/after`).

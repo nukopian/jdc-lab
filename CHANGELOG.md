@@ -32,6 +32,13 @@ has the steps).
   `gap`: two `<br>`s with nothing between, or a blank line in text laid
   out by its newlines. Nothing decides anything from it yet; it's there
   for the stages that will (roadmap 24).
+- Tags left open are read as a browser reads them. A heading tag never
+  closed ends at the next block, keeping its heading cue, rather than
+  turning every later `<br>` into a space; bold opened in a paragraph
+  ends with it, so a forgotten `</strong>` no longer makes the footer
+  after it bold; and HTML's other block-level tags, such as `<aside>`
+  and `<center>`, end blocks, rather than running their text into the
+  next with no space (roadmap 24).
 - A 9 MB build of `chunk`, left at the root by a bare
   `go build ./cmd/chunk` and committed with everything else in v0.5.0,
   is gone. `.gitignore` claimed to hide such builds but didn't; it now

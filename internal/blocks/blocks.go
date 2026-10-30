@@ -139,6 +139,9 @@ type builder struct {
 	newlines int  // newlines since the last visible text
 	gap      bool // a blank line came since the last line or block
 	afterBr  bool // a <br> came since the last visible text, in this block
+
+	inP   bool // inside a <p>, closed or not
+	pBold int  // how many <strong> or <b> we were inside when it opened
 }
 
 func (b *builder) text(s string) {
@@ -212,13 +215,17 @@ func (b *builder) start(tag atom.Atom) {
 			b.afterBr = true
 		}
 	case isHeading(tag):
+		b.closeP()
+		b.endHeading()
 		if b.inItem {
-			b.piece.write(" ", false) // a heading in an item stays in the item
+			b.leaveItem()
 		} else {
 			b.endBlock()
 		}
 		b.heading++
 	case tag == atom.Li:
+		b.closeP()
+		b.endHeading()
 		if b.inItem {
 			b.endItem() // the item before, if its </li> was left out
 		} else {
@@ -226,6 +233,8 @@ func (b *builder) start(tag atom.Atom) {
 		}
 		b.inItem = true
 	case tag == atom.Ul || tag == atom.Ol:
+		b.closeP()
+		b.endHeading()
 		if b.inItem {
 			b.endItem() // the outer item's own text, before its sublist
 		} else {
@@ -233,7 +242,12 @@ func (b *builder) start(tag atom.Atom) {
 		}
 		b.list++
 	case breaks(tag):
+		b.closeP()
+		b.endHeading()
 		b.boundary()
+		if tag == atom.P {
+			b.inP, b.pBold = true, b.bold
+		}
 	}
 }
 
@@ -244,17 +258,12 @@ func (b *builder) end(tag atom.Atom) {
 	case tag == atom.Strong || tag == atom.B:
 		b.bold = max(b.bold-1, 0)
 	case isHeading(tag):
-		switch {
-		case b.inItem:
+		if b.inItem {
 			b.piece.write(" ", false)
-		case b.heading > 0:
-			if it, ok := b.piece.take(); ok {
-				it.Cues.Heading = true
-				it.Cues.Gap, b.gap = b.gap, false
-				b.add(Block{Kind: Paragraph, Text: it.Text, Cues: it.Cues})
-			}
+			b.heading = max(b.heading-1, 0)
+		} else {
+			b.endHeading()
 		}
-		b.heading = max(b.heading-1, 0)
 	case tag == atom.Li:
 		switch {
 		case b.inItem:
@@ -276,7 +285,41 @@ func (b *builder) end(tag atom.Atom) {
 			b.endList()
 		}
 	case breaks(tag):
+		if tag == atom.P {
+			b.closeP()
+		}
 		b.boundary()
+	}
+}
+
+// endHeading ends a heading tag, if one is open, as a Paragraph with the
+// heading cue: at its end tag, or at a block, list or heading that opens
+// before it, as when the end tag was left out ("<h3>Heading<p>Text").
+// Inside a list item, the heading's text stays in the item.
+func (b *builder) endHeading() {
+	if b.heading == 0 {
+		return
+	}
+	b.heading = 0
+	if b.inItem {
+		return
+	}
+	if it, ok := b.piece.take(); ok {
+		it.Cues.Heading = true
+		it.Cues.Gap, b.gap = b.gap, false
+		b.add(Block{Kind: Paragraph, Text: it.Text, Cues: it.Cues})
+	}
+}
+
+// closeP ends a <p>, at its end tag or at a block or list that opens
+// before it, closing it as a browser does. Bold opened in the paragraph
+// ends with it, closed or not, though a browser carries it on: where ads
+// leave a <strong> open, the paragraph after is a footer, not meant bold.
+// Bold around the paragraph goes on.
+func (b *builder) closeP() {
+	if b.inP {
+		b.bold = min(b.bold, b.pBold)
+		b.inP = false
 	}
 }
 
@@ -430,7 +473,10 @@ func breaks(tag atom.Atom) bool {
 	switch tag {
 	case atom.P, atom.Div, atom.Section, atom.Article, atom.Header, atom.Footer,
 		atom.Blockquote, atom.Pre, atom.Table, atom.Tr, atom.Td, atom.Th,
-		atom.Dl, atom.Dt, atom.Dd, atom.Hr:
+		atom.Dl, atom.Dt, atom.Dd, atom.Hr,
+		atom.Main, atom.Nav, atom.Aside, atom.Address, atom.Figure, atom.Figcaption,
+		atom.Details, atom.Summary, atom.Form, atom.Fieldset, atom.Legend,
+		atom.Hgroup, atom.Menu, atom.Center, atom.Caption:
 		return true
 	}
 	return false

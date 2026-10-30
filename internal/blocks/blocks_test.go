@@ -355,9 +355,32 @@ Responsibilities
 			[]string{"list", `  "One"`, `  "Two"`, `paragraph "After the list."`, `paragraph "More text."`},
 		},
 		{
-			"a heading tag inside an item stays in the item",
+			"a heading tag after an item's text leaves it, as a <p> does",
 			`<ul><li>Intro <h3>Head</h3> more</li></ul>`,
-			[]string{"list", `  "Intro Head more"`},
+			[]string{"list", `  "Intro"`, `paragraph "Head" heading`, `paragraph "more"`},
+		},
+		{
+			"a heading tag never closed ends at the next block, keeping its cue",
+			`<h3>Heading<p>Text under it.<br>Its second line.<p>More text.`,
+			[]string{`paragraph "Heading" heading`, `line "Text under it."`, `line "Its second line."`,
+				`paragraph "More text."`},
+		},
+		{
+			"bold opened in a paragraph ends with it, closed or not",
+			`<p><b>Heading<p>Text under it.</p><p><strong>Notice</p><p>Footer</p>`,
+			[]string{`paragraph "Heading" bold`, `paragraph "Text under it."`, `paragraph "Notice" bold`,
+				`paragraph "Footer"`},
+		},
+		{
+			"bold around paragraphs stays on each",
+			`<strong><p>One</p><p>Two</p></strong><p>Three</p>`,
+			[]string{`paragraph "One" bold`, `paragraph "Two" bold`, `paragraph "Three"`},
+		},
+		{
+			"HTML's other block-level tags end blocks too",
+			`<section>First<aside>Second</aside><center>Third</center><figure>Fourth<figcaption>Fifth</figcaption></figure>`,
+			[]string{`paragraph "First"`, `paragraph "Second"`, `paragraph "Third"`, `paragraph "Fourth"`,
+				`paragraph "Fifth"`},
 		},
 	}
 	for _, tt := range tests {

@@ -179,6 +179,17 @@ stands where it is, and ends the list before it, so that nothing comes
 out of the ad's order. An item that really is two lines (`Days<br>Nights`)
 is split too: the price of finding what's run into the others.
 
+**Tags left open.** Ads leave out end tags, so an opening tag is taken
+to end what's open before it, as a browser takes it: a `<p>`, a list or
+a heading tag ends a `<p>` or a heading tag still open, keeping the
+heading's cue, and a `<p>` or `<br>` after an item's text ends the item
+(see Lists), so a list never closed doesn't swallow the rest of the ad.
+Bold opened in a paragraph ends with it, closed or not: in the samples,
+each of the 5 paragraphs a `<strong>` left open ran into is a footer
+after a forgotten `</strong>`, not text meant bold. Bold around
+paragraphs goes on. HTML's other block-level tags, such as `<aside>`, `<center>`
+and `<figure>`, end blocks too, though none is in the samples.
+
 It decides nothing. Whether a bold block is a heading is the next stage's
 call, which keeps the HTML parsing apart from the judgement, so either
 can change without the other.
