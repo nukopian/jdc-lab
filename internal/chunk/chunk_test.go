@@ -239,8 +239,10 @@ func TestFacts(t *testing.T) {
 			facts = c
 		}
 	}
-	if facts.Use != Metadata || facts.Text != "- 40hrs pw\n- 50,000pa + excellent bonus and benefits" || len(facts.Facts) != 2 ||
-		facts.Facts[0].Kind != "hours" || facts.Facts[1].Values["min"] != "50000" || !strings.Contains(facts.PlacedBy, "facts") {
+	// The sentence kept in the summary has its fact listed too.
+	if facts.Use != Metadata || facts.Text != "- 40hrs pw\n- 50,000pa + excellent bonus and benefits" || len(facts.Facts) != 3 ||
+		facts.Facts[0].Kind != "hours" || facts.Facts[1].Values["min"] != "50000" ||
+		facts.Facts[2].Kind != "pattern" || facts.Facts[2].Values["value"] != "permanent" || !strings.Contains(facts.PlacedBy, "facts") {
 		t.Errorf("the facts: %+v", facts)
 	}
 	d := kind(cs, sections.Details)
@@ -368,5 +370,96 @@ func TestGuess(t *testing.T) {
 	cs := Of([]sections.Section{duties}, never)
 	if len(cs) != 1 || cs[0].Kind != sections.Requirements || cs[0].Use != Embed || !strings.HasPrefix(cs[0].PlacedBy, "guessed") {
 		t.Errorf("the chunks: %+v; want one guessed requirements chunk", cs)
+	}
+}
+
+// A field stays in its section's chunk, and is listed in the details too,
+// as metadata, wherever it's written; its text isn't repeated there.
+func TestFieldsInDetailsToo(t *testing.T) {
+	contract := headings.Part{Role: headings.Field, Text: "Contract type: Permanent", Key: "contract type", Value: "Permanent"}
+	pay := headings.Part{Role: headings.Field, Text: "Pay rate: £13.00 per hour", Key: "pay rate", Value: "£13.00 per hour"}
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{text("We deliver parcels across the north of England."), contract}},
+		{Kind: sections.Benefits, Heading: "Benefits", Parts: []headings.Part{pay, text("A pension.")}},
+	}
+	cs := Of(ss, func(string) bool { return false })
+	var details *Chunk
+	for i := range cs {
+		if cs[i].Kind == sections.Details {
+			details = &cs[i]
+		}
+	}
+	if details == nil {
+		t.Fatalf("no details chunk in %+v", cs)
+	}
+	want := []Field{{"contract type", "Permanent"}, {"pay rate", "£13.00 per hour"}}
+	if !reflect.DeepEqual(details.Fields, want) {
+		t.Errorf("the details' fields: %+v, want %+v", details.Fields, want)
+	}
+	if details.Text != "" || details.Tokens != 0 {
+		t.Errorf("the details repeat the fields' text: %q, %d tokens", details.Text, details.Tokens)
+	}
+	if !strings.Contains(cs[0].Text, "Contract type: Permanent") || len(cs[0].Fields) != 1 {
+		t.Errorf("the summary lost its field: %+v", cs[0])
+	}
+	if !strings.Contains(cs[1].Text, "Pay rate: £13.00 per hour") || len(cs[1].Fields) != 1 {
+		t.Errorf("the benefits lost their field: %+v", cs[1])
+	}
+}
+
+// A fact stated in a section's prose stays there, and is listed in the
+// details too: a working pattern written into the role is metadata.
+func TestFactsInProseInDetailsToo(t *testing.T) {
+	line := "You'll work Monday to Friday, 8am to 4pm, from our depot."
+	ss := []sections.Section{
+		{Kind: sections.Role, Heading: "The Role", Parts: []headings.Part{text("You'll deliver parcels to homes."), text(line)}},
+	}
+	cs := Of(ss, func(string) bool { return false })
+	if !strings.Contains(cs[0].Text, line) {
+		t.Errorf("the role lost its line: %q", cs[0].Text)
+	}
+	var details *Chunk
+	for i := range cs {
+		if cs[i].Kind == sections.Details {
+			details = &cs[i]
+		}
+	}
+	if details == nil || len(details.Facts) == 0 {
+		t.Fatalf("no facts listed in the details: %+v", cs)
+	}
+	if details.Text != "" {
+		t.Errorf("the details repeat the role's line: %q", details.Text)
+	}
+}
+
+// Salary written in the benefits stays there, and is listed in the details.
+func TestFactsLeftOutInDetailsToo(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Benefits, Heading: "Benefits", Parts: []headings.Part{text("A salary of £30,000 a year, and a pension.")}},
+	}
+	cs := Of(ss, func(string) bool { return false })
+	for _, c := range cs {
+		if c.Kind == sections.Details {
+			for _, f := range c.Facts {
+				if f.Kind == "pay" {
+					return
+				}
+			}
+		}
+	}
+	t.Errorf("no pay fact listed in the details: %+v", cs)
+}
+
+// Facts in what the employer says of itself, or of applying, aren't the
+// job's, and aren't listed in the details.
+func TestFactsAboutTheEmployerNotInDetails(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Company, Heading: "About us", Parts: []headings.Part{text("We place staff in temporary, contract and permanent roles.")}},
+		{Kind: sections.Apply, Heading: "How to apply", Parts: []headings.Part{text("If you have not heard from us within 48 hours, please call.")}},
+	}
+	for _, c := range Of(ss, func(string) bool { return false }) {
+		if c.Kind == sections.Details {
+			t.Errorf("facts about the employer listed in the details: %+v", c.Facts)
+		}
 	}
 }

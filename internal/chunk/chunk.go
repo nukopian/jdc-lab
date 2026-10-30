@@ -11,6 +11,10 @@
 // advertiser's or after the apply text, its text goes to the boilerplate
 // chunk, under its heading, and its fields to a details chunk.
 //
+// Fields, and facts in prose, stay in their sections' chunks, but the details
+// list them too, as metadata, without their text: every field, and every fact
+// read in a section's lines, but those about the employer or applying.
+//
 // Text found as boilerplate leaves the embedded chunks for
 // one chunk of its own, at the end, left out but there to see, each line
 // with the section it came from: the verdict catches advertisers'
@@ -84,7 +88,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	var cs []Chunk
 	var gathered []string                // the boilerplate of the embedded chunks, and the unmapped text
 	unmapped := 0                        // the unmapped text's tokens
-	var found Chunk                      // the lines of facts taken from the chunks
+	var found Chunk                      // the lines of facts taken from the chunks, and every field and fact
 	worded := map[sections.Kind]*Chunk{} // lines placed by their wording, by kind
 	var wordedKinds []sections.Kind      // in the order first found
 	takeWording := func(s sections.Section, p headings.Part) bool {
@@ -170,7 +174,21 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 				continue
 			}
 			if p.Role == headings.Field {
-				c.Fields = append(c.Fields, Field{Label: p.Key, Value: p.Value})
+				f := Field{Label: p.Key, Value: p.Value}
+				c.Fields = append(c.Fields, f)
+				// A field is metadata wherever it's written, so the details
+				// list it too, without its text, which stays where it is.
+				if s.Kind != sections.Details {
+					found.Fields = append(found.Fields, f)
+				}
+			}
+			// So is a fact: a working pattern in the role, or salary in
+			// the benefits, is listed in the details as well. Not from what
+			// the employer says of itself or of applying, though: there
+			// "temporary, contract and permanent roles" are an agency's, and
+			// "within 48 hours" a reply's.
+			if s.Kind != sections.Details && !aboutTheEmployer(s.Kind) {
+				found.Facts = append(found.Facts, placeless(facts.Find(p.Text))...)
 			}
 			lines = append(lines, line(p))
 		}
@@ -190,11 +208,11 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		w.PlacedBy = "lines placed by their wording (openings.txt): " + strings.TrimPrefix(w.PlacedBy, ", ")
 		cs = append(cs, *w)
 	}
-	if found.Text != "" {
+	if found.Text != "" || len(found.Fields) > 0 || len(found.Facts) > 0 {
 		found.Kind, found.Use = sections.Details, Metadata
 		found.Text = strings.TrimPrefix(found.Text, "\n")
 		found.Tokens = Tokens(found.Text)
-		found.PlacedBy = "lines of facts, read by the facts grammars (pay, hours, work pattern, schedule, location), from the chunks above"
+		found.PlacedBy = "lines of facts, read by the facts grammars (pay, hours, work pattern, schedule, location), and the fields and facts of the chunks above, which keep them"
 		cs = append(cs, found)
 	}
 	// What says what the job is comes first, in that order; the rest
@@ -260,6 +278,12 @@ func placeless(fs []facts.Fact) []facts.Fact {
 		fs[i].From = 0
 	}
 	return fs
+}
+
+// aboutTheEmployer reports whether a kind of section is about the employer
+// or applying, not the job: its facts are seldom the job's.
+func aboutTheEmployer(k sections.Kind) bool {
+	return k == sections.Company || k == sections.Apply || k == sections.Legal
 }
 
 // firsts are the kinds of chunk that come first, in this order.

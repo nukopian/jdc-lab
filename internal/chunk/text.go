@@ -22,8 +22,10 @@ func (a Ad) WriteText(w io.Writer) error {
 		a.Tokens, a.Embedded, share(a.Embedded), a.Unclassified, share(a.Unclassified))
 	for i, ch := range a.Chunks {
 		fmt.Fprintf(&b, "\n[%d] %s · %s · about %d tokens\n    placed by %s\n", i+1, ch.Kind, ch.Use, ch.Tokens, ch.PlacedBy)
-		for _, line := range strings.Split(ch.Text, "\n") {
-			fmt.Fprintf(&b, "    | %s\n", line)
+		if ch.Text != "" {
+			for _, line := range strings.Split(ch.Text, "\n") {
+				fmt.Fprintf(&b, "    | %s\n", line)
+			}
 		}
 		for _, f := range ch.Fields {
 			fmt.Fprintf(&b, "    field %s: %s\n", f.Label, f.Value)

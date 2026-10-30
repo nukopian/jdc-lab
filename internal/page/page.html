@@ -34,7 +34,7 @@
       <p class="use">{{.Use}} · about {{.Tokens}} tokens</p>
       <p class="placed">placed by {{.PlacedBy}}</p>
       <div class="text">
-        {{range lines .}}{{if .Item}}<p class="item">{{with .From}}<span class="from">{{.}}</span> {{end}}{{.Text}}</p>{{else}}<p>{{.Text}}</p>{{end}}{{else}}<p class="empty">(nothing under it)</p>{{end}}
+        {{range lines .}}{{if .Item}}<p class="item">{{with .From}}<span class="from">{{.}}</span> {{end}}{{.Text}}</p>{{else}}<p>{{.Text}}</p>{{end}}{{else}}{{if not .Fields}}<p class="empty">(nothing under it)</p>{{end}}{{end}}
       </div>
       {{with .Fields}}
       <table class="fields"><caption>fields</caption>

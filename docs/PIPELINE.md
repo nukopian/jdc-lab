@@ -646,6 +646,17 @@ apart by "|", "," or "/": "Leeds | Permanent" is a line of facts,
 gains the facts read from them. A known field label followed by " - "
 is a field, as one followed by a colon is.
 
+**Fields and facts in details too.** A field, or a fact in a line of
+prose, is metadata wherever it's written, but also part of what its
+section says: a working pattern in the role, salary in the benefits. So
+it stays in its section's chunk, and the details chunk of lines of
+facts lists it as well, without its text, so no token counts twice:
+every field, with its label and value, and every fact read in a
+section's lines. Not those in the company, apply and legal sections,
+though: there "temporary, contract and permanent roles" are an
+agency's, and "within 48 hours" a reply's. The pages and the view show
+each chunk's fields, and the pages its facts.
+
 ### Pages before and after
 
 **Package** `internal/page`, **program** `cmd/chunk -pages`.

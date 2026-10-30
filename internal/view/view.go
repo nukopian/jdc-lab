@@ -126,7 +126,7 @@ func Render(w io.Writer, ad ads.Ad, c chunk.Ad, lost Lost) error {
 		if ch.Heading != "" && len(lines) > 0 && lines[0] == ch.Heading {
 			lines = lines[1:] // the heading is the chunk's own heading, above
 		}
-		if len(lines) == 0 || lines[0] == "" && len(lines) == 1 {
+		if (len(lines) == 0 || lines[0] == "" && len(lines) == 1) && len(ch.Fields) == 0 {
 			b.WriteString("*(nothing under it)*\n\n")
 		}
 		inList := false
@@ -146,6 +146,13 @@ func Render(w io.Writer, ad ads.Ad, c chunk.Ad, lost Lost) error {
 			b.WriteString(escape(line) + "\n\n")
 		}
 		if inList {
+			b.WriteString("\n")
+		}
+		if len(ch.Fields) > 0 {
+			b.WriteString("*fields:*\n\n")
+			for _, f := range ch.Fields {
+				fmt.Fprintf(&b, "- %s: %s\n", escape(f.Label), escape(f.Value))
+			}
 			b.WriteString("\n")
 		}
 	}

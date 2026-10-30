@@ -12,6 +12,13 @@ has the steps).
 
 ## Unreleased
 
+- The details list every field and fact an ad states, wherever it's
+  written, as well as the lines of facts taken there: a field such as
+  "Contract type: Permanent" in the summary, a working pattern in the
+  role, salary in the benefits. Each stays in its own section too, and
+  its text isn't repeated, so no token counts twice; facts in what the
+  employer says of itself or of applying aren't the job's, and aren't
+  listed. The pages and each run's view show every chunk's fields.
 - Walls of text, paragraphs over 400 characters, are split into
   sentences, a line each, so the headings run into them are found
   ("… completion. The Role Reporting to the MD …", "Required Attributes
