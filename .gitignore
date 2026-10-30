@@ -16,6 +16,7 @@
 
 # Working notes: they carry context that isn't for publishing
 CLAUDE.md
+CLAUDE.*.md
 
 # PDFs of the documents, built on demand by scripts/readme-pdf.sh
 *.pdf
