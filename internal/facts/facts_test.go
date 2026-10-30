@@ -111,6 +111,9 @@ func TestLabelsAndBonuses(t *testing.T) {
 		{"£30 bonus for short-notice cover", nil},
 		{"£32,500 basic salary plus bonus", []string{"pay: £32,500"}},
 		{"£28k + bonus", []string{"pay: £28k"}},
+		{"£30,000 plus bonus", []string{"pay: £30,000"}},
+		{"£30,000 per annum plus bonus", []string{"pay: £30,000 per annum"}},
+		{"£30k with bonus", []string{"pay: £30k"}},
 	}
 	for _, tt := range tests {
 		var got []string

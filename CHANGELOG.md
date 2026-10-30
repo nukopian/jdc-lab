@@ -12,6 +12,15 @@ has the steps).
 
 ## Unreleased
 
+- The wash-up before this release, by an independent review, found
+  four faults in today's work, each now fixed with a test: the bonus
+  rule dropped pay before "plus bonus" or "with bonus" (51 ads); a
+  company section's lines of facts were taken to the details as the
+  job's (33 ads); requirements placed by their wording came under
+  "Desirable" (about 46 ads); and a heading tag left open and ended by
+  a block's end tag swallowed the text after it, and a plain-text ad's
+  leading blank lines gave its first block a gap (neither in the
+  samples).
 - grammar v0.4.1, which gives a rule whose only text-matching part is
   one word list, beside lookarounds, the list's value: the work pattern
   grammar is one rule again, its lookahead beside its word list, where

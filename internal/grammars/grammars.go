@@ -10,13 +10,16 @@ import "github.com/nukopian/grammar"
 // Pay is a figure of money: with a currency sign, or a period, or both,
 // as one or a range, "up to" it, or not. A figure with neither isn't
 // pay ("5 years"), though facts.Find takes one after a pay label; nor is
-// a bonus, a figure followed by "bonus", with at most a word between.
+// a bonus, a figure followed by "bonus", with at most a word between that
+// isn't "plus", "with" or the like: "£30,000 plus bonus" is pay.
 var Pay = grammar.MustCompile(`
 grammar Pay {
     token TOP    { [ $<upto>=[ :i up \s+ to ] \s+ ]? <cur>? \s? <min=amount>
                    [ <.sep> <cur>? \s? <max=amount> ]? <period>? <!before <.bonus>> }
-    # A bonus isn't pay: "£30 bonus for cover", "£1,500 joining bonus".
-    token bonus  { \s+ [ :i bonus >> | <[a..zA..Z-]>+ \s+ :i bonus >> ] }
+    # A bonus isn't pay: "£30 bonus for cover", "£1,500 joining bonus";
+    # but pay "plus bonus" or "with bonus" is pay, with a bonus besides.
+    token bonus  { \s+ [ :i bonus >>
+                       | <!before :i [ plus | with | and | or | including | incl | inc ] >> > <[a..zA..Z-]>+ \s+ :i bonus >> ] }
     token cur    { '£' | '$' | '€' }
     token amount { <num> [ $<k>=[ :i k ] >> ]? }
     token num    { \d+ [ ',' \d ** 3 ]* [ '.' \d+ ]? }

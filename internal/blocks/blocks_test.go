@@ -377,6 +377,16 @@ Responsibilities
 			[]string{`paragraph "One" bold`, `paragraph "Two" bold`, `paragraph "Three"`},
 		},
 		{
+			"a heading tag left open ends with the block around it",
+			"<div><h3>Benefits</div>Holiday pay\nPension<p>Next</p>",
+			[]string{`paragraph "Benefits" heading`, `line "Holiday pay"`, `line "Pension"`, `paragraph "Next"`},
+		},
+		{
+			"blank lines before all of a plain-text ad are no gap",
+			"\n\nHello\n\nThere",
+			[]string{`paragraph "Hello"`, `paragraph "There" gap`},
+		},
+		{
 			"HTML's other block-level tags end blocks too",
 			`<section>First<aside>Second</aside><center>Third</center><figure>Fourth<figcaption>Fifth</figcaption></figure>`,
 			[]string{`paragraph "First"`, `paragraph "Second"`, `paragraph "Third"`, `paragraph "Fourth"`,

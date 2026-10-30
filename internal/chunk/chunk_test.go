@@ -550,7 +550,7 @@ func TestRequirementsOneChunk(t *testing.T) {
 		t.Fatalf("got %d requirements chunks, want 1: %+v", len(reqs), reqs)
 	}
 	r := reqs[0]
-	want := "Essential\n- A forklift licence\n- Two years in a warehouse\nDesirable\n- A first aid certificate\nExperience of CNC machines."
+	want := "Essential\n- A forklift licence\n- Two years in a warehouse\nExperience of CNC machines.\nDesirable\n- A first aid certificate"
 	if r.Kind != sections.Requirements || r.Use != Embed || r.Text != want {
 		t.Errorf("the requirements: %s, %s,\n%s\nwant:\n%s", r.Kind, r.Use, r.Text, want)
 	}
@@ -626,5 +626,41 @@ func TestCompanyWithTheSummary(t *testing.T) {
 	}
 	if b := kind(cs, Boilerplate); !strings.Contains(b.Text, "Acme is an equal opportunities employer.") {
 		t.Errorf("the company's standard text isn't boilerplate: %q", b.Text)
+	}
+}
+
+// The company's lines of facts are the employer's, not the job's: they
+// stay in its text, with the summary, and aren't taken to the details.
+func TestCompanyFactsStay(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{text("We're hiring a driver.")}},
+		{Kind: sections.Company, Heading: "About us", Parts: []headings.Part{
+			text("Temporary, contract and permanent roles"), text("Head office: Leeds LS1 4AB"),
+		}},
+	}
+	cs := Of(ss, func(string) bool { return false })
+	for _, c := range cs {
+		if c.Kind == sections.Details {
+			t.Errorf("the company's lines taken to the details: %q, %+v", c.Text, c.Facts)
+		}
+	}
+	if s := kind(cs, sections.Summary); !strings.Contains(s.Text, "Head office: Leeds LS1 4AB") {
+		t.Errorf("the company's line left its text: %q", s.Text)
+	}
+}
+
+// Lines placed as requirements by their wording are requirements, not
+// desirable: they come before the "Desirable" sub-list.
+func TestDesirableLast(t *testing.T) {
+	item := func(s string) headings.Part { return headings.Part{Role: headings.Text, Text: s, Item: true} }
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{text("We're hiring."), text("Experience of HGV driving essential")}},
+		{Kind: sections.Requirements, Heading: "Essential", Parts: []headings.Part{item("Patience")}},
+		{Kind: sections.Desirable, Heading: "Desirable", Parts: []headings.Part{item("A forklift ticket")}},
+	}
+	r := kind(Of(ss, func(string) bool { return false }), sections.Requirements)
+	want := "Essential\n- Patience\nExperience of HGV driving essential\nDesirable\n- A forklift ticket"
+	if r.Text != want {
+		t.Errorf("the requirements:\n%s\nwant:\n%s", r.Text, want)
 	}
 }

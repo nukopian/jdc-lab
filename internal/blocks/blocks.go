@@ -187,7 +187,7 @@ func (b *builder) text(s string) {
 				b.piece.write(" ", b.bold > 0)
 			case b.newlines > 1:
 				b.endBlock()
-				b.gap = true
+				b.gap = b.started() // a blank line before all of it is no gap
 			default:
 				b.endLine()
 			}
@@ -293,6 +293,7 @@ func (b *builder) end(tag atom.Atom) {
 		if tag == atom.P {
 			b.closeP()
 		}
+		b.endHeading() // a heading tag left open ends with the block around it
 		b.boundary()
 	}
 }

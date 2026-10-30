@@ -198,7 +198,8 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			lines = append(lines, s.Heading)
 		}
 		for _, p := range s.Parts {
-			if c.Use == Embed && (takeFacts(p) || takeWording(s, p)) {
+			// The company's lines of facts are the employer's, and stay.
+			if c.Use == Embed && ((!aboutTheEmployer(s.Kind) && takeFacts(p)) || takeWording(s, p)) {
 				continue
 			}
 			if c.Use == Embed && p.Role == headings.Text && boilerplate(p.Text) {
@@ -348,6 +349,11 @@ func together(cs []Chunk) []Chunk {
 			out[i] = ps[0]
 			continue
 		}
+		// The desirable come after the requirements, those placed by their
+		// wording too.
+		slices.SortStableFunc(ps, func(a, b Chunk) int {
+			return cmp.Compare(boolInt(a.Kind == sections.Desirable), boolInt(b.Kind == sections.Desirable))
+		})
 		r := Chunk{Kind: c.Kind, Use: ps[0].Use}
 		var texts, placed []string
 		for _, p := range ps {
@@ -370,6 +376,13 @@ func together(cs []Chunk) []Chunk {
 		out[i] = r
 	}
 	return out
+}
+
+func boolInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 // once returns fs with each fact listed once, by its kind and values, and

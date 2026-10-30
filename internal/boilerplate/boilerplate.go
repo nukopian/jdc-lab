@@ -204,7 +204,9 @@ func (ix *Index) record(key, title string, kind sections.Kind) {
 // "Acme is a disability-confident employer." is too short to count on its
 // own, but not in Acme's footer. A line repeated enough to be judged
 // keeps its own verdict: an agency's opening line about the job ("English
-// teacher required for …") stays a template for it.
+// teacher required for …") stays a template for it. As every verdict is a
+// text's, over all the ads it's in, a line a wall makes boilerplate is
+// boilerplate in every ad it's in, in a wall or not.
 // A wall repeated whole in the sections that describe the job, as an
 // employer's own duties are, is a template for the job, and its lines too.
 func (ix *Index) Wall(src Source, kind sections.Kind, wall string, lines ...string) {
