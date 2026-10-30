@@ -12,6 +12,14 @@ has the steps).
 
 ## Unreleased
 
+- `shape` shows a job ad at each stage of the pipeline, from its HTML
+  as stored to its blocks with their cues, the role headings gives each
+  part, its sections and its chunks, so you can judge how it changes
+  shape and find the stage where it goes wrong: `shape 225682313`, or
+  `shape -stage blocks,headings 225682313` for some stages only. It
+  runs the code as it stands. `chunk`'s ways of finding an ad, reading
+  a run's boilerplate and writing chunks as text moved into packages for
+  both to use, its output unchanged (roadmap 5).
 - Headings and fields an ad lays out by its newlines, rather than by
   its tags, are found. An ad with any tag that lays out blocks was read
   as a browser shows it, newlines as spaces, so "Key Responsibilities"

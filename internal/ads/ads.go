@@ -100,3 +100,20 @@ func (d *Distinct) First(a Ad) bool {
 	d.seen[a.HTML] = true
 	return true
 }
+
+// ErrNotFound is what Find's error wraps when the file has no ad of the ID.
+var ErrNotFound = errors.New("no ad of that ID")
+
+// Find returns the first ad in the file at path with the ID id, reading as
+// File does, or an error wrapping ErrNotFound if there's none.
+func Find(path, id string) (Ad, error) {
+	for ad, err := range File(path) {
+		if err != nil {
+			return Ad{}, err
+		}
+		if ad.ID == id {
+			return ad, nil
+		}
+	}
+	return Ad{}, fmt.Errorf("%s: %w: %s", path, ErrNotFound, id)
+}

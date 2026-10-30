@@ -99,6 +99,7 @@ go run ./cmd/view           data/ingestion/ads-20261025.jsonl data/view
 ```
 
 `cmd/heading-uses` is for looking at one heading across a sample's ads,
+and `cmd/shape` at one ad down every stage, from its HTML to its chunks,
 when improving the stages (see [Improving it](#improving-it)).
 `go install ./cmd/...` puts the programs in `bin/`, on the lab's `PATH`,
 so they can be run by name. Ads whose HTML is the same as an earlier
@@ -649,8 +650,8 @@ short. Improving the pipeline is a loop over them:
    on the samples together (see [Before and after](#before-and-after)).
 2. **Pick** the biggest gap: the table row with the most ads or text.
 3. **Look** at it in the ads, in context, before deciding anything:
-   `view/ads.md` has 20 of them, and `cmd/heading-uses` every use of a
-   heading.
+   `view/ads.md` has 20 of them, `cmd/heading-uses` every use of a
+   heading, and `cmd/shape` one ad at every stage.
 4. **Change one thing:** a phrase, a label, a rule, a threshold.
 5. **Measure again,** as the run `claude/after`, and compare. Keep the
    change only if it helped and broke nothing. A change that fits one
@@ -726,14 +727,20 @@ head -20 $r/headings/fields.tsv
 ```
 
 **Why did an ad come out as it did?** Take its id (here the first from
-`heading-uses`), then see its blocks, and its HTML, to tell a block
-split wrongly from a heading judged wrongly:
+`heading-uses`), and read it down the stages with `shape`: its HTML as
+stored, its blocks with their cues, the role headings gave each part,
+its sections and its chunks. The first stage where its shape goes wrong
+is the one to change: a block split wrongly, say, or a heading judged
+wrongly. `-stage` shows only the stages named:
 
 ```
 id=$(go run ./cmd/heading-uses "$ads" "please note" | awk '$1 ~ /^[0-9]+$/ {print $1; exit}')
-jq -c --arg id "$id" 'select(.id == $id) | .blocks[]' $r/blocks/ads.jsonl | head -20
-jq -r --arg id "$id" 'select(.id == $id) | .html' "$ads" | head -c 3000
+go run ./cmd/shape "$id"
+go run ./cmd/shape -stage blocks,headings "$id"
 ```
+
+It runs the code as it stands, so after a change it shows the change;
+only the chunks' boilerplate comes from the run, as `chunk`'s does.
 
 **Is a boilerplate verdict wrong?** Templates under three or more title
 groups are worth a look, as footers filed under requirements end up
@@ -908,7 +915,7 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Word | Meaning |
 |---|---|
 | block | a paragraph, line or list, as a reader sees it |
-| cue | what the markup says about text: heading tag, bold, bold lead |
+| cue | what the markup says about text: heading tag, bold, bold lead, a gap before it |
 | part | a block or list item with its role |
 | role | heading, field, repeat or text |
 | key | the normalised form of text, for matching only |

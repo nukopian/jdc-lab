@@ -117,3 +117,13 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   eye, were all right, and the only stops before a capital it kept
   inside a sentence were 4 after "e.g.". Nothing calls it yet: the
   walls stage (step 3) will.
+- **A tool to review an ad's shape, at Iain's request, as part of this
+  item.** `cmd/shape`, on `internal/shape`, prints an ad at each stage
+  (its HTML as stored, blocks with cues, the role headings gives each
+  part, sections, chunks), or only the stages named, running the code as
+  it stands, so that the walls stage can be judged ad by ad; the walls
+  will be a stage of it. `chunk`'s finding of an ad, reading of a run's
+  boilerplate verdicts and text writer moved into `ads.Find`,
+  `boilerplate.Verdicts` and `chunk.Ad.WriteText` for both, `chunk`'s
+  output checked byte for byte the same for five ads in all three
+  formats. Iain chose terminal text over web pages, and the name.

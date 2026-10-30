@@ -49,6 +49,7 @@ import (
 
 	"github.com/nukopian/jdc-lab/internal/ads"
 	"github.com/nukopian/jdc-lab/internal/blocks"
+	"github.com/nukopian/jdc-lab/internal/boilerplate"
 	"github.com/nukopian/jdc-lab/internal/chunk"
 	"github.com/nukopian/jdc-lab/internal/headings"
 	"github.com/nukopian/jdc-lab/internal/page"
@@ -111,7 +112,9 @@ func main() {
 			}
 			continue
 		}
-		write(w, c)
+		if err := c.WriteText(w); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -125,15 +128,11 @@ func find(arg, run, title string) (ads.Ad, error) {
 	if b, err := os.ReadFile(arg); err == nil {
 		return ads.Ad{ID: filepath.Base(arg), Title: title, HTML: string(b)}, nil
 	}
-	for a, err := range ads.File(filepath.Join(run, "ads.jsonl")) {
-		if err != nil {
-			return ads.Ad{}, err
-		}
-		if a.ID == arg {
-			return a, nil
-		}
+	a, err := ads.Find(filepath.Join(run, "ads.jsonl"), arg)
+	if errors.Is(err, ads.ErrNotFound) {
+		return a, fmt.Errorf("chunk: %s: no such file, nor an ad of that ID in %s", arg, run)
 	}
-	return ads.Ad{}, fmt.Errorf("chunk: %s: no such file, nor an ad of that ID in %s", arg, run)
+	return a, err
 }
 
 // writePages writes the ads the file at list names as pages, beside it,
@@ -213,45 +212,11 @@ func writeFile(path string, write func(io.Writer) error) (err error) {
 // readBoilerplate reads a repeated.tsv, and returns the keys of the texts
 // it found to be boilerplate.
 func readBoilerplate(path string) (map[string]bool, error) {
-	f, err := os.Open(path)
+	keys, err := boilerplate.Verdicts(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, fmt.Errorf("chunk: %s: no such file; run the pipeline first (go run ./cmd/pipeline run latest)", path)
 	}
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	keys := map[string]bool{}
-	sc := bufio.NewScanner(f)
-	sc.Buffer(nil, 1<<20)
-	for sc.Scan() {
-		f := strings.SplitN(sc.Text(), "\t", 6)
-		if len(f) == 6 && f[4] == "boilerplate" {
-			keys[headings.Key(f[5])] = true
-		}
-	}
-	return keys, sc.Err()
+	return keys, err
 }
 
 // write writes an ad's chunks as text to read.
-func write(w io.Writer, c chunk.Ad) {
-	share := func(n int) int {
-		if c.Tokens == 0 {
-			return 0
-		}
-		return 100 * n / c.Tokens
-	}
-	fmt.Fprintf(w, "%s · %s\n", c.Title, c.ID)
-	fmt.Fprintf(w, "about %d tokens in all; %d embedded (%d%%), %d unclassified (%d%%)\n",
-		c.Tokens, c.Embedded, share(c.Embedded), c.Unclassified, share(c.Unclassified))
-	for i, ch := range c.Chunks {
-		fmt.Fprintf(w, "\n[%d] %s · %s · about %d tokens\n    placed by %s\n", i+1, ch.Kind, ch.Use, ch.Tokens, ch.PlacedBy)
-		for _, line := range strings.Split(ch.Text, "\n") {
-			fmt.Fprintf(w, "    | %s\n", line)
-		}
-		for _, f := range ch.Fields {
-			fmt.Fprintf(w, "    field %s: %s\n", f.Label, f.Value)
-		}
-	}
-	fmt.Fprintln(w)
-}

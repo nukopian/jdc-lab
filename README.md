@@ -49,7 +49,9 @@ embeddings, and a large language model only where those fall short.
   rest), and
   finds the boilerplate that ads repeat whatever the job. Grammars read
   the facts ads state, pay, hours, work pattern, schedule and postcode,
-  as values. `chunk` shows any ad's chunks, saying what to embed, what
+  as values. `shape` shows any ad at each stage, from its HTML to its
+  chunks, to see where its shape changes. `chunk` shows any ad's chunks,
+  saying what to embed, what
   becomes metadata, and what placed each, as text, data, or web pages
   of ads before and after, and each
   run shows 20 ads in their chunks, the same in every run, to read by

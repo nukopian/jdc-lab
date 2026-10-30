@@ -129,3 +129,23 @@ func TestAllStopsWhenTheLoopDoes(t *testing.T) {
 		t.Errorf("the loop body ran %d times after break, want 1", n)
 	}
 }
+
+func TestFind(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "ads.jsonl")
+	lines := `{"id":"1","title":"Driver","location":null,"location_canonical":null,"html":"<p>Drive.</p>"}
+{"id":"2","title":"Chef","location":null,"location_canonical":null,"html":"<p>Cook.</p>"}
+`
+	if err := os.WriteFile(path, []byte(lines), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	a, err := Find(path, "2")
+	if err != nil || a.Title != "Chef" {
+		t.Errorf(`Find(path, "2") = %q, %v; want the Chef`, a.Title, err)
+	}
+	if _, err := Find(path, "3"); !errors.Is(err, ErrNotFound) {
+		t.Errorf(`Find(path, "3") error = %v, want ErrNotFound`, err)
+	}
+	if _, err := Find(filepath.Join(t.TempDir(), "none.jsonl"), "1"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("Find in a missing file: error = %v, want one that it doesn't exist", err)
+	}
+}
