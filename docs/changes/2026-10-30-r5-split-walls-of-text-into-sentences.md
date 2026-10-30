@@ -106,3 +106,14 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   ("You will have …") to pay, and `wording`'s openings could place each
   once they're lines. Some of that may follow from step 4 on its own;
   what doesn't is for an idea after this item.
+- **Sentences (step 2).** `internal/sentences` splits text at a full
+  stop, question mark or exclamation mark followed by a space and a
+  capital, kept as written, joined by spaces giving the text back. A
+  stop before a lower-case word or a figure ends nothing ("example.
+  com"), nor one after an abbreviation or an initial ("e.g. Sage", "J.
+  Smith"); further stops and a closing quote or bracket stay with their
+  sentence. Over the 10,874 walls in the samples, it makes 35,239
+  sentences, about 3.2 a wall; a sample of 30 of its boundaries, read by
+  eye, were all right, and the only stops before a capital it kept
+  inside a sentence were 4 after "e.g.". Nothing calls it yet: the
+  walls stage (step 3) will.
