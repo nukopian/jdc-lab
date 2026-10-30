@@ -49,7 +49,7 @@ whose name in a heading usually names a job ("Legal Secretary"). grammar
 always made a `=>` rule's value a phrase, so the lab read its rules
 twice and rebuilt them with `AddAs`; `MapOnly` is that rebuild, built
 in. grammar's
-[change record](https://github.com/nukopian/grammar/blob/main/docs/changes/2026-10-26-rules-whose-canonical-isnt-a-phrase.md)
+[change record](https://github.com/nukopian/grammar/blob/v0.4.0/docs/changes/2026-10-26-rules-whose-canonical-isnt-a-phrase.md)
 has the details. A rule with nothing before `=>` is now an error under
 `MapOnly`, as it would add nothing; `headings.txt` has none.
 

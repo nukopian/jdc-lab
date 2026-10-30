@@ -612,7 +612,7 @@ python python/bin/retrieval_eval.py data/runs/latest/retrieval
 
 Embedding takes about 20 minutes on a Mac's GPU. What it showed, and what it
 can't, are in its
-[record](changes/2026-10-27-a-first-retrieval-test.md): a job title is
+[record](changes/2026-10-27-r10-a-first-retrieval-test.md): a job title is
 a narrow query.
 
 ## Improving it
@@ -798,7 +798,7 @@ On the three samples together, measured on 2026-10-27 with
 | together | 28,000 | 25,954 distinct |
 
 The rules were tuned on the first sample, checked on the second
-([record](changes/2026-10-25-check-the-rules-on-a-second-sample.md)),
+([record](changes/2026-10-25-r1-check-the-rules-on-a-second-sample.md)),
 and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
@@ -828,7 +828,7 @@ of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching
 alone found 15.8%: standard text with the ad's own title or place
 written in, or a few words changed, is most of the rest
-([record](changes/2026-10-27-find-near-duplicate-boilerplate.md)).
+([record](changes/2026-10-27-r3-find-near-duplicate-boilerplate.md)).
 
 **Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
 by the index): 65.6% of an ad's tokens are embedded, 3.1% kept as

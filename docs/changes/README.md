@@ -27,11 +27,13 @@ having. Small fixes don't need one.
 - **What happened is added as the work goes,** and finished when the
   change ships or is dropped, in the same commit. When it ships, the
   status says "shipped, unreleased", and the release names its version.
-- **It's named for the day work started and the change,** such as
-  `2026-10-25-stop-shift-times-passing-as-headings.md`: dates never
-  collide between sessions and sort in order. A roadmap item keeps its
-  number as its name in commits and the CHANGELOG, and the record gives
-  it in its header.
+- **It's named for the day work started, "r" and its roadmap number,
+  and the change,** such as `2026-10-25-r2-stop-shift-times-passing-as-headings.md`
+  for roadmap 2: dates never collide between sessions and sort in order,
+  and a search for `r2` finds the record, where a bare number would find
+  every date and figure with a 2 in it. A record for a `TODO.md` task
+  has no number, so it's named for the day and the change alone. The
+  record gives its origin in its header too.
 - **It's public,** on `main` and in every release, like the rest of
   `docs/`, so nothing personal goes in it, and nothing from job ads
   beyond the figures and short phrases, such as headings, that
@@ -69,29 +71,29 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
-- [Keep the layout an ad's text implies](2026-10-30-keep-the-layout-an-ads-text-implies.md)
+- [Keep the layout an ad's text implies](2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)
   (roadmap 24), in progress
-- [Split walls of text into sentences](2026-10-30-split-walls-of-text-into-sentences.md)
+- [Split walls of text into sentences](2026-10-30-r5-split-walls-of-text-into-sentences.md)
   (roadmap 5), in progress
-- [Make boilerplate's verdict right](2026-10-28-make-boilerplates-verdict-right.md)
+- [Make boilerplate's verdict right](2026-10-28-r4-make-boilerplates-verdict-right.md)
   (roadmap 4), shipped in v0.5.2
-- [Keep a list item's own blocks in the ad's order](2026-10-28-a-list-items-own-blocks-in-order.md)
+- [Keep a list item's own blocks in the ad's order](2026-10-28-r17-a-list-items-own-blocks-in-order.md)
   (roadmap 17), shipped in v0.5.2
-- [One set of grammars for facts and headings](2026-10-28-one-set-of-grammars-for-facts-and-headings.md)
+- [One set of grammars for facts and headings](2026-10-28-r22-one-set-of-grammars-for-facts-and-headings.md)
   (roadmap 22), shipped in v0.5.2
-- [Map what's left](2026-10-28-map-whats-left.md)
+- [Map what's left](2026-10-28-r21-map-whats-left.md)
   (roadmap 21), shipped in v0.5.2
 - [Check the paths read from grammar matches with CheckPath](2026-10-27-check-match-paths-with-checkpath.md),
   shipped in v0.5.1
-- [A chunker for any ad](2026-10-27-a-chunker-for-any-ad.md)
+- [A chunker for any ad](2026-10-27-r18-a-chunker-for-any-ad.md)
   (roadmap 18), shipped in v0.5.0
-- [Facts from the details, by grammar](2026-10-27-facts-from-the-details.md)
+- [Facts from the details, by grammar](2026-10-27-r7-facts-from-the-details.md)
   (roadmap 7), shipped in v0.5.0
-- [Does it make search better? A first test](2026-10-27-a-first-retrieval-test.md)
+- [Does it make search better? A first test](2026-10-27-r10-a-first-retrieval-test.md)
   (roadmap 10), shipped in v0.5.0
-- [Find near-duplicate boilerplate](2026-10-27-find-near-duplicate-boilerplate.md)
+- [Find near-duplicate boilerplate](2026-10-27-r3-find-near-duplicate-boilerplate.md)
   (roadmap 3), shipped in v0.5.0
-- [A readable view of chunked ads](2026-10-27-a-readable-view-of-chunked-ads.md)
+- [A readable view of chunked ads](2026-10-27-r16-a-readable-view-of-chunked-ads.md)
   (roadmap 16), shipped in v0.5.0
 - [Try grammar's Overlap in sections.All, then take up grammar v0.3.2](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md),
   shipped in v0.3.5
@@ -99,7 +101,7 @@ Newest first.
   shipped in v0.3.5
 - [Take up grammar v0.3.0 and scalar v0.6.0](2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md),
   shipped in v0.3.5
-- [Check the rules on a second sample](2026-10-25-check-the-rules-on-a-second-sample.md)
+- [Check the rules on a second sample](2026-10-25-r1-check-the-rules-on-a-second-sample.md)
   (roadmap 1), shipped in v0.3.5
-- [Stop shift times passing as headings](2026-10-25-stop-shift-times-passing-as-headings.md)
+- [Stop shift times passing as headings](2026-10-25-r2-stop-shift-times-passing-as-headings.md)
   (roadmap 2), shipped in v0.4.0

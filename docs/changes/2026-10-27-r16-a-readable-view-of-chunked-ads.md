@@ -83,4 +83,4 @@ on today's samples).
   and could change with a change to boilerplate, shuffling the view.
   Sixteen ads are now always the first by the hash, and all are
   written in its order (see that
-  [record](2026-10-27-find-near-duplicate-boilerplate.md)).
+  [record](2026-10-27-r3-find-near-duplicate-boilerplate.md)).

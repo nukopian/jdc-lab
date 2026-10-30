@@ -31,21 +31,21 @@ Text in its place: lists in order, unmapped text guessed, boilerplate right both
   to about 20%. Boilerplate is 18.2% of the text, from 17.5%.
   `openings.txt` knows many more job lines' openings, which 21's guess
   uses too
-  (roadmap 4; [record](docs/changes/2026-10-28-make-boilerplates-verdict-right.md)).
+  (roadmap 4; [record](docs/changes/2026-10-28-r4-make-boilerplates-verdict-right.md)).
 - Text inside list items stays in the ad's order. Where an ad put
   paragraphs, headings or further lists inside a list item, up to the
   whole ad in one, some of it came out after the blocks that followed
   it, under the wrong heading: in 20 ads of the three samples, pay under
   "Why ...?" and left out as benefits, and requirements gone from their
   own heading. Now none
-  (roadmap 17; [record](docs/changes/2026-10-28-a-list-items-own-blocks-in-order.md)).
+  (roadmap 17; [record](docs/changes/2026-10-28-r17-a-list-items-own-blocks-in-order.md)).
 - One set of grammars for facts and headings: `internal/grammars`,
   which `facts` reads values with and `headings` keeps facts out of
   headings with, in place of its regexes. Headings are unchanged on the
   three samples. Facts read with the regexes' care for word boundaries:
   times are no longer read from inside a figure ("45am-5pm" from
   "745am-5pm"), and "til" joins a range; 15 fewer of 103,015 facts
-  (roadmap 22; [record](docs/changes/2026-10-28-one-set-of-grammars-for-facts-and-headings.md)).
+  (roadmap 22; [record](docs/changes/2026-10-28-r22-one-set-of-grammars-for-facts-and-headings.md)).
 - Text under headings of no known kind is placed by an educated guess
   rather than left out whole: by its lines' wording, as boilerplate,
   the advertiser's or after the apply text, as details for a label and
@@ -56,7 +56,7 @@ Text in its place: lists in order, unmapped text guessed, boilerplate right both
   guess is right for about four sections in five, short of the plan's
   nine in ten, and the unmapped text is 9.8% of the text, short of its
   9%: the record says why
-  (roadmap 21; [record](docs/changes/2026-10-28-map-whats-left.md)).
+  (roadmap 21; [record](docs/changes/2026-10-28-r21-map-whats-left.md)).
 - A wash-up before the release found a regression from roadmap 21: a
   field's label naming a work pattern, "Hybrid Working" in bold, was
   taken for a line of facts and lost as a heading, so its text ran into
@@ -112,7 +112,7 @@ worked on, so a minor release.
   chunker for any ad, is done: by it, 57.5% of an ad's tokens are
   embedded, the rest facts, notices, the employer's pitch and text
   still to map (roadmap 18;
-  [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md)).
+  [record](docs/changes/2026-10-27-r18-a-chunker-for-any-ad.md)).
 - The ad's title run into the rest of its line is split off, as a
   repeat: "General Foreman Responsibilities:" is the title, then the
   heading; "Electrician (Permanent)" and "Support Worker - Hull £12.93
@@ -168,7 +168,7 @@ worked on, so a minor release.
   chunks' own lines. On the three samples, lines of facts come out of
   25% of ads. A known label and " - " is a field, as with a colon
   (roadmap 7, with ideas 13 and 14;
-  [record](docs/changes/2026-10-27-facts-from-the-details.md)).
+  [record](docs/changes/2026-10-27-r7-facts-from-the-details.md)).
 - A short plain line with a section's phrase, before a list, starts
   that section: sub-headings such as "Highly Desirable", "Essential
   Experience & Qualifications" and "Key Skills". On the three samples,
@@ -197,7 +197,7 @@ worked on, so a minor release.
   embedded chunks, and the text of unmapped sections, are gathered into
   a boilerplate chunk of their own, left out but in sight, each line
   with where it was (roadmap 18;
-  [record](docs/changes/2026-10-27-a-chunker-for-any-ad.md)).
+  [record](docs/changes/2026-10-27-r18-a-chunker-for-any-ad.md)).
 - A first test of retrieval: `cmd/retrieval-set` builds it from a run,
   5,000 ads with the texts each representation embeds and 50 job
   titles as queries, and `python/bin/retrieval_eval.py` scores it with
@@ -207,7 +207,7 @@ worked on, so a minor release.
   and the sections that describe the job alone 0.61. Titles are a
   narrow test: it can't show whether boilerplate's verdict is right
   (roadmap 10;
-  [record](docs/changes/2026-10-27-a-first-retrieval-test.md)).
+  [record](docs/changes/2026-10-27-r10-a-first-retrieval-test.md)).
 - Boilerplate is found when it isn't word for word the same: with the
   ad's own title or place written in, as placeholders, or, in texts of
   20 words or more, with a few words changed, by their runs of five
@@ -216,7 +216,7 @@ worked on, so a minor release.
   as written, as alike they're more often about the job. The view's
   ads keep their places: sixteen are always the first by the hash
   (roadmap 3;
-  [record](docs/changes/2026-10-27-find-near-duplicate-boilerplate.md)).
+  [record](docs/changes/2026-10-27-r3-find-near-duplicate-boilerplate.md)).
 - `pipeline run` runs every stage once, on all the samples together,
   in place of each sample and `all`: a run's tables are in
   `data/runs/RUN/STAGE/`, with the samples it read in `samples.txt`. A
@@ -233,7 +233,7 @@ worked on, so a minor release.
   also checks every ad's text is in its sections, in the ad's order:
   none is lost, but 20 ads of the three samples have text out of order
   (roadmap 16;
-  [record](docs/changes/2026-10-27-a-readable-view-of-chunked-ads.md)).
+  [record](docs/changes/2026-10-27-r16-a-readable-view-of-chunked-ads.md)).
 
 ## v0.4.0 (2026-10-27)
 
@@ -262,7 +262,7 @@ lab is worked on, so a minor release.
   own, most of them unmapped. A bare range of hours, such as "8-5",
   counts as a time beside a range of days, M-F among them, and
   "9-5pm" implies am (roadmap 2;
-  [record](docs/changes/2026-10-25-stop-shift-times-passing-as-headings.md)).
+  [record](docs/changes/2026-10-25-r2-stop-shift-times-passing-as-headings.md)).
 - Bold patterns of work are no longer headings either: a rota ("4 on 4
   off") or days or nights beside a range of days ("Monday - Friday
   (Days)"), unless it ends in a colon and heads what follows. Taken
@@ -309,7 +309,7 @@ change to how the lab is set up or worked on, so a patch release.
   "legal" alone is no longer a phrase, so a heading such as "The
   successful Legal Secretary will have:" isn't taken for a legal notice:
   a rule written `phrases => kind` leaves the kind's name out
-  (roadmap 1; [record](docs/changes/2026-10-25-check-the-rules-on-a-second-sample.md)).
+  (roadmap 1; [record](docs/changes/2026-10-25-r1-check-the-rules-on-a-second-sample.md)).
 - grammar v0.3.2, with `Overlap` and `Outermost`, both suggested from
   the lab's use: phrases in a heading that overlap now all count, so
   "To succeed in this role, you will need:" is requirements rather than

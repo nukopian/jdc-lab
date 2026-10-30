@@ -49,7 +49,7 @@ newlines its author meant as layout are folded into the text, with the
 headings and fields on them, and breaks inside list items run the
 item's lines together. Tags left open can swallow or mislabel what
 follows. The plan is in its
-[record](docs/changes/2026-10-30-keep-the-layout-an-ads-text-implies.md).
+[record](docs/changes/2026-10-30-r24-keep-the-layout-an-ads-text-implies.md).
 
 ## Next
 
@@ -62,7 +62,7 @@ follows. The plan is in its
 Started, then paused: many walls turned out to be layout folded by
 blocks, which 24 keeps, so what's left of them is measured once 24 lands.
 The plan, and what was found, are in its
-[record](docs/changes/2026-10-30-split-walls-of-text-into-sentences.md).
+[record](docs/changes/2026-10-30-r5-split-walls-of-text-into-sentences.md).
 
 ## Later
 
@@ -91,7 +91,7 @@ prefixes and many sections, beside other small local models.
 
 Added 2026-10-25, to Ideas 2026-10-27. Measure retrieval: a first slice,
 with job titles as queries, is in its
-[record](docs/changes/2026-10-27-a-first-retrieval-test.md); judged
+[record](docs/changes/2026-10-27-r10-a-first-retrieval-test.md); judged
 queries, a check of boilerplate's verdict, metadata and a managed
 service are still to come.
 
