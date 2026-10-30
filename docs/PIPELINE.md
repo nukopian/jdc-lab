@@ -137,7 +137,7 @@ blocks a reader would see, in order:
 | Kind | What it is |
 |---|---|
 | `paragraph` | a block of text on its own: a `<p>`, a `<div>`, a heading tag, or loose text |
-| `line` | one of several lines a `<br>` split a block into |
+| `line` | one of several lines a `<br>` or a newline split a block into |
 | `list` | consecutive list items, each an item of its own |
 
 Each block has its text as a browser shows it (entities decoded, runs
@@ -179,14 +179,24 @@ It decides nothing. Whether a bold block is a heading is the next stage's
 call, which keeps the HTML parsing apart from the judgement, so either
 can change without the other.
 
-**Plain text.** Some ads have no tags that lay out blocks. There, a
-newline ends a line and a blank line ends a block. A **wall** of text
-with no newlines at all stays one paragraph: splitting it needs
-sentences, a later stage.
+**Newlines.** Many ads are laid out by their newlines as much as by
+their tags: plain text, with no tags that lay out blocks, and ads with
+tags round only part of their text, such as a footer, or with bare lines
+between their tags. So a newline ends a line, and a blank line a block,
+outside list items and heading tags, though a browser would show a
+space. In an ad with tags, only a newline with text either side, and no
+tag between, counts: one beside a tag is how the source is formatted,
+often a tag to a line. And there a newline before a lower-case letter,
+or after a comma, "&" or a word such as "to" that a line can't end with
+("Welcome to" before a name), is a line wrapped in the source, so it
+stays a space. Over the three samples, that keeps 2,480 more lines than
+reading every newline in a tagged ad as a space. A **wall** of text with
+no newlines at all stays one paragraph: splitting it needs sentences, a
+later stage.
 
 On the sample, no ad uses heading tags: headings are bold paragraphs, or
 lines ending with a colon. 3 ads have a paragraph over 1,500 characters
-(of the three samples' 28,000, 17).
+(of the three samples' 28,000, 16).
 
 ## 3. Headings: what each block is
 

@@ -79,4 +79,35 @@ re-measured on what's left.
 
 ## What happened
 
-Nothing yet.
+- **Names agreed (step 1).** Iain's choices: text after a `<br>` or
+  `<p>` inside a list item leaves the item, each line a block of its
+  own after the list, as blocks already does for a paragraph inside an
+  item; and the cue for a blank line before a block is `gap`. The
+  baseline is `claude/before`, the pipeline at
+  6e589dbf47910ddb758821ac283050fb221b04a4.
+- **Newlines (step 2), and wrapping checked first.** Outside list
+  items, tagged ads have about 12,000 newlines before a lower-case
+  letter, in 453 ads, nearly all a sentence wrapped in the source, and
+  about 2,400 after a stop or before a capital or a symbol, in about
+  1,000 ads, mostly layout. So a newline before a lower-case letter
+  stays a space. Two refinements came from the runs:
+  - **Wrapping before a capital.** The first run cut a heading in 28
+    ads at a wrap before a capital ("Welcome to" / "Northern Repairs", a team named in a heading), so a newline
+    after a comma, "&" or a word a line can't end with ("to", "and",
+    "of", "the" and the like) stays a space too.
+  - **A tag to a line.** The second run split "**Location:** Hampshire"
+    in two, and sentences at each bold word, in ads whose HTML is
+    formatted with a tag on each line. So in a tagged ad only a newline
+    with text either side, in one run of text with no tag between,
+    counts; plain text still counts every newline, across inline tags
+    too.
+- **Measurements, step 2** (`pipeline compare claude/before
+  claude/after`): lines 146,756 to 149,236, paragraphs 259,921 to
+  259,359; heading uses 91,497 to 91,539, of a known kind 74,467 to
+  74,509 (81% both); lines starting a section by name 19,026 to 19,089.
+  Two headings are newly unmapped, both real ones once run into the
+  line before ("Process Development & Continuous Improvement:"). The six
+  ads looked at when planning all read as laid out: one, a
+  plain-text ad with a tagged footer, was one summary chunk and now has
+  its summary, role, responsibilities and requirements. Walls: ads with
+  a paragraph over 800 characters 381 to 375, over 1,500 17 to 16.

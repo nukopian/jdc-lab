@@ -12,6 +12,15 @@ has the steps).
 
 ## Unreleased
 
+- Headings and fields an ad lays out by its newlines, rather than by
+  its tags, are found. An ad with any tag that lays out blocks was read
+  as a browser shows it, newlines as spaces, so "Key Responsibilities"
+  on a line of its own ran into the line after it, and a plain-text ad
+  with one tagged footer was one paragraph, role, duties and all. Now a
+  newline with text either side ends a line, unless it wraps a sentence:
+  over the three samples, 2,480 more lines, and 42 more heading uses
+  found, all of a known kind (roadmap 24;
+  [record](docs/changes/2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)).
 - A 9 MB build of `chunk`, left at the root by a bare
   `go build ./cmd/chunk` and committed with everything else in v0.5.0,
   is gone. `.gitignore` claimed to hide such builds but didn't; it now

@@ -25,7 +25,7 @@ const (
 	// Paragraph is a block of text on its own: a <p>, a heading tag, a
 	// <div>, or text outside any of them.
 	Paragraph Kind = iota
-	// Line is one of several lines a <br> split a block into.
+	// Line is one of several lines a <br> or a newline split a block into.
 	Line
 	// List is consecutive list items, from <ul>, <ol> or bare <li>s.
 	List
@@ -86,10 +86,17 @@ type Block struct {
 // such as <p>&nbsp;</p>, are dropped. Broken HTML is read as far as it
 // makes sense; nothing makes Split fail.
 //
-// Some ads are plain text, with no tags that lay out blocks: at most
-// inline ones such as <b>. Their newlines are all the layout they have, so
-// there a newline ends a Line and a blank line ends a block. A wall of text
-// with no newlines stays one Paragraph: splitting it is for later steps.
+// Many ads are laid out by their newlines as much as by their tags, as if
+// the newlines would show: some are plain text, with no tags that lay out
+// blocks, and others have tags around only part of their text, such as a
+// footer. So a newline ends a Line and a blank line ends a block, outside
+// list items and heading tags, as the author laid them out, though a
+// browser would show a space. In an ad with tags, only a newline with text
+// either side, and no tag between, counts: one beside a tag is how the
+// source is formatted. And there a newline before a lower-case letter, or
+// after a comma, "&" or a word such as "to" that a line can't end with, is
+// a line wrapped in the source, and stays a space. A wall of text with no
+// newlines stays one Paragraph: splitting it is for later steps.
 func Split(src string) []Block {
 	b := builder{plain: !laidOut(src)}
 	z := html.NewTokenizer(strings.NewReader(src))
@@ -125,37 +132,51 @@ type builder struct {
 	inItem  bool   // inside an <li>
 
 	plain    bool // src is plain text, laid out by its newlines
-	newlines int  // newlines since the last visible text, in plain text
+	newlines int  // newlines since the last visible text
 }
 
 func (b *builder) text(s string) {
 	if b.skip > 0 {
 		return
 	}
-	if !b.plain {
-		b.piece.write(s, b.bold > 0)
+	if !b.plain && (b.inItem || b.heading > 0) {
+		b.piece.write(s, b.bold > 0) // an item or heading stays one piece
 		return
 	}
-	// In plain text, newlines end lines and blocks, but only once more
-	// visible text comes: spaces and further newlines in between change
-	// nothing, and trailing ones end nothing.
+	// Newlines end lines and blocks, but only once more visible text comes:
+	// spaces and further newlines in between change nothing, and trailing
+	// ones end nothing. In HTML, a newline before a lower-case letter, or
+	// after a word a line can't end with, is a line wrapped in the source,
+	// not laid out, so it stays a space: ads with tags lay out as many lines
+	// by their newlines as plain text does, but wrap many more. And there,
+	// only a newline with text either side, in one run of text, counts: one
+	// beside a tag is how the source is formatted, often a tag to a line.
 	s = strings.ReplaceAll(strings.ReplaceAll(s, "\r\n", "\n"), "\r", "\n")
-	start := 0
+	if !b.plain {
+		b.newlines = 0
+	}
+	start, seen := 0, false
 	for i, r := range s {
 		switch {
-		case r == '\n':
+		case r == '\n' && (b.plain || seen):
 			b.piece.write(s[start:i], b.bold > 0)
 			start = i + 1
 			b.newlines++
 		case b.newlines > 0 && visible(string(r)):
 			b.piece.write(s[start:i], b.bold > 0)
 			start = i
-			if b.newlines > 1 {
+			switch {
+			case !b.plain && (unicode.IsLower(r) || b.piece.continues()):
+				b.piece.write(" ", b.bold > 0)
+			case b.newlines > 1:
 				b.endBlock()
-			} else {
+			default:
 				b.endLine()
 			}
 			b.newlines = 0
+		}
+		if !seen && visible(string(r)) {
+			seen = true
 		}
 	}
 	b.piece.write(s[start:], b.bold > 0)
@@ -401,6 +422,25 @@ func (p *piece) write(s string, bold bool) {
 		}
 	}
 	collapse(&p.text, s)
+}
+
+// continues reports whether the text so far stops where a line can't end,
+// so that a newline after it is a line wrapped, whatever comes next: after
+// a comma or "&", or a word such as "to" or "and" that needs more after it
+// ("Welcome to" before a name).
+func (p *piece) continues() bool {
+	t := strings.TrimRight(p.text.String(), " ")
+	if strings.HasSuffix(t, ",") || strings.HasSuffix(t, "&") {
+		return true
+	}
+	return joining[strings.ToLower(t[strings.LastIndexByte(t, ' ')+1:])]
+}
+
+// joining are the words a line doesn't end with.
+var joining = map[string]bool{
+	"a": true, "an": true, "the": true, "and": true, "or": true, "of": true, "to": true, "in": true,
+	"on": true, "at": true, "for": true, "with": true, "by": true, "from": true, "as": true,
+	"our": true, "your": true, "their": true, "its": true,
 }
 
 // take returns what's been gathered as an Item, and whether it has anything

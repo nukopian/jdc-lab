@@ -231,6 +231,65 @@ now.</p>`,
 			[]string{"list", `  "Drive"`, `paragraph "Apply now."`},
 		},
 		{
+			"in HTML, bare lines between tags keep their newlines",
+			`<p>We're hiring.</p>Key Responsibilities
+HR Administration
+<ul><li>Payroll</li></ul>`,
+			[]string{`paragraph "We're hiring."`, `line "Key Responsibilities"`, `line "HR Administration"`, "list",
+				`  "Payroll"`},
+		},
+		{
+			"in HTML, a blank line between bare lines ends a block",
+			`<p>Leeds</p>We're hiring
+a driver.
+
+The Role
+You'll drive.`,
+			[]string{`paragraph "Leeds"`, `paragraph "We're hiring a driver."`, `line "The Role"`,
+				`line "You'll drive."`},
+		},
+		{
+			"in HTML, a newline after a word that can't end a line is wrapping, before a capital too",
+			`<p><strong>A Different Kind of Role: Welcome to
+Northern Repairs</strong></p>Days: Weekdays and
+Saturdays, Sales &
+Marketing`,
+			[]string{`paragraph "A Different Kind of Role: Welcome to Northern Repairs" bold`,
+				`paragraph "Days: Weekdays and Saturdays, Sales & Marketing"`},
+		},
+		{
+			"in HTML laid out with a tag on each line, a newline beside a tag is only spacing",
+			`<p>
+ <strong>
+  Location:
+ </strong>
+ Hampshire
+ <br>
+ <strong>Salary:</strong>
+ £30,000
+</p>
+<strong>We</strong>
+ are hiring a
+<strong>
+ Damage Assessor
+</strong>
+. Apply now.`,
+			[]string{`line "Location: Hampshire" lead="Location:"`, `line "Salary: £30,000" lead="Salary:"`,
+				`paragraph "We are hiring a Damage Assessor . Apply now." lead="We"`},
+		},
+		{
+			"a plain-text ad with a tagged footer keeps its newlines",
+			`About the Role
+We need teachers.
+
+Responsibilities
+- Teach
+- Mark
+<p>Footer one.<br>Footer two.</p>`,
+			[]string{`line "About the Role"`, `line "We need teachers."`, `line "Responsibilities"`, "list",
+				`  "Teach"`, `  "Mark"`, `line "Footer one."`, `line "Footer two."`},
+		},
+		{
 			"stray end tags change nothing",
 			`</strong></ul></li><p>Text</p>`,
 			[]string{`paragraph "Text"`},
