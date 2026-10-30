@@ -2,7 +2,7 @@
 
 ## Test grammar's fix for a word list's value beside a lookahead
 
-**From:** grammar's session, 2026-10-30 (grammar fa339e2a, work uncommitted)
+**From:** grammar's session, 2026-10-30 (grammar fa339e22fa1456a041ff4c471dfc316876dc61ba, work uncommitted)
 **Waiting on:** nothing; grammar's fix is uncommitted in `../grammar`,
 which this repository's `go.work` already joins
 
@@ -10,7 +10,7 @@ which this repository's `go.work` already joins
 tell Iain whether it holds, so that grammar can commit and release it.
 Iain asked for the fix not to be committed until jdc-lab has tested it.
 
-**Why:** this repository's task in grammar (grammar fa339e2a) found that
+**Why:** this repository's task in grammar (grammar fa339e22fa1456a041ff4c471dfc316876dc61ba) found that
 `token TOP { <!before …> @patterns }` left `made` empty, so `Pattern` in
 `internal/grammars/grammars.go` gained a rule of its own for the list,
 `token word { @patterns }`, read as `word.made`. Iain chose to make the
