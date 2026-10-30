@@ -3,6 +3,7 @@ package chunk
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -483,11 +484,22 @@ func TestAdOfTitle(t *testing.T) {
 	if c.Kind != Title || c.Use != Embed || c.Text != "Production Operative" || c.Tokens != Tokens("Production Operative") {
 		t.Errorf("the first chunk: %+v; want the title, embedded", c)
 	}
-	if a.Tokens != Whole(ss)+c.Tokens || a.Embedded != c.Tokens+a.Chunks[1].Tokens {
+	if a.Tokens != Whole(ss)+c.Tokens || a.Embedded != c.Tokens+Tokens("We make parts for cars.") {
 		t.Errorf("totals: %d tokens, %d embedded; want the title counted in both", a.Tokens, a.Embedded)
 	}
-	if !strings.Contains(a.Chunks[1].Text, "Job Title: Production Operative") {
-		t.Errorf("the summary lost its job title field: %q", a.Chunks[1].Text)
+	// The title the ad writes as a field leaves the summary, as the title
+	// chunk embeds it, but is listed in the details.
+	if strings.Contains(a.Chunks[1].Text, "Job Title") {
+		t.Errorf("the summary embeds the title again: %q", a.Chunks[1].Text)
+	}
+	var listed bool
+	for _, c := range a.Chunks {
+		if c.Kind == sections.Details && slices.Contains(c.Fields, Field{"job title", "Production Operative"}) {
+			listed = true
+		}
+	}
+	if !listed {
+		t.Errorf("the job title field isn't listed in the details: %+v", a.Chunks)
 	}
 	if b := AdOf("8", "", ss, func(string) bool { return false }); b.Chunks[0].Kind == Title {
 		t.Errorf("an ad with no title has a title chunk: %+v", b.Chunks[0])

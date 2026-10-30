@@ -19,8 +19,9 @@ has the steps).
 - The ad's title, its title field, is a chunk of its own, first and
   embedded: titles embed well alone, and until now the title was in no
   chunk at all, unless the ad wrote it again. It counts in the ad's
-  tokens. A title written in the ad, as a "Job Title:" field, stays
-  where it is.
+  tokens. A title the ad writes as a field ("Job Title: …") leaves the
+  summary, so as not to be embedded twice, and is listed in the
+  details.
 - The details list each fact once, by its kind and values, though an ad
   states it more than once, or differently ("Full Time", "full-time"),
   and not again if its own details section lists it. A day's stop is no

@@ -548,8 +548,9 @@ the structure too: each chunk's text is a block of its lines.
 
 The ad's **title**, its title field, is a chunk of its own, first and
 embedded: titles embed well alone, and kept apart they don't dilute the
-summary. A title the ad writes again, as a "Job Title:" field, stays
-where it is. An ad's requirements, desirable ones too, are one chunk,
+summary. A title the ad writes again, as a "Job Title:" field, leaves
+the embedded chunks, so as not to be embedded twice, and is listed in
+the details, as every field is. An ad's requirements, desirable ones too, are one chunk,
 where the first of them stands: each section's heading a line over its
 own list, "Desirable" over desirable lines with none, so that
 "Essential" and "Desirable" are its sub-lists, and what placed each said

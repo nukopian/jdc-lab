@@ -92,8 +92,9 @@ type Chunk struct {
 // AdOf returns an ad's chunks, with its totals: its title, the ad's title
 // field, as a chunk of its own, first and embedded, as titles embed well
 // alone; then its sections' chunks (see Of). The title is counted in the
-// ad's tokens. A title written in the ad as well, as a "Job Title:" field,
-// stays where it is.
+// ad's tokens. A title the ad writes as a field ("Job Title: …") leaves
+// the embedded chunks, so as not to be embedded twice, and is listed in
+// the details, as fields are.
 func AdOf(id, title string, ss []sections.Section, boilerplate func(string) bool) Ad {
 	var cs []Chunk
 	if title != "" {
@@ -196,12 +197,17 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			}
 			if p.Role == headings.Field {
 				f := Field{Label: p.Key, Value: p.Value}
-				c.Fields = append(c.Fields, f)
 				// A field is metadata wherever it's written, so the details
-				// list it too, without its text, which stays where it is.
+				// list it too, without its text, which stays where it is;
+				// but the title, which the title chunk embeds, isn't
+				// embedded again (see AdOf).
 				if s.Kind != sections.Details {
 					found.Fields = append(found.Fields, f)
 				}
+				if c.Use == Embed && titleLabels[p.Key] {
+					continue
+				}
+				c.Fields = append(c.Fields, f)
 			}
 			// So is a fact: a working pattern in the role, or salary in
 			// the benefits, is listed in the details as well. Not from what
@@ -375,6 +381,9 @@ func once(fs []facts.Fact, cs []Chunk) []facts.Fact {
 	}
 	return out
 }
+
+// titleLabels are the labels of fields that give the job's title.
+var titleLabels = map[string]bool{"job title": true, "job role": true, "position": true, "role": true}
 
 // aboutTheEmployer reports whether a kind of section is about the employer
 // or applying, not the job: its facts are seldom the job's.
