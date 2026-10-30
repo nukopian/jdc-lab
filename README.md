@@ -86,7 +86,11 @@ embeddings, and a large language model only where those fall short.
   matching section headings to section types. BGE separated the types
   more clearly, but the test was too small to settle anything, and it
   has to be rerun fairly for E5. ONNX Runtime works from both Python and
-  Go, so a model chosen in Python can also run from Go.
+  Go, so a model chosen in Python can also run from Go. A third,
+  `BAAI/bge-small-en-v1.5`, suggests a kind for each unknown heading
+  from the known headings nearest it, phrases to add to the rules:
+  about four in five of its confident suggestions are right, but names
+  of advertisers and slogans get a kind too.
 
 ## Layout
 

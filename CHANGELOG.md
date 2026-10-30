@@ -12,7 +12,11 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- `python/bin/heading_suggest.py` suggests a kind for each heading the
+  rules don't know, from the kinds of the known headings nearest it,
+  embedded with `BAAI/bge-small-en-v1.5`: phrases to add to
+  `headings.txt`, about four in five confident suggestions right, read
+  by eye. A first try at roadmap 40's offline use.
 
 ## v0.6.0 (2026-10-30)
 

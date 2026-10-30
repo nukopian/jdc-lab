@@ -213,3 +213,22 @@ kind it is, where it's confident; the guess still decides the rest. It
 has to beat the guess's 39 to 43 in 50, on text the rules couldn't
 place. Run from Go, it needs 36 to 38; used offline, to suggest phrases
 for `headings.txt`, it needs none of them.
+
+The offline use has had a first try, `python/bin/heading_suggest.py`:
+on the three samples together, `BAAI/bge-small-en-v1.5` embeds 13,303
+mapped headings and 9,638 unmapped ones in under a minute, and each
+unmapped heading's ten nearest mapped ones vote for its kind. The vote
+gives back the rules' own kind for 85% of mapped headings, and 99% of
+those with nine-tenths of the vote or more, but that flatters it, as their neighbours
+share the phrases the rules matched. Read by eye, 32 of 40 unmapped
+headings with nine-tenths of the vote were given the kind a reader would:
+missing phrases ("what do you need", "to be considered you must",
+"caring and investing in you") and pay, places and hours read as
+headings. The misses are names of advertisers, slogans, job titles and
+codes, given a kind with as much confidence, after a mapped heading
+with the same name and a phrase ("why" and the name). Its suggestions
+are worth reading; applied as they stand, they'd be no better than the
+guess. Next: leave out headings that are mostly a name, and let a weak
+nearest neighbour say no kind. `BAAI/bge-base-en-v1.5` took three times
+as long and agreed on 71% of unmapped headings, for no clear gain. A
+section's text, not its heading, is still the part to classify.

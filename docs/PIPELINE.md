@@ -778,6 +778,20 @@ or one by name:
 go run ./cmd/heading-uses "$ads" "please note"
 ```
 
+**Which kind might an unmapped heading be?** `heading_suggest.py`
+embeds every heading with `BAAI/bge-small-en-v1.5`, and has each
+unmapped heading's ten nearest mapped ones vote for its kind, writing
+the kind, its share of the votes and the three nearest to a file, in
+`unmapped.tsv`'s order. Read it for phrases to add: about four in five
+confident suggestions are right, but names of advertisers, slogans and
+codes get a kind too
+([roadmap 40](../ROADMAP.md#40-sections-the-rules-cant-place-classified-by-their-text)):
+
+```
+python python/bin/heading_suggest.py $r suggested.tsv
+awk -F'\t' 'NR == 1 || $3 >= 0.9' suggested.tsv | head -40
+```
+
 **Did a heading go to the wrong kind?** `disagree.tsv` lists headings
 whose phrases point to more than one kind, with the kind that won:
 
