@@ -27,16 +27,16 @@ func TestOf(t *testing.T) {
 	}
 	boiler := func(s string) bool { return s == "We are an agency." }
 	cs := Of(ss, boiler)
-	if len(cs) != 6 {
-		t.Fatalf("got %d chunks, want 5 and one of boilerplate", len(cs))
+	if len(cs) != 5 {
+		t.Fatalf("got %d chunks, want 4, the company with the summary, and one of boilerplate", len(cs))
 	}
 	tests := []struct {
 		use, placed, text string
 	}{
-		{Embed, "nothing before it: summary by default", "We deliver parcels across the north of England every day."},
+		{Embed, `nothing before it: summary by default; the heading "About Brightway": it starts "about", the employer's own words, with the summary`,
+			"We deliver parcels across the north of England every day.\nAbout Brightway\nWe are a family firm."},
 		{Embed, `the heading "What you'll be doing": "what you'll be doing" in headings.txt`, "What you'll be doing\nDrive the van."},
 		{Metadata, `the heading "Job details": "job details" in headings.txt`, "Job details\nSalary: £30,000"},
-		{LeaveOut, `the heading "About Brightway": it starts "about"`, "About Brightway\nWe are a family firm."},
 		{LeaveOut, `the line "How to apply": exactly a section's name`, "How to apply\nApply today."},
 	}
 	for i, tt := range tests {
@@ -47,7 +47,7 @@ func TestOf(t *testing.T) {
 	}
 	// Boilerplate leaves an embedded chunk for one of its own, at the end,
 	// each line with the section it came from.
-	b := cs[5]
+	b := cs[4]
 	if b.Kind != Boilerplate || b.Use != LeaveOut || b.Text != "responsibilities: We are an agency." {
 		t.Errorf("the boilerplate chunk: %+v", b)
 	}
@@ -55,7 +55,7 @@ func TestOf(t *testing.T) {
 		t.Errorf("the details' fields: %+v", got)
 	}
 	// Tokens: about four for every three words.
-	if got := cs[0].Tokens; got != 13 {
+	if got := Tokens("We deliver parcels across the north of England every day."); got != 13 {
 		t.Errorf("tokens: got %d, want 13 (10 words)", got)
 	}
 }
@@ -200,7 +200,8 @@ func TestOrder(t *testing.T) {
 		got = append(got, string(c.Kind)+" "+c.Heading)
 	}
 	// The two requirements sections are one chunk, its headings lines in it.
-	want := []string{"summary ", "role The role", "requirements ", "benefits Perks", "company About us", "boilerplate "}
+	// The company joins the summary.
+	want := []string{"summary ", "role The role", "requirements ", "benefits Perks", "boilerplate "}
 	if strings.Join(got, "|") != strings.Join(want, "|") {
 		t.Errorf("got  %q\nwant %q", got, want)
 	}
@@ -595,5 +596,35 @@ func TestOneChunkAKind(t *testing.T) {
 		if n > 1 {
 			t.Errorf("%s listed %d times in the details", k, n)
 		}
+	}
+}
+
+// The employer's own words go with the summary, embedded, under their
+// heading; its standard text, repeated whatever the job, is boilerplate.
+func TestCompanyWithTheSummary(t *testing.T) {
+	ss := []sections.Section{
+		{Kind: sections.Summary, Parts: []headings.Part{text("We're hiring a driver in Leeds.")}},
+		{Kind: sections.Responsibilities, Heading: "Duties", Parts: []headings.Part{text("Drive the van.")}},
+		{Kind: sections.Company, Heading: "About us", Parts: []headings.Part{
+			text("We're a family firm of forty years."), text("Acme is an equal opportunities employer."),
+			text("We place staff in temporary, contract and permanent roles."),
+		}},
+	}
+	cs := Of(ss, func(s string) bool { return s == "Acme is an equal opportunities employer." })
+	for _, c := range cs {
+		if c.Kind == sections.Company {
+			t.Errorf("a company chunk: %+v", c)
+		}
+		if c.Kind == sections.Details {
+			t.Errorf("the company's facts listed in the details: %+v", c.Facts)
+		}
+	}
+	s := kind(cs, sections.Summary)
+	want := "We're hiring a driver in Leeds.\nAbout us\nWe're a family firm of forty years.\nWe place staff in temporary, contract and permanent roles."
+	if s.Use != Embed || s.Text != want {
+		t.Errorf("the summary: %s\n%s\nwant:\n%s", s.Use, s.Text, want)
+	}
+	if b := kind(cs, Boilerplate); !strings.Contains(b.Text, "Acme is an equal opportunities employer.") {
+		t.Errorf("the company's standard text isn't boilerplate: %q", b.Text)
 	}
 }

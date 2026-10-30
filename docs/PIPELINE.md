@@ -559,7 +559,11 @@ requirements. Each section's heading is a line over its own lines,
 "Desirable" are the requirements' sub-lists; what placed each is said
 in turn, and each fact is listed once. The summary, role, responsibilities, requirements and
 desirable chunks are embedded; details are metadata, with their fields;
-benefits, company, apply and legal are left out. Text found as boilerplate leaves the
+benefits, apply and legal are left out. The company's text, the
+employer's own words, goes with the summary, under its heading: not
+about the job, but close to it, and as an embedded chunk's lines are
+checked for boilerplate, its standard text, about half of it, is found
+there. Text found as boilerplate leaves the
 embedded chunks for a **boilerplate** chunk of its own, at the end,
 left out, each line with the section it came from: this is where to
 see what the verdict takes, and whether it's right. Other chunks keep theirs, so an
@@ -944,10 +948,15 @@ written in, or a few words changed, is most of the rest
 ([record](changes/2026-10-27-r3-find-near-duplicate-boilerplate.md)).
 
 **Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
-by the index): 65.6% of an ad's tokens are embedded, 3.1% kept as
-metadata, 21.2% left out (benefits, company, apply, legal), and 10.1%
-gathered in the boilerplate chunk, 2.8 points of it text under
-unmapped headings the guess left out. Of the unmapped text, 6.3 points
+by the index), on 2026-10-27: 65.6% of an ad's tokens are embedded,
+3.1% kept as metadata, 21.2% left out (benefits, company, apply, legal),
+and 10.1% gathered in the boilerplate chunk, 2.8 points of it text under
+unmapped headings the guess left out. On 2026-10-30, with each ad's
+title a chunk and the company's text with the summary (`chunk.AdOf`,
+boilerplate by the run's verdicts, as `chunk` reads them): 68.3%
+embedded, 3.1% metadata, 17.8% left out (benefits, apply, legal), and
+11.6% in the boilerplate chunk; company text is 3.3% of the tokens, and
+half of it boilerplate. Of the unmapped text, 6.3 points
 of an ad's tokens are placed by the guess, nearly all as the summary.
 Facts are read in 35% of ads.
 

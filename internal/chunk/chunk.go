@@ -4,8 +4,10 @@
 // many tokens it is, and what placed it in its section.
 //
 // The sections that say what the job is are embedded: the summary, the
-// role, responsibilities, requirements and desirable. Details are metadata;
-// benefits, company, apply and legal are left out. An unmapped section,
+// role, responsibilities, requirements and desirable; and the company's,
+// the employer's own words, with the summary, where its standard text is
+// found as boilerplate. Details are metadata; benefits, apply and legal are
+// left out. An unmapped section,
 // whose heading has no known kind, is placed by a guess (see guess): by
 // its lines' wording, or as the summary; or, when it's boilerplate, the
 // advertiser's or after the apply text, its text goes to the boilerplate
@@ -183,7 +185,14 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			}
 			continue
 		}
-		c := Chunk{Kind: s.Kind, Heading: s.Heading, PlacedBy: cmp.Or(placed, placedBy(s)), Use: use(s.Kind)}
+		kind := s.Kind
+		if kind == sections.Company {
+			// The employer's own words go with the summary: not about the
+			// job, but close enough to it to be worth embedding, and the
+			// standard half of them is found as boilerplate there.
+			kind, placed = sections.Summary, cmp.Or(placed, placedBy(s))+", the employer's own words, with the summary"
+		}
+		c := Chunk{Kind: kind, Heading: s.Heading, PlacedBy: cmp.Or(placed, placedBy(s)), Use: use(kind)}
 		var lines []string
 		if s.Heading != "" {
 			lines = append(lines, s.Heading)

@@ -66,9 +66,9 @@ embeddings, and a large language model only where those fall short.
   text, that probably needn't be embedded: a first answer to whether
   search can improve while embedding less. A third of ads state a
   working pattern, such as "Monday to Friday, 9am–5pm": a fact for
-  metadata, not embedding. Chunked, an ad's embedded text is 66% of its
-  tokens: the rest is facts, the employer's pitch, notices and
-  boilerplate. Text under a heading of no known kind is placed by an
+  metadata, not embedding. Chunked, an ad's embedded text is 68% of its
+  tokens, its title and the employer's own words included: the rest is
+  facts, benefits, notices and boilerplate. Text under a heading of no known kind is placed by an
   educated guess, mostly as the summary, and right for about four
   sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,

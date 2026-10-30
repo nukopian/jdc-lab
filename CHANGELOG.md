@@ -12,6 +12,13 @@ has the steps).
 
 ## Unreleased
 
+- The company's text, the employer's own words, goes with the summary,
+  embedded, under its heading, where it had been left out: Iain found
+  the two work well together. Its standard half, as boilerplate, goes
+  to the boilerplate chunk, as an embedded chunk's lines are checked.
+  Over the samples, embedded text rises from 66.5% of the tokens to
+  68.3%, the boilerplate chunk from 9.9% to 11.6%, and what's left out
+  falls from 21.2% to 17.8%.
 - The facts grammars no longer read "Contract" in a field's label as a
   work pattern ("Contract type: Temp to Perm" is temp to perm, not a
   contract), in 2,879 lines over the samples, nor a bonus as pay ("£250
