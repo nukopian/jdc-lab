@@ -3,8 +3,8 @@
 ## Take up grammar's release of a list's value beside a lookahead, and simplify Pattern
 
 **From:** jdc-lab's session, 2026-10-30 (jdc-lab 7f1ea57f9ebf161589156821bd836efa7b82fd4e)
-**Waiting on:** a grammar release with its fix for a word list's value
-beside lookarounds (grammar's record
+**Waiting on:** nothing: grammar v0.4.1 has the fix
+(`go get github.com/nukopian/grammar@v0.4.1`; grammar's record
 `docs/changes/2026-10-30-list-value-beside-lookarounds.md`)
 
 **What:** require the grammar release that has the fix, and give
