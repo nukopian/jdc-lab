@@ -875,6 +875,7 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | [Walls of text](../ROADMAP.md#5-split-walls-of-text-into-sentences) | Headings run into the text, and bullets flattened into it, go unseen | Split into sentences, and find headings inside them, once layout is kept |
 | [Inline lists](../ROADMAP.md#25-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
 | [Italic not a cue](../ROADMAP.md#26-italic-as-a-cue-like-bold) | Headings and notices set in italic carry no cue, as bold ones do | Record italic as blocks records bold |
+| [Label emoji lost](../ROADMAP.md#27-keep-what-label-emoji-mean-wherever-they-are) | A label emoji is written as its label only where it opens a line, and some clock faces aren't mapped, so facts set between emoji lose their labels; a decorative one can get a label it shouldn't | Label an emoji wherever it opens a value, map every clock face, and check the value fits the label |
 
 ## Words used here
 

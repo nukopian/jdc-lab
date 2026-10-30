@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 27.
+number: 28.
 
 When an item ships, it moves from here to the CHANGELOG, whose line for
 it ends with its number, such as "(roadmap 7)", and links to its record.
@@ -130,3 +130,15 @@ symbols could split it into items instead. 49 ads in the samples.
 Added 2026-10-30. Blocks records a paragraph all in bold, but not one
 all in `<em>` or `<i>`, though ads set headings ("You'll also need to:")
 and notices in italic too. 470 ads in the samples have one.
+
+### 27. Keep what label emoji mean, wherever they are
+
+Added 2026-10-30. Cleaning writes a label emoji as its English label
+only when it opens a line ("📍 Leeds" is "Location: Leeds"), and drops
+it anywhere else. So a line of facts set between emoji ("📍 Bristol |
+💰 £26,000-£28,000") keeps the location's label but loses the pay's, a
+label emoji after a bullet gets none, and only one of the 24 clock faces
+is mapped (about 56 lines in the samples open with another). The
+other way, a mapped emoji used as decoration gets a label it shouldn't
+("📞 Participate in an on-call rota" would be a contact): a label could
+wait for text that reads as a value of it.
