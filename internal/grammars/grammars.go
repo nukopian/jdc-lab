@@ -9,11 +9,14 @@ import "github.com/nukopian/grammar"
 
 // Pay is a figure of money: with a currency sign, or a period, or both,
 // as one or a range, "up to" it, or not. A figure with neither isn't
-// pay ("5 years"), though facts.Find takes one after a pay label.
+// pay ("5 years"), though facts.Find takes one after a pay label; nor is
+// a bonus, a figure followed by "bonus", with at most a word between.
 var Pay = grammar.MustCompile(`
 grammar Pay {
     token TOP    { [ $<upto>=[ :i up \s+ to ] \s+ ]? <cur>? \s? <min=amount>
-                   [ <.sep> <cur>? \s? <max=amount> ]? <period>? }
+                   [ <.sep> <cur>? \s? <max=amount> ]? <period>? <!before <.bonus>> }
+    # A bonus isn't pay: "£30 bonus for cover", "£1,500 joining bonus".
+    token bonus  { \s+ [ :i bonus >> | <[a..zA..Z-]>+ \s+ :i bonus >> ] }
     token cur    { '£' | '$' | '€' }
     token amount { <num> [ $<k>=[ :i k ] >> ]? }
     token num    { \d+ [ ',' \d ** 3 ]* [ '.' \d+ ]? }
@@ -60,8 +63,14 @@ office based, office-based, site based, site-based
 }()
 
 // Pattern is a work pattern or arrangement, its canonical value as the
-// match's made: "Perm" is permanent.
-var Pattern = grammar.MustCompile(`grammar Pattern { token TOP { @patterns } }`, patterns)
+// made of its word: "Perm" is permanent. "Contract" as a field's label
+// states nothing: before a colon, or "type", "length" or "duration", as
+// in "Contract: Permanent" or "Contract type: Temp to Perm". Other words
+// before a colon are values: "Part-Time: 25 hours per week".
+var Pattern = grammar.MustCompile(`grammar Pattern {
+    token TOP  { <!before :i contract \s* [ ':' | :i [ type | length | duration ] >> ]> <word> }
+    token word { @patterns }
+}`, patterns)
 
 // Schedule is days and times of work: a range of days, with times or
 // not, a range of times on its own, or a rota. A bare range of hours,

@@ -60,7 +60,7 @@ func Find(line string) []Fact {
 	}
 	for _, m := range all(grammars.Pattern, line) {
 		// The word list's canonical value is the match's made.
-		fs = append(fs, fact("pattern", m, map[string]string{"value": m.At("made").Str()}))
+		fs = append(fs, fact("pattern", m, map[string]string{"value": m.At("word.made").Str()}))
 	}
 	for _, m := range all(grammars.Schedule, line) {
 		fs = append(fs, fact("schedule", m, scheduleOf(m)))

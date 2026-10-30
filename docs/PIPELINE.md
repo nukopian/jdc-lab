@@ -641,6 +641,10 @@ above), so that a line is a time, or a rota, by one set of rules:
 | location | a UK postcode, "NE8 1AQ" | `postcode` |
 
 A figure is pay only with a currency sign or a period ("5 years" isn't),
+and not before "bonus", with at most a word between ("£250 referral
+bonus" isn't); "Contract" as a field's label ("Contract type: Temp to
+Perm", "Contract: Permanent") is no work pattern, though other patterns
+before a colon are ("Part-Time: 25 hours per week");
 and in a range, "£25-28k", the top figure's k is the bottom's too; a
 bare "h" is hours only with a period after it ("24h support" isn't); a
 bare range of hours is a time only after a range of days; and a time

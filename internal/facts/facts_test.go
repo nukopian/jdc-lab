@@ -92,3 +92,35 @@ func TestDaysWithoutStops(t *testing.T) {
 		}
 	}
 }
+
+// "Contract" as a field's label states nothing ("Contract type: Temp to
+// Perm" is temp to perm, not a contract), though other patterns before a
+// colon are values; and a bonus isn't pay.
+func TestLabelsAndBonuses(t *testing.T) {
+	tests := []struct {
+		line string
+		want []string // kind: text
+	}{
+		{"Contract Type: Temp to Perm", []string{"pattern: Temp to Perm"}},
+		{"Contract: Permanent", []string{"pattern: Permanent"}},
+		{"Contract length: 12 months, full time", []string{"pattern: full time"}},
+		{"A 12-month contract, full time", []string{"pattern: contract", "pattern: full time"}},
+		{"Part-Time: 25 Hours per Week", []string{"pattern: Part-Time"}},
+		{"Permanent: 37.5 hours per week", []string{"pattern: Permanent"}},
+		{"£1,500 joining bonus for engineers", nil},
+		{"£30 bonus for short-notice cover", nil},
+		{"£32,500 basic salary plus bonus", []string{"pay: £32,500"}},
+		{"£28k + bonus", []string{"pay: £28k"}},
+	}
+	for _, tt := range tests {
+		var got []string
+		for _, f := range Find(tt.line) {
+			if f.Kind == "pattern" || f.Kind == "pay" {
+				got = append(got, f.Kind+": "+f.Text)
+			}
+		}
+		if strings.Join(got, "|") != strings.Join(tt.want, "|") {
+			t.Errorf("Find(%q) = %q, want %q", tt.line, got, tt.want)
+		}
+	}
+}

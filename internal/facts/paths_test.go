@@ -21,7 +21,7 @@ func TestPaths(t *testing.T) {
 		{"pay", grammars.Pay, []string{"~", "from", "cur", "cur[0].~", "min", "max", "min.k", "max.k", "upto",
 			"period", "period.~", "min.num.~", "max.num.~"}},
 		{"hours", grammars.Hours, []string{"~", "from", "num.~", "per.week", "per.day"}},
-		{"pattern", grammars.Pattern, []string{"~", "from", "made"}},
+		{"pattern", grammars.Pattern, []string{"~", "from", "word.made"}},
 		{"schedule", grammars.Schedule, []string{"~", "from", "days", "days.mf", "days.first.~", "days.last.~",
 			"times", "times.a.~", "times.b.~", "rota", "rota.~"}},
 		{"postcode", grammars.Postcode, []string{"~", "from"}},

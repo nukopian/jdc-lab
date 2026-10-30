@@ -12,6 +12,10 @@ has the steps).
 
 ## Unreleased
 
+- The facts grammars no longer read "Contract" in a field's label as a
+  work pattern ("Contract type: Temp to Perm" is temp to perm, not a
+  contract), in 2,879 lines over the samples, nor a bonus as pay ("£250
+  referral bonus", "£100 joining bonus"), in 415.
 - Text repeated in a role section, under "The role" or "Job
   description", is judged as text repeated in the duties and
   requirements is: about the job, a template for it, not boilerplate.
