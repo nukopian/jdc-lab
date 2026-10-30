@@ -69,3 +69,28 @@ made-up text in the shapes seen, and PIPELINE.md has the new stage.
   and fields folded into the text, but few whole walls were folded
   layout: what's left is prose, which this item's plan is for. Step 1,
   the names, is next.
+- **Names agreed (step 1)**, after reading real walls with Iain:
+  - a **wall** is a paragraph or line over 400 characters: over the
+    three samples, about 11,000, among them the 487 that mix sentences
+    repeated across ads with their own, and all five with a heading run
+    in (466 to 1,619 characters);
+  - a **sentence** runs up to a full stop, question mark or exclamation
+    mark followed by a capital, or to the wall's end, kept as written;
+  - a **run-in heading** is a known heading phrase (`headings.txt`) at
+    a sentence's start, before a capital: in the walls it comes after a
+    sentence's end ("… completion. The Role Reporting to …") or opens
+    one with no stop at all ("Required Attributes and Experience The
+    ideal …"), so the plan's "between a sentence's end and a capital"
+    becomes "at a sentence's start";
+  - `internal/sentences`, with `sentences.Split(text) []string`, pure
+    text; and `internal/walls`, with `walls.Split([]blocks.Block)
+    []blocks.Block`, a stage between blocks and headings, as headings
+    can't import sections, where `headings.txt` is read;
+  - a wall's sentences become Lines, as a `<br>` makes, so later stages
+    need learn nothing new, and a run-in heading a Line of its own with
+    the cue `run_in`. A wall is then printed a sentence to a line.
+- **Seen in the walls, beyond this plan:** a prose wall's sentences run
+  from company to duties ("Duties will include …") to requirements
+  ("You will have …") to pay, and `wording`'s openings could place each
+  once they're lines. Some of that may follow from step 4 on its own;
+  what doesn't is for an idea after this item.
