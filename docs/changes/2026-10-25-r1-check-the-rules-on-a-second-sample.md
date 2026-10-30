@@ -123,7 +123,7 @@ gap is out of PIPELINE.md, and its figures are updated.
 - **What's left:**
   - Text with no heading of its own, after the requirements, counts as
     template, as footers do
-    ([roadmap 4](../../ROADMAP.md#4-make-boilerplates-verdict-right)),
+    ([roadmap 4](2026-10-28-r4-make-boilerplates-verdict-right.md)),
     though here it isn't at the end of the ad.
   - Phrases are found leftmost first, without overlapping (the longest
     where two start at the same word), so "To join

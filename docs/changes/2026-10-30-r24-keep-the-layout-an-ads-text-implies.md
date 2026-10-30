@@ -169,5 +169,5 @@ re-measured on what's left.
   lines, are read as headings of no known kind (6 in the samples):
   [idea 28](../../ROADMAP.md#28-bold-labels-on-benefit-lines-arent-headings).
   The wall paragraphs left are
-  [roadmap 5](../../ROADMAP.md#5-split-walls-of-text-into-sentences)'s.
+  [roadmap 5](2026-10-30-r5-split-walls-of-text-into-sentences.md)'s.
   Inline lists and italic stay ideas 25 and 26. Nothing reads `gap` yet.

@@ -43,18 +43,20 @@ embeddings, and a large language model only where those fall short.
 ## Where it stands
 
 - **A pipeline, by rules alone.** It splits each ad into the blocks a
-  reader sees, as its author laid them out, by newlines as well as tags,
-  splits walls of text into sentences, finds its headings and fields,
-  those run into walls too, divides it into sections
-  (summary, role, responsibilities, requirements, benefits and the
-  rest), and
+  reader sees, as its author laid them out, by newlines as well as
+  tags, splits walls of text into sentences, finds its headings and
+  fields, those run into walls too, divides it into sections (summary,
+  role, responsibilities, requirements, benefits and the rest), and
   finds the boilerplate that ads repeat whatever the job. Grammars read
   the facts ads state, pay, hours, work pattern, schedule and postcode,
-  as values. `shape` shows any ad at each stage, from its HTML to its
-  chunks, to see where its shape changes. `chunk` shows any ad's chunks,
-  saying what to embed, what
-  becomes metadata, and what placed each, as text, data, or web pages
-  of ads before and after, and each
+  as values. Its chunks are what an embedding job would ask for: the
+  ad's title on its own, one chunk for each kind of section, the
+  requirements with their essential and desirable as sub-lists, and the
+  details listing every field and fact the ad states, wherever it
+  states them. `shape` shows any ad at each stage, from its HTML to its
+  chunks, to see where its shape changes; `chunk` shows any ad's
+  chunks, saying what to embed, what becomes metadata, and what placed
+  each, as text, data, or web pages of ads before and after; and each
   run shows 20 ads in their chunks, the same in every run, to read by
   eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
   what it measured, and how to improve it.
@@ -62,15 +64,15 @@ embeddings, and a large language model only where those fall short.
   kinds of job, and checked on a third of 21,000. 88% of ads have
   headings, and about four in five heading uses are recognised by
   rule, on all three. About a fifth of an ad is boilerplate, found
-  even with a few words changed, or company, application and legal
-  text, that probably needn't be embedded: a first answer to whether
-  search can improve while embedding less. A third of ads state a
-  working pattern, such as "Monday to Friday, 9am–5pm": a fact for
-  metadata, not embedding. Chunked, an ad's embedded text is 68% of its
-  tokens, its title and the employer's own words included: the rest is
-  facts, benefits, notices and boilerplate. Text under a heading of no known kind is placed by an
-  educated guess, mostly as the summary, and right for about four
-  sections in five.
+  even with a few words changed, or application and legal text, that
+  probably needn't be embedded: a first answer to whether search can
+  improve while embedding less. A third of ads state a working
+  pattern, such as "Monday to Friday, 9am–5pm": a fact for metadata,
+  not embedding. Chunked, an ad's embedded text is 68% of its tokens,
+  its title and the employer's own words included: the rest is facts,
+  benefits, notices and boilerplate. Text under a heading of no known
+  kind is placed by an educated guess, mostly as the summary, and
+  right for about four sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
   and why: nothing is under way, and its ideas are next to choose
   from.
