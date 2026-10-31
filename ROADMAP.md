@@ -50,6 +50,64 @@ Nothing at the moment.
 
 ## Next
 
+### 26. Italic as a cue, like bold
+
+**Serves:** structure
+
+**Size:** XS (1)
+
+**What:** record a paragraph all in `<em>` or `<i>`, as blocks records
+one all in bold, so headings read italic as a cue too.
+
+**Why:** ads set headings ("You'll also need to:") and notices in
+italic, and without a cue those are read as text: 470 ads in the
+samples have one, so it reaches many ads for little work.
+
+**Done when** blocks records italic beside bold; headings takes it as a
+cue where it takes bold; tests cover both tags with made-up text; a run
+against the one before shows which headings were gained, and nothing
+else moved; and PIPELINE.md says so, its Known gaps row gone.
+
+### 34. Metadata as filters in the retrieval test
+
+**Serves:** metadata
+
+**Size:** M (3)
+
+**What:** use the facts read as metadata (pay, hours, work pattern,
+place) as filters beside the embeddings in the retrieval test, and
+measure what they add.
+
+**Why:** that facts can be filtered on rather than embedded is the
+lab's central claim, and it's untested: structure work is judged so far
+by figures that stand in for search, not by search.
+
+**Done when** the retrieval test has queries that name a fact as well
+as a title ("in Leeds", "part-time"), scored with the fact as a filter
+and with it left to the embeddings; the figures are in its record and
+the README's Where it stands.
+
+### 33. Retrieval with boilerplate's verdict checked
+
+**Serves:** search
+
+**Size:** M (3)
+
+**What:** check boilerplate's verdict on a sample by hand, and measure
+whether leaving out what it takes costs retrieval anything, for queries
+beyond titles.
+
+**Why:** the first retrieval test found that an ad without its
+boilerplate is found as well as the whole, for 16% fewer tokens, but
+titles can't see what's lost if that text is about the job, and about
+one in seven of the texts roadmap 3 newly found are openers about the
+job. Nothing is dropped until this is known.
+
+**Done when** a sample of what the verdict takes is judged by hand,
+with the share that's about the job; the retrieval test is run with
+queries a title can't answer, with and without that text; and the
+figures, and whether to drop it, are in the record and the README.
+
 ### 28. Bold labels on benefit lines aren't headings
 
 **Serves:** structure
@@ -71,6 +129,25 @@ lists, with no heading of their own; tests cover the shapes with
 made-up text; a run against the one before shows nothing else moved;
 and PIPELINE.md says how headings reads them.
 
+### 12. Boilerplate thresholds scaled to the ads' number
+
+**Serves:** structure
+
+**Size:** M (3)
+
+**What:** scale boilerplate's thresholds, now counts of title groups,
+to the number of ads read, so its verdict doesn't depend on how many
+there are.
+
+**Why:** more ads pass a count more easily, so boilerplate's share
+rises as each batch is added (12.5% of text on 5,000 ads, 15.1% on
+21,000, by word for word matching), and figures from before and after a
+batch don't compare. It's to be done before the next batch is added.
+
+**Done when** boilerplate's share is steady, within a point, across the
+samples and their union; tests cover the scaling; and PIPELINE.md's
+figures and thresholds are updated.
+
 ## Later
 
 Nothing at the moment.
@@ -88,14 +165,6 @@ comparison of `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`
 fairly, with E5's prefixes and many sections, beside other small local
 models.
 
-### 12. Boilerplate thresholds scaled to the ads' number
-
-Added 2026-10-27. **Size:** M (3). Boilerplate's thresholds are counts
-of title groups, which more ads pass more easily, so its share rises as
-each batch is added (12.5% of text on 5,000 ads, 15.1% on 21,000, by
-word for word matching): figures from before and after a new batch
-don't compare.
-
 ### 23. Split a list with no heading by its wording
 
 Added 2026-10-28. **Size:** M (3). A list that follows a headed one,
@@ -112,13 +181,6 @@ its items between bullet symbols ("Free parking • Pension • 25 days'
 holiday"). Cleaning drops the symbols, so the list is embedded as one
 line of text: the symbols could split it into items instead. 49 ads in
 the samples.
-
-### 26. Italic as a cue, like bold
-
-Added 2026-10-30. **Size:** XS (1). Blocks records a paragraph all in
-bold, but not one all in `<em>` or `<i>`, though ads set headings
-("You'll also need to:") and notices in italic too. 470 ads in the
-samples have one.
 
 ### 27. Keep what label emoji mean, wherever they are
 
@@ -160,18 +222,6 @@ Added 2026-10-30, split from 10 (does it make search better?, added
 [record](docs/changes/2026-10-27-r10-a-first-retrieval-test.md)).
 **Size:** L (5). Queries with the ads people judge right for them, so
 retrieval is measured by more than titles. Needs people's judgements.
-
-### 33. Retrieval with boilerplate's verdict checked
-
-Added 2026-10-30, split from 10. **Size:** M (3). Measure whether
-leaving out what boilerplate's verdict takes costs retrieval anything,
-before anything is dropped.
-
-### 34. Metadata as filters in the retrieval test
-
-Added 2026-10-30, split from 10. **Size:** M (3). Use the facts read as
-metadata (pay, hours, work pattern, place) as filters beside the
-embeddings, and measure what they add.
 
 ### 35. Compared with a managed embedding service
 
