@@ -17,6 +17,10 @@ has the steps).
   embedded with `BAAI/bge-small-en-v1.5`: phrases to add to
   `headings.txt`, about four in five confident suggestions right, read
   by eye. A first try at roadmap 40's offline use.
+- grammar v0.4.2, whose `Trace` option prints a trace of a parse, rule
+  by rule, so a grammar of the lab's that won't match can be watched
+  rather than guessed at. Nothing in the lab uses it yet, and every
+  stage's output is unchanged.
 
 ## v0.6.0 (2026-10-30)
 
