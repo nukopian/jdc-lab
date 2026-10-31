@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 43.
+number: 44.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -46,7 +46,18 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment.
+### 43. Read facts only where they can be
+
+**Serves:** deployment
+
+**Size:** S (2)
+
+Chunking is the slowest step, about 200 ads a second, nearly all of it
+running the fact grammars over every line, some lines more than once.
+Each line's facts read once per ad, and a grammar skipped for a line
+that can't hold what it matches, should make it much cheaper without
+changing a fact. The plan is in its
+[record](docs/changes/2026-10-31-r43-read-facts-only-where-they-can-be.md).
 
 ## Next
 
