@@ -294,3 +294,32 @@ func TestDivideNotSubtitle(t *testing.T) {
 		t.Errorf("\n got: %q\nwant: %q", got, want)
 	}
 }
+
+// A heading set apart by italic alone, of no known kind, is text: italic
+// sets notes, straplines and codes apart as often as headings. Over a
+// list, or of a known kind, it's a heading still, as one in bold is.
+func TestDivideItalic(t *testing.T) {
+	html := `<p>We're a friendly team.</p>` +
+		`<p><em>Support | SQL | Deployment</em></p><p>Join us in Leeds.</p>` +
+		`<p><em>Key Responsibilities</em></p><p>Cooking.</p>` +
+		`<p><em>It would be great if you also have</em></p><ul><li>A van</li></ul>` +
+		`<p><i>Want to know more?</i></p><p>Call us.</p>` +
+		`<p><b>Software Development</b></p><p>Some Go.</p>`
+	var got []string
+	for _, s := range Divide(headings.Read(blocks.Split(html), "")) {
+		line := fmt.Sprintf("%s %q:", s.Kind, s.Heading)
+		for _, p := range s.Parts {
+			line += fmt.Sprintf(" %s(%s)", p.Role, p.Text)
+		}
+		got = append(got, line)
+	}
+	want := []string{
+		`summary "": text(We're a friendly team.) text(Support | SQL | Deployment) text(Join us in Leeds.)`,
+		`responsibilities "Key Responsibilities": text(Cooking.)`,
+		`unmapped "It would be great if you also have": text(A van) text(Want to know more?) text(Call us.)`,
+		`unmapped "Software Development": text(Some Go.)`,
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("\n got: %q\nwant: %q", got, want)
+	}
+}

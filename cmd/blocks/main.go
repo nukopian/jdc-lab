@@ -37,6 +37,7 @@ type tally struct {
 	kinds              map[blocks.Kind]int
 	items              int
 	heading, bold, led int
+	italic             int
 	gap                int
 	walls, wallLines   int
 	runIn              int
@@ -99,6 +100,9 @@ func (t *tally) add(bs []blocks.Block) {
 		if c.Bold {
 			t.bold++
 		}
+		if c.Italic {
+			t.italic++
+		}
 		if c.BoldLead != "" {
 			t.led++
 		}
@@ -140,6 +144,7 @@ func (t tally) print(target string) {
 	fmt.Printf("%-10s %6d\n", "heading", t.heading)
 	fmt.Printf("%-10s %6d\n", "bold", t.bold)
 	fmt.Printf("%-10s %6d\n", "bold lead", t.led)
+	fmt.Printf("%-10s %6d\n", "italic", t.italic)
 	fmt.Printf("%-10s %6d\n\n", "gap", t.gap)
 	fmt.Printf("walls over %d characters: %d, split into %d lines, %d of them headings run in\n",
 		walls.MinChars, t.walls, t.wallLines, t.runIn)

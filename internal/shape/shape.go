@@ -133,6 +133,9 @@ func cues(c blocks.Cues) string {
 	if c.Bold {
 		cs = append(cs, "bold")
 	}
+	if c.Italic {
+		cs = append(cs, "italic")
+	}
 	if c.BoldLead != "" {
 		cs = append(cs, fmt.Sprintf("bold lead %q", c.BoldLead))
 	}

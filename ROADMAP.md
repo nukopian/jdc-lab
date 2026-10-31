@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 42.
+number: 43.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -46,16 +46,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 26. Italic as a cue, like bold
-
-**Serves:** structure
-
-**Size:** XS (1)
-
-Blocks records a paragraph all in bold, but not one all in `<em>` or
-`<i>`, though ads set headings ("You'll also need to:") and notices in
-italic too: 470 ads in the samples have one. The plan is in its
-[record](docs/changes/2026-10-31-r26-italic-as-a-cue-like-bold.md).
+Nothing at the moment.
 
 ## Next
 
@@ -311,3 +302,16 @@ learning from the rules' own labels, most promising first:
 - **A judged set of sections:** sections judged by hand, chosen where
   the ways above disagree most, to measure any of them on text the
   rules couldn't place.
+
+### 42. Codes and straplines aren't headings
+
+Added 2026-10-31. **Size:** S (2). Job-board codes ("INDPSAL",
+"#LI-KC1") on a line of their own, in bold, are read as headings, in
+about 450 ads in the samples, and so are straplines of terms between
+bars ("Permanent | Full-time | 37.5 hours per week"), in about 400, some
+of them facts. Most are of no known kind, starting a section the guess
+places; one with a kind's word in it ("Application Support | SQL") starts
+that kind's section, taking the ad's opening with it. Read a line of
+codes as text, and one of three or more terms between bars as text, or
+as facts. Found by roadmap 26, which reads those set in italic alone, of no
+known kind, as text.

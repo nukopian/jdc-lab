@@ -167,6 +167,7 @@ symbols are about 1,150 of them.
 |---|---|
 | `heading` | the text was in `<h1>` to `<h6>` |
 | `bold` | all of it was in `<strong>` or `<b>` |
+| `italic` | all of it was in `<em>` or `<i>`; over the three samples, 4,723 paragraphs, lines and items |
 | `bold_lead` | it starts with bold text: `Salary:` in "**Salary:** £30,000" |
 | `added` | the English label cleaning added: `Location: ` for "📍 Leeds" |
 | `gap` | a blank line came before it: two `<br>`s with nothing between, or a blank line in text laid out by its newlines (not the space every paragraph has); over the three samples, 69,126 lines and paragraphs. Nothing reads it yet |
@@ -189,11 +190,11 @@ heading's cue, and a `<p>` or `<br>` after an item's text ends the item
 (see Lists), so a list never closed doesn't swallow the rest of the ad.
 Bold opened in a paragraph ends with it, closed or not: in the samples,
 each of the 5 paragraphs a `<strong>` left open ran into is a footer
-after a forgotten `</strong>`, not text meant bold. Bold around
-paragraphs goes on. HTML's other block-level tags, such as `<aside>`, `<center>`
+after a forgotten `</strong>`, not text meant bold. Italic is read the
+same way. Bold or italic around paragraphs goes on. HTML's other block-level tags, such as `<aside>`, `<center>`
 and `<figure>`, end blocks too, though none is in the samples.
 
-It decides nothing. Whether a bold block is a heading is the next stage's
+It decides nothing. Whether a bold or italic block is a heading is the next stage's
 call, which keeps the HTML parsing apart from the judgement, so either
 can change without the other.
 
@@ -261,7 +262,7 @@ returns them as **parts**:
 
 | Role | How it's recognised | Example |
 |---|---|---|
-| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day (a bare range of hours, such as 8-5, only beside a range of days); no pattern of work ("4 on 4 off", or days or nights beside a range of days), nor only facts ("Permanent | Full-time", "Monday - Friday"), unless it ends in `:`; no contact details an export took out ("(phone number removed)"); not ending in `.` | "**Key Responsibilities**" |
+| `heading` | short (`MaxWords`, 10, or `MaxIntroWords`, 20, with a cue and ending in `:`), with a cue (heading tag, all bold, or all italic without a bold lead) or ending in `:` or `;`; a word that isn't a conjunction; no money, long numbers or times of day (a bare range of hours, such as 8-5, only beside a range of days); no pattern of work ("4 on 4 off", or days or nights beside a range of days), nor only facts ("Permanent \| Full-time", "Monday - Friday"), unless it ends in `:`; no contact details an export took out ("(phone number removed)"); not ending in `.` | "**Key Responsibilities**" |
 | `field` | "Label: value", "Label \| value" or "Label - value", where the label is a known one | "Hours: 40 per week" |
 | `repeat` | only the ad's title or location again | "**Delivery Driver**" at the top |
 | `text` | everything else | |
@@ -285,10 +286,16 @@ A few rules refine this:
 - **A field's label written as a heading,** with a short value (up to
   `MaxValueWords`, 15) on the next line, is joined into one field:
   "**Working Hours**", then "Monday to Friday".
-- **A long line in bold that ends with a colon** introduces what follows,
-  as a heading does, so it can have up to `MaxIntroWords` (20) words:
-  "**As a Mobile Mechanic, you'll get benefits that go the extra mile:**".
-  Without the colon, or without the bold or a heading tag, it's a sentence.
+- **A long line in bold or italic that ends with a colon** introduces
+  what follows, as a heading does, so it can have up to `MaxIntroWords`
+  (20) words: "**As a Mobile Mechanic, you'll get benefits that go the
+  extra mile:**". Without the colon, or without the bold, italic or a
+  heading tag, it's a sentence.
+- **Italic is a weaker cue than bold.** Ads set notes, straplines and
+  job-board codes in italic as often as headings, so a heading only
+  italic set apart is marked (`italic`), and sections reads one of no
+  known kind as text. An italic line with a bold lead,
+  "***Directorate:** Transformation*", is read by its lead.
 - **Conjunctions alone aren't headings.** "**OR**", "**and**",
   "**Either:**" or "**Plus:**" on a line of their own join what's before
   them to what's after, so the section carries on.
@@ -343,6 +350,14 @@ stage, which knows no kinds, still counts it). Before, the whole line
 was an unmapped heading, and everything under it, sometimes the whole
 ad, was unmapped too. A label after the title, ending in a colon
 ("You:") or over a list, is a heading still.
+
+A heading only italic set apart (see [Headings](#4-headings-what-each-block-is)),
+of no known kind and over no list, is text too, and not counted as a
+heading: "Hybrid/Flexible working options available", a strapline, a
+code. Over the three samples, italic gained 131 heading uses of a known
+kind ("Desirable:", "What's on Offer", "Week 1 - Nights") and 18 of no
+known kind, each over a list ("Cost Analysis and Commercial Support");
+116 more, of no known kind, are read as text.
 
 **The phrases are data.**
 [`internal/sections/headings.txt`](../internal/sections/headings.txt)
@@ -919,7 +934,8 @@ next change, run `claude/before` again.
 On the three samples together, measured on 2026-10-27 with
 `go run ./cmd/pipeline run latest`, and again on 2026-10-30, after
 roadmap 24 kept the ads' layout and roadmap 5 split walls into
-sentences, where they moved a figure here:
+sentences, and on 2026-10-31, after roadmap 26 read italic as a cue,
+where they moved a figure here:
 
 | Sample | Ads | Leans towards |
 |---|---:|---|
@@ -934,7 +950,7 @@ and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
 **Headings.** 88% of ads have at least one heading. Headings of a known
-kind are 81% of heading uses; ads with every heading known, 62%; ads
+kind are 81% of heading uses; ads with every heading known, 61%; ads
 with no section but the summary, 4%.
 
 **Sections and boilerplate**, by share of all the ads' text:
@@ -1008,8 +1024,8 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Gap | Effect | Likely fix |
 |---|---|---|
 | [Inline lists](../ROADMAP.md#25-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
-| [Italic not a cue](../ROADMAP.md#26-italic-as-a-cue-like-bold) | Headings and notices set in italic carry no cue, as bold ones do | Record italic as blocks records bold |
 | [Label emoji lost](../ROADMAP.md#27-keep-what-label-emoji-mean-wherever-they-are) | A label emoji is written as its label only where it opens a line, and some clock faces aren't mapped, so facts set between emoji lose their labels; a decorative one can get a label it shouldn't | Label an emoji wherever it opens a value, map every clock face, and check the value fits the label |
+| [Codes and straplines taken for headings](../ROADMAP.md#42-codes-and-straplines-arent-headings) | Job-board codes ("INDPSAL", "#LI-KC1") and straplines of terms between bars, set in bold, are headings, mostly of no known kind; a strapline with a kind's word in it ("Application Support \| SQL") starts that kind's section | Read a line of codes, or of three or more terms between bars, as text, or as facts |
 | [Bold labels taken for headings](../ROADMAP.md#28-bold-labels-on-benefit-lines-arent-headings) | Lines of a benefits list that open with a bold label are read as headings of no known kind | Read a bold lead before " - ", amid lines like it, as a line of the list |
 
 ## Words used here
@@ -1017,7 +1033,7 @@ and the figures in [What it measured](#what-it-measured) are updated.
 | Word | Meaning |
 |---|---|
 | block | a paragraph, line or list, as a reader sees it |
-| cue | what the markup says about text: heading tag, bold, bold lead, a gap before it; and run in, from walls |
+| cue | what the markup says about text: heading tag, bold, italic, bold lead, a gap before it; and run in, from walls |
 | part | a block or list item with its role |
 | role | heading, field, repeat or text |
 | wall | a paragraph or line over 400 characters, split into sentences |

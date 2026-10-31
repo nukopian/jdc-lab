@@ -28,6 +28,9 @@ func show(bs []blocks.Block) []string {
 		if b.Cues.Bold {
 			s += " bold"
 		}
+		if b.Cues.Italic {
+			s += " italic"
+		}
 		if b.Cues.Gap {
 			s += " gap"
 		}
@@ -74,6 +77,12 @@ func TestSplit(t *testing.T) {
 			slices.Concat([]string{`line "Benefits include a pension."`, `line "We are The Best Agency in town."`,
 				`line "As A Driver you will travel."`},
 				repeat(`line "`+filler+`"`, strings.Count(pad("Benefits include a pension. We are The Best Agency in town. As A Driver you will travel."), filler))),
+		},
+		{
+			"the wall's italic goes with every line",
+			blocks.Block{Kind: blocks.Paragraph, Text: pad("We're hiring a driver."), Cues: blocks.Cues{Italic: true}},
+			slices.Concat([]string{`line "We're hiring a driver." italic`},
+				repeat(`line "`+filler+`" italic`, strings.Count(pad("We're hiring a driver."), filler))),
 		},
 		{
 			"the wall's gap goes with its first line, its bold with every line",

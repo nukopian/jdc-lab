@@ -17,6 +17,16 @@ has the steps).
   embedded with `BAAI/bge-small-en-v1.5`: phrases to add to
   `headings.txt`, about four in five confident suggestions right, read
   by eye. A first try at roadmap 40's offline use.
+- A heading set in italic is found as one set in bold is: blocks
+  records `italic` for text all in `<em>` or `<i>` (4,723 blocks in the
+  samples), and headings takes it as a cue. Since ads set notes,
+  straplines and job-board codes in italic as often as headings, one
+  that only italic set apart, of no known kind and over no list, is
+  read as text, and a bold label in an italic line is still the
+  heading. Over the samples, headings of a known kind rise from 74,646
+  uses to 74,777, still 81%; ads with every heading known go from
+  15,965 to 15,961, so 61%, not 62% (roadmap 26;
+  [record](docs/changes/2026-10-31-r26-italic-as-a-cue-like-bold.md)).
 - grammar v0.4.2, whose `Trace` option prints a trace of a parse, rule
   by rule, so a grammar of the lab's that won't match can be watched
   rather than guessed at. Nothing in the lab uses it yet, and every

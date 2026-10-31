@@ -76,15 +76,19 @@ type Part struct {
 	// Whole is the block it was split from, when only a space ended the
 	// title: "Head Chef Manager" of "Manager".
 	Whole string `json:"whole,omitempty"`
+	// Italic is true for a heading that only its italic set apart: ads set
+	// notes, straplines and codes in italic as often as headings, so
+	// internal/sections reads one of no known kind as text.
+	Italic bool `json:"italic,omitempty"`
 }
 
-// MaxWords is the most words a heading has. Longer bold text is a bold
-// sentence, not a heading.
+// MaxWords is the most words a heading has. Longer bold or italic text is
+// a sentence set apart, not a heading.
 const MaxWords = 10
 
-// MaxIntroWords is the most words a heading has when it's in bold, or a
-// heading tag, and ends with a colon: it introduces what follows, as in
-// "As a Mobile Mechanic, you'll get benefits that go the extra mile:".
+// MaxIntroWords is the most words a heading has when it's in bold or
+// italic, or a heading tag, and ends with a colon: it introduces what
+// follows, as in "As a Mobile Mechanic, you'll get benefits that go the extra mile:".
 const MaxIntroWords = 20
 
 // fieldLabels are the labels of fields, by key. A label not here is no
@@ -175,13 +179,14 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 		return []Part{p}
 	}
 	most := MaxWords
-	if (cues.Heading || cues.Bold) && strings.HasSuffix(strings.TrimRightFunc(text, unicode.IsSpace), ":") {
+	if setApart(cues) && strings.HasSuffix(strings.TrimRightFunc(text, unicode.IsSpace), ":") {
 		most = MaxIntroWords
 	}
 	// A heading run into a wall is one: internal/walls found it by its
 	// phrase, or as a title before a sentence.
-	if headingShaped(text, key, most) && (cues.Heading || cues.Bold || cues.RunIn || endsAsLabel(text)) {
-		return []Part{{Role: Heading, Text: text, Key: key}}
+	if headingShaped(text, key, most) && (setApart(cues) || cues.RunIn || endsAsLabel(text)) {
+		italic := !cues.Heading && !cues.Bold && !cues.RunIn && !endsAsLabel(text)
+		return []Part{{Role: Heading, Text: text, Key: key, Italic: italic}}
 	}
 	// A bold lead that's a heading of its own, run into its text.
 	if lead := cues.BoldLead; lead != "" {
@@ -191,6 +196,14 @@ func block(text string, cues blocks.Cues, repeats map[string]bool) []Part {
 		}
 	}
 	return []Part{{Role: Text, Text: text}}
+}
+
+// setApart reports whether the markup set a block apart from text, as a
+// heading: in a heading tag, or all in bold or italic. An italic line
+// with a bold lead isn't: the lead is its heading, if anything is, as in
+// "*__Directorate:__ Transformation*".
+func setApart(cues blocks.Cues) bool {
+	return cues.Heading || cues.Bold || (cues.Italic && cues.BoldLead == "")
 }
 
 // afterTitle splits the ad's title off a block that opens with it, as a

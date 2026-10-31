@@ -66,7 +66,7 @@ func split(wall blocks.Block) []blocks.Block {
 		out = append(out, blocks.Block{Kind: blocks.Line, Text: s})
 	}
 	for i := range out {
-		out[i].Cues.Bold = wall.Cues.Bold
+		out[i].Cues.Bold, out[i].Cues.Italic = wall.Cues.Bold, wall.Cues.Italic
 	}
 	first := &out[0].Cues
 	first.Heading, first.Added, first.Bullet, first.Gap = wall.Cues.Heading, wall.Cues.Added, wall.Cues.Bullet, wall.Cues.Gap

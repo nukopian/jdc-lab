@@ -64,6 +64,26 @@ func TestRead(t *testing.T) {
 			[]string{`heading "The Role" key="the role"`, `text "We build things."`},
 		},
 		{
+			"an italic heading, in <em> or <i>, as a bold one",
+			`<p><em>The Role</em></p><p><i>What you'll need:</i></p><p>We build <em>things</em>.</p>`,
+			[]string{`heading "The Role" key="the role"`, `heading "What you'll need:" key="what you'll need"`,
+				`text "We build things."`},
+		},
+		{
+			"a bold lead in an italic line is its heading, as without the italic",
+			`<p><em><strong>Directorate:</strong> Transformation</em></p>`,
+			[]string{`heading "Directorate:" key="directorate"`, `text "Transformation"`},
+		},
+		{
+			"long italic text is a sentence, unless it ends in a colon",
+			`<p><i>We are looking for an experienced and motivated engineer to join our team</i></p>` +
+				`<p><em>As a Mobile Mechanic with us, you'll get benefits that go the extra mile:</em></p>`,
+			[]string{
+				`text "We are looking for an experienced and motivated engineer to join our team"`,
+				`heading "As a Mobile Mechanic with us, you'll get benefits that go the extra mile:" key="as a mobile mechanic with us you'll get benefits that go the extra mile"`,
+			},
+		},
+		{
 			"a heading tag",
 			`<h2>About us</h2>`,
 			[]string{`heading "About us" key="about us"`},

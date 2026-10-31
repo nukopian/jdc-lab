@@ -45,7 +45,8 @@ embeddings, and a large language model only where those fall short.
 - **A pipeline, by rules alone.** It splits each ad into the blocks a
   reader sees, as its author laid them out, by newlines as well as
   tags, splits walls of text into sentences, finds its headings and
-  fields, those run into walls too, divides it into sections (summary,
+  fields, by bold, italic and heading tags, and those run into walls
+  too, divides it into sections (summary,
   role, responsibilities, requirements, benefits and the rest), and
   finds the boilerplate that ads repeat whatever the job. Grammars read
   the facts ads state, pay, hours, work pattern, schedule and postcode,
@@ -74,9 +75,9 @@ embeddings, and a large language model only where those fall short.
   kind is placed by an educated guess, mostly as the summary, and
   right for about four sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why. Under way: italic read as a cue for headings, as bold is.
-  Next: two retrieval tests, facts as filters, and whether what
-  boilerplate takes is about the job.
+  and why: nothing is under way, and next are two retrieval tests:
+  facts as filters, and whether what boilerplate takes is about the
+  job.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

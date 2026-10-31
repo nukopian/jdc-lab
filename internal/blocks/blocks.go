@@ -53,6 +53,8 @@ type Cues struct {
 	Heading bool `json:"heading,omitempty"`
 	// Bold is true when all the text is in <strong> or <b>.
 	Bold bool `json:"bold,omitempty"`
+	// Italic is true when all the text is in <em> or <i>.
+	Italic bool `json:"italic,omitempty"`
 	// BoldLead is the bold text it starts with, when not all of it is
 	// bold: "Salary:" in "<strong>Salary:</strong> £30,000".
 	BoldLead string `json:"bold_lead,omitempty"`
@@ -135,6 +137,7 @@ type builder struct {
 	lines   []Item // pieces of the current block that <br>s have ended
 	items   []Item // the list being gathered
 	bold    int    // how many <strong> or <b> we're inside
+	italic  int    // how many <em> or <i> we're inside
 	skip    int    // how many <script> or <style> we're inside
 	heading int    // how many <h1> to <h6> we're inside
 	list    int    // how many <ul> or <ol> we're inside
@@ -145,8 +148,17 @@ type builder struct {
 	gap      bool // a blank line came since the last line or block
 	afterBr  bool // a <br> came since the last visible text, in this block
 
-	inP   bool // inside a <p>, closed or not
-	pBold int  // how many <strong> or <b> we were inside when it opened
+	inP     bool // inside a <p>, closed or not
+	pBold   int  // how many <strong> or <b> we were inside when it opened
+	pItalic int  // how many <em> or <i> we were inside when it opened
+}
+
+// style is how text is set: in bold, in italic, or both.
+type style struct{ bold, italic bool }
+
+// style returns how text written now is set.
+func (b *builder) style() style {
+	return style{bold: b.bold > 0, italic: b.italic > 0}
 }
 
 func (b *builder) text(s string) {
@@ -157,7 +169,7 @@ func (b *builder) text(s string) {
 		b.afterBr = false
 	}
 	if !b.plain && (b.inItem || b.heading > 0) {
-		b.piece.write(s, b.bold > 0) // an item or heading stays one piece
+		b.piece.write(s, b.style()) // an item or heading stays one piece
 		return
 	}
 	// Newlines end lines and blocks, but only once more visible text comes:
@@ -176,15 +188,15 @@ func (b *builder) text(s string) {
 	for i, r := range s {
 		switch {
 		case r == '\n' && (b.plain || seen):
-			b.piece.write(s[start:i], b.bold > 0)
+			b.piece.write(s[start:i], b.style())
 			start = i + 1
 			b.newlines++
 		case b.newlines > 0 && visible(string(r)):
-			b.piece.write(s[start:i], b.bold > 0)
+			b.piece.write(s[start:i], b.style())
 			start = i
 			switch {
 			case !b.plain && (unicode.IsLower(r) || b.piece.continues()):
-				b.piece.write(" ", b.bold > 0)
+				b.piece.write(" ", b.style())
 			case b.newlines > 1:
 				b.endBlock()
 				b.gap = b.started() // a blank line before all of it is no gap
@@ -197,7 +209,7 @@ func (b *builder) text(s string) {
 			seen = true
 		}
 	}
-	b.piece.write(s[start:], b.bold > 0)
+	b.piece.write(s[start:], b.style())
 }
 
 func (b *builder) start(tag atom.Atom) {
@@ -206,10 +218,12 @@ func (b *builder) start(tag atom.Atom) {
 		b.skip++
 	case tag == atom.Strong || tag == atom.B:
 		b.bold++
+	case tag == atom.Em || tag == atom.I:
+		b.italic++
 	case tag == atom.Br:
 		switch {
 		case b.heading > 0:
-			b.piece.write(" ", false) // a heading stays one piece
+			b.piece.write(" ", style{}) // a heading stays one piece
 		case b.inItem:
 			b.leaveItem()
 		default:
@@ -251,7 +265,7 @@ func (b *builder) start(tag atom.Atom) {
 		b.endHeading()
 		b.boundary()
 		if tag == atom.P {
-			b.inP, b.pBold = true, b.bold
+			b.inP, b.pBold, b.pItalic = true, b.bold, b.italic
 		}
 	}
 }
@@ -262,9 +276,11 @@ func (b *builder) end(tag atom.Atom) {
 		b.skip = max(b.skip-1, 0)
 	case tag == atom.Strong || tag == atom.B:
 		b.bold = max(b.bold-1, 0)
+	case tag == atom.Em || tag == atom.I:
+		b.italic = max(b.italic-1, 0)
 	case isHeading(tag):
 		if b.inItem {
-			b.piece.write(" ", false)
+			b.piece.write(" ", style{})
 			b.heading = max(b.heading-1, 0)
 		} else {
 			b.endHeading()
@@ -318,13 +334,14 @@ func (b *builder) endHeading() {
 }
 
 // closeP ends a <p>, at its end tag or at a block or list that opens
-// before it, closing it as a browser does. Bold opened in the paragraph
-// ends with it, closed or not, though a browser carries it on: where ads
-// leave a <strong> open, the paragraph after is a footer, not meant bold.
-// Bold around the paragraph goes on.
+// before it, closing it as a browser does. Bold or italic opened in the
+// paragraph ends with it, closed or not, though a browser carries it on:
+// where ads leave a <strong> open, the paragraph after is a footer, not
+// meant bold. Bold or italic around the paragraph goes on.
 func (b *builder) closeP() {
 	if b.inP {
 		b.bold = min(b.bold, b.pBold)
+		b.italic = min(b.italic, b.pItalic)
 		b.inP = false
 	}
 }
@@ -347,7 +364,7 @@ func (b *builder) boundary() {
 // unseen.
 func (b *builder) leaveItem() {
 	if !visible(b.piece.text.String()) {
-		b.piece.write(" ", false)
+		b.piece.write(" ", style{})
 		return
 	}
 	b.endItem()
@@ -488,27 +505,35 @@ func breaks(tag atom.Atom) bool {
 	return false
 }
 
-// piece gathers the text of one Item, noting which of it was bold. Its zero
-// value is ready to use.
+// piece gathers the text of one Item, noting which of it was bold or
+// italic. Its zero value is ready to use.
 type piece struct {
 	text     strings.Builder
 	lead     strings.Builder // the bold text at the start
 	leadDone bool            // plain text has ended the lead
 	bold     bool            // some visible text was bold
 	plain    bool            // some visible text wasn't
+	italic   bool            // some visible text was italic
+	upright  bool            // some visible text wasn't
 }
 
-// write adds s, which was in bold or not.
-func (p *piece) write(s string, bold bool) {
+// write adds s, set as st says.
+func (p *piece) write(s string, st style) {
 	seen := visible(s)
 	switch {
-	case seen && bold:
+	case seen && st.bold:
 		p.bold = true
 	case seen:
 		p.plain = true
 	}
+	switch {
+	case seen && st.italic:
+		p.italic = true
+	case seen:
+		p.upright = true
+	}
 	if !p.leadDone {
-		if seen && !bold {
+		if seen && !st.bold {
 			p.leadDone = true
 		} else {
 			collapse(&p.lead, s)
@@ -546,6 +571,7 @@ func (p *piece) take() (Item, bool) {
 	}
 	it := Item{Text: text, Cues: Cues{Added: added, Bullet: clean.Bullet(p.text.String())}}
 	it.Cues.Bold = p.bold && !p.plain
+	it.Cues.Italic = p.italic && !p.upright
 	if p.bold && p.plain && p.leadDone {
 		it.Cues.BoldLead, it.Text = clean.Lead(p.lead.String(), text)
 	}

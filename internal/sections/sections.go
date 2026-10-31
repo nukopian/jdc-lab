@@ -194,15 +194,16 @@ type Section struct {
 // Divide divides an ad's parts into sections. Parts before the first
 // heading are the summary. A heading of no known kind starts an Unmapped
 // section, even a sub-heading such as "Software Development" among the
-// requirements, so that what's left to map shows; a line of text that is
-// exactly a section's name, with no cue, starts that section, as does a
-// short one with a kind's phrase in it before a list (see beforeList).
+// requirements, so that what's left to map shows, unless only italic set
+// it apart (see italicText); a line of text that is exactly a section's
+// name, with no cue, starts that section, as does a short one with a
+// kind's phrase in it before a list (see beforeList).
 func Divide(parts []headings.Part) []Section {
 	parts = Joined(parts)
 	sections := []Section{{Kind: Summary}}
 	for i, p := range parts {
-		if Subtitle(parts, i) {
-			p.Role, p.Key = headings.Text, ""
+		if Demoted(parts, i) {
+			p.Role, p.Key, p.Italic = headings.Text, "", false
 		}
 		kind, ok := starts(p)
 		if !ok && i+1 < len(parts) && parts[i+1].Item {
@@ -265,6 +266,28 @@ func Joined(parts []headings.Part) []headings.Part {
 func Subtitle(parts []headings.Part, i int) bool {
 	p := parts[i]
 	if p.Role != headings.Heading || !p.AfterTitle || strings.HasSuffix(strings.TrimSpace(p.Text), ":") {
+		return false
+	}
+	if i+1 < len(parts) && parts[i+1].Item {
+		return false
+	}
+	_, ok := Of(p.Key)
+	return !ok
+}
+
+// Demoted reports whether parts[i], a heading, is read as text: the ad's
+// subtitle (see Subtitle), or a heading only italic set apart (see
+// italicText).
+func Demoted(parts []headings.Part, i int) bool {
+	return Subtitle(parts, i) || italicText(parts, i)
+}
+
+// italicText reports whether parts[i] is a heading that only italic set
+// apart, of no known kind and over no list: text, as italic sets notes,
+// straplines and codes apart as often as headings.
+func italicText(parts []headings.Part, i int) bool {
+	p := parts[i]
+	if p.Role != headings.Heading || !p.Italic {
 		return false
 	}
 	if i+1 < len(parts) && parts[i+1].Item {

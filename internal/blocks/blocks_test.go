@@ -20,6 +20,9 @@ func show(blocks []Block) []string {
 		if it.Cues.Bold {
 			s += " bold"
 		}
+		if it.Cues.Italic {
+			s += " italic"
+		}
 		if it.Cues.BoldLead != "" {
 			s += fmt.Sprintf(" lead=%q", it.Cues.BoldLead)
 		}
@@ -370,6 +373,28 @@ Responsibilities
 			`<p><b>Heading<p>Text under it.</p><p><strong>Notice</p><p>Footer</p>`,
 			[]string{`paragraph "Heading" bold`, `paragraph "Text under it."`, `paragraph "Notice" bold`,
 				`paragraph "Footer"`},
+		},
+		{
+			"italic in <em> or <i>, all of it or part",
+			`<p><em>The role</em></p><p><i>Note</i></p><p>We build <em>things</em>.</p><ul><li><i>Pension</i></li></ul>`,
+			[]string{`paragraph "The role" italic`, `paragraph "Note" italic`, `paragraph "We build things."`,
+				"list", `  "Pension" italic`},
+		},
+		{
+			"bold and italic together",
+			`<p><strong><em>Benefits</em></strong></p><p><b>Salary</b> <i>negotiable</i></p>`,
+			[]string{`paragraph "Benefits" bold italic`, `paragraph "Salary negotiable" lead="Salary"`},
+		},
+		{
+			"italic opened in a paragraph ends with it, closed or not",
+			`<p><em>Heading<p>Text under it.</p><p><i>Notice</p><p>Footer</p>`,
+			[]string{`paragraph "Heading" italic`, `paragraph "Text under it."`, `paragraph "Notice" italic`,
+				`paragraph "Footer"`},
+		},
+		{
+			"italic around paragraphs stays on each",
+			`<em><p>One</p><p>Two</p></em><p>Three</p>`,
+			[]string{`paragraph "One" italic`, `paragraph "Two" italic`, `paragraph "Three"`},
 		},
 		{
 			"bold around paragraphs stays on each",
