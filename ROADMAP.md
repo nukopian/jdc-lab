@@ -259,6 +259,14 @@ learning from the rules' own labels, most promising first:
   a kind.
 - **Taxonomy hits as evidence:** many skills in a section point to
   requirements (30), benefit words to benefits.
+- **Facts as evidence:** pay in a sentence, beside holidays or a
+  pension, points to benefits, and perks are among the guess's
+  misses; hours and patterns point to the role. Pay alone is
+  weak, as ads open with it too, so first count, in placed sections,
+  which kind each fact in a sentence sits in, and how many unmapped
+  sections have one. A fact that is mostly one kind's becomes evidence
+  in the guess, as openings are; one that isn't is a clue for place in
+  the ad.
 - **A judged set of sections:** sections judged by hand, chosen where
   the ways above disagree most, to measure any of them on text the
   rules couldn't place.
