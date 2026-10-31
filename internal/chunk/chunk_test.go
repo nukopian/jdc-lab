@@ -358,7 +358,7 @@ func TestGuess(t *testing.T) {
 			Parts: []headings.Part{{Role: headings.Field, Text: "Pay: £16.50", Key: "pay", Value: "£16.50"}}}}, never, "", "no text"},
 	}
 	for _, tt := range tests {
-		kind, why := guess(tt.ss, len(tt.ss)-1, tt.boilerplate)
+		kind, why := guess(tt.ss, len(tt.ss)-1, tt.boilerplate, factReader{})
 		if kind != tt.kind || why != tt.why {
 			t.Errorf("%s: got %q, %q; want %q, %q", tt.name, kind, why, tt.kind, tt.why)
 		}
@@ -662,5 +662,20 @@ func TestDesirableLast(t *testing.T) {
 	want := "Essential\n- Patience\nExperience of HGV driving essential\nDesirable\n- A forklift ticket"
 	if r.Text != want {
 		t.Errorf("the requirements:\n%s\nwant:\n%s", r.Text, want)
+	}
+}
+
+// A factReader hands each caller its own copy, as placeless changes what
+// it's given: no caller sees another's change.
+func TestFactReaderCopies(t *testing.T) {
+	read := factReader{}
+	line := "Salary: £30,000 per annum"
+	first := read.find(line)
+	if len(first) == 0 || first[0].From == 0 {
+		t.Fatalf("find(%q) = %+v, want pay found after the label", line, first)
+	}
+	placeless(first)
+	if again := read.find(line); again[0].From == 0 {
+		t.Errorf("find(%q) again = %+v: placeless changed what it read before", line, again)
 	}
 }

@@ -5,7 +5,13 @@
 // both go by the same rules. It imports neither.
 package grammars
 
-import "github.com/nukopian/grammar"
+import (
+	"slices"
+	"strings"
+	"unicode"
+
+	"github.com/nukopian/grammar"
+)
 
 // Pay is a figure of money: with a currency sign, or a period, or both,
 // as one or a range, "up to" it, or not. A figure with neither isn't
@@ -45,11 +51,9 @@ grammar Hours {
     token day  { :i [ per \s+ day | a \s+ day | daily | per \s+ shift ] >> }
 }`)
 
-// patterns are the work patterns and arrangements, each rule its
+// patternRules are the work patterns and arrangements, each rule its
 // canonical value first, then what ads write for it.
-var patterns = func() *grammar.WordList {
-	l := grammar.NewWordList("patterns", grammar.FoldCase(), grammar.LooseSpacing(), grammar.WholeWords())
-	if err := l.AddRules(`
+const patternRules = `
 permanent, perm, permanent position, permanent role
 temporary, temp, temporary role, temporary position
 temp to perm, temp-to-perm, temporary to permanent
@@ -59,7 +63,11 @@ part time, part-time
 hybrid, hybrid working
 remote, fully remote, work from home, wfh
 office based, office-based, site based, site-based
-`); err != nil {
+`
+
+var patterns = func() *grammar.WordList {
+	l := grammar.NewWordList("patterns", grammar.FoldCase(), grammar.LooseSpacing(), grammar.WholeWords())
+	if err := l.AddRules(patternRules); err != nil {
 		panic(err)
 	}
 	return l
@@ -115,3 +123,72 @@ var Postcode = grammar.MustCompile(`
 grammar Postcode {
     token TOP { << <[A..Z]> ** 1..2 \d [ <[A..Z]> | \d ]? \s* \d <[A..Z]> ** 2 >> }
 }`)
+
+// MayHold reports whether line could hold a match of g, one of the fact
+// grammars here, by what every match of it has, so that a line that can't
+// is skipped without running g: most of an ad's lines are prose with no
+// fact in them. It errs towards true, and true for a grammar it doesn't
+// know. Each check is kept in step with its grammar, and a test checks it
+// never says false for a line g finds a match in:
+//
+//   - Pay, Hours, Postcode and Figure: a digit, as \d is, any of Unicode's.
+//   - Schedule: a digit, a day's first three letters, in any case, or
+//     "M" and "F" with a "-", for "M - F".
+//   - Pattern: the first word of one of its phrases, in any case.
+func MayHold(g *grammar.Grammar, line string) bool {
+	switch g {
+	case Pay, Hours, Postcode, Figure:
+		return hasDigit(line)
+	case Schedule:
+		if hasDigit(line) || strings.Contains(line, "M") && strings.Contains(line, "F") && strings.Contains(line, "-") {
+			return true
+		}
+		return containsAny(folded(line), days)
+	case Pattern:
+		return containsAny(folded(line), patternStems)
+	}
+	return true
+}
+
+func hasDigit(s string) bool { return strings.ContainsFunc(s, unicode.IsDigit) }
+
+// days are the first three letters of the days' names, which every name
+// Schedule's day rule knows starts with.
+var days = []string{"mon", "tue", "wed", "thu", "fri", "sat", "sun"}
+
+// patternStems are the first words of patternRules' phrases, each the
+// letters before its first space or hyphen: "temp" for "temp-to-perm".
+// LooseSpacing can change what's between a phrase's words, but not its
+// first word.
+var patternStems = func() []string {
+	var stems []string
+	for _, phrase := range strings.FieldsFunc(patternRules, func(r rune) bool { return r == ',' || r == '\n' }) {
+		stem, _, _ := strings.Cut(strings.TrimSpace(phrase), " ")
+		stem, _, _ = strings.Cut(stem, "-")
+		if stem != "" && !slices.Contains(stems, stem) {
+			stems = append(stems, stem)
+		}
+	}
+	return stems
+}()
+
+func containsAny(s string, subs []string) bool {
+	return slices.ContainsFunc(subs, func(sub string) bool { return strings.Contains(s, sub) })
+}
+
+// folded returns s with each letter that folds to an ASCII letter, as
+// grammar's FoldCase and :i fold it, made that letter in lower case: the
+// Kelvin sign is "k", and the long s "s".
+func folded(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r < unicode.MaxASCII {
+			return unicode.ToLower(r)
+		}
+		for f := unicode.SimpleFold(r); f != r; f = unicode.SimpleFold(f) {
+			if f < unicode.MaxASCII {
+				return unicode.ToLower(f)
+			}
+		}
+		return r
+	}, s)
+}

@@ -57,7 +57,8 @@ embeddings, and a large language model only where those fall short.
   states them. `shape` shows any ad at each stage, from its HTML to its
   chunks, to see where its shape changes; `chunk` shows any ad's
   chunks, saying what to embed, what becomes metadata, and what placed
-  each, as text, data, or web pages of ads before and after; and each
+  each, as text, data, or web pages of ads before and after, for any
+  number of ads, every ad of the samples in under a minute; and each
   run shows 20 ads in their chunks, the same in every run, to read by
   eye. [docs/PIPELINE.md](docs/PIPELINE.md) says how each stage works,
   what it measured, and how to improve it.
@@ -75,9 +76,9 @@ embeddings, and a large language model only where those fall short.
   kind is placed by an educated guess, mostly as the summary, and
   right for about four sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why. Under way: chunking made faster, by reading facts only
-  where they can be. Next: two retrieval tests, facts as filters, and
-  whether what boilerplate takes is about the job.
+  and why: nothing is under way, and next are two retrieval tests:
+  facts as filters, and whether what boilerplate takes is about the
+  job.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

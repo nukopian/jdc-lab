@@ -42,7 +42,7 @@ func Find(line string) []Fact {
 			fs = append(fs, f)
 		}
 	}
-	if !slices.ContainsFunc(fs, func(f Fact) bool { return f.Kind == "pay" }) {
+	if !slices.ContainsFunc(fs, func(f Fact) bool { return f.Kind == "pay" }) && may(grammars.Figure, line) {
 		if f, ok := labelledPay(line); ok {
 			fs = append(fs, f)
 		}
@@ -74,7 +74,21 @@ func Find(line string) []Fact {
 
 // all returns the matches of g in line, none inside another.
 func all(g *grammar.Grammar, line string) []*scalar.SV {
+	if !may(g, line) {
+		return nil
+	}
 	return g.FindAll(line, grammar.Outermost()).Items()
+}
+
+// skipLines turns on skipping a grammar for a line that can't hold a match
+// of it (see grammars.MayHold): most lines are prose, and skipping them is
+// most of what reading facts saves. Tests turn it off to check it changes
+// nothing.
+var skipLines = true
+
+// may reports whether g is worth running over line.
+func may(g *grammar.Grammar, line string) bool {
+	return !skipLines || grammars.MayHold(g, line)
 }
 
 // fact returns a fact of kind, from the match m, with values.

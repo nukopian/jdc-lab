@@ -565,8 +565,9 @@ the structure too: each chunk's text is a block of its lines.
 Given many ads, `chunk` and `shape` find them all in one reading of the
 run's ads, so a few thousand cost little more than one: 500 ads spread
 through the samples took 111 s when each was looked for on its own, and
-take 3 s. What's left is the chunking, about 200 ads a second, most of
-it reading facts with the grammars:
+take 3 s. Chunking every ad of the samples, all 25,954, takes about
+45 s, about 575 ads a second, since roadmap 43 read facts only in lines
+that can hold them (see [Facts](#facts)):
 
 ```
 xargs go run ./cmd/chunk -json < ids.txt > chunks.jsonl
@@ -703,6 +704,46 @@ its kind and values: an ad states "Full Time" and "full-time", or its
 pay in a field and in prose, and the values are the same; one the ad's
 own details section lists already isn't listed again. The pages and the view show
 each chunk's fields, and the pages its facts.
+
+**Reading facts cheaply.** Reading facts was most of what chunking
+cost, as every grammar ran over nearly every line of an ad, and the
+chunker read some lines two or three times. Two things make it cheaper,
+each changing no fact:
+
+- **A line that can't hold a fact is skipped.** `grammars.MayHold` says
+  whether a line could hold a match of a grammar, by what every match
+  has, and `facts.Find` runs only the grammars it says could match:
+
+  | Grammar | A line needs |
+  |---|---|
+  | pay, hours, postcode, and pay after a label | a digit |
+  | schedule | a digit, a day's first three letters, or "M - F" |
+  | pattern | the first word of one of its word list's phrases |
+
+  Letters are matched as the grammars' case folding matches them. On
+  2,000 ads, 62% of lines can hold no fact at all, and most of the rest
+  only some. Each check is kept beside its grammar; a test runs
+  `facts.Find` with skipping on and off over made-up lines and 2,000
+  ads of the samples, and the facts are the same.
+- **Each line is read once per ad.** The chunker keeps what it read of
+  each line while it chunks an ad, handing each use a copy of its own,
+  as listing a fact in the details changes it. A test chunks 2,000 ads
+  with this on and off, and the chunks are the same.
+
+Measured by `BenchmarkFindSamples` (every line of 2,000 ads of the
+latest run) and `BenchmarkAdOfSamples` (the same ads chunked, from their
+sections), on 2026-10-31:
+
+| | `facts.Find` | chunking | allocations, chunking |
+|---|---:|---:|---:|
+| before | 5.5 s | 9.3 s | 358 million |
+| reading each line once | | 5.4 s | 203 million |
+| skipping lines | 1.8 s | 3.3 s | 115 million |
+| both | 1.8 s | 2.2 s | 75 million |
+
+Chunking every ad of the samples went from 128 s to 45 s, and its
+output stayed the same, byte for byte. The rest is the grammars
+matching, which grammar's own matcher is to make cheaper (its roadmap 9).
 
 ### Pages before and after
 

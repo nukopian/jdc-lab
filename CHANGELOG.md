@@ -32,6 +32,14 @@ has the steps).
   111 s, so a whole run can be chunked in a couple of minutes. An ID
   that isn't there stops them before they write anything, naming every
   such ID.
+- Chunking is about four times faster, every chunk the same: a fact
+  grammar is run only over a line that could hold what it matches (62%
+  of lines can hold no fact at all), and each line's facts are read once
+  per ad, where the chunker read some two or three times. 2,000 ads
+  chunk in 2.2 s, not 9.3 s, and every ad of the samples in 45 s, not
+  128 s. Benchmarks of reading facts and of chunking, over the samples
+  where they're present, measure it (roadmap 43;
+  [record](docs/changes/2026-10-31-r43-read-facts-only-where-they-can-be.md)).
 - grammar v0.4.2, whose `Trace` option prints a trace of a parse, rule
   by rule, so a grammar of the lab's that won't match can be watched
   rather than guessed at. Nothing in the lab uses it yet, and every

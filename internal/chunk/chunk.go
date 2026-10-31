@@ -110,6 +110,7 @@ func AdOf(id, title string, ss []sections.Section, boilerplate func(string) bool
 // Of returns an ad's sections as chunks; boilerplate says whether a text
 // part was found to be boilerplate.
 func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
+	read := factReader{}
 	var cs []Chunk
 	var gathered []string                // the boilerplate of the embedded chunks, and the unmapped text
 	unmapped := 0                        // the unmapped text's tokens
@@ -142,7 +143,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		if p.Role != headings.Text {
 			return false
 		}
-		fs := facts.Find(p.Text)
+		fs := read.find(p.Text)
 		if !factLine(p.Text, fs) {
 			return false
 		}
@@ -153,7 +154,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 	for i, s := range ss {
 		placed := ""
 		if s.Kind == sections.Unmapped {
-			if kind, why := guess(ss, i, boilerplate); kind != "" {
+			if kind, why := guess(ss, i, boilerplate, read); kind != "" {
 				s.Kind, placed = kind, why
 			} else {
 				placed = why
@@ -226,7 +227,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 			// "temporary, contract and permanent roles" are an agency's, and
 			// "within 48 hours" a reply's.
 			if s.Kind != sections.Details && !aboutTheEmployer(s.Kind) {
-				found.Facts = append(found.Facts, placeless(facts.Find(p.Text))...)
+				found.Facts = append(found.Facts, placeless(read.find(p.Text))...)
 			}
 			lines = append(lines, line(p))
 		}
@@ -234,7 +235,7 @@ func Of(ss []sections.Section, boilerplate func(string) bool) []Chunk {
 		c.Tokens = Tokens(c.Text)
 		if c.Kind == sections.Details {
 			for _, l := range lines {
-				c.Facts = append(c.Facts, placeless(facts.Find(l))...)
+				c.Facts = append(c.Facts, placeless(read.find(l))...)
 			}
 		}
 		cs = append(cs, c)
@@ -309,6 +310,31 @@ func factLine(text string, fs []facts.Fact) bool {
 		}
 	}
 	return others == 0 || others <= 2 && strings.ContainsAny(rest, "|,/")
+}
+
+// readOnce turns on reading each line's facts once per ad: the chunker
+// asks for some lines' facts two or three times, to place a section, to
+// gather lines of facts, and to list every fact in the details. Tests
+// turn it off to check it changes nothing.
+var readOnce = true
+
+// factReader reads the facts of an ad's lines, each line once (see
+// readOnce). Make one with factReader{}: a nil one can't keep what it
+// reads.
+type factReader map[string][]facts.Fact
+
+// find returns line's facts, as facts.Find does, each call a copy of its
+// own, as placeless changes what it's given.
+func (r factReader) find(line string) []facts.Fact {
+	if !readOnce {
+		return facts.Find(line)
+	}
+	fs, ok := r[line]
+	if !ok {
+		fs = facts.Find(line)
+		r[line] = fs
+	}
+	return slices.Clone(fs)
 }
 
 // placeless returns facts without where they were in their line, which a
@@ -493,13 +519,13 @@ func use(kind sections.Kind) string {
 // ("we", "our"), or it comes after the ad's apply or legal text, or when
 // it has no lines of text, only fields or facts; and why says which. A
 // label over a short value is details. Otherwise it's the summary.
-func guess(ss []sections.Section, i int, boilerplate func(string) bool) (kind sections.Kind, why string) {
+func guess(ss []sections.Section, i int, boilerplate func(string) bool, read factReader) (kind sections.Kind, why string) {
 	s := ss[i]
 	counts := map[sections.Kind]int{}
 	phrases := map[sections.Kind][]string{}
 	lines, repeated := 0, 0
 	for _, p := range s.Parts {
-		if p.Role != headings.Text || factLine(p.Text, facts.Find(p.Text)) {
+		if p.Role != headings.Text || factLine(p.Text, read.find(p.Text)) {
 			continue
 		}
 		lines++

@@ -1,6 +1,7 @@
 package grammars
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/nukopian/grammar"
@@ -40,5 +41,35 @@ func TestRules(t *testing.T) {
 		if got := Figure.Find(text).At("~").Str(); got != want {
 			t.Errorf("Figure in %q: got %q, want %q", text, got, want)
 		}
+	}
+}
+
+func TestMayHold(t *testing.T) {
+	for _, tt := range []struct {
+		g    *grammar.Grammar
+		line string
+		want bool
+	}{
+		{Pay, "Salary: £30,000", true},
+		{Pay, "Up to ٣٠ an hour", true},
+		{Pay, "Competitive salary", false},
+		{Hours, "Forty hours a week", false},
+		{Postcode, "NE8 1AQ", true},
+		{Schedule, "Monday to Friday", true},
+		{Schedule, "MON - FRI", true},
+		{Schedule, "M - F", true},
+		{Schedule, "We work as a team", false},
+		{Pattern, "Temp-to-perm", true},
+		{Pattern, "WFH", true},
+		{Pattern, "ſite based", true}, // the long s folds to s
+		{Pattern, "A friendly team", false},
+	} {
+		if got := MayHold(tt.g, tt.line); got != tt.want {
+			t.Errorf("MayHold(%s, %q) = %t, want %t", tt.g.Name(), tt.line, got, tt.want)
+		}
+	}
+	if !slices.Equal(patternStems, []string{"permanent", "perm", "temporary", "temp", "contract", "fixed", "ftc",
+		"full", "part", "hybrid", "remote", "fully", "work", "wfh", "office", "site"}) {
+		t.Errorf("patternStems = %q", patternStems)
 	}
 }

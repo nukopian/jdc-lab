@@ -72,7 +72,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Read facts only where they can be](2026-10-31-r43-read-facts-only-where-they-can-be.md)
-  (roadmap 43), in progress
+  (roadmap 43), shipped, unreleased
 - [Italic as a cue, like bold](2026-10-31-r26-italic-as-a-cue-like-bold.md)
   (roadmap 26), shipped, unreleased
 - [Keep the layout an ad's text implies](2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)

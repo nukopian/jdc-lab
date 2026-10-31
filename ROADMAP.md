@@ -46,18 +46,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 43. Read facts only where they can be
-
-**Serves:** deployment
-
-**Size:** S (2)
-
-Chunking is the slowest step, about 200 ads a second, nearly all of it
-running the fact grammars over every line, some lines more than once.
-Each line's facts read once per ad, and a grammar skipped for a line
-that can't hold what it matches, should make it much cheaper without
-changing a fact. The plan is in its
-[record](docs/changes/2026-10-31-r43-read-facts-only-where-they-can-be.md).
+Nothing at the moment.
 
 ## Next
 
