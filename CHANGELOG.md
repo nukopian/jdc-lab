@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.2 (2026-10-31)
+
+grammar v0.4.3: chunking a quarter faster again
+
 - grammar v0.4.3, whose matcher allocates far less, measured on the
   lab's facts before its release: reading facts is 39% faster, with 74%
   fewer allocations, and chunking 38% faster, so chunking every ad of
