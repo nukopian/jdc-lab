@@ -9,6 +9,7 @@ import (
 	"io"
 	"iter"
 	"os"
+	"strings"
 )
 
 // An Ad is one job ad. Location and LocationCanonical are nil where the
@@ -101,19 +102,63 @@ func (d *Distinct) First(a Ad) bool {
 	return true
 }
 
-// ErrNotFound is what Find's error wraps when the file has no ad of the ID.
+// ErrNotFound is what Find's and FindAll's errors wrap when the file has
+// no ad of an ID.
 var ErrNotFound = errors.New("no ad of that ID")
+
+// A NotFoundError is FindAll's error when the file has no ad of some of
+// the IDs. It wraps ErrNotFound, so errors.Is finds that, and errors.As
+// gives the IDs.
+type NotFoundError struct {
+	Path string
+	IDs  []string // the IDs missing, in the order asked for
+}
+
+func (e *NotFoundError) Error() string {
+	return fmt.Sprintf("%s: %v: %s", e.Path, ErrNotFound, strings.Join(e.IDs, ", "))
+}
+
+// Unwrap returns ErrNotFound.
+func (e *NotFoundError) Unwrap() error { return ErrNotFound }
 
 // Find returns the first ad in the file at path with the ID id, reading as
 // File does, or an error wrapping ErrNotFound if there's none.
 func Find(path, id string) (Ad, error) {
+	found, err := FindAll(path, []string{id})
+	return found[id], err
+}
+
+// FindAll returns the first ad in the file at path with each of ids, by
+// ID, reading the file once, as File does, and no further than the last
+// of them. If any is missing, it returns those it found, and a
+// *NotFoundError naming the rest.
+func FindAll(path string, ids []string) (map[string]Ad, error) {
+	want := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		want[id] = true
+	}
+	found := make(map[string]Ad, len(want))
 	for ad, err := range File(path) {
 		if err != nil {
-			return Ad{}, err
+			return nil, err
 		}
-		if ad.ID == id {
-			return ad, nil
+		if want[ad.ID] {
+			found[ad.ID] = ad
+			delete(want, ad.ID)
+			if len(want) == 0 {
+				return found, nil
+			}
 		}
 	}
-	return Ad{}, fmt.Errorf("%s: %w: %s", path, ErrNotFound, id)
+	if len(want) == 0 {
+		return found, nil // no IDs were asked for
+	}
+	var missing []string
+	for _, id := range ids {
+		if want[id] {
+			missing = append(missing, id)
+			delete(want, id) // named once
+		}
+	}
+	return found, &NotFoundError{Path: path, IDs: missing}
 }

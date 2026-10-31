@@ -90,13 +90,13 @@ func main() {
 		return
 	}
 
+	as, err := find(flag.Args(), *run, *title)
+	if err != nil {
+		log.Fatal(err)
+	}
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
-	for _, arg := range flag.Args() {
-		a, err := find(arg, *run, *title)
-		if err != nil {
-			log.Fatal(err)
-		}
+	for _, a := range as {
 		c := chunked(a)
 		if *asYAML {
 			fmt.Fprintln(w, "---")
@@ -119,21 +119,43 @@ func main() {
 	}
 }
 
-// find returns the ad arg names: a file of HTML, "-" for standard input,
-// or an ID in the run's ads.
-func find(arg, run, title string) (ads.Ad, error) {
-	if arg == "-" {
-		b, err := io.ReadAll(os.Stdin)
-		return ads.Ad{ID: "-", Title: title, HTML: string(b)}, err
+// find returns the ads args name, in order: each a file of HTML, "-" for
+// standard input, or an ID in the run's ads. The IDs are found in one
+// reading of the run's ads, however many there are.
+func find(args []string, run, title string) ([]ads.Ad, error) {
+	as := make([]ads.Ad, len(args))
+	var ids []string
+	var at []int // where in args each of ids is
+	for i, arg := range args {
+		if arg == "-" {
+			b, err := io.ReadAll(os.Stdin)
+			if err != nil {
+				return nil, err
+			}
+			as[i] = ads.Ad{ID: "-", Title: title, HTML: string(b)}
+			continue
+		}
+		if b, err := os.ReadFile(arg); err == nil {
+			as[i] = ads.Ad{ID: filepath.Base(arg), Title: title, HTML: string(b)}
+			continue
+		}
+		ids, at = append(ids, arg), append(at, i)
 	}
-	if b, err := os.ReadFile(arg); err == nil {
-		return ads.Ad{ID: filepath.Base(arg), Title: title, HTML: string(b)}, nil
+	if len(ids) == 0 {
+		return as, nil
 	}
-	a, err := ads.Find(filepath.Join(run, "ads.jsonl"), arg)
-	if errors.Is(err, ads.ErrNotFound) {
-		return a, fmt.Errorf("chunk: %s: no such file, nor an ad of that ID in %s", arg, run)
+	found, err := ads.FindAll(filepath.Join(run, "ads.jsonl"), ids)
+	var nf *ads.NotFoundError
+	if errors.As(err, &nf) {
+		return nil, fmt.Errorf("chunk: %s: no such file, nor an ad of that ID in %s", strings.Join(nf.IDs, ", "), run)
 	}
-	return a, err
+	if err != nil {
+		return nil, err
+	}
+	for j, id := range ids {
+		as[at[j]] = found[id]
+	}
+	return as, nil
 }
 
 // writePages writes the ads the file at list names as pages, beside it,

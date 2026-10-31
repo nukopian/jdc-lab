@@ -562,6 +562,16 @@ The text is to read at a glance, JSON (`-json`, a line an ad) is for
 programs, and YAML (`-yaml`, a document an ad) is for people who want
 the structure too: each chunk's text is a block of its lines.
 
+Given many ads, `chunk` and `shape` find them all in one reading of the
+run's ads, so a few thousand cost little more than one: 500 ads spread
+through the samples took 111 s when each was looked for on its own, and
+take 3 s. What's left is the chunking, about 200 ads a second, most of
+it reading facts with the grammars:
+
+```
+xargs go run ./cmd/chunk -json < ids.txt > chunks.jsonl
+```
+
 The ad's **title**, its title field, is a chunk of its own, first and
 embedded: titles embed well alone, and kept apart they don't dilute the
 summary. A title the ad writes again, as a "Job Title:" field, leaves

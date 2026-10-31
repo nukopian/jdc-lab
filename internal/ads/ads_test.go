@@ -149,3 +149,35 @@ func TestFind(t *testing.T) {
 		t.Errorf("Find in a missing file: error = %v, want one that it doesn't exist", err)
 	}
 }
+
+func TestFindAll(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "ads.jsonl")
+	// The last line is broken: FindAll stops reading once it has every ad,
+	// so only a search that needs it reaches it.
+	lines := `{"id":"1","title":"Driver","location":null,"location_canonical":null,"html":"<p>Drive.</p>"}
+{"id":"2","title":"Chef","location":null,"location_canonical":null,"html":"<p>Cook.</p>"}
+{"id":"1","title":"Driver again","location":null,"location_canonical":null,"html":"<p>Drive.</p>"}
+{"id":
+`
+	if err := os.WriteFile(path, []byte(lines), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err := FindAll(path, []string{"2", "1", "2"})
+	if err != nil || len(got) != 2 || got["1"].Title != "Driver" || got["2"].Title != "Chef" {
+		t.Errorf(`FindAll(path, 2, 1, 2) = %v, %v; want the first Driver and the Chef`, got, err)
+	}
+	_, err = FindAll(path, []string{"1", "4", "3"})
+	if err == nil || errors.Is(err, ErrNotFound) {
+		t.Errorf("FindAll reading the broken line: error = %v, want the line's", err)
+	}
+	path = filepath.Join(t.TempDir(), "ads.jsonl")
+	if err := os.WriteFile(path, []byte(strings.Join(strings.Split(lines, "\n")[:3], "\n")), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err = FindAll(path, []string{"1", "4", "3", "4"})
+	var nf *NotFoundError
+	if !errors.Is(err, ErrNotFound) || !errors.As(err, &nf) || !slices.Equal(nf.IDs, []string{"4", "3"}) ||
+		len(got) != 1 || got["1"].Title != "Driver" {
+		t.Errorf("FindAll(path, 1, 4, 3, 4) = %v, %v; want the Driver, and ErrNotFound naming 4, 3", got, err)
+	}
+}

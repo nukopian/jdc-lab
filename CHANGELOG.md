@@ -27,6 +27,11 @@ has the steps).
   uses to 74,777, still 81%; ads with every heading known go from
   15,965 to 15,961, so 61%, not 62% (roadmap 26;
   [record](docs/changes/2026-10-31-r26-italic-as-a-cue-like-bold.md)).
+- `chunk` and `shape` find every ad they're given in one reading of the
+  run's ads, where they read it again for each: 500 ads take 3 s, not
+  111 s, so a whole run can be chunked in a couple of minutes. An ID
+  that isn't there stops them before they write anything, naming every
+  such ID.
 - grammar v0.4.2, whose `Trace` option prints a trace of a parse, rule
   by rule, so a grammar of the lab's that won't match can be watched
   rather than guessed at. Nothing in the lab uses it yet, and every

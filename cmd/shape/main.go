@@ -57,18 +57,19 @@ func main() {
 	}
 	isBoilerplate := func(s string) bool { return verdicts[headings.Key(s)] }
 
+	// The ads are found in one reading of the run's, however many there are.
+	found, err := ads.FindAll(filepath.Join(*run, "ads.jsonl"), flag.Args())
+	var nf *ads.NotFoundError
+	if errors.As(err, &nf) {
+		log.Fatalf("shape: %s: no ad of that ID in %s", strings.Join(nf.IDs, ", "), *run)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 	for _, id := range flag.Args() {
-		a, err := ads.Find(filepath.Join(*run, "ads.jsonl"), id)
-		if errors.Is(err, ads.ErrNotFound) {
-			w.Flush()
-			log.Fatalf("shape: %s: no ad of that ID in %s", id, *run)
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-		if err := shape.Write(w, a, isBoilerplate, stages...); err != nil {
+		if err := shape.Write(w, found[id], isBoilerplate, stages...); err != nil {
 			w.Flush()
 			log.Fatal(err)
 		}
