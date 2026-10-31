@@ -16,7 +16,7 @@ var tricky = []string{
 	"4 on 4 off", "8.30-3.30",
 	"Permanent", "PERM", "Temp-to-perm", "Fixed-term contract", "FTC", "WFH", "Full-time",
 	"Fully remote", "Hybrid working", "Office-based", "Site based",
-	"Kelvin", "ſite based", "Work from home",
+	"WOR\u212A FROM HOME", "ſite based", "Work from home", "HYBRİD", "SİTE BASED",
 	"We are a friendly team.", "",
 }
 

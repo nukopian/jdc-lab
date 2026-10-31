@@ -61,3 +61,33 @@ def test_suggest_votes_for_each_unmapped_heading():
     assert "right for 100.0% of mapped keys" in summary
     assert rows[1].split("\t")[:2] == ["4", "responsibilities"]
     assert rows[1].split("\t")[4] == "Tasks:"
+
+
+# Found in the wash-up: a vote with no more mapped headings than voters,
+# and one where some are unalike (negative cosine), which counted against
+# their kind and gave a share over 1.
+def test_vote_with_few_headings_or_unalike_ones():
+    v = vote(np.array([0.9, 0.8, 0.1]), ["benefits", "benefits", "apply"], k=3)
+    assert v.kind == "benefits" and v.voters == [0, 1, 2]
+    v = vote(
+        np.array([0.9, -0.5, -0.6, 0.1]), ["benefits", "apply", "apply", "legal"], k=3
+    )
+    assert v.kind == "benefits" and 0 < v.share <= 1
+
+
+# Found in the wash-up: the similarities are worked out a block of rows at
+# a time, to hold memory down, with the same suggestions as all at once.
+def test_suggest_in_blocks_matches_all_at_once():
+    rng = np.random.default_rng(1)
+    keys = [f"heading {i}" for i in range(12)]
+    vectors = rng.normal(size=(12 + 5, 8))
+    vectors /= np.linalg.norm(vectors, axis=1, keepdims=True)
+    table = dict(zip(keys + [f"new {i}" for i in range(5)], vectors, strict=True))
+    mapped = Mapped(keys, ["benefits", "apply", "legal"] * 4, [1] * 12)
+    unmapped = [(f"new {i}", 1, f"New {i}") for i in range(5)]
+
+    def embed(texts):
+        return np.array([table[t] for t in texts])
+
+    whole = suggest(embed, mapped, unmapped)
+    assert suggest(embed, mapped, unmapped, block=2) == whole

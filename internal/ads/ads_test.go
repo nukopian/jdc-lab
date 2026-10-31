@@ -130,26 +130,6 @@ func TestAllStopsWhenTheLoopDoes(t *testing.T) {
 	}
 }
 
-func TestFind(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "ads.jsonl")
-	lines := `{"id":"1","title":"Driver","location":null,"location_canonical":null,"html":"<p>Drive.</p>"}
-{"id":"2","title":"Chef","location":null,"location_canonical":null,"html":"<p>Cook.</p>"}
-`
-	if err := os.WriteFile(path, []byte(lines), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	a, err := Find(path, "2")
-	if err != nil || a.Title != "Chef" {
-		t.Errorf(`Find(path, "2") = %q, %v; want the Chef`, a.Title, err)
-	}
-	if _, err := Find(path, "3"); !errors.Is(err, ErrNotFound) {
-		t.Errorf(`Find(path, "3") error = %v, want ErrNotFound`, err)
-	}
-	if _, err := Find(filepath.Join(t.TempDir(), "none.jsonl"), "1"); !errors.Is(err, fs.ErrNotExist) {
-		t.Errorf("Find in a missing file: error = %v, want one that it doesn't exist", err)
-	}
-}
-
 func TestFindAll(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "ads.jsonl")
 	// The last line is broken: FindAll stops reading once it has every ad,
@@ -166,6 +146,11 @@ func TestFindAll(t *testing.T) {
 	if err != nil || len(got) != 2 || got["1"].Title != "Driver" || got["2"].Title != "Chef" {
 		t.Errorf(`FindAll(path, 2, 1, 2) = %v, %v; want the first Driver and the Chef`, got, err)
 	}
+	// Found in the wash-up: asking for no ads reads nothing, so the broken
+	// line isn't reached.
+	if got, err := FindAll(path, nil); err != nil || len(got) != 0 {
+		t.Errorf("FindAll(path, nil) = %v, %v; want nothing, read", got, err)
+	}
 	_, err = FindAll(path, []string{"1", "4", "3"})
 	if err == nil || errors.Is(err, ErrNotFound) {
 		t.Errorf("FindAll reading the broken line: error = %v, want the line's", err)
@@ -173,6 +158,9 @@ func TestFindAll(t *testing.T) {
 	path = filepath.Join(t.TempDir(), "ads.jsonl")
 	if err := os.WriteFile(path, []byte(strings.Join(strings.Split(lines, "\n")[:3], "\n")), 0o644); err != nil {
 		t.Fatal(err)
+	}
+	if _, err := FindAll(filepath.Join(t.TempDir(), "none.jsonl"), []string{"1"}); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("FindAll in a missing file: error = %v, want one that it doesn't exist", err)
 	}
 	got, err = FindAll(path, []string{"1", "4", "3", "4"})
 	var nf *NotFoundError

@@ -12,6 +12,17 @@ has the steps).
 
 ## Unreleased
 
+- The wash-up before this release, by an independent review, found
+  nothing serious; each fault is fixed with a test. Pay written in
+  digits other than ASCII's, which the grammars match, was read as 0:
+  one ad in the samples writes its salary in bold mathematical digits,
+  "£𝟑𝟎,𝟎𝟎𝟎", and now has 30,000, and its 35,000 besides. A capital
+  dotted İ, as in "HYBRİD", made the new line check skip a work pattern
+  the grammar would have found (none in the samples). An italic title
+  made longer, "Head Chef Manager", lost what made it italic when
+  joined back into one heading. And `heading_suggest.py` failed with
+  ten or fewer known headings, and held matrices of over a gigabyte at
+  once; it now works them out a block at a time.
 - `python/bin/heading_suggest.py` suggests a kind for each heading the
   rules don't know, from the kinds of the known headings nearest it,
   embedded with `BAAI/bge-small-en-v1.5`: phrases to add to
@@ -29,9 +40,8 @@ has the steps).
   [record](docs/changes/2026-10-31-r26-italic-as-a-cue-like-bold.md)).
 - `chunk` and `shape` find every ad they're given in one reading of the
   run's ads, where they read it again for each: 500 ads take 3 s, not
-  111 s, so a whole run can be chunked in a couple of minutes. An ID
-  that isn't there stops them before they write anything, naming every
-  such ID.
+  111 s. An ID that isn't there stops them before they write anything,
+  naming every such ID.
 - Chunking is about four times faster, every chunk the same: a fact
   grammar is run only over a line that could hold what it matches (62%
   of lines can hold no fact at all), and each line's facts are read once
@@ -44,6 +54,14 @@ has the steps).
   by rule, so a grammar of the lab's that won't match can be watched
   rather than guessed at. Nothing in the lab uses it yet, and every
   stage's output is unchanged.
+- The roadmap gains ideas 40 and 41, ways to place the sections the
+  rules can't, by a model trained on those they can or by cheaper local
+  means, and 42, job-board codes and straplines read as headings, found
+  by roadmap 26. Next is now ordered by what's cheapest and widest:
+  italic as a cue first (26, shipped), then the retrieval tests of facts
+  as filters (34) and of boilerplate's verdict (33), then bold labels on
+  benefit lines (28) and boilerplate's thresholds scaled to the ads'
+  number (12), before more ads are added.
 
 ## v0.6.0 (2026-10-30)
 

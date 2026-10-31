@@ -250,7 +250,7 @@ func Joined(parts []headings.Part) []headings.Part {
 	for _, p := range parts {
 		if _, known := Of(p.Key); p.Whole != "" && p.Role == headings.Heading && !known &&
 			len(out) > 0 && out[len(out)-1].Role == headings.Repeat {
-			out[len(out)-1] = headings.Part{Role: headings.Heading, Text: p.Whole, Key: headings.Key(p.Whole)}
+			out[len(out)-1] = headings.Part{Role: headings.Heading, Text: p.Whole, Key: headings.Key(p.Whole), Italic: p.Italic}
 			continue
 		}
 		out = append(out, p)

@@ -573,6 +573,9 @@ that can hold them (see [Facts](#facts)):
 xargs go run ./cmd/chunk -json < ids.txt > chunks.jsonl
 ```
 
+`xargs` runs it once for each batch of a few thousand IDs, so the run's
+ads are read once a batch: still a few seconds in all.
+
 The ad's **title**, its title field, is a chunk of its own, first and
 embedded: titles embed well alone, and kept apart they don't dilute the
 summary. A title the ad writes again, as a "Job Title:" field, leaves

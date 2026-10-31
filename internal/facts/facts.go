@@ -15,6 +15,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/nukopian/grammar"
@@ -129,7 +130,11 @@ func payOf(m *scalar.SV) (Fact, bool) {
 
 // amount returns an amount's figure, "45k" as 45000, commas gone.
 func amount(m *scalar.SV) string {
-	n, _ := strconv.ParseFloat(strings.ReplaceAll(m.At("num.~").Str(), ",", ""), 64)
+	s := m.At("num.~").Str()
+	n, ok := parse(s)
+	if !ok {
+		return s
+	}
 	if m.At("k").Defined() {
 		n *= 1000
 	}
@@ -138,11 +143,31 @@ func amount(m *scalar.SV) string {
 
 // number returns a figure as written, as a plain number.
 func number(s string) string {
-	n, err := strconv.ParseFloat(strings.ReplaceAll(s, ",", ""), 64)
-	if err != nil {
+	n, ok := parse(s)
+	if !ok {
 		return s
 	}
 	return strconv.FormatFloat(n, 'f', -1, 64)
+}
+
+// parse reads a figure as the grammars match it: digits, any of Unicode's,
+// as \d is, with commas between thousands and a point.
+func parse(s string) (float64, bool) {
+	ascii := strings.Map(func(r rune) rune {
+		switch {
+		case r == ',':
+			return -1
+		case r >= '0' && r <= '9' || !unicode.IsDigit(r):
+			return r
+		}
+		zero := r // the first digit of r's run of ten
+		for unicode.IsDigit(zero - 1) {
+			zero--
+		}
+		return '0' + (r-zero)%10
+	}, s)
+	n, err := strconv.ParseFloat(ascii, 64)
+	return n, err == nil
 }
 
 // periodOf names a pay period: year, hour, day, week or month.

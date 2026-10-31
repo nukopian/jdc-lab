@@ -324,7 +324,8 @@ var readOnce = true
 type factReader map[string][]facts.Fact
 
 // find returns line's facts, as facts.Find does, each call a copy of its
-// own, as placeless changes what it's given.
+// own, as placeless changes what it's given. The copy is shallow: the
+// facts' Values are shared, and nothing changes them.
 func (r factReader) find(line string) []facts.Fact {
 	if !readOnce {
 		return facts.Find(line)

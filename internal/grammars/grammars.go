@@ -176,13 +176,15 @@ func containsAny(s string, subs []string) bool {
 	return slices.ContainsFunc(subs, func(sub string) bool { return strings.Contains(s, sub) })
 }
 
-// folded returns s with each letter that folds to an ASCII letter, as
-// grammar's FoldCase and :i fold it, made that letter in lower case: the
-// Kelvin sign is "k", and the long s "s".
+// folded returns s with each letter that grammar matches to an ASCII
+// letter made that letter in lower case. A word list's FoldCase lowers a
+// letter ("İ" is "i"), and :i folds it as Unicode's simple case folding
+// does (the long s is "s"); the Kelvin sign is "k" either way. It errs
+// towards true: the long s matches :i's days, but not the word list.
 func folded(s string) string {
 	return strings.Map(func(r rune) rune {
-		if r < unicode.MaxASCII {
-			return unicode.ToLower(r)
+		if l := unicode.ToLower(r); l < unicode.MaxASCII {
+			return l
 		}
 		for f := unicode.SimpleFold(r); f != r; f = unicode.SimpleFold(f) {
 			if f < unicode.MaxASCII {

@@ -61,7 +61,8 @@ func TestMayHold(t *testing.T) {
 		{Schedule, "We work as a team", false},
 		{Pattern, "Temp-to-perm", true},
 		{Pattern, "WFH", true},
-		{Pattern, "ſite based", true}, // the long s folds to s
+		{Pattern, "ſite based", true}, // erring towards true: :i folds the long s to s, the word list doesn't
+		{Pattern, "HYBRİD", true},     // the word list lowers İ to i
 		{Pattern, "A friendly team", false},
 	} {
 		if got := MayHold(tt.g, tt.line); got != tt.want {

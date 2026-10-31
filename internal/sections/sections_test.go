@@ -323,3 +323,22 @@ func TestDivideItalic(t *testing.T) {
 		t.Errorf("\n got: %q\nwant: %q", got, want)
 	}
 }
+
+// Found in the wash-up: the title made longer, joined back into one
+// heading, keeps its italic, so it's read as any heading only italic set
+// apart is.
+func TestDivideItalicTitleMadeLonger(t *testing.T) {
+	html := `<p>We cook.</p><p><em>Head Chef Manager</em></p><p>Join us.</p>`
+	var got []string
+	for _, s := range Divide(headings.Read(blocks.Split(html), "Head Chef")) {
+		line := fmt.Sprintf("%s %q:", s.Kind, s.Heading)
+		for _, p := range s.Parts {
+			line += fmt.Sprintf(" %s(%s)", p.Role, p.Text)
+		}
+		got = append(got, line)
+	}
+	want := []string{`summary "": text(We cook.) text(Head Chef Manager) text(Join us.)`}
+	if !slices.Equal(got, want) {
+		t.Errorf("\n got: %q\nwant: %q", got, want)
+	}
+}

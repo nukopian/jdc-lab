@@ -46,9 +46,8 @@ embeddings, and a large language model only where those fall short.
   reader sees, as its author laid them out, by newlines as well as
   tags, splits walls of text into sentences, finds its headings and
   fields, by bold, italic and heading tags, and those run into walls
-  too, divides it into sections (summary,
-  role, responsibilities, requirements, benefits and the rest), and
-  finds the boilerplate that ads repeat whatever the job. Grammars read
+  too, divides it into sections (summary, role, responsibilities,
+  requirements, benefits and the rest), and finds the boilerplate that ads repeat whatever the job. Grammars read
   the facts ads state, pay, hours, work pattern, schedule and postcode,
   as values. Its chunks are what an embedding job would ask for: the
   ad's title on its own, one chunk for each kind of section, the

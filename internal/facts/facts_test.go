@@ -127,3 +127,17 @@ func TestLabelsAndBonuses(t *testing.T) {
 		}
 	}
 }
+
+// Found in the wash-up: a figure in digits other than ASCII's, which \d
+// matches, has its value, not 0.
+func TestFiguresInOtherDigits(t *testing.T) {
+	for line, want := range map[string]string{
+		"Up to ٣٠ per hour":         `pay "Up to ٣٠ per hour" map[max:30 period:hour]`,
+		"Salary: £٣٠,٠٠٠ per annum": `pay "£٣٠,٠٠٠ per annum" map[currency:GBP min:30000 period:year]`,
+		"٣٧.٥ hours per week":       `hours "٣٧.٥ hours per week" map[per_week:37.5]`,
+	} {
+		if got := show(Find(line)); got != want {
+			t.Errorf("Find(%q)\n got: %s\nwant: %s", line, got, want)
+		}
+	}
+}

@@ -22,6 +22,10 @@ import numpy as np
 # How many mapped headings vote on each heading.
 K = 10
 
+# BLOCK is how many headings' similarities are worked out at once: all of
+# them, for every heading, would be a matrix of a gigabyte or more.
+BLOCK = 1024
+
 # Key's folding of typographic characters, as internal/headings/key.go has it.
 _FOLD = {
     **dict.fromkeys(map(chr, (0x2018, 0x2019, 0x201A, 0x201B, 0x2032)), "'"),
@@ -127,32 +131,39 @@ def vote(sims: np.ndarray, kinds: Sequence[str], k: int = K) -> Vote:
     """Has the k mapped headings most like one heading vote for its kind.
 
     sims holds how alike the heading is to each mapped heading; a mapped
-    heading to leave out of the vote has a similarity below -1.
+    heading to leave out of the vote has a similarity below -1. A voter
+    weighs as much as it's alike, and one unalike (below 0) not at all.
+    With k or fewer mapped headings, they all vote.
     """
-    voters = np.argpartition(-sims, k)[:k]
+    k = min(k, len(sims))
+    voters = np.argpartition(-sims, k - 1)[:k]
     voters = voters[np.argsort(-sims[voters])]
     weight: defaultdict[str, float] = defaultdict(float)
     for i in voters:
-        weight[kinds[i]] += float(sims[i])
+        weight[kinds[i]] += max(float(sims[i]), 0.0)
     kind = max(weight, key=weight.__getitem__)
+    total = sum(weight.values())
     return Vote(
         kind,
-        weight[kind] / sum(weight.values()),
+        weight[kind] / total if total else 0.0,
         float(sims[voters[0]]),
         voters.tolist(),
     )
 
 
-def leave_one_out(vectors: np.ndarray, mapped: Mapped) -> str:
+def leave_one_out(vectors: np.ndarray, mapped: Mapped, block: int = BLOCK) -> str:
     """Says how often each mapped heading's neighbours give back its kind.
 
     This flatters the model: mapped headings share the phrases the rules
     matched, so each one's neighbours are near copies of it. Unmapped
     headings have no such phrases.
     """
-    sims = vectors @ vectors.T
-    np.fill_diagonal(sims, -2.0)
-    votes = [vote(row, mapped.kinds) for row in sims]
+    votes = []
+    for start in range(0, len(vectors), block):
+        sims = vectors[start : start + block] @ vectors.T
+        for i, row in enumerate(sims):
+            row[start + i] = -2.0  # not its own voter
+            votes.append(vote(row, mapped.kinds))
     right = np.array([v.kind == k for v, k in zip(votes, mapped.kinds, strict=True)])
     share = np.array([v.share for v in votes])
     uses = np.array(mapped.uses)
@@ -172,7 +183,10 @@ def leave_one_out(vectors: np.ndarray, mapped: Mapped) -> str:
 
 
 def suggest(
-    embed: Callable[[list[str]], np.ndarray], mapped: Mapped, unmapped
+    embed: Callable[[list[str]], np.ndarray],
+    mapped: Mapped,
+    unmapped,
+    block: int = BLOCK,
 ) -> tuple[str, list[str]]:
     """Embeds the headings and votes on each unmapped one.
 
@@ -182,7 +196,12 @@ def suggest(
     m = embed(mapped.keys)
     u = embed([k for k, _, _ in unmapped])
     rows = ["ads\tkind\tshare\tnearest\theading\tvoters"]
-    for sims, (_, ads, heading) in zip(u @ m.T, unmapped, strict=True):
+    sims_by_row = (
+        row
+        for start in range(0, len(u), block)
+        for row in u[start : start + block] @ m.T
+    )
+    for sims, (_, ads, heading) in zip(sims_by_row, unmapped, strict=True):
         v = vote(sims, mapped.kinds)
         voters = " | ".join(
             f"{mapped.keys[i]} ({mapped.kinds[i]})" for i in v.voters[:3]
@@ -190,4 +209,4 @@ def suggest(
         rows.append(
             f"{ads}\t{v.kind}\t{v.share:.2f}\t{v.nearest:.3f}\t{heading}\t{voters}"
         )
-    return leave_one_out(m, mapped), rows
+    return leave_one_out(m, mapped, block), rows

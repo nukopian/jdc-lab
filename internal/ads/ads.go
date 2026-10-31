@@ -102,8 +102,8 @@ func (d *Distinct) First(a Ad) bool {
 	return true
 }
 
-// ErrNotFound is what Find's and FindAll's errors wrap when the file has
-// no ad of an ID.
+// ErrNotFound is what FindAll's errors wrap when the file has no ad of an
+// ID.
 var ErrNotFound = errors.New("no ad of that ID")
 
 // A NotFoundError is FindAll's error when the file has no ad of some of
@@ -121,18 +121,14 @@ func (e *NotFoundError) Error() string {
 // Unwrap returns ErrNotFound.
 func (e *NotFoundError) Unwrap() error { return ErrNotFound }
 
-// Find returns the first ad in the file at path with the ID id, reading as
-// File does, or an error wrapping ErrNotFound if there's none.
-func Find(path, id string) (Ad, error) {
-	found, err := FindAll(path, []string{id})
-	return found[id], err
-}
-
 // FindAll returns the first ad in the file at path with each of ids, by
 // ID, reading the file once, as File does, and no further than the last
 // of them. If any is missing, it returns those it found, and a
 // *NotFoundError naming the rest.
 func FindAll(path string, ids []string) (map[string]Ad, error) {
+	if len(ids) == 0 {
+		return map[string]Ad{}, nil
+	}
 	want := make(map[string]bool, len(ids))
 	for _, id := range ids {
 		want[id] = true
@@ -149,9 +145,6 @@ func FindAll(path string, ids []string) (map[string]Ad, error) {
 				return found, nil
 			}
 		}
-	}
-	if len(want) == 0 {
-		return found, nil // no IDs were asked for
 	}
 	var missing []string
 	for _, id := range ids {
