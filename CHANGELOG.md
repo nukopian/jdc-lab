@@ -12,7 +12,11 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.4.3, whose matcher allocates far less, measured on the
+  lab's facts before its release: reading facts is 39% faster, with 74%
+  fewer allocations, and chunking 38% faster, so chunking every ad of
+  the samples takes 34 s, where it took 45 s. Every chunk is the same,
+  byte for byte, and every stage's output unchanged.
 
 ## v0.6.1 (2026-10-31)
 

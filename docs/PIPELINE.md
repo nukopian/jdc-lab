@@ -566,8 +566,9 @@ Given many ads, `chunk` and `shape` find them all in one reading of the
 run's ads, so a few thousand cost little more than one: 500 ads spread
 through the samples took 111 s when each was looked for on its own, and
 take 3 s. Chunking every ad of the samples, all 25,954, takes about
-45 s, about 575 ads a second, since roadmap 43 read facts only in lines
-that can hold them (see [Facts](#facts)):
+34 s, about 770 ads a second, since roadmap 43 read facts only in lines
+that can hold them, and grammar v0.4.3 matched them with fewer
+allocations (see [Facts](#facts)):
 
 ```
 xargs go run ./cmd/chunk -json < ids.txt > chunks.jsonl
@@ -743,10 +744,13 @@ sections), on 2026-10-31:
 | reading each line once | | 5.4 s | 203 million |
 | skipping lines | 1.8 s | 3.3 s | 115 million |
 | both | 1.8 s | 2.2 s | 75 million |
+| both, with grammar v0.4.3 | 1.1 s | 1.4 s | 25 million |
 
-Chunking every ad of the samples went from 128 s to 45 s, and its
-output stayed the same, byte for byte. The rest is the grammars
-matching, which grammar's own matcher is to make cheaper (its roadmap 9).
+Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
+with grammar v0.4.3, whose matcher keeps its results in slots rather
+than making a closure for each (grammar's roadmap 9, measured on these
+benchmarks before its release), and its output stayed the same, byte
+for byte.
 
 ### Pages before and after
 
