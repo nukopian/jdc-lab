@@ -1,6 +1,6 @@
 # Read facts only where they can be
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.6.1
 
 **Origin:** roadmap 43
 

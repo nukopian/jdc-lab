@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.1 (2026-10-31)
+
+Italic headings, and chunking four times faster
+
 - The wash-up before this release, by an independent review, found
   nothing serious; each fault is fixed with a test. Pay written in
   digits other than ASCII's, which the grammars match, was read as 0:

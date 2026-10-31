@@ -1,6 +1,6 @@
 # Italic as a cue, like bold
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.6.1
 
 **Origin:** roadmap 26
 

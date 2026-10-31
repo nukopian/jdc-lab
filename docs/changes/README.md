@@ -72,9 +72,9 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Read facts only where they can be](2026-10-31-r43-read-facts-only-where-they-can-be.md)
-  (roadmap 43), shipped, unreleased
+  (roadmap 43), shipped in v0.6.1
 - [Italic as a cue, like bold](2026-10-31-r26-italic-as-a-cue-like-bold.md)
-  (roadmap 26), shipped, unreleased
+  (roadmap 26), shipped in v0.6.1
 - [Keep the layout an ad's text implies](2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)
   (roadmap 24), shipped in v0.6.0
 - [Split walls of text into sentences](2026-10-30-r5-split-walls-of-text-into-sentences.md)
