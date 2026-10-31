@@ -46,27 +46,18 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment.
-
-## Next
-
 ### 26. Italic as a cue, like bold
 
 **Serves:** structure
 
 **Size:** XS (1)
 
-**What:** record a paragraph all in `<em>` or `<i>`, as blocks records
-one all in bold, so headings read italic as a cue too.
+Blocks records a paragraph all in bold, but not one all in `<em>` or
+`<i>`, though ads set headings ("You'll also need to:") and notices in
+italic too: 470 ads in the samples have one. The plan is in its
+[record](docs/changes/2026-10-31-r26-italic-as-a-cue-like-bold.md).
 
-**Why:** ads set headings ("You'll also need to:") and notices in
-italic, and without a cue those are read as text: 470 ads in the
-samples have one, so it reaches many ads for little work.
-
-**Done when** blocks records italic beside bold; headings takes it as a
-cue where it takes bold; tests cover both tags with made-up text; a run
-against the one before shows which headings were gained, and nothing
-else moved; and PIPELINE.md says so, its Known gaps row gone.
+## Next
 
 ### 34. Metadata as filters in the retrieval test
 
