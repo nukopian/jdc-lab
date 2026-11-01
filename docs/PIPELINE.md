@@ -695,6 +695,13 @@ apart by "|", "," or "/": "Leeds | Permanent" is a line of facts,
 gains the facts read from them. A known field label followed by " - "
 is a field, as one followed by a colon is.
 
+**Why a fact wasn't found.** When a test of `facts.Find` expects a fact
+and gets none, it says why, for each kind missing: that
+`grammars.MayHold` skipped the line; or where the kind's grammar gave
+up, from grammar's `FindErr`, as `expected <day>, found "5pm"` for
+"Monday to 5pm"; or that the grammar matched and `Find` turned the
+match down, as it does a figure with no currency or period.
+
 **Fields and facts in details too.** A field, or a fact in a line of
 prose, is metadata wherever it's written, but also part of what its
 section says: a working pattern in the role, salary in the benefits. So
@@ -750,7 +757,8 @@ Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
 with grammar v0.4.3, whose matcher keeps its results in slots rather
 than making a closure for each (grammar's roadmap 9, measured on these
 benchmarks before its release), and its output stayed the same, byte
-for byte.
+for byte. grammar v0.4.4 and scalar v0.6.2 moved neither benchmark,
+nor any chunk.
 
 ### Pages before and after
 

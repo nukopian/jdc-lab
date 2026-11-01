@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/nukopian/grammar"
+
+	"github.com/nukopian/jdc-lab/internal/grammars"
 )
 
 // show writes the facts found in a line, one a line, values sorted.
@@ -13,6 +17,43 @@ func show(fs []Fact) string {
 		out = append(out, fmt.Sprintf("%s %q %v", f.Kind, f.Text, f.Values))
 	}
 	return strings.Join(out, "\n")
+}
+
+// grammarOf is the grammar each kind of fact is found with.
+var grammarOf = map[string]*grammar.Grammar{
+	"pay":      grammars.Pay,
+	"hours":    grammars.Hours,
+	"pattern":  grammars.Pattern,
+	"schedule": grammars.Schedule,
+	"location": grammars.Postcode,
+}
+
+// whyMissing says, for each kind of fact in want (as show writes them)
+// that got lacks, why Find found none in line: that MayHold skipped the
+// line, or FindErr's report of where the kind's grammar gave up, or, when
+// it matched, that Find turned the match down, as payOf does a figure
+// with no currency or period.
+func whyMissing(line, got, want string) string {
+	var why []string
+	for w := range strings.Lines(want) {
+		kind, _, _ := strings.Cut(w, " ")
+		g := grammarOf[kind]
+		if g == nil || strings.HasPrefix(got, kind+" ") || strings.Contains(got, "\n"+kind+" ") {
+			continue
+		}
+		switch m, err := g.FindErr(line, grammar.Outermost()); {
+		case !grammars.MayHold(g, line):
+			why = append(why, fmt.Sprintf("no %s: MayHold skips the line", kind))
+		case err != nil:
+			why = append(why, fmt.Sprintf("no %s: %v", kind, err))
+		default:
+			why = append(why, fmt.Sprintf("no %s: %s matched %q, and Find turned it down", kind, g.Name(), strings.TrimSpace(m.At("~").Str())))
+		}
+	}
+	if why == nil {
+		return ""
+	}
+	return "\n" + strings.Join(why, "\n")
 }
 
 func TestFind(t *testing.T) {
@@ -45,7 +86,7 @@ func TestFind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		if got := show(Find(tt.line)); got != tt.want {
-			t.Errorf("Find(%q):\n got %s\nwant %s", tt.line, got, tt.want)
+			t.Errorf("Find(%q):\n got %s\nwant %s%s", tt.line, got, tt.want, whyMissing(tt.line, got, tt.want))
 		}
 	}
 }
@@ -74,7 +115,7 @@ func TestFindWashUp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		if got := show(Find(tt.line)); got != tt.want {
-			t.Errorf("Find(%q):\n got %s\nwant %s", tt.line, got, tt.want)
+			t.Errorf("Find(%q):\n got %s\nwant %s%s", tt.line, got, tt.want, whyMissing(tt.line, got, tt.want))
 		}
 	}
 }
@@ -137,7 +178,7 @@ func TestFiguresInOtherDigits(t *testing.T) {
 		"٣٧.٥ hours per week":       `hours "٣٧.٥ hours per week" map[per_week:37.5]`,
 	} {
 		if got := show(Find(line)); got != want {
-			t.Errorf("Find(%q)\n got: %s\nwant: %s", line, got, want)
+			t.Errorf("Find(%q)\n got: %s\nwant: %s%s", line, got, want, whyMissing(line, got, want))
 		}
 	}
 }

@@ -12,7 +12,13 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.4.4 and scalar v0.6.2. Every chunk is the same, byte for
+  byte, every stage's output unchanged, and reading facts and chunking
+  take the time they did. A fact test that expects a fact and gets none
+  now says why, with grammar's new `FindErr`: where the kind's grammar
+  gave up and what it expected there, that the line was skipped as
+  unable to hold one, or that the grammar matched and `Find` turned it
+  down.
 
 ## v0.6.2 (2026-10-31)
 
