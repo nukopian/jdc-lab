@@ -24,6 +24,11 @@ has the steps).
   assertion builds the whole match so far; grammar's roadmap 24 would
   win that back.
   ([record](docs/changes/2026-11-02-checks-in-the-fact-grammars.md))
+- Wash-up: Hours' check read a figure only in ASCII digits, though the
+  grammar matches any of Unicode's, so "٢٧٢ hours" and "２７２ hours"
+  passed as plausible. It now reads figures as facts does, with one
+  function, `grammars.Number`. No ad of the samples has such a figure,
+  so nothing moved.
 
 ## v0.6.3 (2026-11-02)
 

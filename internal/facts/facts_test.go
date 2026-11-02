@@ -132,6 +132,10 @@ func TestImplausibleHours(t *testing.T) {
 		{"168 hours per month", ""},
 		{"84 Hours per Fortnight", ""},
 		{"25 hours per day", ""},
+		// In any of Unicode's digits, as \d matches them.
+		{"٢٧٢ hours annual leave", ""},
+		{"２７２ hours", ""},
+		{"٣٧.٥ hours per week", `hours "٣٧.٥ hours per week" map[per_week:37.5]`},
 		// The limits themselves are plausible.
 		{"24 hours per day", `hours "24 hours per day" map[per_day:24]`},
 		{"80 hours", `hours "80 hours" map[hours:80]`},

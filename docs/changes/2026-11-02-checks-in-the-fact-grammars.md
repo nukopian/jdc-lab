@@ -233,6 +233,11 @@ hours facts over the limits, and adds none.
   showed why: each assertion builds the match so far, a hash for every
   capture, 39% of a search's allocations, though Pay's function reads
   two captures.
+- **Found in the release's wash-up:** `implausible` read the figure
+  with scalar's `Num`, which reads ASCII digits only, so "٢٧٢ hours"
+  passed as plausible. `parse` moved from facts to
+  `grammars.Number`, which both now use; a test of such figures failed
+  before and passes after, and chunks and every stage are unchanged.
 - **What's left:** building only what an assertion reads, now
   grammar's roadmap 24 and scalar's 5, both at the top of Next. When
   it ships, take it up and measure again. The threshold of 80 for a

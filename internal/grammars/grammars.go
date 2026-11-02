@@ -7,6 +7,7 @@ package grammars
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -64,7 +65,7 @@ grammar Hours {
 // long week's, as "272 hours" of annual leave, "2026 Hours" after a date
 // or "0600hrs" are.
 var implausible = grammar.Assertion("implausible", func(m *scalar.SV) bool {
-	n := m.At("num.~").Num()
+	n, _ := Number(m.At("num.~").Str())
 	switch {
 	case m.At("per.day").Defined():
 		return n > 24
@@ -73,6 +74,26 @@ var implausible = grammar.Assertion("implausible", func(m *scalar.SV) bool {
 	}
 	return n > 80
 })
+
+// Number reads a figure as the grammars match it: digits, any of
+// Unicode's, as \d is, with commas between thousands and a point.
+func Number(s string) (float64, bool) {
+	ascii := strings.Map(func(r rune) rune {
+		switch {
+		case r == ',':
+			return -1
+		case r >= '0' && r <= '9' || !unicode.IsDigit(r):
+			return r
+		}
+		zero := r // the first digit of r's run of ten
+		for unicode.IsDigit(zero - 1) {
+			zero--
+		}
+		return '0' + (r-zero)%10
+	}, s)
+	n, err := strconv.ParseFloat(ascii, 64)
+	return n, err == nil
+}
 
 // patternRules are the work patterns and arrangements, each rule its
 // canonical value first, then what ads write for it.
