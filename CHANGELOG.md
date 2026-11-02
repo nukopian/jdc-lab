@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.5 (2026-11-02)
+
+grammar v0.5.1: code assertions name what they read
+
 - grammar v0.5.1, and Pay's and Hours' assertions name the captures
   they read, so grammar builds only those. Reading facts and chunking
   cost what they did before code assertions, and chunking every ad
