@@ -12,7 +12,10 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.5.1, and Pay's and Hours' assertions name the captures
+  they read, so grammar builds only those. Reading facts and chunking
+  cost what they did before code assertions, and chunking every ad
+  takes 2% less than with v0.5.0, its output the same, byte for byte.
 
 ## v0.6.4 (2026-11-02)
 

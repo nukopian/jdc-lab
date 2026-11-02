@@ -44,9 +44,10 @@ grammar Pay {
 // pay says whether a match of Pay so far is pay: it has a currency sign
 // or a period. cur is captured twice in the rule, before each amount, so
 // it's an array, empty when there's none; period is one match, or missing.
+// It names the captures it reads, so that grammar builds only those.
 var pay = grammar.Assertion("pay", func(m *scalar.SV) bool {
 	return len(m.At("cur").AV().Items()) > 0 || m.At("period").Defined()
-})
+}, "cur", "period")
 
 // Hours is hours of work: "40hrs pw", "37.5 hours per week", "12 hours
 // per day", "40 hours". A bare "h" is hours only with a period after it,
@@ -63,7 +64,7 @@ grammar Hours {
 // implausible says whether a match of Hours is more hours than its period
 // holds: over 24 a day, over 168 a week, or, with no period, over 80, a
 // long week's, as "272 hours" of annual leave, "2026 Hours" after a date
-// or "0600hrs" are.
+// or "0600hrs" are. It names the captures it reads, as pay does.
 var implausible = grammar.Assertion("implausible", func(m *scalar.SV) bool {
 	n, _ := Number(m.At("num.~").Str())
 	switch {
@@ -73,7 +74,7 @@ var implausible = grammar.Assertion("implausible", func(m *scalar.SV) bool {
 		return n > 168
 	}
 	return n > 80
-})
+}, "num", "per")
 
 // Number reads a figure as the grammars match it: digits, any of
 // Unicode's, as \d is, with commas between thousands and a point.

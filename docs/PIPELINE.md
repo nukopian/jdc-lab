@@ -767,6 +767,7 @@ sections), on 2026-10-31:
 | both | 1.8 s | 2.2 s | 75 million |
 | both, with grammar v0.4.3 | 1.1 s | 1.4 s | 25 million |
 | with code assertions, grammar v0.5.0 | 1.2 s | 1.6 s | 27 million |
+| naming what they read, grammar v0.5.1 | 1.1 s | 1.4 s | 25 million |
 
 Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
 with grammar v0.4.3, whose matcher keeps its results in slots rather
@@ -775,9 +776,13 @@ benchmarks before its release), and its output stayed the same, byte
 for byte. grammar v0.4.4 and scalar v0.6.2 moved neither benchmark,
 nor any chunk. Code assertions, measured on 2026-11-02, cost 8% on
 both benchmarks, and 4% chunking every ad (37.7 s to 39.2 s), as each
-builds the match so far, every capture of it, though Pay's reads two;
-grammar's roadmap 24 would build only what's read. Pay's alone gave
-chunks the same, byte for byte.
+builds the match so far, every capture of it, though Pay's reads two.
+Pay's alone gave chunks the same, byte for byte. With grammar v0.5.1,
+each assertion names the captures it reads, and only those are built:
+reading facts and chunking are back to their cost before assertions,
+with 2–4% more allocations, and chunking every ad 2% quicker than with
+v0.5.0 (37.8–38.0 s against 38.6–38.8 s, three runs each, interleaved),
+its output the same, byte for byte.
 
 ### Pages before and after
 
