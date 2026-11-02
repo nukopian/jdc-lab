@@ -12,7 +12,12 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.5.2 and scalar v0.6.5: a faster matcher, and a match's
+  values made in one allocation. Reading facts and chunking take less
+  than half the time they did, with 87% fewer allocations, and chunking
+  every ad 26 s rather than 37 s; the whole pipeline runs in 119 s
+  rather than 134 s. Every chunk, section and stage's output is the
+  same, byte for byte.
 
 ## v0.6.5 (2026-11-02)
 

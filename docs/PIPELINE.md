@@ -566,9 +566,9 @@ Given many ads, `chunk` and `shape` find them all in one reading of the
 run's ads, so a few thousand cost little more than one: 500 ads spread
 through the samples took 111 s when each was looked for on its own, and
 take 3 s. Chunking every ad of the samples, all 25,954, takes about
-34 s, about 770 ads a second, since roadmap 43 read facts only in lines
-that can hold them, and grammar v0.4.3 matched them with fewer
-allocations (see [Facts](#facts)):
+26 s, about 1,000 ads a second, since roadmap 43 read facts only in
+lines that can hold them, and grammar v0.4.3 and v0.5.2 matched them
+faster, with fewer allocations (see [Facts](#facts)):
 
 ```
 xargs go run ./cmd/chunk -json < ids.txt > chunks.jsonl
@@ -768,6 +768,7 @@ sections), on 2026-10-31:
 | both, with grammar v0.4.3 | 1.1 s | 1.4 s | 25 million |
 | with code assertions, grammar v0.5.0 | 1.2 s | 1.6 s | 27 million |
 | naming what they read, grammar v0.5.1 | 1.1 s | 1.4 s | 25 million |
+| grammar v0.5.2's faster matcher, scalar v0.6.5 | 0.51 s | 0.65 s | 3.1 million |
 
 Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
 with grammar v0.4.3, whose matcher keeps its results in slots rather
@@ -782,7 +783,12 @@ each assertion names the captures it reads, and only those are built:
 reading facts and chunking are back to their cost before assertions,
 with 2–4% more allocations, and chunking every ad 2% quicker than with
 v0.5.0 (37.8–38.0 s against 38.6–38.8 s, three runs each, interleaved),
-its output the same, byte for byte.
+its output the same, byte for byte. grammar v0.5.2's faster matcher
+(grammar's roadmap 25), with scalar v0.6.5 making a match's values in
+one allocation, more than halved both benchmarks, with 87% fewer
+allocations, and chunking every ad took 26.0–26.8 s against 37.2–37.9 s
+(three runs each, interleaved), its output the same, byte for byte, as
+every stage's was.
 
 ### Pages before and after
 
