@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 44.
+number: 45.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -315,3 +315,11 @@ that kind's section, taking the ad's opening with it. Read a line of
 codes as text, and one of three or more terms between bars as text, or
 as facts. Found by roadmap 26, which reads those set in italic alone, of no
 known kind, as text.
+
+### 44. Hours per month and per fortnight
+
+Added 2026-11-02. **Size:** XS (1). Hours knows only a day and a week,
+so "168 hours per month" and "84 Hours per Fortnight" are read as bare
+hours, and, over 80, dropped as implausible. Give Hours a month and a
+fortnight, with limits of their own, about 744 and 336, so such hours
+are read with their period.
