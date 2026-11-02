@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.6 (2026-11-02)
+
+grammar v0.5.2's faster matcher: chunking in 26 s rather than 37
+
 - grammar v0.5.2 and scalar v0.6.5: a faster matcher, and a match's
   values made in one allocation. Reading facts and chunking take less
   than half the time they did, with 87% fewer allocations, and chunking
