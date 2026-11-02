@@ -113,3 +113,82 @@ index 4688533..7940060 100644
 
 **Check:** `scripts/test-all.sh` passes, and chunking every ad gives
 output identical to before the change.
+
+## Drop implausible hours in the Hours grammar, with a code assertion
+
+**From:** grammar's session, 2026-11-02 (grammar 450a8507cab32d1f2fe2ad9c530120bbed479fe1)
+**Waiting on:** a grammar release with code assertions (after v0.4.4)
+
+**What:** Hours reads any figure before "hours" as hours, so the latest
+run's facts include "272 hours" (annual leave), "Dec 2026 Hours : 37.5
+hours per week" (a year), "1800-0600hrs" (clock times), "168 hours per
+month" and "84 Hours per Fortnight" (periods Hours doesn't know, read as
+bare hours). A code assertion, `<!{ implausible($/) }>`, drops a match
+with more hours than its period holds: over 24 a day, over 168 a week,
+or, with no period, over 80.
+
+**Why:** these are misreadings, and a line holding one counts as a line
+of facts: "- 224 hours holiday" in four care-home ads was taken out of
+the summary into a details chunk.
+
+**What's known:** tried against grammar's checkout on 2026-11-02 with
+the patch below. Over all 28,000 ads, 76 hours facts go (4,729 to
+4,653), every one a bare figure over 80, 33 readings in all, and
+nothing is added; the only other change is those four ads' holiday
+lines staying in their summaries. `go test ./internal/...` passed.
+The left boundary, `<!after <[\d.]>>`, is needed: without it, a
+rejected "224 hours" leaves the search to find "24 hours" inside it,
+as "2026 Hours" gave "026 Hours". The threshold of 80 for a bare figure
+is a guess at a long week; the lab may prefer another, or periods for
+months and fortnights instead.
+
+**Steps,** once the release is out (with the Pay task, the scalar
+import is added once):
+
+```diff
+diff --git a/internal/grammars/grammars.go b/internal/grammars/grammars.go
+index 3887850..60b92d3 100644
+--- a/internal/grammars/grammars.go
++++ b/internal/grammars/grammars.go
+@@ -11,6 +11,7 @@ import (
+ 	"unicode"
+ 
+ 	"github.com/nukopian/grammar"
++	"github.com/nukopian/scalar"
+ )
+ 
+ // Pay is a figure of money: with a currency sign, or a period, or both,
+@@ -44,12 +45,27 @@ grammar Pay {
+ // as "24h support" isn't.
+ var Hours = grammar.MustCompile(`
+ grammar Hours {
+-    token TOP  { <num> \s* :i [ [ hours | hrs | hr ] >> [ \s* <per> ]? | h >> \s* <per> ] }
++    token TOP  { <!after <[\d.]>> <num> \s* :i [ [ hours | hrs | hr ] >> [ \s* <per> ]? | h >> \s* <per> ] <!{ implausible($/) }> }
+     token num  { \d+ [ '.' \d+ ]? }
+     token per  { <week> | <day> }
+     token week { :i [ per \s+ week | pw | 'p/w' | a \s+ week | weekly ] >> }
+     token day  { :i [ per \s+ day | a \s+ day | daily | per \s+ shift ] >> }
+-}`)
++}`, implausible)
++
++// implausible says whether a match of Hours is more hours than its period
++// holds: over 24 a day, over 168 a week, or, with no period, over 80, a
++// long week's, as "272 hours" of annual leave, "2026 Hours" after a date
++// or "0600hrs" are.
++var implausible = grammar.Assertion("implausible", func(m *scalar.SV) bool {
++	n := m.At("num.~").Num()
++	switch {
++	case m.At("per.day").Defined():
++		return n > 24
++	case m.At("per.week").Defined():
++		return n > 168
++	}
++	return n > 80
++})
+ 
+ // patternRules are the work patterns and arrangements, each rule its
+ // canonical value first, then what ads write for it.
+```
+
+**Check:** `scripts/test-all.sh` passes; chunking every ad drops only
+hours facts over the limits, and adds none.
