@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.3 (2026-11-02)
+
+grammar v0.4.4 and scalar v0.6.2, and fact tests that say why
+
 - grammar v0.4.4 and scalar v0.6.2. Every chunk is the same, byte for
   byte, every stage's output unchanged, and reading facts and chunking
   take the time they did. A fact test that expects a fact and gets none
