@@ -2,7 +2,7 @@
 
 ## Check pay in the Pay grammar, with a code assertion
 
-**From:** grammar's session, 2026-11-02 (grammar 24b190a7)
+**From:** grammar's session, 2026-11-02 (grammar 24b190ab4ab18da57055eb91a43627f59d8a2d23)
 **Waiting on:** a grammar release with code assertions (after v0.4.4)
 
 **What:** Pay's rule that a figure is pay only with a currency sign or a
