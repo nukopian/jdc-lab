@@ -39,9 +39,7 @@ type Fact struct {
 func Find(line string) []Fact {
 	var fs []Fact
 	for _, m := range all(grammars.Pay, line) {
-		if f, ok := payOf(m); ok {
-			fs = append(fs, f)
-		}
+		fs = append(fs, payOf(m))
 	}
 	if !slices.ContainsFunc(fs, func(f Fact) bool { return f.Kind == "pay" }) && may(grammars.Figure, line) {
 		if f, ok := labelledPay(line); ok {
@@ -97,15 +95,13 @@ func fact(kind string, m *scalar.SV, values map[string]string) Fact {
 	return Fact{Kind: kind, Text: strings.TrimSpace(m.At("~").Str()), Values: values, From: int(m.At("from").Int())}
 }
 
-// payOf reads a pay match, if it's pay: it needs a currency or a period.
-func payOf(m *scalar.SV) (Fact, bool) {
+// payOf reads a pay match. The grammar has made sure it's pay, with a
+// currency or a period.
+func payOf(m *scalar.SV) Fact {
 	// cur is captured twice in the rule, before each amount, so it's an
 	// array, empty when there's none; period is one match, or missing.
 	curs := m.At("cur").AV().Items()
 	cur, period := len(curs) > 0, m.At("period").Defined()
-	if !cur && !period {
-		return Fact{}, false
-	}
 	v := map[string]string{"min": amount(m.At("min"))}
 	if m.At("max").Defined() {
 		v["max"] = amount(m.At("max"))
@@ -125,7 +121,7 @@ func payOf(m *scalar.SV) (Fact, bool) {
 	if period {
 		v["period"] = periodOf(m.At("period.~").Str())
 	}
-	return fact("pay", m, v), true
+	return fact("pay", m, v)
 }
 
 // amount returns an amount's figure, "45k" as 45000, commas gone.

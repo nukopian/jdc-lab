@@ -18,7 +18,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/nukopian/grammar"
-	"github.com/nukopian/scalar"
 
 	"github.com/nukopian/jdc-lab/internal/blocks"
 	"github.com/nukopian/jdc-lab/internal/clean"
@@ -381,30 +380,24 @@ func hasRemoved(text string) bool {
 // schedules, hours and pay, and what joins them: "Permanent | Full-time"
 // or "Monday - Friday" in bold is a line of facts, not a heading. Ending
 // in a colon, it heads what follows, as "Monday - Friday:" heads its
-// hours, and a field's label ("Hybrid Working") heads its value. Pay
-// counts with a currency or a period, as internal/facts reads it.
+// hours, and a field's label ("Hybrid Working") heads its value.
 func onlyFacts(text string) bool {
 	if endsAsLabel(text) || fieldLabels[Key(text)] {
 		return false
 	}
 	left := []rune(text)
-	cut := func(g *grammar.Grammar, keep func(m *scalar.SV) bool) {
+	cut := func(g *grammar.Grammar) {
 		for _, m := range g.FindAll(text, grammar.Outermost()).Items() {
-			if keep != nil && !keep(m) {
-				continue
-			}
 			from, to := int(m.At("from").Int()), int(m.At("to").Int())
 			for i := from; i < to && i < len(left); i++ {
 				left[i] = ' '
 			}
 		}
 	}
-	cut(grammars.Pattern, nil)
-	cut(grammars.Schedule, nil)
-	cut(grammars.Hours, nil)
-	cut(grammars.Pay, func(m *scalar.SV) bool {
-		return len(m.At("cur").AV().Items()) > 0 || m.At("period").Defined()
-	})
+	cut(grammars.Pattern)
+	cut(grammars.Schedule)
+	cut(grammars.Hours)
+	cut(grammars.Pay)
 	if string(left) == text {
 		return false // no facts at all
 	}

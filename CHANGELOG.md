@@ -12,7 +12,18 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- grammar v0.5.0 and scalar v0.6.3, and checks in the fact grammars,
+  as grammar's new code assertions. Pay's rule that a figure needs a
+  currency or a period is in its grammar, once, where facts and
+  headings kept a copy each; every chunk is the same, byte for byte.
+  Hours drops a figure over what its period holds, 24 a day, 168 a
+  week, or 80 with none: 76 of 4,729 hours facts went, all misreadings,
+  such as "272 hours" of leave, "2026 Hours" after a date and "0600hrs",
+  and four ads' holiday lines stay in their summaries. Reading facts
+  costs 8% more, and chunking every ad 4% (37.7 s to 39.2 s), as each
+  assertion builds the whole match so far; grammar's roadmap 24 would
+  win that back.
+  ([record](docs/changes/2026-11-02-checks-in-the-fact-grammars.md))
 
 ## v0.6.3 (2026-11-02)
 

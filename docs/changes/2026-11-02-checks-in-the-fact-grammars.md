@@ -1,6 +1,21 @@
-# To do
+# Checks in the fact grammars, with code assertions
 
-## Check pay in the Pay grammar, with a code assertion
+**Status:** shipped, unreleased
+
+**Origin:** two TODO tasks from grammar's session (grammar
+24b190ab4ab18da57055eb91a43627f59d8a2d23 and
+450a8507cab32d1f2fe2ad9c530120bbed479fe1)
+
+**Started:** 2026-11-02, in e94d4963779aed4a1943437a1c114a94078efe61
+
+**Finished:** 2026-11-02
+
+## The plan
+
+Two tasks, taken up together, as both wait on the same grammar release
+and change the same file.
+
+### Check pay in the Pay grammar, with a code assertion
 
 **From:** grammar's session, 2026-11-02 (grammar 24b190ab4ab18da57055eb91a43627f59d8a2d23)
 **Waiting on:** a grammar release with code assertions (after v0.4.4)
@@ -114,7 +129,7 @@ index 4688533..7940060 100644
 **Check:** `scripts/test-all.sh` passes, and chunking every ad gives
 output identical to before the change.
 
-## Drop implausible hours in the Hours grammar, with a code assertion
+### Drop implausible hours in the Hours grammar, with a code assertion
 
 **From:** grammar's session, 2026-11-02 (grammar 450a8507cab32d1f2fe2ad9c530120bbed479fe1)
 **Waiting on:** a grammar release with code assertions (after v0.4.4)
@@ -192,3 +207,35 @@ index 3887850..60b92d3 100644
 
 **Check:** `scripts/test-all.sh` passes; chunking every ad drops only
 hours facts over the limits, and adds none.
+
+## What happened
+
+- **Outcome:** both done, with grammar v0.5.0 and scalar v0.6.3, which
+  it needs. `scripts/test-all.sh` passes. Chunking all 28,000 ads of
+  the latest run with Pay's check in its grammar gave output identical,
+  byte for byte, to grammar v0.4.4's. Adding Hours' check, 76 hours
+  facts went (4,729 to 4,653), 33 readings, every one a bare figure
+  over 80, and no fact was added or changed; the only other change was
+  four ads' holiday lines staying in their summaries, as the task
+  found. Every stage's output is unchanged (`pipeline compare
+  claude/before claude/after`).
+- **Changes from the plan:** `payOf` lost its bool, as nothing calls it
+  for labelled pay; `onlyFacts`'s `cut` lost its `keep` argument, which
+  no grammar needed any more, and headings no longer imports scalar. A
+  test of the misreadings the Hours task names, and of its limits,
+  fails before the change and passes after.
+- **Measurements,** on 2026-11-02, with six runs of each benchmark:
+  `BenchmarkFindSamples` 1.14 s to 1.22 s (+7.6%), and
+  `BenchmarkAdOfSamples` 1.46 s to 1.58 s (+8.5%), with 8% more
+  allocations. Chunking every ad took 37.7 s, 39.0 s with Pay's check,
+  and 39.2 s with both: 4% in all, about 0.06 ms an ad. Iain took the
+  cost for one copy of each rule. Profiling grammar's `BenchmarkAssert`
+  showed why: each assertion builds the match so far, a hash for every
+  capture, 39% of a search's allocations, though Pay's function reads
+  two captures.
+- **What's left:** building only what an assertion reads, now
+  grammar's roadmap 24 and scalar's 5, both at the top of Next. When
+  it ships, take it up and measure again. The threshold of 80 for a
+  bare figure is still a guess; "168 hours per month" and "84 Hours per
+  Fortnight" are dropped, not read, as Hours has no month or
+  fortnight.

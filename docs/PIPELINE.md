@@ -676,7 +676,10 @@ above), so that a line is a time, or a rota, by one set of rules:
 
 A figure is pay only with a currency sign or a period ("5 years" isn't),
 and not before "bonus", with at most a word between ("£250 referral
-bonus" isn't); "Contract" as a field's label ("Contract type: Temp to
+bonus" isn't); hours are no more than their period holds, 24 a day, 168
+a week, or, with no period, 80, a long week's, so "272 hours" of leave,
+"2026 Hours" after a date and "0600hrs" aren't hours, nor is "24 hours"
+inside "224 hours"; "Contract" as a field's label ("Contract type: Temp to
 Perm", "Contract: Permanent") is no work pattern, though other patterns
 before a colon are ("Part-Time: 25 hours per week");
 and in a range, "£25-28k", the top figure's k is the bottom's too; a
@@ -695,12 +698,23 @@ apart by "|", "," or "/": "Leeds | Permanent" is a line of facts,
 gains the facts read from them. A known field label followed by " - "
 is a field, as one followed by a colon is.
 
+**Checks only code can make** are in the grammars too, as code
+assertions: `<?{ pay($/) }>` in Pay calls a Go function that says
+whether the figure so far has a currency or a period, and
+`<!{ implausible($/) }>` in Hours one that compares the hours with
+their period. So each rule is written once, beside the rest of what
+makes a fact, and a match that breaks it is never made, rather than
+made and thrown away; headings, which keep facts out, use the same
+grammars and so the same checks.
+
 **Why a fact wasn't found.** When a test of `facts.Find` expects a fact
 and gets none, it says why, for each kind missing: that
 `grammars.MayHold` skipped the line; or where the kind's grammar gave
 up, from grammar's `FindErr`, as `expected <day>, found "5pm"` for
 "Monday to 5pm"; or that the grammar matched and `Find` turned the
-match down, as it does a figure with no currency or period.
+match down. For a figure with no currency or period, which Pay's `pay`
+assertion turns down, that's where Pay got furthest: after the figure,
+expecting a period.
 
 **Fields and facts in details too.** A field, or a fact in a line of
 prose, is metadata wherever it's written, but also part of what its
@@ -752,13 +766,18 @@ sections), on 2026-10-31:
 | skipping lines | 1.8 s | 3.3 s | 115 million |
 | both | 1.8 s | 2.2 s | 75 million |
 | both, with grammar v0.4.3 | 1.1 s | 1.4 s | 25 million |
+| with code assertions, grammar v0.5.0 | 1.2 s | 1.6 s | 27 million |
 
 Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
 with grammar v0.4.3, whose matcher keeps its results in slots rather
 than making a closure for each (grammar's roadmap 9, measured on these
 benchmarks before its release), and its output stayed the same, byte
 for byte. grammar v0.4.4 and scalar v0.6.2 moved neither benchmark,
-nor any chunk.
+nor any chunk. Code assertions, measured on 2026-11-02, cost 8% on
+both benchmarks, and 4% chunking every ad (37.7 s to 39.2 s), as each
+builds the match so far, every capture of it, though Pay's reads two;
+grammar's roadmap 24 would build only what's read. Pay's alone gave
+chunks the same, byte for byte.
 
 ### Pages before and after
 

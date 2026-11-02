@@ -71,6 +71,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Checks in the fact grammars, with code assertions](2026-11-02-checks-in-the-fact-grammars.md)
+  (two TODO tasks), shipped, unreleased
 - [Read facts only where they can be](2026-10-31-r43-read-facts-only-where-they-can-be.md)
   (roadmap 43), shipped in v0.6.1
 - [Italic as a cue, like bold](2026-10-31-r26-italic-as-a-cue-like-bold.md)

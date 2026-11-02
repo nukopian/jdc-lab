@@ -11,6 +11,7 @@ import (
 	"unicode"
 
 	"github.com/nukopian/grammar"
+	"github.com/nukopian/scalar"
 )
 
 // Pay is a figure of money: with a currency sign, or a period, or both,
@@ -21,7 +22,7 @@ import (
 var Pay = grammar.MustCompile(`
 grammar Pay {
     token TOP    { [ $<upto>=[ :i up \s+ to ] \s+ ]? <cur>? \s? <min=amount>
-                   [ <.sep> <cur>? \s? <max=amount> ]? <period>? <!before <.bonus>> }
+                   [ <.sep> <cur>? \s? <max=amount> ]? <period>? <?{ pay($/) }> <!before <.bonus>> }
     # A bonus isn't pay: "£30 bonus for cover", "£1,500 joining bonus";
     # but pay "plus bonus" or "with bonus" is pay, with a bonus besides.
     token bonus  { \s+ [ :i bonus >>
@@ -37,19 +38,41 @@ grammar Pay {
                             | per \s+ day | a \s+ day | daily
                             | pw | 'p/w' | per \s+ week | a \s+ week | weekly
                             | pcm | per \s+ month | a \s+ month | monthly ] >> ] }
-}`)
+}`, pay)
+
+// pay says whether a match of Pay so far is pay: it has a currency sign
+// or a period. cur is captured twice in the rule, before each amount, so
+// it's an array, empty when there's none; period is one match, or missing.
+var pay = grammar.Assertion("pay", func(m *scalar.SV) bool {
+	return len(m.At("cur").AV().Items()) > 0 || m.At("period").Defined()
+})
 
 // Hours is hours of work: "40hrs pw", "37.5 hours per week", "12 hours
 // per day", "40 hours". A bare "h" is hours only with a period after it,
 // as "24h support" isn't.
 var Hours = grammar.MustCompile(`
 grammar Hours {
-    token TOP  { <num> \s* :i [ [ hours | hrs | hr ] >> [ \s* <per> ]? | h >> \s* <per> ] }
+    token TOP  { <!after <[\d.]>> <num> \s* :i [ [ hours | hrs | hr ] >> [ \s* <per> ]? | h >> \s* <per> ] <!{ implausible($/) }> }
     token num  { \d+ [ '.' \d+ ]? }
     token per  { <week> | <day> }
     token week { :i [ per \s+ week | pw | 'p/w' | a \s+ week | weekly ] >> }
     token day  { :i [ per \s+ day | a \s+ day | daily | per \s+ shift ] >> }
-}`)
+}`, implausible)
+
+// implausible says whether a match of Hours is more hours than its period
+// holds: over 24 a day, over 168 a week, or, with no period, over 80, a
+// long week's, as "272 hours" of annual leave, "2026 Hours" after a date
+// or "0600hrs" are.
+var implausible = grammar.Assertion("implausible", func(m *scalar.SV) bool {
+	n := m.At("num.~").Num()
+	switch {
+	case m.At("per.day").Defined():
+		return n > 24
+	case m.At("per.week").Defined():
+		return n > 168
+	}
+	return n > 80
+})
 
 // patternRules are the work patterns and arrangements, each rule its
 // canonical value first, then what ads write for it.

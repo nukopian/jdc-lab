@@ -31,8 +31,7 @@ var grammarOf = map[string]*grammar.Grammar{
 // whyMissing says, for each kind of fact in want (as show writes them)
 // that got lacks, why Find found none in line: that MayHold skipped the
 // line, or FindErr's report of where the kind's grammar gave up, or, when
-// it matched, that Find turned the match down, as payOf does a figure
-// with no currency or period.
+// it matched, that Find turned the match down.
 func whyMissing(line, got, want string) string {
 	var why []string
 	for w := range strings.Lines(want) {
@@ -112,6 +111,31 @@ func TestFindWashUp(t *testing.T) {
 		// More ways to write an hourly rate.
 		{"£12.50/hr", `pay "£12.50/hr" map[currency:GBP min:12.5 period:hour]`},
 		{"£14 per hr", `pay "£14 per hr" map[currency:GBP min:14 period:hour]`},
+	}
+	for _, tt := range tests {
+		if got := show(Find(tt.line)); got != tt.want {
+			t.Errorf("Find(%q):\n got %s\nwant %s%s", tt.line, got, tt.want, whyMissing(tt.line, got, tt.want))
+		}
+	}
+}
+
+// More hours than a period holds aren't hours of work: over 24 a day,
+// over 168 a week, or, with no period, over 80, a long week's. Nor is
+// what's left of such a figure, "24 hours" of "224 hours", or "026 Hours"
+// of "2026 Hours".
+func TestImplausibleHours(t *testing.T) {
+	tests := []struct{ line, want string }{
+		{"272 hours annual leave", ""},
+		{"- 224 hours holiday", ""},
+		{"Dec 2026 Hours : 37.5 hours per week", `hours "37.5 hours per week" map[per_week:37.5]`},
+		{"1800-0600hrs", ""},
+		{"168 hours per month", ""},
+		{"84 Hours per Fortnight", ""},
+		{"25 hours per day", ""},
+		// The limits themselves are plausible.
+		{"24 hours per day", `hours "24 hours per day" map[per_day:24]`},
+		{"80 hours", `hours "80 hours" map[hours:80]`},
+		{"60 hours per week", `hours "60 hours per week" map[per_week:60]`},
 	}
 	for _, tt := range tests {
 		if got := show(Find(tt.line)); got != tt.want {
