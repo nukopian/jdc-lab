@@ -1,6 +1,6 @@
 # Checks in the fact grammars, with code assertions
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.6.4
 
 **Origin:** two TODO tasks from grammar's session (grammar
 24b190ab4ab18da57055eb91a43627f59d8a2d23 and

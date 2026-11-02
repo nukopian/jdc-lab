@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.6.4 (2026-11-02)
+
+Checks in the fact grammars, with grammar's code assertions
+
 - grammar v0.5.0 and scalar v0.6.3, and checks in the fact grammars,
   as grammar's new code assertions. Pay's rule that a figure needs a
   currency or a period is in its grammar, once, where facts and
