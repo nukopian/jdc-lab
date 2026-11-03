@@ -6,6 +6,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"testing"
 
@@ -138,4 +139,52 @@ func TestFastAlikeChangesNothing(t *testing.T) {
 		}
 	}
 	t.Logf("%d answers, %d long texts, %d of them joined to another", len(with), len(withGroups), joined)
+}
+
+// read reads the ads in the file at path, and returns them, the answers
+// cmd/boilerplate asks of their texts, one line a text, and each long
+// text's group of texts alike, by the group's own name.
+func read(t *testing.T, path string) ([]Divided, []string, map[string]string) {
+	all, ix, _, err := Read(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var lines []string
+	for _, a := range all {
+		src := SourceOf(a.Ad)
+		for _, p := range Texts(a.Sections) {
+			lines = append(lines, fmt.Sprintf("%t %t %t %d %s", ix.Boilerplate(src, p),
+				ix.Repeated(src, p), ix.Template(src, p), ix.Groups(src, p), p))
+		}
+	}
+	return all, lines, ix.alike
+}
+
+// Dividing ads and finding long texts alike on every processor changes no
+// ad's sections, no answer, and no group of texts alike, nor its name,
+// over 3,000 ads of the latest run.
+func TestParallelReadChangesNothing(t *testing.T) {
+	if testing.Short() {
+		t.Skip("short")
+	}
+	path := samplePath(t, 3000)
+	all, lines, alike := read(t, path)
+	defer func() { parallelRead, parallelAlike = true, true }()
+	parallelRead, parallelAlike = false, false
+	allOne, linesOne, alikeOne := read(t, path)
+	if len(all) != len(allOne) {
+		t.Fatalf("%d ads, %d on one processor", len(all), len(allOne))
+	}
+	for i := range all {
+		if !reflect.DeepEqual(all[i], allOne[i]) {
+			t.Errorf("ad %s divided differently", all[i].Ad.ID)
+		}
+	}
+	if !slices.Equal(lines, linesOne) {
+		t.Errorf("answers differ: %d, %d on one processor", len(lines), len(linesOne))
+	}
+	if !maps.Equal(alike, alikeOne) {
+		t.Errorf("groups of texts alike differ: %d keys, %d on one processor", len(alike), len(alikeOne))
+	}
+	t.Logf("%d ads, %d answers, %d long texts", len(all), len(lines), len(alike))
 }

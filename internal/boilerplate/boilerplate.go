@@ -477,7 +477,9 @@ var fastAlike = true
 
 // joinAlike calls join(i, j), i before j, for each two keys that share
 // at least Overlap of their runs of five words, among those with a run
-// in commonRun keys or fewer.
+// in commonRun keys or fewer. It calls join in the same order whether or
+// not parallelAlike is on, as the order decides what the groups are
+// named.
 func joinAlike(keys []string, join func(i, j int)) {
 	runs := make([][]uint64, len(keys))
 	in := map[uint64][]int{} // a run of words → the keys it's in, in order
@@ -487,8 +489,10 @@ func joinAlike(keys []string, join func(i, j int)) {
 			in[r] = append(in[r], i)
 		}
 	}
-	tried := make([]int, len(keys)) // j was tried against tried[j]-1
-	for i := range keys {
+	// alikeTo is what's found for the key at i: the later keys alike to
+	// it, in the order they're found.
+	alikeTo := func(tried []int, i int) []int {
+		var js []int
 		for _, r := range runs[i] {
 			if len(in[r]) > commonRun {
 				continue
@@ -497,14 +501,41 @@ func joinAlike(keys []string, join func(i, j int)) {
 				if j <= i || tried[j] == i+1 {
 					continue
 				}
-				tried[j] = i + 1
+				tried[j] = i + 1 // j was tried against tried[j]-1
 				if alikeSorted(runs[i], runs[j]) {
-					join(i, j)
+					js = append(js, j)
 				}
 			}
 		}
+		return js
+	}
+	if !parallelAlike {
+		tried := make([]int, len(keys))
+		for i := range keys {
+			for _, j := range alikeTo(tried, i) {
+				join(i, j)
+			}
+		}
+		return
+	}
+	// Whether two keys are alike needs nothing else, so it's found on
+	// every processor, each key's in its own slot; joining stays in order.
+	found := make([][]int, len(keys))
+	inParallel(len(keys), func() func(int) {
+		tried := make([]int, len(keys))
+		return func(i int) { found[i] = alikeTo(tried, i) }
+	})
+	for i, js := range found {
+		for _, j := range js {
+			join(i, j)
+		}
 	}
 }
+
+// parallelAlike turns on finding which long texts are alike on every
+// processor, rather than one. TestParallelReadChangesNothing compares the
+// two.
+var parallelAlike = true
 
 // FNV-1a's offset and prime, as hash/fnv's New64a uses.
 const (

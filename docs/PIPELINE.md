@@ -68,20 +68,20 @@ Then run every stage on the samples together, as the run `latest`:
 go run ./cmd/pipeline run latest
 ```
 
-It takes about 15 s: `data/runs/latest/sections/` holds the
+It takes about 12 s: `data/runs/latest/sections/` holds the
 sections stage's tables, and `data/runs/latest/sections.txt` its
 summary. A run of the same name is replaced.
 
 It builds the stages first, so the code as it stands is what runs, and
-runs them all at once, as none reads another's output, so a run takes
-as long as its slowest stage, view, and needs about 2.5 GB of memory
-while boilerplate and view both run. It ends with how each stage ran,
+runs them all at once, as none reads another's output, and needs about
+2.5 GB of memory while boilerplate and view both run. It ends with how
+each stage ran,
 also kept in `data/runs/latest/timings.tsv`:
 
 ```
 sample  stage               ads      wall       cpu    ads/s      peak
-all     sections          28000     8.70s     9.31s     3219    204 MB
-all     boilerplate       28000    14.49s    17.02s     1933   1237 MB
+all     sections          28000    10.23s     9.97s     2737    204 MB
+all     boilerplate       28000    11.02s    18.82s     2540   1165 MB
 ```
 
 `wall` is the time on the clock, `cpu` the time on the processors (more
@@ -90,10 +90,11 @@ stage held at once (on macOS and Linux; 0 elsewhere). `compare` leaves
 the timings out, as they move a little on every run: compare two runs'
 `timings.tsv` by hand.
 
-Run together, the stages share the machine, so each takes 10% to 20%
-longer than alone, and blocks, the shortest, nearly twice as long. For
-a stage's timings to compare from run to run, as when making it
-faster, run them one at a time, in about 40 s:
+Run together, the stages share the machine's processors, so each takes
+longer than alone: sections and boilerplate about half as long again,
+and blocks, the shortest, twice as long. For a stage's timings to
+compare from run to run, as when making it faster, run them one at a
+time, in about 30 s:
 
 ```
 go run ./cmd/pipeline run -serial claude/before
@@ -112,6 +113,20 @@ output the same, byte for byte. grammar v0.5.3 keeps each rule's
 starts, not only the last one searched for, which the lab asked for:
 run back to back, a run went from 52 s to 42 s with it, and
 heading-counts from 6.9 s to 4.3 s.
+
+Boilerplate and view then divided their ads into sections, and compared
+long texts to find those alike, on one processor; roadmap 45 spreads
+both across every processor
+([record](changes/2026-11-03-r45-boilerplate-and-view-on-several-processors.md)),
+while texts are still added to the index, and joined into groups, in
+order, so the groups keep their names. Run alone, boilerplate went from
+12.7 s to 7.1 s and view from 13.8 s to 8.3 s; a run took 12.1 s rather
+than 15.5 s with the stages at once, and 29.4 s rather than 40.6 s one
+at a time, every stage's output the same. With the stages at once, a
+run now keeps the machine's processors busy, about 60 s of their time
+in 12 s on four fast cores and four slower ones, so it's faster only
+for less work: dividing every ad into sections, done again by four of
+the five stages, is a large part of it (roadmap idea 46).
 
 Each stage's program can also be run alone, on one sample, into any
 folder:

@@ -75,10 +75,9 @@ embeddings, and a large language model only where those fall short.
   kind is placed by an educated guess, mostly as the summary, and
   right for about four sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: under way are boilerplate and view spread across the
-  machine's processors, for a faster run, and next are two retrieval
-  tests: facts as filters, and whether what boilerplate takes is about
-  the job.
+  and why: nothing is under way, and next are two retrieval tests:
+  facts as filters, and whether what boilerplate takes is about the
+  job.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of

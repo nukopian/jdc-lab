@@ -1,10 +1,12 @@
 # Boilerplate and view on several processors
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 45
 
 **Started:** 2026-11-03, in aefbb608ab19c465f823e04568aaf65e5eab4836
+
+**Finished:** 2026-11-03
 
 ## The plan
 
@@ -68,4 +70,48 @@ gives the new timings.
 
 ## What happened
 
-Work in progress.
+- **Outcome:** boilerplate and view divide their ads, and compare long
+  texts, on every processor, behind `parallelRead` and `parallelAlike`,
+  and `pipeline compare` finds every stage's output the same, against
+  `claude/before`, in each run below. Run alone (`pipeline run
+  -serial`), boilerplate went from 12.7 s to 7.1 s and view from 13.8 s
+  to 8.3 s, and a run from 40.6 s to 29.4 s. With the stages at once, a
+  run went from 15.5 s to 12.1 s (two runs, both 12.1 s): not under
+  10 s, for the reason under What's left.
+- **Measurements,** on an Apple M2, four performance cores and four
+  efficiency ones, `benchstat`, interleaved, 6 runs each, on 5,000 ads,
+  each switch on and off in one binary: `Read` 1.52 s → 0.78 s (−49%)
+  with `parallelRead`, the same allocations; `Read` and grouping alike
+  0.78 s → 0.68 s (−13%) with `parallelAlike`. `BenchmarkSamples`,
+  `develop`'s binary against this one's, turn about: 2.02 s → 1.13 s
+  (−44%), the same memory. On all 25,954 distinct ads, by the clock,
+  `Read` went from 9.6 s to 4.2 s: decoding 0.45 s, dividing 1.3 s (from
+  5.3 s), adding to the index 0.8 s, grouping alike 1.0 s (from about
+  1.7 s), and `Ends` 0.7 s.
+- **Tests:** `TestParallelReadChangesNothing` reads 3,000 ads with both
+  switches on and both off, and compares every ad's sections, all
+  73,067 answers cmd/boilerplate asks, and every long text's group by
+  its own name, not by its first key as `TestFastAlikeChangesNothing`
+  does, as adding and joining in order should keep the names too. Both
+  pass under the race detector. Planted bugs: an off-by-one leaving the
+  first ad undivided (one ad, 19 answers and 4 groups differed); and
+  pairs joined the other way round, `join(j, i)`, which changed groups'
+  names and no answer, caught only by comparing names. A third, the
+  joins for one text in reverse order, changed nothing, and rightly:
+  each joins its groups under that text's root, whatever their order,
+  so only the order between texts matters.
+- **Changes from the plan:** step 3, the questions asked after `Read`
+  and the rest of `Ends` on every processor, wasn't done. Asking takes
+  2.8 s in each program, and would save about 2 s of each alone, but
+  with the stages at once the run is bound by the processors' time, not
+  by any stage's: the five use about 62 s of it in 12.1 s, five cores'
+  worth on four fast and four slower ones. Spreading work wider doesn't
+  shorten that, and spreading the questions would mean filling the
+  index's caches first, or guarding them, in both programs. The worker
+  pool is one function, `inParallel`, used by both steps.
+- **What's left:** a run under 10 s needs less work, not more
+  processors. Four of the five stages divide every ad again, and
+  boilerplate and view each build the same index: roadmap idea 46,
+  divide each ad once for every stage. The profile on macOS put 3.6 s
+  in the read system call that the clock showed was 0.45 s of decoding:
+  where they disagree, the clock is right.

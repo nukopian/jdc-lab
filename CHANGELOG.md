@@ -12,7 +12,12 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Boilerplate and view divide their ads into sections, and find long
+  texts alike, on every processor, rather than one: alone, boilerplate
+  takes 7.1 s rather than 12.7 s and view 8.3 s rather than 13.8 s,
+  and a run 12.1 s rather than 15.5 s with the stages at once, every
+  stage's output the same, byte for byte (roadmap 45;
+  [record](docs/changes/2026-11-03-r45-boilerplate-and-view-on-several-processors.md)).
 
 ## v0.7.0 (2026-11-03)
 
