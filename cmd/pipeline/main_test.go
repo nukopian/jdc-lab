@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -91,5 +92,62 @@ func TestCombine(t *testing.T) {
 	got, _ := os.ReadFile(filepath.Join(dir, "all.jsonl"))
 	if string(got) != "{\"id\":\"1\"}\n{\"id\":\"2\"}\n" {
 		t.Errorf("got %q", got)
+	}
+}
+
+// fakeStages writes a shell script into a new folder for each stage,
+// which writes its program's name and its arguments' last parts as its
+// summary, or fails if it's fail, and returns the folder.
+func fakeStages(t *testing.T, fail string) string {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip("the stand-in stages are shell scripts")
+	}
+	bin := t.TempDir()
+	for _, st := range stages {
+		script := "#!/bin/sh\necho " + st.program + " $(basename \"$1\") $(basename \"$2\")\n"
+		if st.program == fail {
+			script = "#!/bin/sh\necho broken >&2\nexit 1\n"
+		}
+		if err := os.WriteFile(filepath.Join(bin, st.program), []byte(script), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return bin
+}
+
+func TestStage(t *testing.T) {
+	for _, serial := range []bool{true, false} {
+		dir := t.TempDir()
+		ads := filepath.Join(dir, "ads.jsonl")
+		os.WriteFile(ads, []byte("{}\n{}\n"), 0o644)
+		timings, err := stage(fakeStages(t, ""), runs.Sample{Name: "all", Path: ads}, dir, serial)
+		if err != nil {
+			t.Fatalf("serial %v: %v", serial, err)
+		}
+		if len(timings) != len(stages) {
+			t.Fatalf("serial %v: %d timings, want %d", serial, len(timings), len(stages))
+		}
+		for i, st := range stages {
+			if timings[i].Stage != st.program || timings[i].Ads != 2 {
+				t.Errorf("serial %v: timing %d is %s of %d ads, want %s of 2", serial, i, timings[i].Stage, timings[i].Ads, st.program)
+			}
+			got, _ := os.ReadFile(filepath.Join(dir, st.dir+".txt"))
+			if want := st.program + " ads.jsonl " + st.dir + "\n"; string(got) != want {
+				t.Errorf("serial %v: %s.txt is %q, want %q", serial, st.dir, got, want)
+			}
+		}
+	}
+}
+
+func TestStageFails(t *testing.T) {
+	for _, serial := range []bool{true, false} {
+		dir := t.TempDir()
+		ads := filepath.Join(dir, "ads.jsonl")
+		os.WriteFile(ads, []byte("{}\n"), 0o644)
+		_, err := stage(fakeStages(t, "sections"), runs.Sample{Name: "all", Path: ads}, dir, serial)
+		if err == nil || !strings.Contains(err.Error(), "sections on all") || !strings.Contains(err.Error(), "broken") {
+			t.Errorf("serial %v: got %v, want sections' failure and what it said", serial, err)
+		}
 	}
 }

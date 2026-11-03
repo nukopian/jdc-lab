@@ -3,11 +3,14 @@
 // docs/PIPELINE.md). A sample is a .jsonl file in data/ingestion, one for
 // each export.
 //
-//	pipeline run RUN
+//	pipeline run [-serial] RUN
 //
 // puts every sample into one file, data/runs/RUN/ads.jsonl, and runs
 // cmd/blocks, cmd/heading-counts, cmd/sections, cmd/boilerplate and
 // cmd/view on it, built afresh, so the code as it stands is what runs.
+// The stages run at once, as none reads another's output, so a run takes
+// as long as its slowest stage; -serial runs them one at a time, for
+// timings that other stages sharing the machine don't sway.
 // Each stage's tables go in data/runs/RUN/STAGE/ and its summary in
 // data/runs/RUN/STAGE.txt, and data/runs/RUN/samples.txt lists the
 // samples read. A run of the same name is replaced. A name can have a
@@ -29,6 +32,8 @@
 package main
 
 import (
+	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -37,6 +42,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/nukopian/jdc-lab/internal/runs"
@@ -65,14 +71,25 @@ func main() {
 	if _, err := os.Stat("go.mod"); err != nil {
 		log.Fatal("pipeline: run it from the lab's folder")
 	}
+	const usage = "usage: pipeline run [-serial] RUN | pipeline compare BEFORE AFTER"
 	var err error
 	switch {
-	case len(os.Args) == 3 && os.Args[1] == "run":
-		err = run(os.Args[2])
+	case len(os.Args) >= 3 && os.Args[1] == "run":
+		// A subcommand's flags come after its name, so it has a FlagSet
+		// of its own, parsing what follows.
+		fs := flag.NewFlagSet("run", flag.ExitOnError)
+		serial := fs.Bool("serial", false, "run the stages one at a time, for timings the others don't sway")
+		fs.Usage = func() { log.Print(usage); fs.PrintDefaults() }
+		fs.Parse(os.Args[2:])
+		if fs.NArg() != 1 {
+			fs.Usage()
+			os.Exit(2)
+		}
+		err = run(fs.Arg(0), *serial)
 	case len(os.Args) == 4 && os.Args[1] == "compare":
 		err = compare(os.Stdout, runsDir, os.Args[2], os.Args[3])
 	default:
-		log.Fatal("usage: pipeline run RUN | pipeline compare BEFORE AFTER")
+		log.Fatal(usage)
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -91,8 +108,9 @@ func checkName(name string) error {
 	return nil
 }
 
-// run runs every stage on every sample together, into data/runs/name.
-func run(name string) error {
+// run runs every stage on every sample together, into data/runs/name:
+// the stages one at a time if serial, or else all at once.
+func run(name string, serial bool) error {
 	if err := checkName(name); err != nil {
 		return err
 	}
@@ -124,7 +142,7 @@ func run(name string) error {
 	defer os.RemoveAll(bin)
 
 	start := time.Now()
-	timings, err := stage(bin, all, dir)
+	timings, err := stage(bin, all, dir, serial)
 	if err != nil {
 		return err
 	}
@@ -132,7 +150,11 @@ func run(name string) error {
 	if err := runs.WriteTimings(os.Stdout, timings); err != nil {
 		return err
 	}
-	fmt.Printf("\nin %.1fs, on %d processors\n", time.Since(start).Seconds(), runtime.NumCPU())
+	how := "the stages at once"
+	if serial {
+		how = "the stages one at a time"
+	}
+	fmt.Printf("\nin %.1fs, %s, on %d processors\n", time.Since(start).Seconds(), how, runtime.NumCPU())
 	tsv, err := os.Create(filepath.Join(dir, "timings.tsv"))
 	if err != nil {
 		return err
@@ -180,8 +202,9 @@ func build() (string, error) {
 }
 
 // stage runs each stage, built in bin, on s, the samples together, into
-// dir, and returns how each ran.
-func stage(bin string, s runs.Sample, dir string) ([]runs.Timing, error) {
+// dir, one at a time if serial, or else all at once, and returns how each
+// ran, in the order of stages.
+func stage(bin string, s runs.Sample, dir string, serial bool) ([]runs.Timing, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
@@ -189,32 +212,60 @@ func stage(bin string, s runs.Sample, dir string) ([]runs.Timing, error) {
 	if err != nil {
 		return nil, err
 	}
-	var timings []runs.Timing
-	for _, st := range stages {
-		summary, err := os.Create(filepath.Join(dir, st.dir+".txt"))
-		if err != nil {
-			return nil, err
+	if serial {
+		var timings []runs.Timing
+		for _, st := range stages {
+			t, err := runStage(bin, st.program, st.dir, s, ads, dir)
+			if err != nil {
+				return nil, err
+			}
+			timings = append(timings, t)
 		}
-		cmd := exec.Command(filepath.Join(bin, st.program), s.Path, filepath.Join(dir, st.dir))
-		cmd.Stdout = summary
-		var stderr strings.Builder
-		cmd.Stderr = &stderr
-		start := time.Now()
-		err = cmd.Run()
-		wall := time.Since(start)
-		if cerr := summary.Close(); err == nil {
-			err = cerr
-		}
-		if err != nil {
-			return nil, fmt.Errorf("%s on %s: %v\n%s", st.program, s.Name, err, stderr.String())
-		}
-		ps := cmd.ProcessState
-		timings = append(timings, runs.Timing{
-			Sample: s.Name, Stage: st.program, Ads: ads, Wall: wall,
-			CPU: ps.UserTime() + ps.SystemTime(), PeakRSS: peakRSS(ps),
+		return timings, nil
+	}
+
+	// Each goroutine writes only its own stage's slot, so they need no
+	// lock, and Wait makes their writes visible here.
+	timings := make([]runs.Timing, len(stages))
+	errs := make([]error, len(stages))
+	var wg sync.WaitGroup
+	for i, st := range stages {
+		wg.Go(func() {
+			timings[i], errs[i] = runStage(bin, st.program, st.dir, s, ads, dir)
 		})
 	}
+	wg.Wait()
+	if err := errors.Join(errs...); err != nil {
+		return nil, err
+	}
 	return timings, nil
+}
+
+// runStage runs program, built in bin, on s, of ads ads, into dir/out,
+// with its summary in dir/out.txt, and returns how it ran.
+func runStage(bin, program, out string, s runs.Sample, ads int, dir string) (runs.Timing, error) {
+	summary, err := os.Create(filepath.Join(dir, out+".txt"))
+	if err != nil {
+		return runs.Timing{}, err
+	}
+	cmd := exec.Command(filepath.Join(bin, program), s.Path, filepath.Join(dir, out))
+	cmd.Stdout = summary
+	var stderr strings.Builder
+	cmd.Stderr = &stderr
+	start := time.Now()
+	err = cmd.Run()
+	wall := time.Since(start)
+	if cerr := summary.Close(); err == nil {
+		err = cerr
+	}
+	if err != nil {
+		return runs.Timing{}, fmt.Errorf("%s on %s: %v\n%s", program, s.Name, err, stderr.String())
+	}
+	ps := cmd.ProcessState
+	return runs.Timing{
+		Sample: s.Name, Stage: program, Ads: ads, Wall: wall,
+		CPU: ps.UserTime() + ps.SystemTime(), PeakRSS: peakRSS(ps),
+	}, nil
 }
 
 // combine writes every sample into one file, at path, and returns it as

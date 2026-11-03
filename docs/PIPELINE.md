@@ -68,18 +68,20 @@ Then run every stage on the samples together, as the run `latest`:
 go run ./cmd/pipeline run latest
 ```
 
-It takes under a minute: `data/runs/latest/sections/` holds the
+It takes about 15 s: `data/runs/latest/sections/` holds the
 sections stage's tables, and `data/runs/latest/sections.txt` its
 summary. A run of the same name is replaced.
 
 It builds the stages first, so the code as it stands is what runs, and
-ends with how each stage ran, also kept in
-`data/runs/latest/timings.tsv`:
+runs them all at once, as none reads another's output, so a run takes
+as long as its slowest stage, view, and needs about 2.5 GB of memory
+while boilerplate and view both run. It ends with how each stage ran,
+also kept in `data/runs/latest/timings.tsv`:
 
 ```
 sample  stage               ads      wall       cpu    ads/s      peak
-all     sections          28000     8.14s     8.25s     3442    205 MB
-all     boilerplate       28000    12.71s    15.71s     2203   1238 MB
+all     sections          28000     8.70s     9.31s     3219    204 MB
+all     boilerplate       28000    14.49s    17.02s     1933   1237 MB
 ```
 
 `wall` is the time on the clock, `cpu` the time on the processors (more
@@ -88,6 +90,15 @@ stage held at once (on macOS and Linux; 0 elsewhere). `compare` leaves
 the timings out, as they move a little on every run: compare two runs'
 `timings.tsv` by hand.
 
+Run together, the stages share the machine, so each takes 10% to 20%
+longer than alone, and blocks, the shortest, nearly twice as long. For
+a stage's timings to compare from run to run, as when making it
+faster, run them one at a time, in about 40 s:
+
+```
+go run ./cmd/pipeline run -serial claude/before
+```
+
 Most of a run is boilerplate's and view's, as both judge every text of
 every ad, and every stage splits each ad into blocks first, so what
 they share pays several times over. On 2026-11-03 they were profiled
@@ -95,7 +106,7 @@ and made faster ([record](changes/2026-11-03-a-faster-pipeline.md)):
 keys and cleaned text read ASCII from a table, long texts alike are
 compared as sorted runs of words, and grouped once, and whether a text
 is phrased as a job line is asked only of those repeated enough to be
-judged. A run went from 128 s to 67 s, boilerplate from 45 s to 20 s,
+judged. Run one at a time, a run went from 128 s to 67 s, boilerplate from 45 s to 20 s,
 view from 50 s to 22 s, and blocks from 5.6 s to 3.4 s, every stage's
 output the same, byte for byte. grammar v0.5.3 keeps each rule's
 starts, not only the last one searched for, which the lab asked for:

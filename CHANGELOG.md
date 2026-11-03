@@ -25,6 +25,11 @@ has the steps).
   one searched for, as the lab asked for: a run takes 42 s rather than
   52 s, run back to back, and heading-counts 4.3 s rather than 6.9 s,
   every stage's output the same.
+- `pipeline run` runs the stages at once, as none reads another's
+  output: a run takes about 15 s rather than 40 s, as long as view, its
+  slowest stage. Each stage takes 10% to 20% longer sharing the
+  machine, so `pipeline run -serial` runs them one at a time, for
+  timings to compare from run to run.
 
 ## v0.6.6 (2026-11-02)
 
