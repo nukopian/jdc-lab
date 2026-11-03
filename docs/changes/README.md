@@ -71,6 +71,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [A faster pipeline](2026-11-03-a-faster-pipeline.md), shipped,
+  unreleased
 - [Checks in the fact grammars, with code assertions](2026-11-02-checks-in-the-fact-grammars.md)
   (two TODO tasks), shipped in v0.6.4
 - [Read facts only where they can be](2026-10-31-r43-read-facts-only-where-they-can-be.md)

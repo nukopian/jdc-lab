@@ -12,7 +12,14 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- A run of the pipeline takes 67 s rather than 128 s. Boilerplate and
+  view, three quarters of it, take less than half the time they did,
+  and splitting ads into blocks, which every stage does, about 40%
+  less. Keys and cleaned text read ASCII from a table, long texts alike
+  are compared as sorted runs of words and grouped once, and the
+  job-line check is asked only of texts repeated enough to be judged.
+  Every stage's output is the same, byte for byte
+  ([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
 
 ## v0.6.6 (2026-11-02)
 

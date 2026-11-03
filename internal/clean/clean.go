@@ -68,6 +68,99 @@ func gone(r rune) bool {
 // Text returns s normalised: see the package's doc. Spaces are collapsed,
 // and trimmed from both ends.
 func Text(s string) string {
+	if !fastText {
+		return slowText(s)
+	}
+	var b spaced
+	b.Grow(len(s))
+	for i := 0; i < len(s); {
+		if c := s[i]; c < utf8.RuneSelf {
+			i++
+			switch k := asciiText[c]; k {
+			case 0:
+			case ' ':
+				b.gap = true
+			default:
+				b.byte(k)
+			}
+			continue
+		}
+		r, n := utf8.DecodeRuneInString(s[i:])
+		i += n
+		f, folds := fold[r] // before gone, as some it folds are symbols
+		switch {
+		case folds:
+			b.string(f)
+		case gone(r):
+		case unicode.IsSpace(r):
+			b.gap = true
+		case r >= 0xFF01 && r <= 0xFF5E: // full-width forms of ASCII
+			b.byte(byte(r - 0xFEE0))
+		default:
+			b.rune(r)
+		}
+	}
+	return b.String()
+}
+
+// fastText turns on Text's fast path, which reads ASCII from asciiText
+// and collapses spaces as it goes, rather than splitting the text into
+// words and joining them. TestFastTextChangesNothing compares the two.
+var fastText = true
+
+// asciiText is what Text writes for each ASCII character: itself, its
+// fold, a space, or nothing (0). It's worked out from slowText, so the
+// two can't disagree.
+var asciiText = func() (t [utf8.RuneSelf]byte) {
+	for c := range t {
+		switch k := slowText("x" + string(rune(c)) + "x"); k {
+		case "xx":
+			t[c] = 0
+		case "x x":
+			t[c] = ' '
+		default:
+			t[c] = k[1]
+		}
+	}
+	return t
+}()
+
+// spaced builds text with its spaces collapsed and trimmed: a space owed
+// is written only before the next character, so none ends the text.
+type spaced struct {
+	strings.Builder
+	gap bool // a space is owed
+}
+
+func (b *spaced) byte(c byte) {
+	if b.gap && b.Len() > 0 {
+		b.WriteByte(' ')
+	}
+	b.gap = false
+	b.WriteByte(c)
+}
+
+func (b *spaced) rune(r rune) {
+	if b.gap && b.Len() > 0 {
+		b.WriteByte(' ')
+	}
+	b.gap = false
+	b.WriteRune(r)
+}
+
+// string writes s, an ASCII fold, its spaces owed as others are.
+func (b *spaced) string(s string) {
+	for i := 0; i < len(s); i++ {
+		if s[i] == ' ' {
+			b.gap = true
+		} else {
+			b.byte(s[i])
+		}
+	}
+}
+
+// slowText is Text without its fast path.
+func slowText(s string) string {
 	var b strings.Builder
 	for _, r := range s {
 		f, folds := fold[r] // before gone, as some it folds are symbols

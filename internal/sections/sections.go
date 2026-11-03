@@ -236,7 +236,7 @@ func beforeList(p headings.Part) (Kind, bool) {
 		return "", false
 	}
 	key := headings.Key(text)
-	if len(strings.Fields(key)) > MaxListWords || len(All(key)) == 0 {
+	if headings.KeyWords(key) > MaxListWords || len(All(key)) == 0 {
 		return "", false
 	}
 	return Of(key)

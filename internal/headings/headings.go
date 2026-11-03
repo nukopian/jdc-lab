@@ -428,7 +428,7 @@ func headingShaped(text, key string, most int) bool {
 	if !strings.ContainsFunc(key, unicode.IsLetter) || onlyConjunctions(key) {
 		return false
 	}
-	if len(strings.Fields(key)) > most || hasMoney(text) || hasTimes(text) || hasPattern(text) || onlyFacts(text) || hasRemoved(text) {
+	if KeyWords(key) > most || hasMoney(text) || hasTimes(text) || hasPattern(text) || onlyFacts(text) || hasRemoved(text) {
 		return false
 	}
 	t := strings.TrimRightFunc(text, func(r rune) bool { return unicode.IsSpace(r) || unicode.Is(unicode.So, r) })

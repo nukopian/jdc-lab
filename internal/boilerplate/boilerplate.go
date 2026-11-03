@@ -82,6 +82,16 @@ const commonRun = 300
 type Source struct {
 	Title  string
 	Places []string
+	// keys are the keys of its title and places, as template uses them,
+	// worked out once by SourceOf; nil for a Source made otherwise.
+	keys *sourceKeys
+}
+
+// sourceKeys are a Source's keys: its places', longest first, and its
+// title's.
+type sourceKeys struct {
+	places []string
+	title  string
 }
 
 // SourceOf returns an ad's Source: its title, and each part of each of its
@@ -95,7 +105,20 @@ func SourceOf(a ads.Ad) Source {
 			}
 		}
 	}
+	s.keys = s.keysOf()
 	return s
+}
+
+// keysOf works out a Source's keys.
+func (s Source) keysOf() *sourceKeys {
+	var places []string
+	for _, p := range s.Places {
+		if k := headings.Key(p); k != "" {
+			places = append(places, k)
+		}
+	}
+	slices.SortFunc(places, func(a, b string) int { return len(b) - len(a) })
+	return &sourceKeys{places, headings.Key(s.Title)}
 }
 
 // The placeholders for an ad's own title and places in a key. Keys are
@@ -109,18 +132,15 @@ const (
 // stand as whole words, replaced by placeholders: places first, the
 // longest first, as a title such as "Driver - Leeds" holds one.
 func (s Source) template(key string) string {
-	var places []string
-	for _, p := range s.Places {
-		if k := headings.Key(p); k != "" {
-			places = append(places, k)
-		}
+	sk := s.keys
+	if sk == nil {
+		sk = s.keysOf()
 	}
-	slices.SortFunc(places, func(a, b string) int { return len(b) - len(a) })
 	k := " " + key + " "
-	for _, p := range places {
+	for _, p := range sk.places {
 		k = strings.ReplaceAll(k, " "+p+" ", " "+placeMark+" ")
 	}
-	if t := headings.Key(s.Title); t != "" {
+	if t := sk.title; t != "" {
 		k = strings.ReplaceAll(k, " "+t+" ", " "+titleMark+" ")
 	}
 	return strings.TrimSpace(k)
@@ -141,6 +161,11 @@ type Index struct {
 	// endsAdded is true when Ends has counted texts since the groups of
 	// texts alike were made, so they're to be made again.
 	endsAdded bool
+	// joined is the group of texts alike each long text is in, by its
+	// place in long, as last worked out: which texts are alike changes
+	// only with the long texts, though what's counted of them changes
+	// with Ends.
+	joined []int
 	// inWall maps a line's key to the walls it was split from, each whole
 	// (see Wall).
 	inWall map[string][]string
@@ -163,7 +188,7 @@ func (ix *Index) Add(src Source, kind sections.Kind, texts ...string) {
 	t := headings.Key(src.Title)
 	for _, s := range texts {
 		k := headings.Key(s)
-		if len(strings.Fields(k)) < MinWords {
+		if headings.KeyWords(k) < MinWords {
 			continue
 		}
 		tk := src.template(k)
@@ -171,7 +196,7 @@ func (ix *Index) Add(src Source, kind sections.Kind, texts ...string) {
 		if tk != k {
 			ix.record(tk, t, kind)
 		}
-		if len(strings.Fields(tk)) >= LongWords && !ix.isLong[tk] {
+		if headings.KeyWords(tk) >= LongWords && !ix.isLong[tk] {
 			ix.isLong[tk] = true
 			ix.long = append(ix.long, tk)
 		}
@@ -229,7 +254,7 @@ func (ix *Index) Wall(src Source, kind sections.Kind, wall string, lines ...stri
 func (ix *Index) Ends(src Source, texts ...string) {
 	for i := len(texts) - 1; i >= 0; i-- {
 		k := headings.Key(texts[i])
-		if len(strings.Fields(k)) < MinWords {
+		if headings.KeyWords(k) < MinWords {
 			continue
 		}
 		if !ix.Repeated(src, texts[i]) {
@@ -329,7 +354,15 @@ func (ix *Index) Boilerplate(src Source, s string) bool {
 // judged is the verdict on s by its own counts, before its walls are
 // asked: see Boilerplate.
 func (ix *Index) judged(src Source, s string) bool {
-	job := JobLine(s)
+	// Whether s is a job line is asked only of a text repeated enough to
+	// be judged, and once: most texts aren't, and asking is a search.
+	job, asked := false, false
+	isJob := func() bool {
+		if !asked {
+			job, asked = JobLine(s), true
+		}
+		return job
+	}
 	for _, k := range ix.keys(src, s) {
 		n := ix.groupsOf(k)
 		if n < MinGroups {
@@ -338,8 +371,8 @@ func (ix *Index) judged(src Source, s string) bool {
 		x := ix.texts[k]
 		switch {
 		case x.elsewhere > x.describes,
-			!job && 2*x.atEnd > x.describes+x.elsewhere && FooterLine(s),
-			n >= Widespread && !(job && x.describes >= x.elsewhere):
+			2*x.atEnd > x.describes+x.elsewhere && !isJob() && FooterLine(s),
+			n >= Widespread && !(x.describes >= x.elsewhere && isJob()):
 			return true
 		}
 	}
@@ -394,45 +427,32 @@ func (ix *Index) findAlike() {
 			delete(ix.texts, k)
 		}
 	}
-	runs := make([]map[uint64]bool, len(ix.long))
-	in := map[uint64][]int{} // a run of words → the texts it's in
-	for i, k := range ix.long {
-		runs[i] = shingles(k)
-		for r := range runs[i] {
-			in[r] = append(in[r], i)
+	if len(ix.joined) != len(ix.long) { // long texts are only ever added
+		group := make([]int, len(ix.long)) // union-find: each text's parent
+		for i := range group {
+			group[i] = i
 		}
-	}
-	group := make([]int, len(ix.long)) // union-find: each text's parent
-	for i := range group {
-		group[i] = i
-	}
-	root := func(i int) int {
-		for group[i] != i {
-			group[i] = group[group[i]]
-			i = group[i]
+		root := func(i int) int {
+			for group[i] != i {
+				group[i] = group[group[i]]
+				i = group[i]
+			}
+			return i
 		}
-		return i
-	}
-	for i := range ix.long {
-		tried := map[int]bool{}
-		for r := range runs[i] {
-			if len(in[r]) > commonRun {
-				continue
-			}
-			for _, j := range in[r] {
-				if j <= i || tried[j] {
-					continue
-				}
-				tried[j] = true
-				if alike(runs[i], runs[j]) {
-					group[root(j)] = root(i)
-				}
-			}
+		join := func(i, j int) { group[root(j)] = root(i) }
+		if fastAlike {
+			joinAlike(ix.long, join)
+		} else {
+			slowJoinAlike(ix.long, join)
+		}
+		ix.joined = group
+		for i := range group {
+			ix.joined[i] = root(i)
 		}
 	}
 	ix.alike = map[string]string{}
 	for i, k := range ix.long {
-		g := "~" + ix.long[root(i)]
+		g := "~" + ix.long[ix.joined[i]]
 		ix.alike[k] = g
 		x, y := ix.texts[g], ix.texts[k]
 		if x == nil {
@@ -447,6 +467,125 @@ func (ix *Index) findAlike() {
 		x.describes += y.describes
 		x.elsewhere += y.elsewhere
 		x.atEnd += y.atEnd
+	}
+}
+
+// fastAlike turns on finding long texts alike through their runs of
+// words as sorted slices, compared by merging them, rather than as maps.
+// TestFastAlikeChangesNothing compares the two.
+var fastAlike = true
+
+// joinAlike calls join(i, j), i before j, for each two keys that share
+// at least Overlap of their runs of five words, among those with a run
+// in commonRun keys or fewer.
+func joinAlike(keys []string, join func(i, j int)) {
+	runs := make([][]uint64, len(keys))
+	in := map[uint64][]int{} // a run of words → the keys it's in, in order
+	for i, k := range keys {
+		runs[i] = shingleList(k)
+		for _, r := range runs[i] {
+			in[r] = append(in[r], i)
+		}
+	}
+	tried := make([]int, len(keys)) // j was tried against tried[j]-1
+	for i := range keys {
+		for _, r := range runs[i] {
+			if len(in[r]) > commonRun {
+				continue
+			}
+			for _, j := range in[r] {
+				if j <= i || tried[j] == i+1 {
+					continue
+				}
+				tried[j] = i + 1
+				if alikeSorted(runs[i], runs[j]) {
+					join(i, j)
+				}
+			}
+		}
+	}
+}
+
+// FNV-1a's offset and prime, as hash/fnv's New64a uses.
+const (
+	fnvOffset = 14695981039346656037
+	fnvPrime  = 1099511628211
+)
+
+// shingleList returns a key's runs of five words, hashed as shingles
+// hashes them, sorted, each once.
+func shingleList(key string) []uint64 {
+	w := strings.Fields(key)
+	if len(w) < 5 {
+		return nil
+	}
+	rs := make([]uint64, 0, len(w)-4)
+	for i := 0; i+5 <= len(w); i++ {
+		h := uint64(fnvOffset)
+		for n, word := range w[i : i+5] {
+			if n > 0 {
+				h = (h ^ ' ') * fnvPrime
+			}
+			for k := 0; k < len(word); k++ {
+				h = (h ^ uint64(word[k])) * fnvPrime
+			}
+		}
+		rs = append(rs, h)
+	}
+	slices.Sort(rs)
+	return slices.Compact(rs)
+}
+
+// alikeSorted is alike, for runs as shingleList gives them.
+func alikeSorted(a, b []uint64) bool {
+	// Shared runs can be no more than the shorter's: if that many
+	// wouldn't do, none will.
+	if most := min(len(a), len(b)); float64(most) < Overlap*float64(len(a)+len(b)-most) {
+		return false
+	}
+	shared := 0
+	for i, j := 0, 0; i < len(a) && j < len(b); {
+		switch {
+		case a[i] < b[j]:
+			i++
+		case a[i] > b[j]:
+			j++
+		default:
+			shared++
+			i++
+			j++
+		}
+	}
+	all := len(a) + len(b) - shared
+	return all > 0 && float64(shared) >= Overlap*float64(all)
+}
+
+// slowJoinAlike is joinAlike, with runs of words as maps.
+func slowJoinAlike(keys []string, join func(i, j int)) {
+	runs := make([]map[uint64]bool, len(keys))
+	in := map[uint64][]int{} // a run of words → the texts it's in
+	for i, k := range keys {
+		runs[i] = shingles(k)
+		for r := range runs[i] {
+			in[r] = append(in[r], i)
+		}
+	}
+	for i := range keys {
+		tried := map[int]bool{}
+		for r := range runs[i] {
+			if len(in[r]) > commonRun {
+				continue
+			}
+			for _, j := range in[r] {
+				if j <= i || tried[j] {
+					continue
+				}
+				tried[j] = true
+				if alike(runs[i], runs[j]) {
+					join(i, j)
+				}
+			}
+		}
 	}
 }
 

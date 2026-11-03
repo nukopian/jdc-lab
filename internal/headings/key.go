@@ -3,6 +3,7 @@ package headings
 import (
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // fold maps characters that vary between ads, but not in meaning, to one
@@ -39,6 +40,93 @@ var fold = map[rune]string{
 // doing" have the same key. The text itself is never changed: keys are
 // only for comparing.
 func Key(text string) string {
+	if !fastKey {
+		return slowKey(text)
+	}
+	var b strings.Builder
+	b.Grow(len(text))
+	gap := false // a space is due before whatever is written next
+	for i := 0; i < len(text); {
+		if c := text[i]; c < utf8.RuneSelf {
+			i++
+			switch k := asciiKey[c]; k {
+			case 0:
+			case ' ':
+				gap = true
+			default:
+				if gap && b.Len() > 0 {
+					b.WriteByte(' ')
+				}
+				gap = false
+				b.WriteByte(k)
+			}
+			continue
+		}
+		r, n := utf8.DecodeRuneInString(text[i:])
+		i += n
+		if s, ok := fold[r]; ok {
+			switch s {
+			case "":
+			case " ":
+				gap = true
+			default:
+				if gap && b.Len() > 0 {
+					b.WriteByte(' ')
+				}
+				gap = false
+				b.WriteString(s)
+			}
+			continue
+		}
+		switch {
+		case unicode.IsLetter(r) || unicode.IsDigit(r):
+			if gap && b.Len() > 0 {
+				b.WriteByte(' ')
+			}
+			gap = false
+			b.WriteRune(unicode.ToLower(r))
+		case unicode.Is(unicode.So, r) || unicode.Is(unicode.Sk, r) || unicode.Is(unicode.Co, r):
+		default:
+			gap = true
+		}
+	}
+	return b.String()
+}
+
+// KeyWords returns how many words a key has, as len(strings.Fields(key))
+// would, without making them: Key parts a key's words with one space.
+func KeyWords(key string) int {
+	if key == "" {
+		return 0
+	}
+	return strings.Count(key, " ") + 1
+}
+
+// fastKey turns on Key's fast path, which reads ASCII from asciiKey and
+// collapses spaces as it goes, rather than splitting the key into words
+// and joining them. TestFastKeyChangesNothing compares the two.
+var fastKey = true
+
+// asciiKey is what Key writes for each ASCII character: itself, lower
+// case, a space, or nothing (0). It's worked out from slowKey, so the two
+// can't disagree.
+var asciiKey = func() (t [utf8.RuneSelf]byte) {
+	for c := range t {
+		switch k := slowKey(" " + string(rune(c)) + "x"); k {
+		case "x":
+			t[c] = ' ' // a space or nothing: told apart below
+			if slowKey("x"+string(rune(c))+"x") == "xx" {
+				t[c] = 0
+			}
+		default:
+			t[c] = k[0]
+		}
+	}
+	return t
+}()
+
+// slowKey is Key without its fast path.
+func slowKey(text string) string {
 	var b strings.Builder
 	for _, r := range text {
 		if s, ok := fold[r]; ok {
