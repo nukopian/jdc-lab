@@ -57,8 +57,8 @@ const (
 )
 
 // PlaceQueries returns up to n queries of a title and a place, from
-// listings: the pairs of a group of similar titles, among the most
-// common groups, and a place, with the most ads whose title is similar to
+// listings: the pairs of a group of similar titles, among the 4n
+// commonest groups, as several pairs can share a title, and a place, with the most ads whose title is similar to
 // the group's commonest and whose place is the place, at least least of
 // them; no title or place in more than most queries.
 func PlaceQueries(ls []Listing, n, least, most int) []FactQuery {
@@ -108,8 +108,8 @@ func PlaceQueries(ls []Listing, n, least, most int) []FactQuery {
 }
 
 // PatternQueries returns, for each of patterns, up to each queries of a
-// title and that work pattern ("part time Receptionist"): the most common
-// groups of similar titles with at least least ads whose facts found the
+// title and that work pattern ("part time Receptionist"): the commonest
+// groups of similar titles, of the first patternGroups, with at least least ads whose facts found the
 // pattern, so that there's something to find. Which ads are for the
 // pattern is judged, so the queries have no relevant ads.
 func PatternQueries(ls []Listing, patterns []string, each, least int) []FactQuery {
@@ -118,7 +118,7 @@ func PatternQueries(ls []Listing, patterns []string, each, least int) []FactQuer
 	for _, l := range ls {
 		has[l.ID] = l.Patterns
 	}
-	common := commonTitles(titles, 40)
+	common := commonTitles(titles, patternGroups)
 	var qs []FactQuery
 	for _, pattern := range patterns {
 		n := 0
@@ -143,6 +143,11 @@ func PatternQueries(ls []Listing, patterns []string, each, least int) []FactQuer
 	}
 	return qs
 }
+
+// patternGroups is how many of the commonest groups of similar titles a
+// work pattern's queries are chosen from: enough that each pattern finds
+// its few, and few enough that the queries are for common jobs.
+const patternGroups = 40
 
 // titlesOf returns each listing's title by its ID, and the IDs in order.
 func titlesOf(ls []Listing) (map[string]string, []string) {

@@ -22,11 +22,8 @@ after go run ./cmd/retrieval-set data/runs/latest/ads.jsonl data/runs/latest/ret
 import sys
 from pathlib import Path
 
+from jdclab import bge
 from jdclab.filters import load, pool, rank, read_lines, report, score, write_lines
-
-MODEL = "BAAI/bge-base-en-v1.5"
-# BGE's instruction for short queries looking for passages.
-QUERY = "Represent this sentence for searching relevant passages: "
 
 
 def main():
@@ -35,29 +32,11 @@ def main():
     step, directory = sys.argv[1], Path(sys.argv[2])
     ads, queries = load(directory)
     if step == "rank":
-        # Imported here, as only ranking needs the model.
-        import torch
-        from sentence_transformers import SentenceTransformer
-
-        device = "mps" if torch.backends.mps.is_available() else "cpu"
-        model = SentenceTransformer(MODEL, device=device)
-
-        def embed(texts):
-            return model.encode(
-                list(texts),
-                batch_size=32,
-                normalize_embeddings=True,
-                show_progress_bar=True,
-            )
-
-        def embed_queries(texts):
-            return model.encode([QUERY + t for t in texts], normalize_embeddings=True)
-
-        write_lines(
-            directory / "rankings.jsonl", rank(ads, queries, embed, embed_queries)
-        )
+        model = bge.load()
+        rankings = rank(ads, queries, model.embed, model.embed_queries)
+        write_lines(directory / "rankings.jsonl", rankings)
         print(
-            f"{len(ads)} ads ranked for {len(queries)} queries with {MODEL} on {device}"
+            f"{len(ads)} ads ranked for {len(queries)} queries with {bge.MODEL} on {model.device}"
         )
     elif step == "pool":
         rows = pool(ads, queries, read_lines(directory / "rankings.jsonl"))
@@ -67,7 +46,7 @@ def main():
         rankings = read_lines(directory / "rankings.jsonl")
         judgements = read_lines(directory / "judgements.jsonl")
         text = report(score(ads, queries, rankings, judgements), queries, judgements)
-        text += f"\nmodel {MODEL}\n"
+        text += f"\nmodel {bge.MODEL}\n"
         (directory / "report.txt").write_text(text, encoding="utf-8")
         print(text, end="")
 
