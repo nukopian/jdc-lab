@@ -140,8 +140,11 @@ cmd/boilerplate asks).
 - **Chunking every ad** (`xargs chunk -json`, 25,954 ads, `GOWORK=off`)
   gives the same chunks, byte for byte. It was faster after in each of
   12 interleaved pairs, by 4% to 39%, but the machine was busy
-  throughout (load average 4 to 6), so no single figure is given here,
-  and PIPELINE.md's "about 26 s" stands until a quiet run.
+  throughout (load average 4 to 6), so no single figure was given then.
+  Timed again on a quieter machine (load average about 2.5), on all
+  28,000 ads, interleaved three times each, v0.6.6 took 25.6 s to
+  26.1 s and `develop`, with grammar v0.5.3, 17.0 s, the same chunks,
+  byte for byte: a third less.
 - **Measuring:** the profiles showed time in `madvise` and in the read
   system call under `json.Decoder` that reading alone didn't (0.5 s for
   all 28,000 ads). It's the cost of the heap's fresh memory, landing

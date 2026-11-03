@@ -15,7 +15,8 @@ has the steps).
 - A run of the pipeline takes 67 s rather than 128 s. Boilerplate and
   view, three quarters of it, take less than half the time they did,
   and splitting ads into blocks, which every stage does, about 40%
-  less. Keys and cleaned text read ASCII from a table, long texts alike
+  less, and chunking every ad 17 s rather than 26 s (with grammar
+  v0.5.3). Keys and cleaned text read ASCII from a table, long texts alike
   are compared as sorted runs of words and grouped once, and the
   job-line check is asked only of texts repeated enough to be judged.
   Every stage's output is the same, byte for byte

@@ -579,10 +579,11 @@ the structure too: each chunk's text is a block of its lines.
 Given many ads, `chunk` and `shape` find them all in one reading of the
 run's ads, so a few thousand cost little more than one: 500 ads spread
 through the samples took 111 s when each was looked for on its own, and
-take 3 s. Chunking every ad of the samples, all 25,954, takes about
-26 s, about 1,000 ads a second, since roadmap 43 read facts only in
-lines that can hold them, and grammar v0.4.3 and v0.5.2 matched them
-faster, with fewer allocations (see [Facts](#facts)):
+take 3 s. Chunking every ad of the samples, all 28,000, takes about
+17 s, about 1,650 ads a second, since roadmap 43 read facts only in
+lines that can hold them, grammar v0.4.3 and v0.5.2 matched them
+faster, with fewer allocations (see [Facts](#facts)), and keys and
+cleaned text were made faster on 2026-11-03 (26 s before):
 
 ```
 xargs go run ./cmd/chunk -json < ids.txt > chunks.jsonl
