@@ -75,13 +75,18 @@ embeddings, and a large language model only where those fall short.
   kind is placed by an educated guess, mostly as the summary, and
   right for about four sections in five.
 - **Next:** the [roadmap](ROADMAP.md) says what the lab means to do,
-  and why: under way is a retrieval test of facts as filters, and next
-  one of whether what boilerplate takes is about the job.
+  and why: nothing is under way, and next is a retrieval test of
+  whether what boilerplate takes is about the job.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of
   them. Titles are a narrow test, and whether boilerplate's verdict is
-  right is still to be checked, so nothing is dropped yet.
+  right is still to be checked, so nothing is dropped yet. A second
+  test asked for a title with a place or a work pattern: filtering on
+  the fact found what was asked for far better than embedding it
+  (precision at 10 of 0.66 against 0.31 for a place, 0.59 against 0.39
+  for a work pattern, judged), where the fact is read right; remote,
+  often misread, didn't help.
 - **Embeddings** have had a first look: two small local models,
   `BAAI/bge-base-en-v1.5` and `intfloat/e5-small-v2`, compared at
   matching section headings to section types. BGE separated the types

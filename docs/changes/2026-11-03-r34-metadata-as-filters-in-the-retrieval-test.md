@@ -1,10 +1,12 @@
 # Metadata as filters in the retrieval test
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 34
 
 **Started:** 2026-11-03, in 10b3c74d171698c9c4168806c2bb7ad976bda2f4
+
+**Finished:** 2026-11-03
 
 ## The plan
 
@@ -82,4 +84,81 @@ the README's Where it stands.
 
 ## What happened
 
-Work in progress.
+- **Outcome:** done, for place and work pattern. A fact as a filter
+  finds the ads asked for far better than the fact left to the
+  embeddings, wherever the fact is read right; a fact read wrongly
+  helps little, and remote, as the facts read it, not at all. Over all
+  25,954 distinct ads of the latest run, with `BAAI/bge-base-en-v1.5`:
+
+  | Queries | Way | Representation | P@10 | nDCG@10 | Recall | Filtered out |
+  |---|---|---|---:|---:|---:|---:|
+  | 30 place | embedded | own | 0.313 | 0.447 | 0.766 at 100 | |
+  | | embedded | whole | 0.310 | 0.450 | 0.746 at 100 | |
+  | | filtered | own | 0.657 | 0.936 | 1.000 at 100 | 0.000 |
+  | | filtered | whole | 0.647 | 0.923 | 0.999 at 100 | 0.000 |
+  | 20 work pattern | embedded | own | 0.394 | 0.472 | 0.426 at 10, in pool | |
+  | | embedded | whole | 0.400 | 0.471 | 0.432 at 10, in pool | |
+  | | filtered | own | 0.589 | 0.709 | 0.680 at 10, in pool | 0.114 |
+  | | filtered | whole | 0.617 | 0.747 | 0.723 at 10, in pool | 0.114 |
+
+  The best precision at 10 the queries allow, as some have fewer than
+  ten relevant ads, is 0.707 for places and 0.706 for work patterns: a
+  place as a filter comes within 0.05 of it. "Filtered out" is the share
+  of relevant ads the filter can't let through: none for a place, whose
+  filter is the answer key's own field, and 11% for a work pattern, ads
+  judged for it whose facts didn't find it. 18 of the 20 pattern
+  queries have a relevant ad; "hybrid Electrician" and "remote
+  Warehouse Operative" have none, every ad judged against or silent.
+- **By work pattern,** precision at 10, own text, embedded against
+  filtered, and how the ads whose facts found the pattern were judged
+  (for, against, silent):
+
+  | Pattern | Embedded | Filtered | Facts that found it, judged |
+  |---|---:|---:|---|
+  | part time | 0.40 | 0.90 | 44, 2, 0 |
+  | temporary | 0.70 | 0.80 | 52, 0, 5 |
+  | hybrid | 0.38 | 0.53 | 28, 3, 0 |
+  | contract | 0.28 | 0.38 | 25, 7, 14 |
+  | remote | 0.03 | 0.05 | 2, 19, 0 |
+
+  Part time, temporary and hybrid are read right nearly always, and
+  filtering on them pays most where the embedding does worst: part time
+  doubles. Contract is read where the word stands for something else,
+  and its judging was hardest (below). Remote is read in negations
+  ("This is NOT a hybrid or remote role", "Remote working is not
+  available"), in other senses ("radio remote and pendant controls",
+  "24/7 remote GP service", "the remote location of the site") and for
+  part of the week ("3 days in the office, 2 days remote"): roadmap idea
+  47.
+- **Judging:** 307 ads, each work-pattern query's top ten of each way
+  and representation whose title is similar, judged by Claude, in four
+  batches, by rules written before any ad was seen (kept with the
+  judgements in the private data store): for, if the job is offered on
+  the pattern, alone or as an option; against, if the ad says another;
+  silent, if it doesn't say. 163 for, 83 against, 61 silent. The calls
+  the judges found hardest, and how they went: a full school week
+  ("8.50am - 3.20pm, 5 days per week, term time only") counted part
+  time, as the rules named school hours, though other ads call such
+  weeks full time; a rolling agency contract counted temporary, and
+  daily-rate supply work not a contract; "ongoing temporary contract"
+  counted a contract; a "social housing contract" or "MOD Contract",
+  the employer's with its client, silent; work at customers' homes or
+  on site against hybrid and remote; a base town alone ("London-based
+  position") silent. An ad no way ranked in its top ten isn't judged,
+  so recall is within the pool, and the pool is judged once, by one
+  model: a second judge, or Iain, on a sample would say how far to
+  trust it.
+- **Changes from the plan:** a pattern query needs at least three ads
+  whose facts found the pattern, so there's something to find, which
+  chooses queries by the facts, though it doesn't judge them. The
+  ranking embeds every ad's own and whole texts, about 52,000 texts, in
+  about 40 minutes on a Mac's GPU. `cmd/retrieval-set` groups 26,000
+  titles twice, which takes a minute: fine for a test run rarely. The
+  score functions of the first test are generic now, for IDs as well as
+  places in a list.
+- **What it means:** the lab's central claim holds for these two facts:
+  filtering on a fact finds what's asked for far better than embedding
+  it, so a fact read reliably is better metadata than text. How
+  reliably the fact is read decides how much it pays, so a fact's
+  rules are worth checking by search, not only by count. Pay and hours,
+  which want queries with a range, are roadmap idea 48.

@@ -851,8 +851,8 @@ where badly.
 
 ## Testing retrieval
 
-**Package** `internal/retrieval`, **programs** `cmd/retrieval-set`
-and `python/bin/retrieval_eval.py`.
+**Package** `internal/retrieval`, **programs** `cmd/retrieval-set`,
+`python/bin/retrieval_eval.py` and `python/bin/retrieval_facts.py`.
 
 A first test of whether representing an ad by its parts finds it
 better. `cmd/retrieval-set` takes 5,000 of a run's ads, by a fixed hash
@@ -874,6 +874,34 @@ Embedding takes about 20 minutes on a Mac's GPU. What it showed, and what it
 can't, are in its
 [record](changes/2026-10-27-r10-a-first-retrieval-test.md): a job title is
 a narrow query.
+
+**Facts as filters.** `cmd/retrieval-set` also writes, in its `facts`
+folder, every distinct ad of the run as a listing: its own and whole
+texts, its place as the export gives it, and the work patterns its
+facts found. Its queries are a job title with a place ("Quantity
+Surveyor in London", 30 of them) or a work pattern ("part time Teaching
+Assistant", 20, four each of part time, temporary, contract, hybrid and
+remote). Each is ranked two ways: **embedded**, the whole query against
+every ad, and **filtered**, the title alone against the ads the fact
+lets through. A place query's relevant ads are those with a similar
+title in the place, by the export's own field; a work pattern's are
+judged, from a pool of each way's top ten:
+
+```
+python python/bin/retrieval_facts.py rank data/runs/latest/retrieval/facts
+python python/bin/retrieval_facts.py pool data/runs/latest/retrieval/facts
+python python/bin/retrieval_facts.py score data/runs/latest/retrieval/facts
+```
+
+`rank` takes about 40 minutes on a Mac's GPU; `pool` writes
+`pool.jsonl`, the ads to judge into `judgements.jsonl`, and the
+judgements of 2026-11-03 are kept in the private data store. On
+2026-11-03 ([record](changes/2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)),
+filtering on the place gave precision at 10 of 0.657, against 0.313
+embedded, of a best possible 0.707; on a work pattern, 0.589 against
+0.394. Part time, temporary and hybrid are read right nearly always,
+and filtering pays most there (part time 0.90 against 0.40); remote is
+misread, in negations and other senses, and doesn't help.
 
 ## Improving it
 

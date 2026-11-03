@@ -72,7 +72,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Metadata as filters in the retrieval test](2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)
-  (roadmap 34), in progress
+  (roadmap 34), shipped, unreleased
 - [Boilerplate thresholds scaled to the ads' number](2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)
   (roadmap 12), dropped
 - [Boilerplate and view on several processors](2026-11-03-r45-boilerplate-and-view-on-several-processors.md)

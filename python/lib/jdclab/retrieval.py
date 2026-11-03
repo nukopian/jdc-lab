@@ -62,17 +62,17 @@ def ad_scores(
     return best
 
 
-def precision_at(k: int, ranked: Sequence[int], relevant: set[int]) -> float:
+def precision_at[T](k: int, ranked: Sequence[T], relevant: set[T]) -> float:
     """The share of the first k ranked that are relevant."""
     return sum(1 for i in ranked[:k] if i in relevant) / k
 
 
-def recall_at(k: int, ranked: Sequence[int], relevant: set[int]) -> float:
+def recall_at[T](k: int, ranked: Sequence[T], relevant: set[T]) -> float:
     """The share of the relevant that are in the first k ranked."""
     return sum(1 for i in ranked[:k] if i in relevant) / len(relevant)
 
 
-def ndcg_at(k: int, ranked: Sequence[int], relevant: set[int]) -> float:
+def ndcg_at[T](k: int, ranked: Sequence[T], relevant: set[T]) -> float:
     """Discounted cumulative gain of the first k, against the best possible."""
     gain = sum(1 / math.log2(r + 2) for r, i in enumerate(ranked[:k]) if i in relevant)
     best = sum(1 / math.log2(r + 2) for r in range(min(k, len(relevant))))

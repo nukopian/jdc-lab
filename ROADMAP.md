@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 47.
+number: 49.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -46,18 +46,7 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 34. Metadata as filters in the retrieval test
-
-**Serves:** metadata
-
-**Size:** M (3)
-
-Queries that name a place or a work pattern as well as a job title,
-ranked with the fact left to the embeddings and with it as a filter,
-over every distinct ad: places judged by the export's own place, work
-patterns by pooling each way's top ten and judging them, to test the
-lab's central claim, that facts can be filtered on rather than embedded
-([record](docs/changes/2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)).
+Nothing at the moment.
 
 ## Next
 
@@ -311,3 +300,22 @@ each build the same index of every ad. Divide each ad once, for every
 stage, either by a stage whose output the others read, which the stages
 don't yet do, or by one program for the stages that share the most.
 Found by roadmap 45.
+
+### 47. Remote read only where the job is worked from home
+
+Added 2026-11-03. **Size:** S (2). The work-pattern facts read
+"remote" in negations ("This is NOT a hybrid or remote role"), in other
+senses ("radio remote and pendant controls", "24/7 remote GP service",
+"the remote location of the site") and for part of the week ("2 days
+remote"): of 21 ads whose facts found it, 19 were judged not remote, so
+filtering on it found nothing. Read it only where the job is worked
+from home, and part of the week as hybrid. Found by roadmap 34.
+
+### 48. Pay and hours as filters in the retrieval test
+
+Added 2026-11-03. **Size:** M (3). Roadmap 34 tested place and work
+pattern as filters, and both paid where the fact is read right. Pay
+and hours want queries with a range ("Warehouse Operative over £30,000",
+"under 20 hours a week"), and pay a period to compare across ("£12 an
+hour" against "£25,000 a year"). Judged as roadmap 34's work patterns
+were, or by the fact's own text where it's plain.

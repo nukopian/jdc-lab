@@ -12,6 +12,17 @@ has the steps).
 
 ## Unreleased
 
+- A retrieval test of facts as filters: a job title with a place or a
+  work pattern, over every distinct ad, ranked with the fact embedded
+  and with it as a filter, work patterns judged from a pool. Filtering
+  found what was asked for far better: precision at 10 of 0.66 against
+  0.31 for a place, and 0.59 against 0.39 for a work pattern, part
+  time 0.90 against 0.40; remote, which the facts often misread,
+  didn't help (roadmap 34;
+  [record](docs/changes/2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)).
+- Roadmap 12, boilerplate's thresholds scaled to the number of ads, is
+  dropped: what larger samples add is mostly boilerplate
+  ([record](docs/changes/2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)).
 - Boilerplate and view divide their ads into sections, and find long
   texts alike, on every processor, rather than one: alone, boilerplate
   takes 7.1 s rather than 12.7 s and view 8.3 s rather than 13.8 s,

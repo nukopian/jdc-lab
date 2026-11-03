@@ -104,16 +104,39 @@ type Query struct {
 // grouping goes in order.
 func Queries(titles map[string]string, n, least int) []Query {
 	ids := slices.Sorted(maps.Keys(titles))
-	// Each title joins the first group with a title similar to it, as
-	// boilerplate's groups do.
-	type group struct {
-		spellings map[string]int
-		ads       int
+	var qs []Query
+	used := map[string]bool{}
+	for _, g := range titleGroups(titles) {
+		if len(qs) == n || g.ads < least {
+			break
+		}
+		q := g.commonest()
+		if used[headings.Key(q)] {
+			continue
+		}
+		used[headings.Key(q)] = true
+		if rel := similar(q, ids, titles); len(rel) >= least {
+			qs = append(qs, Query{Query: q, Relevant: rel})
+		}
 	}
-	var gs []*group
-	for _, id := range ids {
+	return qs
+}
+
+// A titleGroup is a group of similar titles: each spelling, with its
+// ads, and its ads in all.
+type titleGroup struct {
+	spellings map[string]int
+	ads       int
+}
+
+// titleGroups returns titles, an ad's title by its ID, in groups of
+// similar titles, the most ads first. Each title joins the first group
+// with a title similar to it, in order of ID, as boilerplate's groups do.
+func titleGroups(titles map[string]string) []*titleGroup {
+	var gs []*titleGroup
+	for _, id := range slices.Sorted(maps.Keys(titles)) {
 		t := titles[id]
-		i := slices.IndexFunc(gs, func(g *group) bool {
+		i := slices.IndexFunc(gs, func(g *titleGroup) bool {
 			for s := range g.spellings {
 				if boilerplate.SimilarTitles(s, t) {
 					return true
@@ -122,36 +145,32 @@ func Queries(titles map[string]string, n, least int) []Query {
 			return false
 		})
 		if i < 0 {
-			gs = append(gs, &group{spellings: map[string]int{}})
+			gs = append(gs, &titleGroup{spellings: map[string]int{}})
 			i = len(gs) - 1
 		}
 		gs[i].spellings[t]++
 		gs[i].ads++
 	}
-	slices.SortStableFunc(gs, func(a, b *group) int { return b.ads - a.ads })
-	var qs []Query
-	used := map[string]bool{}
-	for _, g := range gs {
-		if len(qs) == n || g.ads < least {
-			break
-		}
-		spellings := slices.Sorted(maps.Keys(g.spellings))
-		q := slices.MaxFunc(spellings, func(a, b string) int {
-			return cmp.Or(cmp.Compare(g.spellings[a], g.spellings[b]), cmp.Compare(b, a))
-		})
-		if used[headings.Key(q)] {
-			continue
-		}
-		used[headings.Key(q)] = true
-		var rel []string
-		for _, id := range ids {
-			if boilerplate.SimilarTitles(q, titles[id]) {
-				rel = append(rel, id)
-			}
-		}
-		if len(rel) >= least {
-			qs = append(qs, Query{Query: q, Relevant: rel})
+	slices.SortStableFunc(gs, func(a, b *titleGroup) int { return b.ads - a.ads })
+	return gs
+}
+
+// commonest returns a group's commonest spelling, the first in sorting
+// order of those as common.
+func (g *titleGroup) commonest() string {
+	spellings := slices.Sorted(maps.Keys(g.spellings))
+	return slices.MaxFunc(spellings, func(a, b string) int {
+		return cmp.Or(cmp.Compare(g.spellings[a], g.spellings[b]), cmp.Compare(b, a))
+	})
+}
+
+// similar returns those of ids whose title is similar to q, in order.
+func similar(q string, ids []string, titles map[string]string) []string {
+	var out []string
+	for _, id := range ids {
+		if boilerplate.SimilarTitles(q, titles[id]) {
+			out = append(out, id)
 		}
 	}
-	return qs
+	return out
 }
