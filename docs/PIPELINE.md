@@ -554,6 +554,32 @@ sentence of a wall judged boilerplate, with its groups (by the key that
 finds the most), ads, characters, the kinds of section it's in, and its
 verdict.
 
+**Checking the verdict.** `cmd/boilerplate-check` lists every text found
+as boilerplate in `check.tsv`, with the rule that decided (`Why`: found
+mostly elsewhere, a footer, widespread, or a wall's verdict, and the key
+that found it), its characters in all and in the sections whose text is
+embedded, and three flags: it holds a fact, it's phrased as a job line,
+or it's mostly in the sections that describe the job:
+
+```
+go run ./cmd/boilerplate-check data/runs/latest/ads.jsonl data/runs/latest/boilerplate-check
+```
+
+What the verdict takes out of search is its text in the sections that
+are embedded: the summary, the company's, and those that describe the
+job; benefits, apply and legal are left out whatever their text. Of
+boilerplate's 11.2 million characters, 4.5 million are there. On
+2026-11-03 a sample of 450 texts was judged
+([record](changes/2026-11-03-r33-boilerplates-verdict-checked.md)):
+about a third of that text, 35% (±8), isn't boilerplate alone, and a
+quarter is about the job, about 2% of all the ads' text. What's taken
+is a large employer's own description of the role, repeated across its
+ads under different titles ("As a Bank Care Assistant, you could be
+doing anything from …"); the setting, a school group's or a care
+provider's account of what it does; requirements and checks written
+into an agency's notices; and facts. The flags don't single it out: the
+texts flagged and not are about as often misfiled.
+
 ## 7. View: ads to read
 
 **Package** `internal/view`, **program** `cmd/view`.

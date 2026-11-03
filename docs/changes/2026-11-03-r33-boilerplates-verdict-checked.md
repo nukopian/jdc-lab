@@ -74,4 +74,71 @@ and PIPELINE.md and the README's Where it stands say what was found.
 
 ## What happened
 
-Work in progress.
+- **Steps 1 and 2:** `Index.Why` names the rule that made a text
+  boilerplate and the key that found it; `Boilerplate` asks it, so the
+  two can't disagree, and `TestWhy` covers each rule, each kind of key
+  and a wall. `boilerplate.Check` and `cmd/boilerplate-check` list every
+  text found as boilerplate, with the rule, the flags, its characters
+  in all, in the sections that describe the job, and in those whose
+  text is embedded, and the title of the first ad it's in. The run's
+  output is unchanged (`pipeline compare`).
+- **What the table shows,** on the latest run: 13,480 texts, 11.2
+  million characters. By rule: found mostly elsewhere 84% of the
+  characters, a footer 13.5%, widespread 1.8%, a wall's verdict 0.7%.
+  Flagged: 3,597 texts, 27% of the characters; mostly in the sections
+  that describe the job 14.7%, holding a fact 13.0%, a job line 0.7%.
+  What the verdict takes out of search is its text in the embedded
+  sections (summary, company, role, responsibilities, requirements,
+  desirable): 4.5 million characters, 41% of it. Benefits, apply and
+  legal are left out whatever their text, so a misfiled benefit loses
+  nothing to search.
+- **Change from the plan:** 3,597 flagged texts were too many to judge
+  each, so both strata were sampled, by probability proportional to
+  characters, without replacement, seed 33: 300 flagged and 150 not,
+  450 texts, 89,000 characters. Judged by Claude in four batches, blind
+  to the rule and the flags, by rules written before any was seen:
+  boilerplate, about the job, or mixed, and what in it matters (fact,
+  duty, requirement, conditions, setting). Kept in the private data
+  store.
+- **Outcome so far:** 292 judged boilerplate, 118 about the job, 40
+  mixed. Weighted to the characters in embedded sections, 35% (±8) of
+  what the verdict takes out of search isn't boilerplate alone, and
+  26% (±7) is about the job; 31% if checks every job of its kind has
+  (an enhanced DBS check, the right to work) aren't counted as about
+  the job. That's about 1.5 million characters, 2.4% of all the ads'
+  text. The flags don't single it out: flagged and unflagged text is
+  misfiled about as often (35% each, embedded). By rule, roughly, of
+  each rule's embedded text: found mostly elsewhere about 45%, a footer
+  about 25%, widespread about 60%, from samples too small for more.
+- **What's misfiled,** from the largest judged texts:
+  - a large employer's own account of the role, repeated across its
+    ads under titles in different groups ("As a Bank Care Assistant,
+    you could be doing anything from …", "As a Roadside Technician …
+    you'll deliver expert mechanical roadside repair"), filed as a
+    footer or as found elsewhere;
+  - the setting: a school group's or care provider's account of what
+    it provides, in the company's section;
+  - requirements and checks written into an agency's notices, and
+    paragraphs mixing an agency's notice with the job's terms ("This
+    advert is for a temporary position");
+  - an employer's standard terms in the benefits, which are left out
+    anyway.
+- **Facts in sentences found as boilerplate (step 5):** over every ad,
+  2,375 such sentences in the embedded sections hold a fact the chunker
+  doesn't read, and in 1,884 ads one isn't in the details otherwise:
+  2,802 work patterns, 370 pay, 153 schedules, 100 hours, 22 places.
+  Most are an agency describing itself ("an employment agency for
+  permanent recruitment and … temporary workers") or a company's
+  turnover read as pay, which the details are right to leave out; of
+  the 120 judged texts holding a fact, 45 were judged to state one of
+  the job. So reading every fact of those sentences would add more
+  wrong facts than right: not a small fix.
+- **Judging:** the calls the judges found hardest were checks written
+  as notices (counted as requirements, by the rules), an agency's
+  generic perks named by brand, personal qualities ("a genuine passion
+  for supporting children"), and a run of keywords repeated across an
+  agency's ads. One model judged once; a second judge, or Iain, on a
+  sample would say how far to trust it.
+
+Work in progress: the fixes for each kind of misfiling are to be put
+on the roadmap.

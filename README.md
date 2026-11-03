@@ -81,8 +81,11 @@ embeddings, and a large language model only where those fall short.
 - **Retrieval** has had a first test: with job titles as queries, an
   ad without its boilerplate is found as well as the whole ad, for 16%
   fewer tokens, and the summary alone nearly as well, for a quarter of
-  them. Titles are a narrow test, and whether boilerplate's verdict is
-  right is still to be checked, so nothing is dropped yet. A second
+  them. Titles are a narrow test, and boilerplate's verdict, checked on
+  a judged sample, takes too much: about a third of the boilerplate
+  text left out of the embeddings isn't boilerplate alone, but a large
+  employer's own account of the role, the setting, or requirements in
+  an agency's notices. So nothing is dropped yet. A second
   test asked for a title with a place or a work pattern: filtering on
   the fact found what was asked for far better than embedding it
   (precision at 10 of 0.66 against 0.31 for a place, 0.59 against 0.39

@@ -1,6 +1,7 @@
 package boilerplate
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
@@ -371,5 +372,121 @@ func TestWallSentenceJudgedAlone(t *testing.T) {
 	}
 	if !ix.Boilerplate(src, notice) {
 		t.Errorf("%q: not boilerplate", notice)
+	}
+}
+
+// Why names the rule that made a text boilerplate, and the key that found
+// it, and nothing for a text that isn't.
+func TestWhy(t *testing.T) {
+	jobs := []string{"Chef", "Crane Operator", "Teaching Assistant", "Nurse", "Accountant"}
+
+	var elsewhere Index
+	for _, job := range jobs[:3] {
+		elsewhere.Add(Source{Title: job}, sections.Company, agency)
+		elsewhere.Add(Source{Title: job}, sections.Responsibilities, duties)
+	}
+	if got := elsewhere.Why(Source{}, agency); got != "elsewhere, by its own key" {
+		t.Errorf("an agency's line: Why = %q", got)
+	}
+	if got := elsewhere.Why(Source{}, duties); got != "" {
+		t.Errorf("duties, a template: Why = %q, want none", got)
+	}
+
+	const notice = "All candidates will be required to complete our standard vetting checks before starting."
+	var widespread Index
+	for _, job := range jobs {
+		widespread.Add(Source{Title: job}, sections.Requirements, notice)
+	}
+	if got := widespread.Why(Source{}, notice); got != "widespread, by its own key" {
+		t.Errorf("a notice in 5 jobs' requirements: Why = %q", got)
+	}
+
+	const footer = "Acme Recruitment is acting as an employment agency in relation to this vacancy."
+	var footers Index
+	for _, job := range jobs[:2] {
+		footers.Add(Source{Title: job}, sections.Requirements, duties, footer)
+	}
+	for _, job := range jobs[:2] {
+		footers.Ends(Source{Title: job}, duties, footer)
+	}
+	if got := footers.Why(Source{}, footer); got != "footer, by its own key" {
+		t.Errorf("a footer under requirements: Why = %q", got)
+	}
+
+	var templated Index
+	places := []string{"Leeds", "York", "Hull"}
+	text := func(i int) string {
+		return "Our client in " + places[i] + " is a well established firm with a fine reputation in the region."
+	}
+	for i, job := range jobs[:3] {
+		templated.Add(Source{Title: job, Places: []string{places[i]}}, sections.Company, text(i))
+	}
+	if got := templated.Why(Source{Title: jobs[0], Places: places[:1]}, text(0)); got != "elsewhere, by its templated key" {
+		t.Errorf("standard text with the ad's place written in: Why = %q", got)
+	}
+
+	long := "Our agency is committed to safeguarding and promoting the welfare of children and young people, " +
+		"and all workers must complete an enhanced DBS check and provide two references before starting any placement."
+	var alike Index
+	for i, v := range []string{long, strings.Replace(long, "two", "three", 1), strings.Replace(long, "Our agency", "Acme", 1)} {
+		alike.Add(Source{Title: jobs[i]}, sections.Legal, v)
+	}
+	if got := alike.Why(Source{Title: jobs[0]}, long); got != "elsewhere, by its alike key" {
+		t.Errorf("a long notice changed a word in each ad: Why = %q", got)
+	}
+
+	short := "Acme is a disability-confident employer."
+	rest := "We welcome applications from everyone in every community across the region, whatever their background."
+	var walls Index
+	for _, job := range jobs[:3] {
+		walls.Wall(Source{Title: job}, sections.Legal, short+" "+rest, short, rest)
+	}
+	if got := walls.Why(Source{Title: jobs[0]}, short); got != "wall: elsewhere, by its own key" {
+		t.Errorf("a short line of a notices wall: Why = %q", got)
+	}
+}
+
+// Check lists each text found as boilerplate once, with where it's
+// found, why, and its flags; a text that isn't boilerplate isn't there.
+func TestCheck(t *testing.T) {
+	const pay = "All our roles pay £12.50 per hour, paid weekly, with holiday pay on top of that rate."
+	jobs := []string{"Chef", "Crane Operator", "Teaching Assistant"}
+	var all []Divided
+	for _, job := range jobs {
+		all = append(all, Divided{
+			Ad: ads.Ad{Title: job},
+			Sections: []sections.Section{
+				{Kind: sections.Company, Parts: []headings.Part{{Role: headings.Text, Text: agency}, {Role: headings.Text, Text: pay}}},
+				{Kind: sections.Benefits, Parts: []headings.Part{{Role: headings.Text, Text: pay}}},
+				{Kind: sections.Requirements, Parts: []headings.Part{{Role: headings.Text, Text: pay}}},
+				{Kind: sections.Responsibilities, Parts: []headings.Part{{Role: headings.Text, Text: duties}}},
+			},
+		})
+	}
+	var ix Index
+	for _, a := range all {
+		src := SourceOf(a.Ad)
+		for _, s := range a.Sections {
+			ix.Add(src, s.Kind, Texts([]sections.Section{s})...)
+		}
+	}
+	got := Check(all, &ix)
+	if len(got) != 2 {
+		t.Fatalf("got %d texts, want 2, the agency's line and its pay, not the duties: %+v", len(got), got)
+	}
+	// The pay line is in each ad three times, a third of it under
+	// requirements.
+	p := got[0]
+	if p.Text != pay || p.Title != "Chef" || p.Ads != 3 || p.Chars != 9*len(pay) || p.Groups != 3 || p.Describing != 3*len(pay) || p.Embedded != 6*len(pay) {
+		t.Errorf("pay: %+v", p)
+	}
+	if !slices.Equal(p.Kinds, []sections.Kind{sections.Requirements, sections.Benefits, sections.Company}) || p.Why != "elsewhere, by its own key" {
+		t.Errorf("pay: kinds %v, why %q", p.Kinds, p.Why)
+	}
+	if !slices.Equal(p.Facts, []string{"pay"}) || !p.Flagged() || p.MostlyDescribing() {
+		t.Errorf("pay: facts %v, flagged %t, mostly describing %t", p.Facts, p.Flagged(), p.MostlyDescribing())
+	}
+	if a := got[1]; a.Text != agency || a.Flagged() {
+		t.Errorf("the agency's line: %+v, flagged %t", a, a.Flagged())
 	}
 }

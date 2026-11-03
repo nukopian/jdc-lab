@@ -329,31 +329,46 @@ func (ix *Index) Repeated(src Source, s string) bool {
 // text that end its ads (see Ends), and talking as a footer does (see
 // FooterLine); or under Widespread groups of titles
 // or more, unless it's phrased so and found mostly in the sections that
-// describe the job.
+// describe the job. Why says which.
 func (ix *Index) Boilerplate(src Source, s string) bool {
+	return ix.Why(src, s) != ""
+}
+
+// The rules that make a text boilerplate, as Why names them.
+const (
+	ByElsewhere  = "elsewhere"  // found more often outside the sections that describe the job
+	ByFooter     = "footer"     // found mostly at the end of its ads, talking as a footer does
+	ByWidespread = "widespread" // under Widespread groups of titles or more
+)
+
+// Why returns the rule that makes a text from src boilerplate, and the
+// key it was found by, as "footer, by its templated key", or "" if it
+// isn't boilerplate (see Boilerplate). A line that takes its wall's
+// verdict says so: "wall: elsewhere, by its own key".
+func (ix *Index) Why(src Source, s string) string {
 	if ix.endsAdded { // the groups of texts alike are to count the ends too
 		ix.alike, ix.groups, ix.endsAdded = nil, nil, false
 	}
-	if ix.judged(src, s) {
-		return true
+	if why := ix.judged(src, s); why != "" {
+		return why
 	}
 	// A sentence repeated enough to be judged on its own keeps its own
 	// verdict; only one too short to count, or written in its wall alone,
 	// takes its wall's.
 	if ix.Repeated(src, s) {
-		return false
+		return ""
 	}
 	for _, w := range ix.inWall[headings.Key(s)] {
-		if ix.judged(src, w) {
-			return true
+		if why := ix.judged(src, w); why != "" {
+			return "wall: " + why
 		}
 	}
-	return false
+	return ""
 }
 
-// judged is the verdict on s by its own counts, before its walls are
-// asked: see Boilerplate.
-func (ix *Index) judged(src Source, s string) bool {
+// judged is the rule that makes s boilerplate by its own counts, before
+// its walls are asked, and the key it was found by, or "": see Why.
+func (ix *Index) judged(src Source, s string) string {
 	// Whether s is a job line is asked only of a text repeated enough to
 	// be judged, and once: most texts aren't, and asking is a search.
 	job, asked := false, false
@@ -363,20 +378,35 @@ func (ix *Index) judged(src Source, s string) bool {
 		}
 		return job
 	}
-	for _, k := range ix.keys(src, s) {
+	for i, k := range ix.keys(src, s) {
 		n := ix.groupsOf(k)
 		if n < MinGroups {
 			continue
 		}
 		x := ix.texts[k]
+		rule := ""
 		switch {
-		case x.elsewhere > x.describes,
-			2*x.atEnd > x.describes+x.elsewhere && !isJob() && FooterLine(s),
-			n >= Widespread && !(x.describes >= x.elsewhere && isJob()):
-			return true
+		case x.elsewhere > x.describes:
+			rule = ByElsewhere
+		case 2*x.atEnd > x.describes+x.elsewhere && !isJob() && FooterLine(s):
+			rule = ByFooter
+		case n >= Widespread && !(x.describes >= x.elsewhere && isJob()):
+			rule = ByWidespread
+		default:
+			continue
 		}
+		// keys gives the text's own key first, then its templated one,
+		// then its group of texts alike, named "~" and its first key.
+		by := "templated"
+		switch {
+		case i == 0:
+			by = "own"
+		case strings.HasPrefix(k, "~"):
+			by = "alike"
+		}
+		return rule + ", by its " + by + " key"
 	}
-	return false
+	return ""
 }
 
 // footerWords are words that footers use and job lines don't: about
