@@ -71,7 +71,7 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
-- [A faster pipeline](2026-11-03-a-faster-pipeline.md), shipped,
+- [A faster pipeline](2026-11-03-a-faster-pipeline.md), shipped
   in v0.7.0
 - [Checks in the fact grammars, with code assertions](2026-11-02-checks-in-the-fact-grammars.md)
   (two TODO tasks), shipped in v0.6.4
