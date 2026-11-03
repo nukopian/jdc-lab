@@ -50,6 +50,31 @@ Nothing at the moment.
 
 ## Next
 
+### 45. Boilerplate and view on several processors
+
+**Serves:** deployment
+
+**Size:** M (3)
+
+**What:** split the work boilerplate and view do over every ad across
+the machine's processors, rather than one, keeping their verdicts the
+same.
+
+**Why:** run at once, the stages take as long as view, about 15 s, and
+boilerplate and view each use about one processor, building one index
+of every ad. A run is the lab's measure of every change, so each second
+off it pays at every step; and work that splits across processors is
+what running the pipeline at scale would need. The order texts are
+added in decides how alike texts are grouped and named, so the split
+must give the same groups, by the same names, whatever the order.
+
+**Done when** both stages are profiled first, as on 2026-11-03
+([record](docs/changes/2026-11-03-a-faster-pipeline.md)); the split is
+behind a switch, with a differential test that catches a planted bug;
+`pipeline compare` shows every stage's output the same; a run takes
+under 10 s, or the record says what stood in the way; and PIPELINE.md
+gives the new timings.
+
 ### 34. Metadata as filters in the retrieval test
 
 **Serves:** metadata
@@ -129,31 +154,6 @@ batch don't compare. It's to be done before the next batch is added.
 **Done when** boilerplate's share is steady, within a point, across the
 samples and their union; tests cover the scaling; and PIPELINE.md's
 figures and thresholds are updated.
-
-### 45. Boilerplate and view on several processors
-
-**Serves:** deployment
-
-**Size:** M (3)
-
-**What:** split the work boilerplate and view do over every ad across
-the machine's processors, rather than one, keeping their verdicts the
-same.
-
-**Why:** run at once, the stages take as long as view, about 15 s, and
-boilerplate and view each use about one processor, building one index
-of every ad. A run is the lab's measure of every change, so each second
-off it pays at every step; and work that splits across processors is
-what running the pipeline at scale would need. The order texts are
-added in decides how alike texts are grouped and named, so the split
-must give the same groups, by the same names, whatever the order.
-
-**Done when** both stages are profiled first, as on 2026-11-03
-([record](docs/changes/2026-11-03-a-faster-pipeline.md)); the split is
-behind a switch, with a differential test that catches a planted bug;
-`pipeline compare` shows every stage's output the same; a run takes
-under 10 s, or the record says what stood in the way; and PIPELINE.md
-gives the new timings.
 
 ## Later
 
