@@ -12,24 +12,28 @@ has the steps).
 
 ## Unreleased
 
-- A run of the pipeline takes 67 s rather than 128 s. Boilerplate and
-  view, three quarters of it, take less than half the time they did,
-  and splitting ads into blocks, which every stage does, about 40%
-  less, and chunking every ad 17 s rather than 26 s (with grammar
-  v0.5.3). Keys and cleaned text read ASCII from a table, long texts alike
-  are compared as sorted runs of words and grouped once, and the
-  job-line check is asked only of texts repeated enough to be judged.
-  Every stage's output is the same, byte for byte
-  ([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
+Nothing yet.
+
+## v0.7.0 (2026-11-03)
+
+A run of the pipeline in 15 s rather than 114 s
+
+- A run of the pipeline takes 41 s rather than 114 s, its stages one
+  at a time, and every stage's output is the same, byte for byte, both
+  timed on a quiet machine. Boilerplate and view, most of a run, take
+  less than a third of the time they did, and chunking every ad 17 s
+  rather than 26 s. Keys and cleaned text read ASCII from a table,
+  long texts alike are compared as sorted runs of words and grouped
+  once, and the job-line check is asked only of texts repeated enough
+  to be judged ([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
 - grammar v0.5.3, which keeps each rule's starts, not only the last
   one searched for, as the lab asked for: a run takes 42 s rather than
-  52 s, run back to back, and heading-counts 4.3 s rather than 6.9 s,
-  every stage's output the same.
+  52 s, run back to back, and heading-counts 4.3 s rather than 6.9 s.
 - `pipeline run` runs the stages at once, as none reads another's
-  output: a run takes about 15 s rather than 40 s, as long as view, its
-  slowest stage. Each stage takes 10% to 20% longer sharing the
-  machine, so `pipeline run -serial` runs them one at a time, for
-  timings to compare from run to run.
+  output: a run takes about 15 s, as long as view, its slowest stage.
+  Each stage takes 10% to 20% longer sharing the machine, so
+  `pipeline run -serial` runs them one at a time, for timings to
+  compare from run to run.
 
 ## v0.6.6 (2026-11-02)
 

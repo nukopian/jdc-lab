@@ -1,6 +1,6 @@
 # A faster pipeline
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.7.0
 
 **Origin:** a session looking for what grammar's roadmap 25 (a faster
 matcher) and scalar's values in one allocation teach about the lab's own
@@ -145,6 +145,10 @@ cmd/boilerplate asks).
   28,000 ads, interleaved three times each, v0.6.6 took 25.6 s to
   26.1 s and `develop`, with grammar v0.5.3, 17.0 s, the same chunks,
   byte for byte: a third less.
+- **At the release,** on a quiet machine, v0.6.6 took 113.6 s for a run
+  (boilerplate 41.3 s, view 42.4 s) and v0.7.0 40.6 s with its stages
+  one at a time (12.7 s and 13.8 s), every stage's output the same.
+  128 s, above, was on a busier machine.
 - **Measuring:** the profiles showed time in `madvise` and in the read
   system call under `json.Decoder` that reading alone didn't (0.5 s for
   all 28,000 ads). It's the cost of the heap's fresh memory, landing
