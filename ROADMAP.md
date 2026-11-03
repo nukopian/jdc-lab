@@ -130,6 +130,31 @@ batch don't compare. It's to be done before the next batch is added.
 samples and their union; tests cover the scaling; and PIPELINE.md's
 figures and thresholds are updated.
 
+### 45. Boilerplate and view on several processors
+
+**Serves:** deployment
+
+**Size:** M (3)
+
+**What:** split the work boilerplate and view do over every ad across
+the machine's processors, rather than one, keeping their verdicts the
+same.
+
+**Why:** run at once, the stages take as long as view, about 15 s, and
+boilerplate and view each use about one processor, building one index
+of every ad. A run is the lab's measure of every change, so each second
+off it pays at every step; and work that splits across processors is
+what running the pipeline at scale would need. The order texts are
+added in decides how alike texts are grouped and named, so the split
+must give the same groups, by the same names, whatever the order.
+
+**Done when** both stages are profiled first, as on 2026-11-03
+([record](docs/changes/2026-11-03-a-faster-pipeline.md)); the split is
+behind a switch, with a differential test that catches a planted bug;
+`pipeline compare` shows every stage's output the same; a run takes
+under 10 s, or the record says what stood in the way; and PIPELINE.md
+gives the new timings.
+
 ## Later
 
 Nothing at the moment.
@@ -323,13 +348,3 @@ so "168 hours per month" and "84 Hours per Fortnight" are read as bare
 hours, and, over 80, dropped as implausible. Give Hours a month and a
 fortnight, with limits of their own, about 744 and 336, so such hours
 are read with their period.
-
-### 45. Boilerplate and view on several processors
-
-Added 2026-11-03. **Size:** M (3). Run at once, the stages take as long
-as view, about 15 s, and boilerplate and view each use about one of the
-machine's processors, building one index of every ad. Splitting that
-work across processors could take a run below 10 s. The order texts are
-added in decides how alike texts are grouped and named, so the result
-must stay the same whatever the order; profile first, as on 2026-11-03
-([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
