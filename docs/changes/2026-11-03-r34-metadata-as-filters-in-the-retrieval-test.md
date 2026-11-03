@@ -1,6 +1,6 @@
 # Metadata as filters in the retrieval test
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.7.1
 
 **Origin:** roadmap 34
 

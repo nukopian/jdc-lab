@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.7.1 (2026-11-03)
+
+Facts as filters, tested: a fact read right finds ads far better than embedded
+
 - A retrieval test of facts as filters: a job title with a place or a
   work pattern, over every distinct ad, ranked with the fact embedded
   and with it as a filter, work patterns judged from a pool. Filtering
@@ -29,6 +35,8 @@ has the steps).
   and a run 12.1 s rather than 15.5 s with the stages at once, every
   stage's output the same, byte for byte (roadmap 45;
   [record](docs/changes/2026-11-03-r45-boilerplate-and-view-on-several-processors.md)).
+- Wash-up: the two retrieval programs' set-up of the embedding model,
+  copied from one to the other, is in one place, `jdclab.bge`.
 
 ## v0.7.0 (2026-11-03)
 

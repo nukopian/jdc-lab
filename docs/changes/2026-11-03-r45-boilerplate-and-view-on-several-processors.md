@@ -1,6 +1,6 @@
 # Boilerplate and view on several processors
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.7.1
 
 **Origin:** roadmap 45
 

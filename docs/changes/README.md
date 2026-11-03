@@ -72,11 +72,11 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Metadata as filters in the retrieval test](2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)
-  (roadmap 34), shipped, unreleased
+  (roadmap 34), shipped in v0.7.1
 - [Boilerplate thresholds scaled to the ads' number](2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)
   (roadmap 12), dropped
 - [Boilerplate and view on several processors](2026-11-03-r45-boilerplate-and-view-on-several-processors.md)
-  (roadmap 45), shipped, unreleased
+  (roadmap 45), shipped in v0.7.1
 - [A faster pipeline](2026-11-03-a-faster-pipeline.md), shipped
   in v0.7.0
 - [Checks in the fact grammars, with code assertions](2026-11-02-checks-in-the-fact-grammars.md)

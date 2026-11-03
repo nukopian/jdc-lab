@@ -75,6 +75,30 @@ with the share that's about the job; the retrieval test is run with
 queries a title can't answer, with and without that text; and the
 figures, and whether to drop it, are in the record and the README.
 
+### 47. Remote read only where the job is worked from home
+
+**Serves:** metadata
+
+**Size:** S (2)
+
+**What:** read the work pattern "remote" only where the job is worked
+from home, all or almost all the time, and a few days at home a week as
+hybrid.
+
+**Why:** roadmap 34 found filtering on a fact pays where the fact is
+read right, and remote is read wrong: in negations ("This is NOT a
+hybrid or remote role"), in other senses ("radio remote and pendant
+controls", "24/7 remote GP service", "the remote location of the
+site") and for part of the week ("2 days remote"). Of 21 ads whose
+facts found it, 19 were judged not remote, so filtering on it found
+nothing.
+
+**Done when** those shapes, in made-up text, are tests; roadmap 34's
+judgements, scored again, show the facts' remote judged for where it's
+found, and filtering on it at least as good as embedding; a run against
+the one before shows what else moved; and PIPELINE.md's Facts says how
+remote is read.
+
 ### 28. Bold labels on benefit lines aren't headings
 
 **Serves:** structure
@@ -300,16 +324,6 @@ each build the same index of every ad. Divide each ad once, for every
 stage, either by a stage whose output the others read, which the stages
 don't yet do, or by one program for the stages that share the most.
 Found by roadmap 45.
-
-### 47. Remote read only where the job is worked from home
-
-Added 2026-11-03. **Size:** S (2). The work-pattern facts read
-"remote" in negations ("This is NOT a hybrid or remote role"), in other
-senses ("radio remote and pendant controls", "24/7 remote GP service",
-"the remote location of the site") and for part of the week ("2 days
-remote"): of 21 ads whose facts found it, 19 were judged not remote, so
-filtering on it found nothing. Read it only where the job is worked
-from home, and part of the week as hybrid. Found by roadmap 34.
 
 ### 48. Pay and hours as filters in the retrieval test
 
