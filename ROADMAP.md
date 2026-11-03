@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 45.
+number: 46.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -323,3 +323,13 @@ so "168 hours per month" and "84 Hours per Fortnight" are read as bare
 hours, and, over 80, dropped as implausible. Give Hours a month and a
 fortnight, with limits of their own, about 744 and 336, so such hours
 are read with their period.
+
+### 45. Boilerplate and view on several processors
+
+Added 2026-11-03. **Size:** M (3). Run at once, the stages take as long
+as view, about 15 s, and boilerplate and view each use about one of the
+machine's processors, building one index of every ad. Splitting that
+work across processors could take a run below 10 s. The order texts are
+added in decides how alike texts are grouped and named, so the result
+must stay the same whatever the order; profile first, as on 2026-11-03
+([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
