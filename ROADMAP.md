@@ -46,28 +46,20 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment.
-
-## Next
-
 ### 34. Metadata as filters in the retrieval test
 
 **Serves:** metadata
 
 **Size:** M (3)
 
-**What:** use the facts read as metadata (pay, hours, work pattern,
-place) as filters beside the embeddings in the retrieval test, and
-measure what they add.
+Queries that name a place or a work pattern as well as a job title,
+ranked with the fact left to the embeddings and with it as a filter,
+over every distinct ad: places judged by the export's own place, work
+patterns by pooling each way's top ten and judging them, to test the
+lab's central claim, that facts can be filtered on rather than embedded
+([record](docs/changes/2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)).
 
-**Why:** that facts can be filtered on rather than embedded is the
-lab's central claim, and it's untested: structure work is judged so far
-by figures that stand in for search, not by search.
-
-**Done when** the retrieval test has queries that name a fact as well
-as a title ("in Leeds", "part-time"), scored with the fact as a filter
-and with it left to the embeddings; the figures are in its record and
-the README's Where it stands.
+## Next
 
 ### 33. Retrieval with boilerplate's verdict checked
 
