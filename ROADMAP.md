@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 49.
+number: 50.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -46,34 +46,22 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-Nothing at the moment.
+### 33. Boilerplate's verdict checked
 
-## Next
-
-### 33. Retrieval with boilerplate's verdict checked
-
-**Serves:** search
+**Serves:** structure
 
 **Size:** M (3)
 
-**What:** check boilerplate's verdict on a sample by hand, and measure
-whether leaving out what it takes costs retrieval anything, for queries
-beyond titles.
+Every text found as boilerplate listed with the rule that decided and
+flags for where something important is likeliest (a fact, a duty's or
+requirement's wording, the sections that describe the job), and a
+judged sample saying how much of boilerplate is about the job, so that
+leaving it out of the embeddings loses nothing; with the facts the
+chunker misses in sentences found as boilerplate. Reshaped before work
+started: whether leaving it out costs retrieval is idea 49
+([record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
 
-**Why:** the first retrieval test found that an ad without its
-boilerplate is found as well as the whole, for 16% fewer tokens, but
-titles can't see what's lost if that text is about the job, and about
-one in seven of the texts roadmap 3 newly found are openers about the
-job. Larger samples find more boilerplate, too, and of what all three
-samples find that a slice of 2,000 ads doesn't, about one in five texts
-is about the job
-([roadmap 12's record](docs/changes/2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)).
-Nothing is dropped until this is known.
-
-**Done when** a sample of what the verdict takes is judged by hand,
-with the share that's about the job; the retrieval test is run with
-queries a title can't answer, with and without that text; and the
-figures, and whether to drop it, are in the record and the README.
+## Next
 
 ### 47. Remote read only where the job is worked from home
 
@@ -333,3 +321,11 @@ and hours want queries with a range ("Warehouse Operative over £30,000",
 "under 20 hours a week"), and pay a period to compare across ("£12 an
 hour" against "£25,000 a year"). Judged as roadmap 34's work patterns
 were, or by the fact's own text where it's plain.
+
+### 49. Retrieval with boilerplate left out, on judged queries
+
+Added 2026-11-03, split from 33. **Size:** M (3). Whether leaving what
+boilerplate's verdict takes out of the embeddings costs retrieval, for
+queries a title can't answer: skills, duties, conditions. The first
+retrieval test found nothing lost for job titles, which can't see it.
+Waits on idea 32's judged queries.
