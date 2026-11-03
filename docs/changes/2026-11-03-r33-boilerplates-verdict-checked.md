@@ -1,10 +1,12 @@
 # Boilerplate's verdict checked
 
-**Status:** in progress
+**Status:** shipped, unreleased
 
 **Origin:** roadmap 33, reshaped before work started
 
 **Started:** 2026-11-03, in 050edf7eccfccf6da8e51d7bc89cae20bab21661
+
+**Finished:** 2026-11-03
 
 ## The plan
 
@@ -140,5 +142,15 @@ and PIPELINE.md and the README's Where it stands say what was found.
   agency's ads. One model judged once; a second judge, or Iain, on a
   sample would say how far to trust it.
 
-Work in progress: the fixes for each kind of misfiling are to be put
-on the roadmap.
+- **Fixes (step 6),** each on the roadmap, in Next, as Iain chose:
+  an employer's own account of the role kept (roadmap 50); repeated
+  paragraphs judged sentence by sentence where they mix standard text
+  and the job's terms (51); facts of this job read from sentences found
+  as boilerplate (52), which is step 5's fix; and the setting kept from
+  the company's text (53). Each is measured on this sample. Meanwhile
+  boilerplate stays out of the embeddings, as Iain chose, with the
+  known cost written down here.
+- **Done when,** against it: the table any run can rebuild, yes; the
+  judged sample's share, yes; a fix on the roadmap for each kind of
+  misfiling, yes; facts in sentences found as boilerplate, an item
+  (52); PIPELINE.md and the README, yes.

@@ -12,7 +12,13 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Boilerplate's verdict checked: `cmd/boilerplate-check` lists every
+  text found as boilerplate with the rule that decided, and a judged
+  sample of 450 found about a third of the boilerplate text left out
+  of the embeddings isn't boilerplate alone: an employer's own account
+  of the role, the setting, requirements in agencies' notices, facts.
+  Its fixes are roadmap 50 to 53 (roadmap 33;
+  [record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
 
 ## v0.7.1 (2026-11-03)
 

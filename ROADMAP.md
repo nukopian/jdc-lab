@@ -28,7 +28,7 @@ Items come in four groups, the most useful first in each:
 Each item has a number, given when it's added, in whichever group. It
 keeps it as it moves between groups, and a number is never used again,
 so that 7 means the same item in a commit message months later. Next
-number: 50.
+number: 54.
 
 Each item has a size too, a guess at how much work it is, as a T-shirt
 size and its story points: XS 1, S 2, M 3 and L 5. An item bigger than
@@ -46,22 +46,97 @@ after](docs/PIPELINE.md#before-and-after)).
 
 ## Now
 
-### 33. Boilerplate's verdict checked
+Nothing at the moment.
+
+## Next
+
+### 50. An employer's own account of the role isn't boilerplate
 
 **Serves:** structure
 
 **Size:** M (3)
 
-Every text found as boilerplate listed with the rule that decided and
-flags for where something important is likeliest (a fact, a duty's or
-requirement's wording, the sections that describe the job), and a
-judged sample saying how much of boilerplate is about the job, so that
-leaving it out of the embeddings loses nothing; with the facts the
-chunker misses in sentences found as boilerplate. Reshaped before work
-started: whether leaving it out costs retrieval is idea 49
+**What:** keep as a template for the job an employer's own account of a
+role, repeated across its ads, where boilerplate's verdict now takes it
+as a footer or as found elsewhere.
+
+**Why:** roadmap 33's judged sample found a large employer's account of
+the role ("As a Bank Care Assistant, you could be doing anything from
+…", "As a Roadside Technician … you'll deliver expert mechanical
+roadside repair") among the largest texts taken out of search: its ads
+for one role carry titles in different groups, so the role's own text
+counts as repeated across jobs. Of the text the verdict takes out of
+search, about a third isn't boilerplate alone ([record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
+
+**Done when** a text that names its ad's own title, or reads as the
+role's duties or requirements, is a template, with tests in made-up
+text; roadmap 33's judged texts of this kind come out of boilerplate,
+and those judged boilerplate stay; a run against the one before shows
+what else moved; and PIPELINE.md's Boilerplate says how.
+
+### 51. Boilerplate judged sentence by sentence in mixed paragraphs
+
+**Serves:** structure
+
+**Size:** M (3)
+
+**What:** judge a repeated paragraph that mixes standard text with the
+job's own terms sentence by sentence, as walls over 400 characters
+already are, so the job's sentences keep their own verdict.
+
+**Why:** roadmap 33 found an agency's standard paragraph with the job's
+terms in it ("All pay rates quoted will be inclusive of … holiday pay.
+This advert is for a temporary position.") judged whole, and taken out
+of search whole: mixed texts were about one in ten of those judged
 ([record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
 
-## Next
+**Done when** a paragraph's sentences are judged on their own where
+they're repeated less than the paragraph, with tests in made-up text;
+roadmap 33's mixed texts lose their job sentences from boilerplate; a
+run against the one before shows what else moved; and PIPELINE.md says
+how.
+
+### 52. Facts of this job read in boilerplate
+
+**Serves:** metadata
+
+**Size:** S (2)
+
+**What:** read into the details the facts of a sentence found as
+boilerplate where it speaks of this job ("this role", "this position",
+"this advert"), not where an agency describes itself.
+
+**Why:** the chunker doesn't read the facts of a sentence found as
+boilerplate in a section it embeds, so in 1,884 ads a fact never
+reaches the details: 2,802 work patterns, 370 pay, 153 schedules. Most
+are an agency's ("an employment agency for permanent recruitment and …
+temporary workers"), rightly left out, but of 120 judged texts holding
+a fact, 45 stated one of the job ([record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
+
+**Done when** such facts reach the details, with tests in made-up text
+for this job's and an agency's; the facts gained are counted, and a
+sample of them judged right; and PIPELINE.md's Chunking says how.
+
+### 53. The setting kept from the company's text
+
+**Serves:** structure
+
+**Size:** M (3)
+
+**What:** keep in the embeddings an employer's account of what it
+provides, the kind of school, care or site the job is in, where
+boilerplate's verdict takes it from the company's section.
+
+**Why:** roadmap 33 found the setting ("specialist education for
+learners who need …") among the text taken out of search, judged about
+the job: a job seeker searching for a special school, or a care home,
+searches for it ([record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)). Telling a setting from self-promotion is the
+hard part.
+
+**Done when** a rule, or a cheap model, tells a setting from
+self-promotion on roadmap 33's judged company texts, with tests; those
+judged about the job stay embedded; a run against the one before shows
+what moved; and PIPELINE.md says how.
 
 ### 47. Remote read only where the job is worked from home
 

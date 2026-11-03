@@ -72,7 +72,7 @@ Why, What's known, Steps, Done when.
 Newest first.
 
 - [Boilerplate's verdict checked](2026-11-03-r33-boilerplates-verdict-checked.md)
-  (roadmap 33), in progress
+  (roadmap 33), shipped, unreleased
 - [Metadata as filters in the retrieval test](2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)
   (roadmap 34), shipped in v0.7.1
 - [Boilerplate thresholds scaled to the ads' number](2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)
