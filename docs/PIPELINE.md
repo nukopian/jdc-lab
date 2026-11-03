@@ -68,7 +68,7 @@ Then run every stage on the samples together, as the run `latest`:
 go run ./cmd/pipeline run latest
 ```
 
-It takes about a minute: `data/runs/latest/sections/` holds the
+It takes under a minute: `data/runs/latest/sections/` holds the
 sections stage's tables, and `data/runs/latest/sections.txt` its
 summary. A run of the same name is replaced.
 
@@ -78,8 +78,8 @@ ends with how each stage ran, also kept in
 
 ```
 sample  stage               ads      wall       cpu    ads/s      peak
-all     sections          28000    12.75s    14.08s     2195    206 MB
-all     boilerplate       28000    20.16s    24.30s     1389   1050 MB
+all     sections          28000     8.14s     8.25s     3442    205 MB
+all     boilerplate       28000    12.71s    15.71s     2203   1238 MB
 ```
 
 `wall` is the time on the clock, `cpu` the time on the processors (more
@@ -97,9 +97,10 @@ compared as sorted runs of words, and grouped once, and whether a text
 is phrased as a job line is asked only of those repeated enough to be
 judged. A run went from 128 s to 67 s, boilerplate from 45 s to 20 s,
 view from 50 s to 22 s, and blocks from 5.6 s to 3.4 s, every stage's
-output the same, byte for byte. With grammar keeping each rule's
-starts, not only the last one searched for (a task in grammar's
-`TODO.md`), a run takes 57 s, and reading headings half the time.
+output the same, byte for byte. grammar v0.5.3 keeps each rule's
+starts, not only the last one searched for, which the lab asked for:
+run back to back, a run went from 52 s to 42 s with it, and
+heading-counts from 6.9 s to 4.3 s.
 
 Each stage's program can also be run alone, on one sample, into any
 folder:

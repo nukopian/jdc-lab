@@ -20,6 +20,10 @@ has the steps).
   job-line check is asked only of texts repeated enough to be judged.
   Every stage's output is the same, byte for byte
   ([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
+- grammar v0.5.3, which keeps each rule's starts, not only the last
+  one searched for, as the lab asked for: a run takes 42 s rather than
+  52 s, run back to back, and heading-counts 4.3 s rather than 6.9 s,
+  every stage's output the same.
 
 ## v0.6.6 (2026-11-02)
 

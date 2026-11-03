@@ -131,7 +131,12 @@ cmd/boilerplate asks).
   searched for one rule. That's grammar's change to make, so it's left
   uncommitted there, with a task in grammar's `TODO.md` (grammar
   33ba54f295932260891feb4c1658264823e90c86), whose release is to leave
-  the lab a task to take it up.
+  the lab a task to take it up. grammar released it in v0.5.3, and the
+  lab took it up the same day: run back to back with `GOWORK=off`, a
+  run took 51.7 s with v0.5.2 and 41.8 s with v0.5.3 (heading-counts
+  6.90 s → 4.25 s, sections 9.79 s → 8.14 s, boilerplate 15.49 s →
+  12.71 s, view 16.67 s → 13.89 s), its output unchanged, on a quieter
+  machine than the runs above.
 - **Chunking every ad** (`xargs chunk -json`, 25,954 ads, `GOWORK=off`)
   gives the same chunks, byte for byte. It was faster after in each of
   12 interleaved pairs, by 4% to 39%, but the machine was busy
