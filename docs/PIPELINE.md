@@ -1128,9 +1128,15 @@ of an ad's tokens are placed by the guess, nearly all as the summary.
 Facts are read in 35% of ads.
 
 Boilerplate's thresholds are counts of title groups, which a larger
-sample passes more easily, so boilerplate figures from samples of
-different sizes don't compare: on its own, the first sample has 13.2%
-by word for word matching, the third 15.1% (idea 12 on the roadmap).
+sample passes more easily, so boilerplate's share grows with the ads
+read: 11.2% on a random 2,000 of them, 15.0% on 10,000, and 17.8% on
+all three samples, about a point and a half each time they double. What
+more ads add is mostly boilerplate, found because more of each
+advertiser's ads are seen, so the thresholds aren't scaled to the
+number of ads
+([record](changes/2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)):
+boilerplate figures compare only on the same ads, as `pipeline compare`
+compares runs, and a batch added moves them.
 
 ## Decisions, and why
 

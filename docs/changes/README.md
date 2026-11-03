@@ -71,6 +71,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Boilerplate thresholds scaled to the ads' number](2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)
+  (roadmap 12), dropped
 - [Boilerplate and view on several processors](2026-11-03-r45-boilerplate-and-view-on-several-processors.md)
   (roadmap 45), shipped, unreleased
 - [A faster pipeline](2026-11-03-a-faster-pipeline.md), shipped

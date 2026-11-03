@@ -83,7 +83,11 @@ beyond titles.
 boilerplate is found as well as the whole, for 16% fewer tokens, but
 titles can't see what's lost if that text is about the job, and about
 one in seven of the texts roadmap 3 newly found are openers about the
-job. Nothing is dropped until this is known.
+job. Larger samples find more boilerplate, too, and of what all three
+samples find that a slice of 2,000 ads doesn't, about one in five texts
+is about the job
+([roadmap 12's record](docs/changes/2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)).
+Nothing is dropped until this is known.
 
 **Done when** a sample of what the verdict takes is judged by hand,
 with the share that's about the job; the retrieval test is run with
@@ -110,25 +114,6 @@ from lists roadmap 24 split out of their items.
 lists, with no heading of their own; tests cover the shapes with
 made-up text; a run against the one before shows nothing else moved;
 and PIPELINE.md says how headings reads them.
-
-### 12. Boilerplate thresholds scaled to the ads' number
-
-**Serves:** structure
-
-**Size:** M (3)
-
-**What:** scale boilerplate's thresholds, now counts of title groups,
-to the number of ads read, so its verdict doesn't depend on how many
-there are.
-
-**Why:** more ads pass a count more easily, so boilerplate's share
-rises as each batch is added (12.5% of text on 5,000 ads, 15.1% on
-21,000, by word for word matching), and figures from before and after a
-batch don't compare. It's to be done before the next batch is added.
-
-**Done when** boilerplate's share is steady, within a point, across the
-samples and their union; tests cover the scaling; and PIPELINE.md's
-figures and thresholds are updated.
 
 ## Later
 
