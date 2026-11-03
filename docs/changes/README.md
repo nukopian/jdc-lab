@@ -71,6 +71,8 @@ Why, What's known, Steps, Done when.
 
 Newest first.
 
+- [Boilerplate and view on several processors](2026-11-03-r45-boilerplate-and-view-on-several-processors.md)
+  (roadmap 45), in progress
 - [A faster pipeline](2026-11-03-a-faster-pipeline.md), shipped
   in v0.7.0
 - [Checks in the fact grammars, with code assertions](2026-11-02-checks-in-the-fact-grammars.md)
