@@ -303,7 +303,8 @@ the lab's folder, with direnv on:
 INLINE_PYTHON_EXECUTABLE="$PWD/.venv/bin/python3" cpanm --installdeps --with-develop .
 ```
 
-That installs Inline::Python, the test toolchain (Test2::V0 and its
+That installs Inline::Python, DBIx::Squirrel (with DBI and
+DBD::SQLite), Ekorn::Pipeline, the test toolchain (Test2::V0 and its
 plugins) and the tools (`yath`, `perlcritic`, `perltidy` and
 `scan-perl-prereqs`). Leave out `--with-develop` to skip the tools.
 `INLINE_PYTHON_EXECUTABLE` builds Inline::Python against the venv's

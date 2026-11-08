@@ -7,6 +7,11 @@
 
 requires 'perl', '5.036';
 
+# Database access and processing pipelines, listed ahead of the first
+# code to use them, so that they're in place when it arrives.
+requires 'DBIx::Squirrel', 'v2.0.5';
+requires 'Ekorn::Pipeline', 'v0.1.2';
+
 requires 'Inline', '0.87';
 
 # Built against the Python that INLINE_PYTHON_EXECUTABLE names: the

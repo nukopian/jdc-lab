@@ -255,9 +255,10 @@ The [`cpanfile`](../cpanfile), at the root beside `requirements.txt` and
   `perl/lib` or `perl/t` loads directly, with `use` or `require`, and
   nothing else. Leave out modules that come with Perl (`corelist Name`
   says whether one does), and other modules' own dependencies, which
-  cpanm finds for itself. The one exception is the test toolchain,
+  cpanm finds for itself. The exceptions are the test toolchain,
   listed ahead of the first test so that it's in place when one
-  arrives.
+  arrives, and DBIx::Squirrel and Ekorn::Pipeline, listed ahead of
+  the first code to use them for the same reason.
 - **Versions:** give each module the version it was tested with, as its
   minimum. `perl -MName -e 'print $Name::VERSION'` shows the installed
   one.

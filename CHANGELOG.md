@@ -19,6 +19,9 @@ has the steps).
   of the role, the setting, requirements in agencies' notices, facts.
   Its fixes are roadmap 50 to 53 (roadmap 33;
   [record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
+- The Perl side's modules include DBIx::Squirrel 2.0.5 and
+  Ekorn::Pipeline 0.1.2, ready for Perl code to use: run SETUP's
+  `cpanm --installdeps` again to add them.
 
 ## v0.7.1 (2026-11-03)
 
