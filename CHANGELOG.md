@@ -26,6 +26,9 @@ has the steps).
   every match needs, such as a digit for pay, before reading it:
   reading facts 6% quicker (497 ms to 466 ms over 2,000 ads), chunking
   4%, every stage's output the same, byte for byte.
+- `scripts/readme-pdf.sh` refuses an output that isn't a `.pdf`: a
+  document named there by mistake, as in `readme-pdf.sh README.md
+  docs/PIPELINE.md`, would be written over with a PDF.
 
 ## v0.7.1 (2026-11-03)
 
