@@ -836,6 +836,7 @@ sections), on 2026-10-31:
 | with code assertions, grammar v0.5.0 | 1.2 s | 1.6 s | 27 million |
 | naming what they read, grammar v0.5.1 | 1.1 s | 1.4 s | 25 million |
 | grammar v0.5.2's faster matcher, scalar v0.6.5 | 0.51 s | 0.65 s | 3.1 million |
+| rejecting a line with no needed character, grammar v0.5.5 | 0.47 s | 0.62 s | 2.9 million |
 
 Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
 with grammar v0.4.3, whose matcher keeps its results in slots rather
@@ -855,7 +856,14 @@ its output the same, byte for byte. grammar v0.5.2's faster matcher
 one allocation, more than halved both benchmarks, with 87% fewer
 allocations, and chunking every ad took 26.0–26.8 s against 37.2–37.9 s
 (three runs each, interleaved), its output the same, byte for byte, as
-every stage's was.
+every stage's was. grammar v0.5.5 works out the characters every match
+of a grammar needs, such as a digit for pay, and rejects a line with
+none of them before reading it (grammar's roadmap 23). Measured on
+2026-11-09 against v0.5.3, ten runs each, interleaved: reading facts
+6% quicker (497 ms to 466 ms), chunking 4% (647 ms to 620 ms), with
+8–12% fewer allocations, and every stage's output the same, byte for
+byte. `MayHold` still checks for a digit before the four grammars that
+need one, so for those its check and grammar's now overlap.
 
 ### Pages before and after
 

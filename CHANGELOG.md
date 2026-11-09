@@ -22,6 +22,10 @@ has the steps).
 - The Perl side's modules include DBIx::Squirrel 2.0.5 and
   Ekorn::Pipeline 0.1.2, ready for Perl code to use: run SETUP's
   `cpanm --installdeps` again to add them.
+- grammar v0.5.5, which rejects a line with none of the characters
+  every match needs, such as a digit for pay, before reading it:
+  reading facts 6% quicker (497 ms to 466 ms over 2,000 ads), chunking
+  4%, every stage's output the same, byte for byte.
 
 ## v0.7.1 (2026-11-03)
 
