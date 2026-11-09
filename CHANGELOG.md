@@ -12,6 +12,12 @@ has the steps).
 
 ## Unreleased
 
+Nothing yet.
+
+## v0.8.0 (2026-11-09)
+
+Boilerplate's verdict checked: a third of what it leaves out isn't boilerplate alone
+
 - Boilerplate's verdict checked: `cmd/boilerplate-check` lists every
   text found as boilerplate with the rule that decided, and a judged
   sample of 450 found about a third of the boilerplate text left out

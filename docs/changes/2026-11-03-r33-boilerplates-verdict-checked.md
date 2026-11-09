@@ -1,6 +1,6 @@
 # Boilerplate's verdict checked
 
-**Status:** shipped, unreleased
+**Status:** shipped in v0.8.0
 
 **Origin:** roadmap 33, reshaped before work started
 
