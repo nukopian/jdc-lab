@@ -1,8 +1,8 @@
-# Make boilerplate's verdict right
+# 2026-0004. Make boilerplate's verdict right
 
 **Status:** shipped in v0.5.2
 
-**Origin:** roadmap 4
+**Origin:** roadmap 2026-0004
 
 **Started:** 2026-10-28, in e6226efeb90802722c14b59348f81a525fc3abca
 

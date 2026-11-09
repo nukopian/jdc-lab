@@ -1,8 +1,8 @@
-# Find near-duplicate boilerplate
+# 2026-0003. Find near-duplicate boilerplate
 
 **Status:** shipped in v0.5.0
 
-**Origin:** roadmap 3
+**Origin:** roadmap 2026-0003
 
 **Started:** 2026-10-27, in 47a0e01caeae782db372469a19bdcd3f5543f689
 

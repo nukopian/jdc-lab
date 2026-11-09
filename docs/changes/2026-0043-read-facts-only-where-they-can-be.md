@@ -1,8 +1,8 @@
-# Read facts only where they can be
+# 2026-0043. Read facts only where they can be
 
 **Status:** shipped in v0.6.1
 
-**Origin:** roadmap 43
+**Origin:** roadmap 2026-0043
 
 **Started:** 2026-10-31, in 8c9df97c5d9ab378637b3c95a2bb75b2d8193823
 

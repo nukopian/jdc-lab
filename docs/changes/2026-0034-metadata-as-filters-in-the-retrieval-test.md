@@ -1,8 +1,8 @@
-# Metadata as filters in the retrieval test
+# 2026-0034. Metadata as filters in the retrieval test
 
 **Status:** shipped in v0.7.1
 
-**Origin:** roadmap 34
+**Origin:** roadmap 2026-0034
 
 **Started:** 2026-11-03, in 10b3c74d171698c9c4168806c2bb7ad976bda2f4
 
@@ -21,7 +21,7 @@ lab's central claim, and it's untested: structure work is judged so far
 by figures that stand in for search, not by search.
 
 **What's known:** the first retrieval test
-([record](2026-10-27-r10-a-first-retrieval-test.md)) has job titles as
+([record](2026-0010-a-first-retrieval-test.md)) has job titles as
 queries, an ad relevant if its title is similar
 (`boilerplate.SimilarTitles`), over 5,000 ads, embedded with
 `BAAI/bge-base-en-v1.5`; an ad without its boilerplate ("own") is found

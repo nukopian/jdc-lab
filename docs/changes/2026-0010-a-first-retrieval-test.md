@@ -1,8 +1,8 @@
-# Does it make search better? A first test
+# 2026-0010. Does it make search better? A first test
 
 **Status:** shipped in v0.5.0
 
-**Origin:** roadmap 10, a first slice
+**Origin:** roadmap 2026-0010, a first slice
 
 **Started:** 2026-10-27, in f4d5cdc22b59590e0b2e3ea22502b8b1692b3a86
 

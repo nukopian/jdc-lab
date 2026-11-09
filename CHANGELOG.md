@@ -12,7 +12,15 @@ has the steps).
 
 ## Unreleased
 
-Nothing yet.
+- Docs: roadmap items and change records are named by an id, the year
+  and a serial, such as 2026-0033, rather than a bare number, as in the
+  maintainer's other projects. Items 1 to 53 kept their numbers as
+  serials, so "roadmap 33" in older commits is 2026-0033, and the
+  records were renamed to their ids, the six for tasks taking 2026-0054
+  to 2026-0059 in the order they were opened. Items that must wait for
+  others say so with **Depends on:**, ideas give their date and size in
+  lines of their own, and a record's open questions are numbered D1, D2
+  and on.
 
 ## v0.8.0 (2026-11-09)
 
@@ -23,8 +31,8 @@ Boilerplate's verdict checked: a third of what it leaves out isn't boilerplate a
   sample of 450 found about a third of the boilerplate text left out
   of the embeddings isn't boilerplate alone: an employer's own account
   of the role, the setting, requirements in agencies' notices, facts.
-  Its fixes are roadmap 50 to 53 (roadmap 33;
-  [record](docs/changes/2026-11-03-r33-boilerplates-verdict-checked.md)).
+  Its fixes are roadmap 2026-0050 to 2026-0053 (roadmap 2026-0033;
+  [record](docs/changes/2026-0033-boilerplates-verdict-checked.md)).
 - The Perl side's modules include DBIx::Squirrel 2.0.5 and
   Ekorn::Pipeline 0.1.2, ready for Perl code to use: run SETUP's
   `cpanm --installdeps` again to add them.
@@ -46,17 +54,17 @@ Facts as filters, tested: a fact read right finds ads far better than embedded
   found what was asked for far better: precision at 10 of 0.66 against
   0.31 for a place, and 0.59 against 0.39 for a work pattern, part
   time 0.90 against 0.40; remote, which the facts often misread,
-  didn't help (roadmap 34;
-  [record](docs/changes/2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)).
+  didn't help (roadmap 2026-0034;
+  [record](docs/changes/2026-0034-metadata-as-filters-in-the-retrieval-test.md)).
 - Roadmap 12, boilerplate's thresholds scaled to the number of ads, is
   dropped: what larger samples add is mostly boilerplate
-  ([record](docs/changes/2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)).
+  ([record](docs/changes/2026-0012-boilerplate-thresholds-scaled-to-the-ads-number.md)).
 - Boilerplate and view divide their ads into sections, and find long
   texts alike, on every processor, rather than one: alone, boilerplate
   takes 7.1 s rather than 12.7 s and view 8.3 s rather than 13.8 s,
   and a run 12.1 s rather than 15.5 s with the stages at once, every
-  stage's output the same, byte for byte (roadmap 45;
-  [record](docs/changes/2026-11-03-r45-boilerplate-and-view-on-several-processors.md)).
+  stage's output the same, byte for byte (roadmap 2026-0045;
+  [record](docs/changes/2026-0045-boilerplate-and-view-on-several-processors.md)).
 - Wash-up: the two retrieval programs' set-up of the embedding model,
   copied from one to the other, is in one place, `jdclab.bge`.
 
@@ -71,7 +79,7 @@ A run of the pipeline in 15 s rather than 114 s
   rather than 26 s. Keys and cleaned text read ASCII from a table,
   long texts alike are compared as sorted runs of words and grouped
   once, and the job-line check is asked only of texts repeated enough
-  to be judged ([record](docs/changes/2026-11-03-a-faster-pipeline.md)).
+  to be judged ([record](docs/changes/2026-0059-a-faster-pipeline.md)).
 - grammar v0.5.3, which keeps each rule's starts, not only the last
   one searched for, as the lab asked for: a run takes 42 s rather than
   52 s, run back to back, and heading-counts 4.3 s rather than 6.9 s.
@@ -114,9 +122,9 @@ Checks in the fact grammars, with grammar's code assertions
   such as "272 hours" of leave, "2026 Hours" after a date and "0600hrs",
   and four ads' holiday lines stay in their summaries. Reading facts
   costs 8% more, and chunking every ad 4% (37.7 s to 39.2 s), as each
-  assertion builds the whole match so far; grammar's roadmap 24 would
+  assertion builds the whole match so far; grammar 2026-0024 would
   win that back.
-  ([record](docs/changes/2026-11-02-checks-in-the-fact-grammars.md))
+  ([record](docs/changes/2026-0058-checks-in-the-fact-grammars.md))
 - Wash-up: Hours' check read a figure only in ASCII digits, though the
   grammar matches any of Unicode's, so "٢٧٢ hours" and "２７２ hours"
   passed as plausible. It now reads figures as facts does, with one
@@ -164,7 +172,7 @@ Italic headings, and chunking four times faster
   rules don't know, from the kinds of the known headings nearest it,
   embedded with `BAAI/bge-small-en-v1.5`: phrases to add to
   `headings.txt`, about four in five confident suggestions right, read
-  by eye. A first try at roadmap 40's offline use.
+  by eye. A first try at roadmap 2026-0040's offline use.
 - A heading set in italic is found as one set in bold is: blocks
   records `italic` for text all in `<em>` or `<i>` (4,723 blocks in the
   samples), and headings takes it as a cue. Since ads set notes,
@@ -173,8 +181,8 @@ Italic headings, and chunking four times faster
   read as text, and a bold label in an italic line is still the
   heading. Over the samples, headings of a known kind rise from 74,646
   uses to 74,777, still 81%; ads with every heading known go from
-  15,965 to 15,961, so 61%, not 62% (roadmap 26;
-  [record](docs/changes/2026-10-31-r26-italic-as-a-cue-like-bold.md)).
+  15,965 to 15,961, so 61%, not 62% (roadmap 2026-0026;
+  [record](docs/changes/2026-0026-italic-as-a-cue-like-bold.md)).
 - `chunk` and `shape` find every ad they're given in one reading of the
   run's ads, where they read it again for each: 500 ads take 3 s, not
   111 s. An ID that isn't there stops them before they write anything,
@@ -185,20 +193,21 @@ Italic headings, and chunking four times faster
   per ad, where the chunker read some two or three times. 2,000 ads
   chunk in 2.2 s, not 9.3 s, and every ad of the samples in 45 s, not
   128 s. Benchmarks of reading facts and of chunking, over the samples
-  where they're present, measure it (roadmap 43;
-  [record](docs/changes/2026-10-31-r43-read-facts-only-where-they-can-be.md)).
+  where they're present, measure it (roadmap 2026-0043;
+  [record](docs/changes/2026-0043-read-facts-only-where-they-can-be.md)).
 - grammar v0.4.2, whose `Trace` option prints a trace of a parse, rule
   by rule, so a grammar of the lab's that won't match can be watched
   rather than guessed at. Nothing in the lab uses it yet, and every
   stage's output is unchanged.
-- The roadmap gains ideas 40 and 41, ways to place the sections the
-  rules can't, by a model trained on those they can or by cheaper local
-  means, and 42, job-board codes and straplines read as headings, found
-  by roadmap 26. Next is now ordered by what's cheapest and widest:
-  italic as a cue first (26, shipped), then the retrieval tests of facts
-  as filters (34) and of boilerplate's verdict (33), then bold labels on
-  benefit lines (28) and boilerplate's thresholds scaled to the ads'
-  number (12), before more ads are added.
+- The roadmap gains ideas 2026-0040 and 2026-0041, ways to place the
+  sections the rules can't, by a model trained on those they can or by
+  cheaper local means, and 2026-0042, job-board codes and straplines
+  read as headings, found by roadmap 2026-0026. Next is now ordered by
+  what's cheapest and widest: italic as a cue first (2026-0026,
+  shipped), then the retrieval tests of facts as filters (2026-0034)
+  and of boilerplate's verdict (2026-0033), then bold labels on benefit
+  lines (2026-0028) and boilerplate's thresholds scaled to the ads'
+  number (2026-0012), before more ads are added.
 
 ## v0.6.0 (2026-10-30)
 
@@ -274,8 +283,8 @@ An ad in the shape its author gave it
   sentences one by one and the wall whole: a short sentence of an agency
   footer is boilerplate with the rest of it. Over the three samples,
   10,874 walls, 66 headings run in, and boilerplate 18.2% to 18.3% of
-  the text (roadmap 5;
-  [record](docs/changes/2026-10-30-r5-split-walls-of-text-into-sentences.md)).
+  the text (roadmap 2026-0005;
+  [record](docs/changes/2026-0005-split-walls-of-text-into-sentences.md)).
 - `shape` shows a job ad at each stage of the pipeline, from its HTML
   as stored to its blocks with their cues, the role headings gives each
   part, its sections and its chunks, so you can judge how it changes
@@ -283,7 +292,7 @@ An ad in the shape its author gave it
   `shape -stage blocks,headings 225682313` for some stages only. It
   runs the code as it stands. `chunk`'s ways of finding an ad, reading
   a run's boilerplate and writing chunks as text moved into packages for
-  both to use, its output unchanged (roadmap 5).
+  both to use, its output unchanged (roadmap 2026-0005).
 - Headings and fields an ad lays out by its newlines, rather than by
   its tags, are found. An ad with any tag that lays out blocks was read
   as a browser shows it, newlines as spaces, so "Key Responsibilities"
@@ -291,26 +300,26 @@ An ad in the shape its author gave it
   with one tagged footer was one paragraph, role, duties and all. Now a
   newline with text either side ends a line, unless it wraps a sentence:
   over the three samples, 2,480 more lines, and 42 more heading uses
-  found, all of a known kind (roadmap 24;
-  [record](docs/changes/2026-10-30-r24-keep-the-layout-an-ads-text-implies.md)).
+  found, all of a known kind (roadmap 2026-0024;
+  [record](docs/changes/2026-0024-keep-the-layout-an-ads-text-implies.md)).
 - A list item ends at a `<br>`, `<p>` or `<div>` after its text, and
   what follows in it is lines and paragraphs of their own, so the
   headings, fields and footers ads run into their last items are found:
   an employer's "Location:", "Hours:" and closing date, written in the
   last benefit, are details again. A list never closed no longer takes
   in the rest of the ad. Over the three samples, 86 more heading uses
-  found (roadmap 24).
+  found (roadmap 2026-0024).
 - Blocks records a blank line before a line or paragraph, as the cue
   `gap`: two `<br>`s with nothing between, or a blank line in text laid
   out by its newlines. Nothing decides anything from it yet; it's there
-  for the stages that will (roadmap 24).
+  for the stages that will (roadmap 2026-0024).
 - Tags left open are read as a browser reads them. A heading tag never
   closed ends at the next block, keeping its heading cue, rather than
   turning every later `<br>` into a space; bold opened in a paragraph
   ends with it, so a forgotten `</strong>` no longer makes the footer
   after it bold; and HTML's other block-level tags, such as `<aside>`
   and `<center>`, end blocks, rather than running their text into the
-  next with no space (roadmap 24).
+  next with no space (roadmap 2026-0024).
 - A 9 MB build of `chunk`, left at the root by a bare
   `go build ./cmd/chunk` and committed with everything else in v0.5.0,
   is gone. `.gitignore` claimed to hide such builds but didn't; it now
@@ -330,21 +339,21 @@ Text in its place: lists in order, unmapped text guessed, boilerplate right both
   to about 20%. Boilerplate is 18.2% of the text, from 17.5%.
   `openings.txt` knows many more job lines' openings, which 21's guess
   uses too
-  (roadmap 4; [record](docs/changes/2026-10-28-r4-make-boilerplates-verdict-right.md)).
+  (roadmap 2026-0004; [record](docs/changes/2026-0004-make-boilerplates-verdict-right.md)).
 - Text inside list items stays in the ad's order. Where an ad put
   paragraphs, headings or further lists inside a list item, up to the
   whole ad in one, some of it came out after the blocks that followed
   it, under the wrong heading: in 20 ads of the three samples, pay under
   "Why ...?" and left out as benefits, and requirements gone from their
   own heading. Now none
-  (roadmap 17; [record](docs/changes/2026-10-28-r17-a-list-items-own-blocks-in-order.md)).
+  (roadmap 2026-0017; [record](docs/changes/2026-0017-a-list-items-own-blocks-in-order.md)).
 - One set of grammars for facts and headings: `internal/grammars`,
   which `facts` reads values with and `headings` keeps facts out of
   headings with, in place of its regexes. Headings are unchanged on the
   three samples. Facts read with the regexes' care for word boundaries:
   times are no longer read from inside a figure ("45am-5pm" from
   "745am-5pm"), and "til" joins a range; 15 fewer of 103,015 facts
-  (roadmap 22; [record](docs/changes/2026-10-28-r22-one-set-of-grammars-for-facts-and-headings.md)).
+  (roadmap 2026-0022; [record](docs/changes/2026-0022-one-set-of-grammars-for-facts-and-headings.md)).
 - Text under headings of no known kind is placed by an educated guess
   rather than left out whole: by its lines' wording, as boilerplate,
   the advertiser's or after the apply text, as details for a label and
@@ -355,8 +364,8 @@ Text in its place: lists in order, unmapped text guessed, boilerplate right both
   guess is right for about four sections in five, short of the plan's
   nine in ten, and the unmapped text is 9.8% of the text, short of its
   9%: the record says why
-  (roadmap 21; [record](docs/changes/2026-10-28-r21-map-whats-left.md)).
-- A wash-up before the release found a regression from roadmap 21: a
+  (roadmap 2026-0021; [record](docs/changes/2026-0021-map-whats-left.md)).
+- A wash-up before the release found a regression from roadmap 2026-0021: a
   field's label naming a work pattern, "Hybrid Working" in bold, was
   taken for a line of facts and lost as a heading, so its text ran into
   the section before. It's a heading again (16 heading uses). It also
@@ -377,7 +386,7 @@ Match paths checked against the grammars
   `internal/wording` and `internal/sections`, so a misspelt capture
   fails `go test` rather than reading undef silently. The pipeline's
   output is unchanged
-  ([record](docs/changes/2026-10-27-check-match-paths-with-checkpath.md)).
+  ([record](docs/changes/2026-0057-check-match-paths-with-checkpath.md)).
 - `readme-pdf.sh` refuses the CHANGELOG and change records by their full
   path, so `changes/x.md` given from `docs/` no longer gets a PDF, as
   scalar's wash-up found in its copy of the script.
@@ -407,11 +416,11 @@ worked on, so a minor release.
   their size, what placed them, their fields and facts, and a bar of
   where the ad's tokens go; and an index, with why each ad is there.
   A dozen, showing where chunking does well and badly, are kept in the
-  private data store (roadmap 18, was 20). With them, roadmap 18, a
+  private data store (roadmap 2026-0018, was 20). With them, roadmap 2026-0018, a
   chunker for any ad, is done: by it, 57.5% of an ad's tokens are
   embedded, the rest facts, notices, the employer's pitch and text
-  still to map (roadmap 18;
-  [record](docs/changes/2026-10-27-r18-a-chunker-for-any-ad.md)).
+  still to map (roadmap 2026-0018;
+  [record](docs/changes/2026-0018-a-chunker-for-any-ad.md)).
 - The ad's title run into the rest of its line is split off, as a
   repeat: "General Foreman Responsibilities:" is the title, then the
   heading; "Electrician (Permanent)" and "Support Worker - Hull £12.93
@@ -421,7 +430,7 @@ worked on, so a minor release.
   the three samples, 4,947 titles are split off; distinct headings fall
   from 24,735 to 23,125; ads with every heading known rise from 54% to
   56%, and ads with an unmapped section fall from 46% to 44% (roadmap
-  18, was idea 15). Its wash-up found the title split off a title made
+  2026-0018, was idea 15). Its wash-up found the title split off a title made
   longer ("Head Chef Manager"), a sentence after a comma, and a label
   cleaning added; labels over lists ("You:") taken for subtitles; bold
   titles in brackets left whole where plain ones split; and, on the
@@ -458,7 +467,7 @@ worked on, so a minor release.
   responsibilities ("Conduct…", "Responsible for…") or benefits ("Free
   parking", "33 days holiday") go to a chunk of that kind, read by a
   grammar over `internal/wording/openings.txt`. On the three samples,
-  8,524 lines move, in 13% of ads (roadmap 18, was 19).
+  8,524 lines move, in 13% of ads (roadmap 2026-0018, was 19).
 - Facts read by grammar: pay, hours, work pattern, schedule and a UK
   postcode, each with its values, `internal/facts` having a grammar
   for each. `chunk` takes lines of facts out of the chunks that would
@@ -466,13 +475,13 @@ worked on, so a minor release.
   bonus" is pay of 50,000 a year), and reads the facts in details
   chunks' own lines. On the three samples, lines of facts come out of
   25% of ads. A known label and " - " is a field, as with a colon
-  (roadmap 7, with ideas 13 and 14;
-  [record](docs/changes/2026-10-27-r7-facts-from-the-details.md)).
+  (roadmap 2026-0007, with ideas 2026-0013 and 2026-0014;
+  [record](docs/changes/2026-0007-facts-from-the-details.md)).
 - A short plain line with a section's phrase, before a list, starts
   that section: sub-headings such as "Highly Desirable", "Essential
   Experience & Qualifications" and "Key Skills". On the three samples,
   4,111 more lines start sections, responsibilities are found in 60%
-  of ads, from 53%, and the summary falls to 17% of the text (roadmap 6, done in roadmap 18).
+  of ads, from 53%, and the summary falls to 17% of the text (roadmap 2026-0006, done in roadmap 2026-0018).
 - Role is a kind of section of its own: what the job is, under "About
   the role", "Job description" and the like, apart from the summary,
   the ad's opening and its introductions. On the three samples, role
@@ -485,7 +494,7 @@ worked on, so a minor release.
   other emoji, bullets and invisible characters go; quotes and dashes
   become ASCII, an em dash " -- ". On the three samples, 32,767 lines
   become list items and 554 more fields are read; `headings.Key` parts
-  words at a typographic dash, as at a hyphen (roadmap 18).
+  words at a typographic dash, as at a hyphen (roadmap 2026-0018).
 - `chunk` prints any ad's chunks, as an embedding job would take them:
   each section with its kind, whether to embed it, keep it as metadata
   or leave it out, about how many tokens it is, and what placed it,
@@ -495,8 +504,8 @@ worked on, so a minor release.
   each chunk's text a block of its lines. Boilerplate found in
   embedded chunks, and the text of unmapped sections, are gathered into
   a boilerplate chunk of their own, left out but in sight, each line
-  with where it was (roadmap 18;
-  [record](docs/changes/2026-10-27-r18-a-chunker-for-any-ad.md)).
+  with where it was (roadmap 2026-0018;
+  [record](docs/changes/2026-0018-a-chunker-for-any-ad.md)).
 - A first test of retrieval: `cmd/retrieval-set` builds it from a run,
   5,000 ads with the texts each representation embeds and 50 job
   titles as queries, and `python/bin/retrieval_eval.py` scores it with
@@ -505,8 +514,8 @@ worked on, so a minor release.
   fewer tokens; the summary alone 0.77, a vector for each section 0.78,
   and the sections that describe the job alone 0.61. Titles are a
   narrow test: it can't show whether boilerplate's verdict is right
-  (roadmap 10;
-  [record](docs/changes/2026-10-27-r10-a-first-retrieval-test.md)).
+  (roadmap 2026-0010;
+  [record](docs/changes/2026-0010-a-first-retrieval-test.md)).
 - Boilerplate is found when it isn't word for word the same: with the
   ad's own title or place written in, as placeholders, or, in texts of
   20 words or more, with a few words changed, by their runs of five
@@ -514,8 +523,8 @@ worked on, so a minor release.
   15.8%, and 10% of summaries, from 7%; short lines are matched only
   as written, as alike they're more often about the job. The view's
   ads keep their places: sixteen are always the first by the hash
-  (roadmap 3;
-  [record](docs/changes/2026-10-27-r3-find-near-duplicate-boilerplate.md)).
+  (roadmap 2026-0003;
+  [record](docs/changes/2026-0003-find-near-duplicate-boilerplate.md)).
 - `pipeline run` runs every stage once, on all the samples together,
   in place of each sample and `all`: a run's tables are in
   `data/runs/RUN/STAGE/`, with the samples it read in `samples.txt`. A
@@ -531,8 +540,8 @@ worked on, so a minor release.
   so a diff of two runs' views shows what a change did, ad by ad. It
   also checks every ad's text is in its sections, in the ad's order:
   none is lost, but 20 ads of the three samples have text out of order
-  (roadmap 16;
-  [record](docs/changes/2026-10-27-r16-a-readable-view-of-chunked-ads.md)).
+  (roadmap 2026-0016;
+  [record](docs/changes/2026-0016-a-readable-view-of-chunked-ads.md)).
 
 ## v0.4.0 (2026-10-27)
 
@@ -560,8 +569,8 @@ lab is worked on, so a minor release.
   across the three samples, each of which had started a section of its
   own, most of them unmapped. A bare range of hours, such as "8-5",
   counts as a time beside a range of days, M-F among them, and
-  "9-5pm" implies am (roadmap 2;
-  [record](docs/changes/2026-10-25-r2-stop-shift-times-passing-as-headings.md)).
+  "9-5pm" implies am (roadmap 2026-0002;
+  [record](docs/changes/2026-0002-stop-shift-times-passing-as-headings.md)).
 - Bold patterns of work are no longer headings either: a rota ("4 on 4
   off") or days or nights beside a range of days ("Monday - Friday
   (Days)"), unless it ends in a colon and heads what follows. Taken
@@ -608,22 +617,22 @@ change to how the lab is set up or worked on, so a patch release.
   "legal" alone is no longer a phrase, so a heading such as "The
   successful Legal Secretary will have:" isn't taken for a legal notice:
   a rule written `phrases => kind` leaves the kind's name out
-  (roadmap 1; [record](docs/changes/2026-10-25-r1-check-the-rules-on-a-second-sample.md)).
+  (roadmap 2026-0001; [record](docs/changes/2026-0001-check-the-rules-on-a-second-sample.md)).
 - grammar v0.3.2, with `Overlap` and `Outermost`, both suggested from
   the lab's use: phrases in a heading that overlap now all count, so
   "To succeed in this role, you will need:" is requirements rather than
   responsibilities (six headings, 22 uses), while one wholly inside a
   longer one still doesn't, so "Company Profile" stays company
-  ([record](docs/changes/2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md)).
+  ([record](docs/changes/2026-0056-try-overlap-and-take-up-grammar-v0.3.2.md)).
 - grammar v0.3.1, whose `MapOnly` option reads a rule written
   `phrases => kind` without making the kind a phrase, as the lab asked
   for legal's rule. `internal/sections` now uses it, in place of reading
   its rules twice; the pipeline's output is unchanged
-  ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md)).
+  ([record](docs/changes/2026-0055-take-up-grammar-v0.3.1-and-read-headings-with-maponly.md)).
 - grammar v0.3.0, which changes nothing in grammar itself but brings
   scalar from v0.5.9 to v0.6.0 (long numbers keep their digits, and `%`
   and `++` follow Perl further). The pipeline's output is unchanged
-  ([record](docs/changes/2026-10-26-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md)).
+  ([record](docs/changes/2026-0054-take-up-grammar-v0.3.0-and-scalar-v0.6.0.md)).
 - A wash-up before the release found only small things, none changing
   the pipeline's output: a test that never reached the code it named,
   a check made twice, and a stale comment and note.

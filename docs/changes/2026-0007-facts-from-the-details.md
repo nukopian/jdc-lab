@@ -1,8 +1,8 @@
-# Facts from the details, by grammar
+# 2026-0007. Facts from the details, by grammar
 
 **Status:** shipped in v0.5.0
 
-**Origin:** roadmap 7
+**Origin:** roadmap 2026-0007
 
 **Started:** 2026-10-27, in 4b2db1d612d6ac23271a366060c1752d39c0bb5f
 

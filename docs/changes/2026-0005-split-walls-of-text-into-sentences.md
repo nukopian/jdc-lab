@@ -1,8 +1,8 @@
-# Split walls of text into sentences
+# 2026-0005. Split walls of text into sentences
 
 **Status:** shipped in v0.6.0
 
-**Origin:** roadmap 5
+**Origin:** roadmap 2026-0005
 
 **Started:** 2026-10-30, in 051e5fee0a24f3d03609757e21679944f75a0ede
 

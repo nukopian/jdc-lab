@@ -1,8 +1,8 @@
-# Keep a list item's own blocks in the ad's order
+# 2026-0017. Keep a list item's own blocks in the ad's order
 
 **Status:** shipped in v0.5.2
 
-**Origin:** roadmap 17
+**Origin:** roadmap 2026-0017
 
 **Started:** 2026-10-28, in 7dbc459e5efbfa5891397f2b2510ee61bd316c67
 

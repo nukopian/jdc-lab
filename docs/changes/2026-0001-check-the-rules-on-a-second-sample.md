@@ -1,8 +1,8 @@
-# Check the rules on a second sample
+# 2026-0001. Check the rules on a second sample
 
 **Status:** shipped in v0.3.5
 
-**Origin:** roadmap 1
+**Origin:** roadmap 2026-0001
 
 **Started:** 2026-10-25, in dedfbc7b228ede0069cd12c0393301288fe88f0f
 
@@ -123,7 +123,7 @@ gap is out of PIPELINE.md, and its figures are updated.
 - **What's left:**
   - Text with no heading of its own, after the requirements, counts as
     template, as footers do
-    ([roadmap 4](2026-10-28-r4-make-boilerplates-verdict-right.md)),
+    ([roadmap 4](2026-0004-make-boilerplates-verdict-right.md)),
     though here it isn't at the end of the ad.
   - Phrases are found leftmost first, without overlapping (the longest
     where two start at the same word), so "To join
@@ -131,7 +131,7 @@ gap is out of PIPELINE.md, and its figures are updated.
     responsibilities: "in this role you will" takes the words that "you
     will need" would have matched. Since put right, with grammar
     v0.3.2's `Outermost`, suggested from here
-    ([record](2026-10-26-try-overlap-and-take-up-grammar-v0.3.2.md)).
+    ([record](2026-0056-try-overlap-and-take-up-grammar-v0.3.2.md)).
   - "What to expect from our recruitment process:" (apply) and "What to
     Expect from …:" (an agency's pitch) are responsibilities, one ad
     each.

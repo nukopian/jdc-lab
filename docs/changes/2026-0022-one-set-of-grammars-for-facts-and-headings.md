@@ -1,8 +1,8 @@
-# One set of grammars for facts and headings
+# 2026-0022. One set of grammars for facts and headings
 
 **Status:** shipped in v0.5.2
 
-**Origin:** roadmap 22
+**Origin:** roadmap 2026-0022
 
 **Started:** 2026-10-28, in f448b6ad38e655513232d97d79c2f9b7be076f5a
 

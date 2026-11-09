@@ -1,8 +1,8 @@
-# Boilerplate thresholds scaled to the ads' number
+# 2026-0012. Boilerplate thresholds scaled to the ads' number
 
 **Status:** dropped
 
-**Origin:** roadmap 12
+**Origin:** roadmap 2026-0012
 
 **Started:** 2026-11-03, in 383ddd5bd06cc12bf9063e8f04e8e7ed68d720ae
 

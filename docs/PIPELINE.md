@@ -103,7 +103,7 @@ go run ./cmd/pipeline run -serial claude/before
 Most of a run is boilerplate's and view's, as both judge every text of
 every ad, and every stage splits each ad into blocks first, so what
 they share pays several times over. On 2026-11-03 they were profiled
-and made faster ([record](changes/2026-11-03-a-faster-pipeline.md)):
+and made faster ([record](changes/2026-0059-a-faster-pipeline.md)):
 keys and cleaned text read ASCII from a table, long texts alike are
 compared as sorted runs of words, and grouped once, and whether a text
 is phrased as a job line is asked only of those repeated enough to be
@@ -115,9 +115,9 @@ run back to back, a run went from 52 s to 42 s with it, and
 heading-counts from 6.9 s to 4.3 s.
 
 Boilerplate and view then divided their ads into sections, and compared
-long texts to find those alike, on one processor; roadmap 45 spreads
+long texts to find those alike, on one processor; roadmap 2026-0045 spreads
 both across every processor
-([record](changes/2026-11-03-r45-boilerplate-and-view-on-several-processors.md)),
+([record](changes/2026-0045-boilerplate-and-view-on-several-processors.md)),
 while texts are still added to the index, and joined into groups, in
 order, so the groups keep their names. Run alone, boilerplate went from
 12.7 s to 7.1 s and view from 13.8 s to 8.3 s; a run took 12.1 s rather
@@ -126,7 +126,8 @@ at a time, every stage's output the same. With the stages at once, a
 run now keeps the machine's processors busy, about 60 s of their time
 in 12 s on four fast cores and four slower ones, so it's faster only
 for less work: dividing every ad into sections, done again by four of
-the five stages, is a large part of it (roadmap idea 46).
+the five stages, is a large part of it (roadmap idea
+2026-0046).
 
 Each stage's program can also be run alone, on one sample, into any
 folder:
@@ -570,7 +571,7 @@ are embedded: the summary, the company's, and those that describe the
 job; benefits, apply and legal are left out whatever their text. Of
 boilerplate's 11.2 million characters, 4.5 million are there. On
 2026-11-03 a sample of 450 texts was judged
-([record](changes/2026-11-03-r33-boilerplates-verdict-checked.md)):
+([record](changes/2026-0033-boilerplates-verdict-checked.md)):
 about a third of that text, 35% (±8), isn't boilerplate alone, and a
 quarter is about the job, about 2% of all the ads' text. What's taken
 is a large employer's own description of the role, repeated across its
@@ -632,7 +633,7 @@ Given many ads, `chunk` and `shape` find them all in one reading of the
 run's ads, so a few thousand cost little more than one: 500 ads spread
 through the samples took 111 s when each was looked for on its own, and
 take 3 s. Chunking every ad of the samples, all 28,000, takes about
-17 s, about 1,650 ads a second, since roadmap 43 read facts only in
+17 s, about 1,650 ads a second, since roadmap 2026-0043 read facts only in
 lines that can hold them, grammar v0.4.3 and v0.5.2 matched them
 faster, with fewer allocations (see [Facts](#facts)), and keys and
 cleaned text were made faster on 2026-11-03 (26 s before):
@@ -840,7 +841,7 @@ sections), on 2026-10-31:
 
 Chunking every ad of the samples went from 128 s to 45 s, then to 34 s
 with grammar v0.4.3, whose matcher keeps its results in slots rather
-than making a closure for each (grammar's roadmap 9, measured on these
+than making a closure for each (grammar 2026-0009, measured on these
 benchmarks before its release), and its output stayed the same, byte
 for byte. grammar v0.4.4 and scalar v0.6.2 moved neither benchmark,
 nor any chunk. Code assertions, measured on 2026-11-02, cost 8% on
@@ -852,13 +853,13 @@ reading facts and chunking are back to their cost before assertions,
 with 2–4% more allocations, and chunking every ad 2% quicker than with
 v0.5.0 (37.8–38.0 s against 38.6–38.8 s, three runs each, interleaved),
 its output the same, byte for byte. grammar v0.5.2's faster matcher
-(grammar's roadmap 25), with scalar v0.6.5 making a match's values in
+(grammar 2026-0025), with scalar v0.6.5 making a match's values in
 one allocation, more than halved both benchmarks, with 87% fewer
 allocations, and chunking every ad took 26.0–26.8 s against 37.2–37.9 s
 (three runs each, interleaved), its output the same, byte for byte, as
 every stage's was. grammar v0.5.5 works out the characters every match
 of a grammar needs, such as a digit for pay, and rejects a line with
-none of them before reading it (grammar's roadmap 23). Measured on
+none of them before reading it (grammar 2026-0023). Measured on
 2026-11-09 against v0.5.3, ten runs each, interleaved: reading facts
 6% quicker (497 ms to 466 ms), chunking 4% (647 ms to 620 ms), with
 8–12% fewer allocations, and every stage's output the same, byte for
@@ -906,7 +907,7 @@ python python/bin/retrieval_eval.py data/runs/latest/retrieval
 
 Embedding takes about 20 minutes on a Mac's GPU. What it showed, and what it
 can't, are in its
-[record](changes/2026-10-27-r10-a-first-retrieval-test.md): a job title is
+[record](changes/2026-0010-a-first-retrieval-test.md): a job title is
 a narrow query.
 
 **Facts as filters.** `cmd/retrieval-set` also writes, in its `facts`
@@ -930,7 +931,7 @@ python python/bin/retrieval_facts.py score data/runs/latest/retrieval/facts
 `rank` takes about 40 minutes on a Mac's GPU; `pool` writes
 `pool.jsonl`, the ads to judge into `judgements.jsonl`, and the
 judgements of 2026-11-03 are kept in the private data store. On
-2026-11-03 ([record](changes/2026-11-03-r34-metadata-as-filters-in-the-retrieval-test.md)),
+2026-11-03 ([record](changes/2026-0034-metadata-as-filters-in-the-retrieval-test.md)),
 filtering on the place gave precision at 10 of 0.657, against 0.313
 embedded, of a best possible 0.707; on a work pattern, 0.589 against
 0.394. Part time, temporary and hybrid are read right nearly always,
@@ -999,7 +1000,7 @@ the kind, its share of the votes and the three nearest to a file, in
 `unmapped.tsv`'s order. Read it for phrases to add: about four in five
 confident suggestions are right, but names of advertisers, slogans and
 codes get a kind too
-([roadmap 40](../ROADMAP.md#40-sections-the-rules-cant-place-classified-by-their-text)):
+([roadmap 2026-0040](../ROADMAP.md#2026-0040-sections-the-rules-cant-place-classified-by-their-text)):
 
 ```
 python python/bin/heading_suggest.py $r suggested.tsv
@@ -1132,8 +1133,8 @@ next change, run `claude/before` again.
 
 On the three samples together, measured on 2026-10-27 with
 `go run ./cmd/pipeline run latest`, and again on 2026-10-30, after
-roadmap 24 kept the ads' layout and roadmap 5 split walls into
-sentences, and on 2026-10-31, after roadmap 26 read italic as a cue,
+roadmap 2026-0024 kept the ads' layout and roadmap 2026-0005 split walls into
+sentences, and on 2026-10-31, after roadmap 2026-0026 read italic as a cue,
 where they moved a figure here:
 
 | Sample | Ads | Leans towards |
@@ -1144,7 +1145,7 @@ where they moved a figure here:
 | together | 28,000 | 25,954 distinct |
 
 The rules were tuned on the first sample, checked on the second
-([record](changes/2026-10-25-r1-check-the-rules-on-a-second-sample.md)),
+([record](changes/2026-0001-check-the-rules-on-a-second-sample.md)),
 and hold on the third: how the text divides into sections moved by two
 points at most from one sample to another, except for company.
 
@@ -1174,7 +1175,7 @@ of an ad probably needn't be embedded. That's a first answer to whether
 retrieval can improve while embedding less. Word for word matching
 alone found 15.8%: standard text with the ad's own title or place
 written in, or a few words changed, is most of the rest
-([record](changes/2026-10-27-r3-find-near-duplicate-boilerplate.md)).
+([record](changes/2026-0003-find-near-duplicate-boilerplate.md)).
 
 **Chunks.** Over the same ads, by the chunker (`chunk.Of`, boilerplate
 by the index), on 2026-10-27: 65.6% of an ad's tokens are embedded,
@@ -1196,7 +1197,7 @@ all three samples, about a point and a half each time they double. What
 more ads add is mostly boilerplate, found because more of each
 advertiser's ads are seen, so the thresholds aren't scaled to the
 number of ads
-([record](changes/2026-11-03-r12-boilerplate-thresholds-scaled-to-the-ads-number.md)):
+([record](changes/2026-0012-boilerplate-thresholds-scaled-to-the-ads-number.md)):
 boilerplate figures compare only on the same ads, as `pipeline compare`
 compares runs, and a batch added moves them.
 
@@ -1228,15 +1229,15 @@ and the figures in [What it measured](#what-it-measured) are updated.
 
 | Gap | Effect | Likely fix |
 |---|---|---|
-| [Inline lists](../ROADMAP.md#25-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
-| [Label emoji lost](../ROADMAP.md#27-keep-what-label-emoji-mean-wherever-they-are) | A label emoji is written as its label only where it opens a line, and some clock faces aren't mapped, so facts set between emoji lose their labels; a decorative one can get a label it shouldn't | Label an emoji wherever it opens a value, map every clock face, and check the value fits the label |
-| [Codes and straplines taken for headings](../ROADMAP.md#42-codes-and-straplines-arent-headings) | Job-board codes ("INDPSAL", "#LI-KC1") and straplines of terms between bars, set in bold, are headings, mostly of no known kind; a strapline with a kind's word in it ("Application Support \| SQL") starts that kind's section | Read a line of codes, or of three or more terms between bars, as text, or as facts |
-| [An employer's own account of the role taken as boilerplate](../ROADMAP.md#50-an-employers-own-account-of-the-role-isnt-boilerplate) | Text an employer repeats about the role across its ads, under titles in different groups, is taken as a footer or as found elsewhere, and left out of search | Keep text that names its ad's title, or reads as duties or requirements, as a template |
-| [Mixed paragraphs judged whole](../ROADMAP.md#51-boilerplate-judged-sentence-by-sentence-in-mixed-paragraphs) | A standard paragraph with the job's own terms in it is boilerplate whole, its job sentences with it | Judge repeated paragraphs sentence by sentence, as walls are |
-| [Facts lost in boilerplate](../ROADMAP.md#52-facts-of-this-job-read-in-boilerplate) | A sentence found as boilerplate in an embedded section gives no facts to the details, its job's with an agency's | Read its facts where it speaks of this job |
-| [The setting taken as boilerplate](../ROADMAP.md#53-the-setting-kept-from-the-companys-text) | An employer's account of what it provides, the kind of school, care or site, is left out of search from the company's section | Tell a setting from self-promotion |
-| [Remote misread](../ROADMAP.md#47-remote-read-only-where-the-job-is-worked-from-home) | "Remote" is read as a work pattern in negations, other senses and for part of the week, so filtering on it finds nothing | Read it only where the job is worked from home |
-| [Bold labels taken for headings](../ROADMAP.md#28-bold-labels-on-benefit-lines-arent-headings) | Lines of a benefits list that open with a bold label are read as headings of no known kind | Read a bold lead before " - ", amid lines like it, as a line of the list |
+| [Inline lists](../ROADMAP.md#2026-0025-split-inline-lists-into-items) | A list run along one line between bullet symbols is one line of text | Split it at the symbols, into items |
+| [Label emoji lost](../ROADMAP.md#2026-0027-keep-what-label-emoji-mean-wherever-they-are) | A label emoji is written as its label only where it opens a line, and some clock faces aren't mapped, so facts set between emoji lose their labels; a decorative one can get a label it shouldn't | Label an emoji wherever it opens a value, map every clock face, and check the value fits the label |
+| [Codes and straplines taken for headings](../ROADMAP.md#2026-0042-codes-and-straplines-arent-headings) | Job-board codes ("INDPSAL", "#LI-KC1") and straplines of terms between bars, set in bold, are headings, mostly of no known kind; a strapline with a kind's word in it ("Application Support \| SQL") starts that kind's section | Read a line of codes, or of three or more terms between bars, as text, or as facts |
+| [An employer's own account of the role taken as boilerplate](../ROADMAP.md#2026-0050-an-employers-own-account-of-the-role-isnt-boilerplate) | Text an employer repeats about the role across its ads, under titles in different groups, is taken as a footer or as found elsewhere, and left out of search | Keep text that names its ad's title, or reads as duties or requirements, as a template |
+| [Mixed paragraphs judged whole](../ROADMAP.md#2026-0051-boilerplate-judged-sentence-by-sentence-in-mixed-paragraphs) | A standard paragraph with the job's own terms in it is boilerplate whole, its job sentences with it | Judge repeated paragraphs sentence by sentence, as walls are |
+| [Facts lost in boilerplate](../ROADMAP.md#2026-0052-facts-of-this-job-read-in-boilerplate) | A sentence found as boilerplate in an embedded section gives no facts to the details, its job's with an agency's | Read its facts where it speaks of this job |
+| [The setting taken as boilerplate](../ROADMAP.md#2026-0053-the-setting-kept-from-the-companys-text) | An employer's account of what it provides, the kind of school, care or site, is left out of search from the company's section | Tell a setting from self-promotion |
+| [Remote misread](../ROADMAP.md#2026-0047-remote-read-only-where-the-job-is-worked-from-home) | "Remote" is read as a work pattern in negations, other senses and for part of the week, so filtering on it finds nothing | Read it only where the job is worked from home |
+| [Bold labels taken for headings](../ROADMAP.md#2026-0028-bold-labels-on-benefit-lines-arent-headings) | Lines of a benefits list that open with a bold label are read as headings of no known kind | Read a bold lead before " - ", amid lines like it, as a line of the list |
 
 ## Words used here
 

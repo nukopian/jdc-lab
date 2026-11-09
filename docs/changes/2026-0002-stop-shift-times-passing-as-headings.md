@@ -1,8 +1,8 @@
-# Stop shift times passing as headings
+# 2026-0002. Stop shift times passing as headings
 
 **Status:** shipped in v0.4.0
 
-**Origin:** roadmap 2
+**Origin:** roadmap 2026-0002
 
 **Started:** 2026-10-25, in dedfbc7b228ede0069cd12c0393301288fe88f0f
 

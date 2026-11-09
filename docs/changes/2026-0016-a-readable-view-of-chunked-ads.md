@@ -1,8 +1,8 @@
-# A readable view of chunked ads
+# 2026-0016. A readable view of chunked ads
 
 **Status:** shipped in v0.5.0
 
-**Origin:** roadmap 16
+**Origin:** roadmap 2026-0016
 
 **Started:** 2026-10-27, in 1a734be8cf0260f9cf8d8313972a0b5ca925cb63
 
@@ -83,4 +83,4 @@ on today's samples).
   and could change with a change to boilerplate, shuffling the view.
   Sixteen ads are now always the first by the hash, and all are
   written in its order (see that
-  [record](2026-10-27-r3-find-near-duplicate-boilerplate.md)).
+  [record](2026-0003-find-near-duplicate-boilerplate.md)).

@@ -1,8 +1,8 @@
-# Boilerplate and view on several processors
+# 2026-0045. Boilerplate and view on several processors
 
 **Status:** shipped in v0.7.1
 
-**Origin:** roadmap 45
+**Origin:** roadmap 2026-0045
 
 **Started:** 2026-11-03, in aefbb608ab19c465f823e04568aaf65e5eab4836
 
@@ -62,7 +62,7 @@ order.
    must show no change.
 
 **Done when** both stages are profiled first, as on 2026-11-03
-([record](2026-11-03-a-faster-pipeline.md)); the split is behind a
+([record](2026-0059-a-faster-pipeline.md)); the split is behind a
 switch, with a differential test that catches a planted bug;
 `pipeline compare` shows every stage's output the same; a run takes
 under 10 s, or the record says what stood in the way; and PIPELINE.md

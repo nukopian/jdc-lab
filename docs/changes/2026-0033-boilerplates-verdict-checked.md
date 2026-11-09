@@ -1,8 +1,8 @@
-# Boilerplate's verdict checked
+# 2026-0033. Boilerplate's verdict checked
 
 **Status:** shipped in v0.8.0
 
-**Origin:** roadmap 33, reshaped before work started
+**Origin:** roadmap 2026-0033, reshaped before work started
 
 **Started:** 2026-11-03, in 050edf7eccfccf6da8e51d7bc89cae20bab21661
 

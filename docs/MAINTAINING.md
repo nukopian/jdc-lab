@@ -66,20 +66,22 @@ print the table.
   so the roadmap stays a queue to pull from, not a list pushing work.
   Each item in Now has a plan written to be picked up cold, in its
   change record, and an item leaves when it ships, in the commit that
-  adds it to the CHANGELOG, whose line ends "(roadmap 7)" and links to
-  the record. Every item has a number, the next one when it's added (the
-  roadmap's opening says which), kept as it moves between groups and
-  never used again; a heading such as `### 7. Title` holds it, as a
-  Markdown numbered list would renumber itself. An idea is that heading,
-  the date it was added, and a line or two; ideas need no Serves line
-  until promoted, and are added in a `docs:` commit whenever one comes
+  adds it to the CHANGELOG, whose line ends "(roadmap 2026-0007)" and
+  links to the record. Every item has an id, its year and a serial, such
+  as 2026-0007, given when it's added (the roadmap's opening gives the
+  last one), kept as it moves between groups and never used again; a
+  heading such as `### 2026-0007. Title` holds it, as a Markdown
+  numbered list would renumber itself. An item that can't be done before
+  another says so in a **Depends on:** line. An idea is that heading,
+  the date it was added, its size, and a line or two; ideas need no
+  Serves line until promoted, and are added in a `docs:` commit whenever one comes
   up. Each of the pipeline's [Known gaps](PIPELINE.md#known-gaps) links
   to its item.
 - [docs/changes/](changes/README.md) holds a record of each planned
   change: the plan as it was written, and what happened, with changes
   from the plan, measurements, and what was tried and reverted. A
   record is opened when work starts on a roadmap item or a `TODO.md`
-  task with steps, named for that day and the change, and finished in
+  task with steps, named for its id and the change, and finished in
   the commit that ships or drops it; its README has the rules and the
   template.
 - `TODO.md`, when there is one, lists tasks for the next session: the
@@ -420,9 +422,9 @@ release from `develop` in these steps. Claude asks before tagging.
    it stands against the work since the last tag, as it's what visitors
    to `main` read first, and ROADMAP.md: what shipped is out of it, and
    Now is what's really being worked on. Prune the Ideas: list them by
-   number, and the maintainer keeps, promotes or drops each. A promoted
-   idea keeps its number and gains a Serves line; a dropped one is
-   deleted, and the commit message names its number. A wash-up is also
+   id, and the maintainer keeps, promotes or drops each. A promoted
+   idea keeps its id and gains a Serves line; a dropped one is
+   deleted, and the commit message names its id. A wash-up is also
    worth doing whenever a run of work comes to a natural close.
 
 1. **Check `develop`:** CI is green on its last commit, there's no

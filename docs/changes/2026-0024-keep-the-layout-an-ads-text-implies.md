@@ -1,8 +1,8 @@
-# Keep the layout an ad's text implies
+# 2026-0024. Keep the layout an ad's text implies
 
 **Status:** shipped in v0.6.0
 
-**Origin:** roadmap 24
+**Origin:** roadmap 2026-0024
 
 **Started:** 2026-10-30, in 727275d1ac905c0199fcb5726802ab51ae5afb0a
 
@@ -167,7 +167,7 @@ re-measured on what's left.
   more bold lead (`pipeline compare claude/step4 claude/after`).
 - **What's left.** Bold labels on benefit lines set in one item, now
   lines, are read as headings of no known kind (6 in the samples):
-  [idea 28](../../ROADMAP.md#28-bold-labels-on-benefit-lines-arent-headings).
+  [idea 28](../../ROADMAP.md#2026-0028-bold-labels-on-benefit-lines-arent-headings).
   The wall paragraphs left are
-  [roadmap 5](2026-10-30-r5-split-walls-of-text-into-sentences.md)'s.
+  [roadmap 5](2026-0005-split-walls-of-text-into-sentences.md)'s.
   Inline lists and italic stay ideas 25 and 26. Nothing reads `gap` yet.

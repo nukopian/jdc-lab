@@ -1,8 +1,8 @@
-# Italic as a cue, like bold
+# 2026-0026. Italic as a cue, like bold
 
 **Status:** shipped in v0.6.1
 
-**Origin:** roadmap 26
+**Origin:** roadmap 2026-0026
 
 **Started:** 2026-10-31, in 8167591a685e4cb58368d727f16f52b0169b0ccc
 
@@ -102,6 +102,6 @@ else moved; and PIPELINE.md says so, its Known gaps row gone.
 - **What's left:** codes and straplines are headings in bold too, about
   450 and 400 ads in the samples, and a strapline with a kind's word in
   it starts that kind's section: idea
-  [42](../../ROADMAP.md#42-codes-and-straplines-arent-headings), with a
+  [42](../../ROADMAP.md#2026-0042-codes-and-straplines-arent-headings), with a
   row in PIPELINE.md's Known gaps. An italic lead, as a bold lead is
   read, isn't recorded; nothing in the compare asked for one.

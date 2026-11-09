@@ -1,8 +1,8 @@
-# A faster pipeline
+# 2026-0059. A faster pipeline
 
 **Status:** shipped in v0.7.0
 
-**Origin:** a session looking for what grammar's roadmap 25 (a faster
+**Origin:** a session looking for what grammar 2026-0025 (a faster
 matcher) and scalar's values in one allocation teach about the lab's own
 Go code
 
