@@ -84,6 +84,9 @@ models/
 # or a link to a private data store, so no trailing slash
 /data
 
+# Local files
+local/
+
 # macOS
 .DS_Store
 jdc-lab.code-workspace
