@@ -28,7 +28,7 @@ unless (caller) {
         Groups        => groups(),
         Units         => units(),
     );
-    dump_to->($x{Groups});
+    dump_to->(\%x);
 }
 
 
@@ -45,14 +45,13 @@ sub level_as_string ($l) {
 
 
 sub all_abbreviations () {
-    state $data = abbreviations() | keep_all;
+    my $data = abbreviations() | keep_all;
     return $data;
 }
 
 
 sub abbreviations (@stages) {
-    return pipeline(\&_as_abbreviation, @stages)
-        ->iterator(tsv($ABBREVIATIONS_TSV));
+    return pipeline(\&_as_abbreviation, @stages)->iterator(tsv($ABBREVIATIONS_TSV));
 }
 
 
@@ -66,7 +65,7 @@ sub _as_abbreviation {
 
 
 sub all_entries () {
-    state $data = entries() | keep_all;
+    my $data = entries() | keep_all;
     return $data;
 }
 
@@ -99,7 +98,7 @@ sub _as_entry {
 
 
 sub all_frameworks () {
-    state $data = frameworks() | keep_all;
+    my $data = frameworks() | keep_all;
     return $data;
 }
 
@@ -122,7 +121,7 @@ sub _as_framework {
 
 
 sub all_isco () {
-    state $data = isco() | keep_all;
+    my $data = isco() | keep_all;
     return $data;
 }
 
@@ -145,11 +144,9 @@ sub _as_isco {
 # as units' takes [$scheme, $code, $title] rows, since the groups come
 # from two sources.
 sub groups () {
-    state $groups = pipeline(
-        groups_index_sink()
-    )->iterator(from_array(
-            (map { [SOC2020 => $_] } @{ all_frameworks() }),
-            (map { [ISCO08  => $_] } @{ all_isco() }),
+    my $groups = pipeline(groups_index_sink())->iterator(from_array(
+        (map { [SOC2020 => $_] } @{ all_frameworks() }),
+        (map { [ISCO08  => $_] } @{ all_isco() }),
     ))->();
     return $groups;
 }
@@ -172,9 +169,7 @@ sub groups_index_sink () {
 
 
 sub units () {
-    state $units = pipeline(
-        units_index_sink()
-    )->iterator(tsv($UNITS_TSV))->();
+    my $units = pipeline(units_index_sink())->iterator(tsv($UNITS_TSV))->();
     return $units;
 }
 
