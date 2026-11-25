@@ -2,8 +2,6 @@ use v5.36;
 
 package UKSOC;
 
-use Ekorn::Pipeline::Operators;
-
 use Ekorn::Pipeline::Tooling qw(:all);
 use Path::Tiny               qw(path);
 
@@ -45,7 +43,7 @@ sub level_as_string ($l) {
 
 
 sub all_abbreviations () {
-    my $data = abbreviations() | keep_all;
+    state $data = abbreviations()->all;
     return $data;
 }
 
@@ -65,7 +63,7 @@ sub _as_abbreviation {
 
 
 sub all_entries () {
-    my $data = entries() | keep_all;
+    state $data = entries()->all;
     return $data;
 }
 
@@ -98,7 +96,7 @@ sub _as_entry {
 
 
 sub all_frameworks () {
-    my $data = frameworks() | keep_all;
+    state $data = frameworks()->all;
     return $data;
 }
 
@@ -121,7 +119,7 @@ sub _as_framework {
 
 
 sub all_isco () {
-    my $data = isco() | keep_all;
+    state $data = isco()->all;
     return $data;
 }
 
@@ -144,11 +142,11 @@ sub _as_isco {
 # as units' takes [$scheme, $code, $title] rows, since the groups come
 # from two sources.
 sub groups () {
-    my $groups = pipeline(groups_index_sink())->iterator(from_array(
+    state $data = pipeline(groups_index_sink())->iterator(from_array(
         (map { [SOC2020 => $_] } @{ all_frameworks() }),
         (map { [ISCO08  => $_] } @{ all_isco() }),
     ))->();
-    return $groups;
+    return $data;
 }
 
 
@@ -169,8 +167,8 @@ sub groups_index_sink () {
 
 
 sub units () {
-    my $units = pipeline(units_index_sink())->iterator(tsv($UNITS_TSV))->();
-    return $units;
+    state $data = pipeline(units_index_sink())->iterator(tsv($UNITS_TSV))->();
+    return $data;
 }
 
 
